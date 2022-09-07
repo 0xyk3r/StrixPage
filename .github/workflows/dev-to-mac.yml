@@ -1,0 +1,30 @@
+name: Deploy to Nginx
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.2
+      - name: Npm Install
+        run: npm install
+      - name: Npm Run Build
+        run: npm run build
+      - name: Stop Old Docker
+        run: docker stop $(docker images  |  grep "strixweb"  | awk '{print $3}') 2> /dev/null || true
+      - name: Remove Old Docker
+        run: docker rm $(docker images  |  grep "strixweb"  | awk '{print $3}') 2> /dev/null || true
+      - name: Docker Build
+        run: docker build -f ./Dockerfile -t strixweb .
+      - name: Docker Run
+        run: docker run -d --name strixweb -p 9889:9889 strixweb
+      - name: Clean Old Docker Build
+        run: docker image prune -a -f
