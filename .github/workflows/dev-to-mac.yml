@@ -13,7 +13,9 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.2
+        uses: actions/checkout@v3.0.2
+        with: 
+          clean: false
       - name: Npm Install
         run: npm install
       - name: Npm Run Build
@@ -28,5 +30,3 @@ jobs:
         run: docker cp dist nginx:/mnt/strixweb
       - name: Execute CMD
         run: docker exec -i nginx bash -c "nginx -s reload"
-      - name: Clean Old Docker Build
-        run: docker image prune -a -f
