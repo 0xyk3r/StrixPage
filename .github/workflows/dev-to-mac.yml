@@ -25,6 +25,6 @@ jobs:
       - name: Docker Build
         run: docker build -f ./Dockerfile -t strixweb .
       - name: Docker Run
-        run: docker run -d --name strixweb -p 9889:9889 strixweb
+        run: docker run -d --name strixweb -p 13232:13232 strixweb
       - name: Clean Old Docker Build
         run: docker image prune -a -f
