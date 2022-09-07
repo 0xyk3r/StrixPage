@@ -1,0 +1,26 @@
+/**
+n-table 数据载入动画
+ */
+.loop(@n) when (@n <=100) {
+    .n-data-table-tbody {
+        .n-data-table-tr:nth-child(@{n}) {
+            opacity: 0;
+            animation: animation-table-tr 360ms @n * 30ms forwards ease-out;
+        }
+    }
+    .loop((@n + 1));
+}
+
+.loop(0);
+
+@keyframes animation-table-tr {
+    0% {
+        transform: translateX(-30px);
+        opacity: .1;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

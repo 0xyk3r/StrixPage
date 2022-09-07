@@ -1,0 +1,47 @@
+diff --git a/node_modules/jsencrypt/lib/lib/jsbn/rsa.js b/node_modules/jsencrypt/lib/lib/jsbn/rsa.js
+index b47d793..dc03980 100644
+--- a/node_modules/jsencrypt/lib/lib/jsbn/rsa.js
++++ b/node_modules/jsencrypt/lib/lib/jsbn/rsa.js
+@@ -170,14 +170,14 @@ var RSAKey = /** @class */ (function () {
+         var qs = B >> 1;
+         this.e = parseInt(E, 16);
+         var ee = new BigInteger(E, 16);
+-        for (;;) {
+-            for (;;) {
++        for (; ;) {
++            for (; ;) {
+                 this.p = new BigInteger(B - qs, 1, rng);
+                 if (this.p.subtract(BigInteger.ONE).gcd(ee).compareTo(BigInteger.ONE) == 0 && this.p.isProbablePrime(10)) {
+                     break;
+                 }
+             }
+-            for (;;) {
++            for (; ;) {
+                 this.q = new BigInteger(qs, 1, rng);
+                 if (this.q.subtract(BigInteger.ONE).gcd(ee).compareTo(BigInteger.ONE) == 0 && this.q.isProbablePrime(10)) {
+                     break;
+@@ -206,7 +206,9 @@ var RSAKey = /** @class */ (function () {
+     // "ctext" is an even-length hex string and the output is a plain string.
+     RSAKey.prototype.decrypt = function (ctext) {
+         var c = parseBigInt(ctext, 16);
+-        var m = this.doPrivate(c);
++        // 这里doPrivate修改为doPublic
++        // var m = this.doPrivate(c);
++        var m = this.doPublic(c);
+         if (m == null) {
+             return null;
+         }
+@@ -312,9 +314,10 @@ function pkcs1unpad2(d, n) {
+     while (i < b.length && b[i] == 0) {
+         ++i;
+     }
+-    if (b.length - i != n - 1 || b[i] != 2) {
+-        return null;
+-    }
++    // 这里将如下三行代码注释
++    // if (b.length - i != n - 1 || b[i] != 2) {
++    // return null;
++    // }
+     ++i;
+     while (b[i] != 0) {
+         if (++i >= b.length) {

@@ -1,0 +1,27 @@
+.app-main-height {
+    user-select: text;
+}
+
+.strix-zoom-in-top-enter-active,
+.strix-zoom-in-top-leave-active {
+    filter: none;
+    transition: filter .4s ease, transform .4s ease;
+}
+
+.strix-zoom-in-top-enter-from,
+.strix-zoom-in-top-leave-from {
+    filter: blur(20px);
+}
+
+.strix-zoom-in-top-leave-active {
+    display: none;
+}
+
+.strix-model-primary {
+    width: 65vw;
+    max-width: 800px;
+}
+
+.strix-form-modal-footer {
+    justify-content: flex-end !important;
+}
