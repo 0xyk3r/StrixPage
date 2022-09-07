@@ -18,13 +18,15 @@ jobs:
         run: npm install
       - name: Npm Run Build
         run: npm run build
-      - name: Stop Old Docker
-        run: docker stop $(docker images  |  grep "strixweb"  | awk '{print $3}') 2> /dev/null || true
-      - name: Remove Old Docker
-        run: docker rm $(docker images  |  grep "strixweb"  | awk '{print $3}') 2> /dev/null || true
-      - name: Docker Build
-        run: docker build -f ./Dockerfile -t strixweb .
-      - name: Docker Run
-        run: docker run -d --name strixweb -p 13232:13232 strixweb
+      - name: Start Nginx
+        run: docker restart nginx
+      - name: Upload Nginx Server Config
+        run: docker cp nginx-strix.conf nginx:/etc/nginx/conf.d/default.conf
+      - name: Delete Old Dist Files
+        run: docker exec -i nginx bash -c "rm -rf /mnt/strixweb"
+      - name: Copy Dist Files
+        run: docker cp dist nginx:/mnt/strixweb
+      - name: Execute CMD
+        run: docker exec -i nginx bash -c "nginx -s reload"
       - name: Clean Old Docker Build
         run: docker image prune -a -f
