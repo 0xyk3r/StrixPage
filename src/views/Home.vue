@@ -82,8 +82,7 @@ import useCurrentInstance from '@/utils/strix-instance-tool'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
-import { Contrast, Expand } from '@vicons/ionicons5'
-import Refresh from '@vicons/tabler/Refresh'
+import { Contrast, Expand, Refresh, CubeOutline } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { NIcon, useDialog, useLoadingBar } from 'naive-ui'
 import ScreenFull from 'screenfull'
@@ -231,18 +230,8 @@ watch(() => $router.currentRoute.value.path,
 // 对系统菜单api的响应结果进行二次处理
 const handleMenuIconField = (list) => {
   for (const child of list) {
-    // icon处理
-    if (child.icon) {
-      if (!child.iconName) {
-        // 在这里将icon组件根据name缓存，解决被反复渲染导致闪烁的问题 不使用render-icon方法原因也是如此
-        child.iconName = child.icon
-        child.iconCom = defineAsyncComponent(() => import(`../../node_modules/@vicons/ionicons5/es/${child.iconName}.js`))
-      }
-      child.icon = () => {
-        return h(NIcon, null, { default: () => h(child.iconCom) })
-      }
-    } else {
-      child.icon = null
+    child.icon = () => {
+      return h(NIcon, null, { default: () => h(CubeOutline) })
     }
     if (child.children.length > 0) {
       handleMenuIconField(child.children)
