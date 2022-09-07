@@ -86,7 +86,7 @@ import { Contrast, Expand, Refresh, CubeOutline } from '@vicons/ionicons5'
 import _ from 'lodash'
 import { NIcon, useDialog, useLoadingBar } from 'naive-ui'
 import ScreenFull from 'screenfull'
-import { computed, defineAsyncComponent, h, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, h, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 
 const { proxy } = useCurrentInstance()
