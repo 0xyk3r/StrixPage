@@ -83,7 +83,8 @@ const dataColumns = [
   {
     key: 'nickname',
     title: '用户昵称',
-    width: 160
+    width: 160,
+    fixed: 'left'
   }, {
     key: 'phoneNumber',
     title: '手机号码',

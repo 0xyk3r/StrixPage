@@ -118,7 +118,8 @@ const dataColumns = [
   {
     key: 'name',
     title: '地区名称',
-    width: 200
+    width: 200,
+    fixed: 'left'
   }, {
     key: 'fullName',
     title: '完整地区名称',
