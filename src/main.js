@@ -9,10 +9,10 @@ import router from './router'
 import './assets/style/base.css'
 import './assets/style/common.css'
 import './assets/style/common.less'
-// Naive UI
+// Naive UI 以及 Lato 字体
 import 'vfonts/Lato.css'
 import naive from 'naive-ui'
-// 引入网络请求框架axios
+// 网络框架
 import installAxios from './plugins/axios'
 // 缓存工具
 import installStrixLocalCache from './utils/strix-local-cache'

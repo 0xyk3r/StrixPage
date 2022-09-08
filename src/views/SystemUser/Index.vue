@@ -7,8 +7,8 @@
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
-        <n-grid x-gap="20" :cols="6" style="margin-bottom: 15px">
-          <n-gi :span="2">
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
+          <n-gi span="6 m:2 l:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（昵称、手机号码）" clearable />
               <n-button type="primary" ghost @click="getDataList">
@@ -19,8 +19,8 @@
         </n-grid>
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
-        <n-grid :cols="24" :x-gap="24">
-          <n-form-item-gi :span="6" label="用户状态" path="status">
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+          <n-form-item-gi span="6 m:2 l:2" label="用户状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="userStatusOptions" placeholder="请选择用户状态" />
           </n-form-item-gi>
         </n-grid>
@@ -60,8 +60,8 @@
 import StrixBlock from '@/components/StrixBlock.vue'
 import { h, onMounted, reactive, ref } from 'vue'
 import { createStrixNotify } from '@/utils/strix-notify'
-import { NButton, NIcon, NTag, NDataTable, NPopconfirm } from 'naive-ui'
-import { CreateOutline, TrashOutline } from '@vicons/ionicons5'
+import { NButton, NTag, NDataTable, NPopconfirm } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import useCurrentInstance from '@/utils/strix-instance-tool'
 import _ from 'lodash'
 
@@ -83,15 +83,18 @@ const dataColumns = [
   {
     key: 'nickname',
     title: '用户昵称',
-    width: 240
+    width: 240,
+    minWidth: 100
   }, {
     key: 'phoneNumber',
     title: '手机号码',
-    width: 450
+    width: 450,
+    minWidth: 120
   }, {
     key: 'status',
     title: '用户状态',
     width: 100,
+    minWidth: 80,
     render(row) {
       let tagType = 'default'
       switch (row.status) {
@@ -112,6 +115,7 @@ const dataColumns = [
   }, {
     title: '操作',
     width: 200,
+    minWidth: 140,
     render(row) {
       return [
         h(NButton,
@@ -121,7 +125,7 @@ const dataColumns = [
             style: 'margin-right: 10px',
             onClick: () => showEditDataModal(row.id)
           },
-          () => h(NIcon, {}, () => h(CreateOutline, { slot: 'icon' }, {}))
+          () => h(Icon, { icon: 'ion:create-outline' })
         ),
         h(NPopconfirm,
           {
@@ -133,7 +137,7 @@ const dataColumns = [
               type: 'error',
               style: 'margin-right: 10px'
             },
-            () => h(NIcon, {}, () => h(TrashOutline, { slot: 'icon' }, {}))
+            () => h(Icon, { icon: 'ion:trash-outline' })
           ),
           default: () => '是否确认删除这条数据? 该操作不可恢复!'
         }

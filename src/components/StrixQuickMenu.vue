@@ -7,7 +7,7 @@
           <n-tooltip class="item" trigger="hover" :delay="300" placement="left" style="max-width: 220px">
             <template #trigger>
               <a @click="item.callback">
-                <n-icon :component="item.icon" :size="18" />
+                <Icon :icon="item.icon" :width="18" />
                 <p>{{ item.name }}</p>
               </a>
             </template>
@@ -22,9 +22,13 @@
 <script>
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { defineComponent, computed, watch, ref } from 'vue'
+import { Icon } from '@iconify/vue'
 
 export default defineComponent({
   name: 'StrixQuickMenu',
+  components: {
+    Icon
+  },
   setup() {
     const quickMenuStore = useQuickMenuStore()
     const quickMenus = computed(() => quickMenuStore.quickMenus)

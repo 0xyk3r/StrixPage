@@ -8,9 +8,7 @@
     </n-tabs>
 
     <n-dropdown trigger="hover" placement="bottom-start" :options="contextmenuList" @select="handleContextmenuSelect">
-      <n-icon class="tabs-common-handler" size="20">
-        <grid />
-      </n-icon>
+      <Icon icon="ion:grid" class="tabs-common-handler" :witdh="20" />
     </n-dropdown>
 
     <teleport to=".n-config-provider">
@@ -26,12 +24,12 @@ import { defineComponent, computed, onMounted, ref, watch, getCurrentInstance, n
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useRoute, useRouter } from 'vue-router'
-import Grid from '@vicons/ionicons5/Grid'
+import { Icon } from '@iconify/vue'
 
 export default defineComponent({
   name: 'StrixTabsBar',
   components: {
-    Grid
+    Icon
   },
   setup() {
     const { proxy } = getCurrentInstance()
@@ -261,7 +259,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-
 ::v-deep(.tabs-content) {
   .n-tabs-wrapper {
     .n-tabs-tab-wrapper {

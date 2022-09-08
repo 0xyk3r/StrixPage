@@ -5,6 +5,7 @@ import JSEncrypt from 'jsencrypt'
 import _ from 'lodash'
 import qs from 'qs'
 import { v4 as uuidv4 } from 'uuid'
+
 // HTTP请求根路径
 axios.defaults.baseURL = '/api/'
 
@@ -62,7 +63,7 @@ function dec(response) {
 
 axios.interceptors.request.use(async config => {
   config.headers['Content-Type'] = 'application/json'
-  const token = window.localStorage.getItem('token')
+  const token = window.localStorage.getItem('strix_login_token')
   if (token) {
     config.headers.token = token
   }
@@ -114,9 +115,11 @@ axios.interceptors.response.use(async response => {
   if (response.data) {
     response.data = dec(response.data)
     if (response.data.code === 401) {
-      // 登录失效
-      window.localStorage.clear()
-      location.reload()
+      // 登录失效 清除登录信息并刷新
+      window.localStorage.removeItem('strix_login_token')
+      window.localStorage.removeItem('strix_login_token_expire')
+      window.localStorage.removeItem('strix_login_info')
+      location.href = '/login?to=' + location.pathname
     }
     // 填充默认错误信息
     if (response.data.code !== 200 && !response.data.msg) {

@@ -7,8 +7,8 @@
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
-        <n-grid x-gap="20" :cols="6" style="margin-bottom: 15px">
-          <n-gi :span="2">
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
+          <n-gi span="6 m:2 l:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（名称）" clearable />
               <n-button type="primary" ghost @click="getDataList">
@@ -96,8 +96,8 @@
 import StrixBlock from '@/components/StrixBlock.vue'
 import { h, onMounted, reactive, ref } from 'vue'
 import { createStrixNotify } from '@/utils/strix-notify'
-import { NButton, NIcon, NTag, NDataTable, NPopconfirm } from 'naive-ui'
-import { Add, CreateOutline, TrashOutline } from '@vicons/ionicons5'
+import { NButton, NTag, NDataTable, NPopconfirm } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import useCurrentInstance from '@/utils/strix-instance-tool'
 import _ from 'lodash'
 
@@ -177,7 +177,7 @@ const dataColumns = [
             style: 'margin-right: 10px',
             onClick: () => showAddDataModal(row.id)
           },
-          () => h(NIcon, {}, () => h(Add, { slot: 'icon' }, {}))
+          () => h(Icon, { icon: 'ion:add' })
         ),
         h(NButton,
           {
@@ -186,7 +186,7 @@ const dataColumns = [
             style: 'margin-right: 10px',
             onClick: () => showEditDataModal(row.id)
           },
-          () => h(NIcon, {}, () => h(CreateOutline, { slot: 'icon' }, {}))
+          () => h(Icon, { icon: 'ion:create-outline' })
         ),
         h(NPopconfirm,
           {
@@ -198,7 +198,7 @@ const dataColumns = [
               type: 'error',
               style: 'margin-right: 10px'
             },
-            () => h(NIcon, {}, () => h(TrashOutline, { slot: 'icon' }, {}))
+            () => h(Icon, { icon: 'ion:trash-outline' })
           ),
           default: () => '是否确认删除这条数据? 该操作不可恢复!'
         }

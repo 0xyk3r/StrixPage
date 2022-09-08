@@ -25,15 +25,9 @@
           <n-gi :span="12">
             <div class="home-header-top-right">
               <n-space v-if="!isSmallWindow">
-                <n-icon size="18">
-                  <contrast @click="changeTheme" />
-                </n-icon>
-                <n-icon size="18">
-                  <expand @click="switchFullscreen" />
-                </n-icon>
-                <n-icon size="18" @click="reloadAll">
-                  <refresh />
-                </n-icon>
+                <Icon icon="ion:contrast" :width="18" @click="changeTheme" />
+                <Icon icon="ion:expand" :width="18" @click="switchFullscreen" />
+                <Icon icon="ion:refresh" :width="18" @click="reloadAll" />
               </n-space>
               <n-dropdown trigger="hover" placement="bottom-start" :options="avatarDropdownOptions"
                 @select="handleAvatarDropdownSelect">
@@ -82,9 +76,9 @@ import useCurrentInstance from '@/utils/strix-instance-tool'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
-import { Contrast, Expand, Refresh, CubeOutline } from '@vicons/ionicons5'
-import _ from 'lodash'
-import { NIcon, useDialog, useLoadingBar } from 'naive-ui'
+import { Icon } from '@iconify/vue'
+import { kebabCase, throttle } from 'lodash'
+import { useDialog, useLoadingBar } from 'naive-ui'
 import ScreenFull from 'screenfull'
 import { computed, h, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
@@ -121,28 +115,30 @@ const cachedRoutes = computed(() => {
 const loginManagerInfo = ref(null)
 // 获取本地存储中的用户信息
 onMounted(() => {
-  const cacheManagerInfo = window.localStorage.getItem('login_info')
+  const cacheManagerInfo = window.localStorage.getItem('strix_login_info')
   loginManagerInfo.value = JSON.parse(cacheManagerInfo || '')
 })
 
 // 登出
 const logout = () => {
-  window.localStorage.clear()
+  window.localStorage.removeItem('strix_login_token')
+  window.localStorage.removeItem('strix_login_token_expire')
+  window.localStorage.removeItem('strix_login_info')
   $router.push('/login')
 }
 // Token续期
 const renewToken = (force) => {
   const nowDateStr = dateToString(new Date())
-  const expireMinute = getDiff(nowDateStr, window.localStorage.getItem('token_expire'), 'minute')
+  const expireMinute = getDiff(nowDateStr, window.localStorage.getItem('strix_login_token_expire'), 'minute')
   // 当剩余有效期小于3天则续期
   if (expireMinute < 4320 || force) {
     proxy.$http.post('system/renewToken').then(({ data: res }) => {
       if (res.code !== 200) {
         createStrixNotify('error', 'Token续期失败', (res.msg ? res.msg : '未知错误'))
       } else {
-        window.localStorage.setItem('token', res.data.token)
-        window.localStorage.setItem('token_expire', res.data.tokenExpire)
-        window.localStorage.setItem('login_info', JSON.stringify(res.data.info))
+        window.localStorage.setItem('strix_login_token', res.data.token)
+        window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
+        window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
         loginManagerInfo.value = res.data.info
       }
     }).catch(() => {
@@ -230,8 +226,16 @@ watch(() => $router.currentRoute.value.path,
 // 对系统菜单api的响应结果进行二次处理
 const handleMenuIconField = (list) => {
   for (const child of list) {
-    child.icon = () => {
-      return h(NIcon, null, { default: () => h(CubeOutline) })
+    if (child.icon) {
+      if (!child.iconName) {
+        // 在这里将icon组件根据name缓存，解决被反复渲染
+        child.iconName = child.icon
+      }
+      child.icon = () => {
+        return h(Icon, { icon: 'ion:' + kebabCase(child.iconName) })
+      }
+    } else {
+      child.icon = null
     }
     if (child.children.length > 0) {
       handleMenuIconField(child.children)
@@ -288,7 +292,7 @@ const checkMinimumScreenLimit = () => {
   }
 }
 onMounted(() => handleWindowSizeChange())
-const handleWindowSizeChange = _.throttle(function () {
+const handleWindowSizeChange = throttle(function () {
   const clientWidth = document.documentElement.clientWidth
   globalSettingsStore.setIsSmallWindow(clientWidth < 768)
   if (clientWidth < 768) {
@@ -358,7 +362,7 @@ export default {
           margin-top: 8px;
         }
 
-        .n-space .n-icon:hover {
+        .n-space .iconify:hover {
           color: #63e2b7;
         }
 

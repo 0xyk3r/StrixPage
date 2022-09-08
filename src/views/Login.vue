@@ -97,12 +97,12 @@ const login = () => {
           createStrixNotify('error', '登录失败', (res.msg ? res.msg : '未知错误'))
         } else {
           const loginManagerType = res.data.info.managerType
-          window.localStorage.setItem('token', res.data.token)
-          window.localStorage.setItem('token_expire', res.data.tokenExpire)
-          window.localStorage.setItem('login_info', JSON.stringify(res.data.info))
+          window.localStorage.setItem('strix_login_token', res.data.token)
+          window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
+          window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
           tabBarStore.delAllVisitedRoutes()
           createStrixNotify('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
-          $router.push(loggedJumpPath)
+          $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
         }
       }).catch((e) => {
         console.log(e)

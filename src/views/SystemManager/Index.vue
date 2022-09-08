@@ -7,8 +7,8 @@
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
-        <n-grid x-gap="20" :cols="6" style="margin-bottom: 15px">
-          <n-gi :span="2">
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
+          <n-gi span="6 m:2 l:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（昵称、账号）" clearable />
               <n-button type="primary" ghost @click="getDataList">
@@ -24,12 +24,12 @@
         </n-grid>
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
-        <n-grid :cols="24" :x-gap="24">
-          <n-form-item-gi :span="6" label="管理人员状态" path="managerStatus">
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+          <n-form-item-gi span="6 m:2 l:2" label="管理人员状态" path="managerStatus">
             <n-select v-model:value="getDataListParams.managerStatus" :options="managerStatusList"
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
-          <n-form-item-gi :span="6" label="管理人员类型" path="managerType">
+          <n-form-item-gi span="6 m:2 l:2" label="管理人员类型" path="managerType">
             <n-select v-model:value="getDataListParams.managerType" :options="managerTypeList"
               placeholder="请选择管理人员类型" />
           </n-form-item-gi>
@@ -117,10 +117,10 @@ import { useQuickMenuStore } from '@/stores/quick-menu'
 import useCurrentInstance from '@/utils/strix-instance-tool'
 import { createStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
-import { CreateOutline, Refresh, TrashOutline } from '@vicons/ionicons5'
+import { Icon } from '@iconify/vue'
 import _ from 'lodash'
-import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NIcon, NPopconfirm, NSpace, NSpin, NTag } from 'naive-ui'
-import { h, markRaw, nextTick, onActivated, onDeactivated, onMounted, reactive, ref } from 'vue'
+import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NPopconfirm, NSpace, NSpin, NTag } from 'naive-ui'
+import { h, nextTick, onActivated, onDeactivated, onMounted, reactive, ref } from 'vue'
 
 const { proxy } = useCurrentInstance()
 const quickMenuStore = useQuickMenuStore()
@@ -131,7 +131,7 @@ const funName = '系统人员'
 onActivated(() => {
   quickMenuStore.addQuickMenu({
     id: 'RefreshSystemManagersRole',
-    icon: markRaw(Refresh),
+    icon: 'ion:refresh',
     color: 'primary',
     name: '刷新角色',
     tips: '强制刷新所有系统人员的角色列表',
@@ -286,7 +286,7 @@ const dataColumns = [
             style: 'margin-right: 10px',
             onClick: () => showEditDataModal(row.id)
           },
-          () => h(NIcon, {}, () => h(CreateOutline, { slot: 'icon' }, {}))
+          () => h(Icon, { icon: 'ion:create-outline' })
         ),
         h(NPopconfirm,
           {
@@ -298,7 +298,7 @@ const dataColumns = [
               type: 'error',
               style: 'margin-right: 10px'
             },
-            () => h(NIcon, {}, () => h(TrashOutline, { slot: 'icon' }, {}))
+            () => h(Icon, { icon: 'ion:trash-outline' })
           ),
           default: () => '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -653,4 +653,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 </style>

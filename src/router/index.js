@@ -4,7 +4,6 @@ import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 const Login = () => import('@/views/Login.vue')
 const Home = () => import('@/views/Home.vue')
 const Welcome = () => import('@/views/Welcome.vue')
-// const Welcome2 = () => import('@/views/Welcome2.vue')
 const EmptyLayout = () => import('@/components/EmptyLayout.vue')
 
 const SystemManagerIndex = () => import('@/views/SystemManager/Index.vue')
@@ -114,19 +113,12 @@ const router = createRouter({
 
 // 前置路由导航守卫
 router.beforeEach((to, form, next) => {
-  controlStrixLoadingBar('start')
-  // to 将要访问的路径
-  // form 从哪个路径跳转而来
   // next() 放行    next('/login') 强制跳转
-  if (to.path === '/login') {
-    return next()
-  }
-  const tokenStr = window.localStorage.getItem('token')
-  if (!tokenStr) {
-    return next('/login?to=' + to.fullPath)
-  } else {
-    return next()
-  }
+  controlStrixLoadingBar('start')
+  if (to.path === '/login') { return next() }
+  const loginToken = window.localStorage.getItem('strix_login_token')
+  if (!loginToken) { return next('/login?to=' + to.fullPath) }
+  return next()
 })
 // 后置路由导航守卫
 router.afterEach(() => {
