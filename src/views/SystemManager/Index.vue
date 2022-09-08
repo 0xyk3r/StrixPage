@@ -203,8 +203,7 @@ const dataColumns = [
   }, {
     key: 'nickname',
     title: '昵称',
-    width: 120,
-    fixed: 'left'
+    width: 120
   }, {
     key: 'loginName',
     title: '登录名',
