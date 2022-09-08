@@ -30,7 +30,7 @@
     </strix-block>
     <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataData"
       :pagination="dataPagination" :row-key="dataRowKey" :cascade="false" :allow-checking-not-loaded="true"
-      v-model:expanded-row-keys="dataExpandedRowKeys" @load="onDataChildrenLoad" />
+      table-layout="fixed" v-model:expanded-row-keys="dataExpandedRowKeys" @load="onDataChildrenLoad" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
       size="huge">
@@ -403,4 +403,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 </style>
