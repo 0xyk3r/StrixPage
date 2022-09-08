@@ -118,11 +118,11 @@ const dataColumns = [
   {
     key: 'name',
     title: '地区名称',
-    width: 240
+    width: 200
   }, {
     key: 'fullName',
     title: '完整地区名称',
-    width: 400
+    width: 320
   }, {
     key: 'level',
     title: '地区层级',
@@ -164,7 +164,8 @@ const dataColumns = [
     }
   }, {
     key: 'remarks',
-    title: '备注信息'
+    title: '备注信息',
+    width: 200
   }, {
     title: '操作',
     width: 200,

@@ -253,6 +253,7 @@ const dataColumns = [
   }, {
     key: 'regionId',
     title: '地区权限',
+    width: 140,
     render(row) {
       let tagType = 'default'
       let tagText = ''

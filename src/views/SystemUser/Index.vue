@@ -83,18 +83,15 @@ const dataColumns = [
   {
     key: 'nickname',
     title: '用户昵称',
-    width: 240,
-    minWidth: 100
+    width: 160
   }, {
     key: 'phoneNumber',
     title: '手机号码',
-    width: 450,
-    minWidth: 120
+    width: 220
   }, {
     key: 'status',
     title: '用户状态',
-    width: 100,
-    minWidth: 80,
+    width: 120,
     render(row) {
       let tagType = 'default'
       switch (row.status) {
@@ -115,7 +112,6 @@ const dataColumns = [
   }, {
     title: '操作',
     width: 200,
-    minWidth: 140,
     render(row) {
       return [
         h(NButton,
