@@ -204,15 +204,18 @@ const dataColumns = [
     key: 'nickname',
     title: '昵称',
     width: 120,
+    minWidth: 120,
     fixed: 'left'
   }, {
     key: 'loginName',
     title: '登录名',
-    width: 120
+    width: 120,
+    minWidth: 120
   }, {
     key: 'managerStatus',
     title: '账户状态',
     width: 100,
+    minWidth: 100,
     render(row) {
       let tagType = 'default'
       switch (row.managerStatus) {
@@ -234,6 +237,7 @@ const dataColumns = [
     key: 'managerType',
     title: '账户类型',
     width: 100,
+    minWidth: 100,
     render(row) {
       let tagType = 'default'
       switch (row.managerType) {
@@ -255,6 +259,7 @@ const dataColumns = [
     key: 'regionId',
     title: '地区权限',
     width: 140,
+    minWidth: 140,
     render(row) {
       let tagType = 'default'
       let tagText = ''
@@ -275,10 +280,12 @@ const dataColumns = [
   }, {
     key: 'createTime',
     title: '创建时间',
-    width: 160
+    width: 160,
+    minWidth: 160
   }, {
     title: '操作',
     width: 160,
+    minWidth: 160,
     render(row) {
       return [
         h(NButton,
