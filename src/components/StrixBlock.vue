@@ -53,8 +53,8 @@ const fixedControl = ref(false)
 let scrollParent = null
 
 const expandedIcon = computed(() => isExpanded.value ?
-  h(Icon, { icon: 'ion:caret-down', inline: true }) :
-  h(Icon, { icon: 'ion:caret-up', inline: true })
+  h(Icon, { icon: 'ion:caret-up', inline: true }) :
+  h(Icon, { icon: 'ion:caret-down', inline: true })
 )
 const codeArea = computed(() => proxy.$el.getElementsByClassName('meta')[0])
 
