@@ -27,7 +27,7 @@
       </n-form>
     </strix-block>
     <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataData"
-      :pagination="dataPagination" :row-key="dataRowKey" table-layout="fixed" />
+      :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
       size="huge">
