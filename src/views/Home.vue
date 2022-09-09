@@ -294,8 +294,8 @@ const checkMinimumScreenLimit = () => {
 onMounted(() => handleWindowSizeChange())
 const handleWindowSizeChange = throttle(function () {
   const clientWidth = document.documentElement.clientWidth
-  globalSettingsStore.setIsSmallWindow(clientWidth < 768)
-  if (clientWidth < 768) {
+  globalSettingsStore.setIsSmallWindow(clientWidth < 640)
+  if (globalSettingsStore.isSmallWindow) {
     siderCollapsed.value = true
     if (!ignoreCheckMinimumScreenLimitWarn.value) {
       ignoreCheckMinimumScreenLimitWarn.value = true

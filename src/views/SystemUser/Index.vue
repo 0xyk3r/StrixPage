@@ -8,7 +8,7 @@
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
-          <n-gi span="6 m:2 l:2">
+          <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（昵称、手机号码）" clearable />
               <n-button type="primary" ghost @click="getDataList">
@@ -20,7 +20,7 @@
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 m:2 l:2" label="用户状态" path="status">
+          <n-form-item-gi span="6 s:3 m:2" label="用户状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="userStatusOptions" placeholder="请选择用户状态" />
           </n-form-item-gi>
         </n-grid>

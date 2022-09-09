@@ -8,7 +8,7 @@
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
-          <n-gi span="6 m:2 l:2">
+          <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（昵称、账号）" clearable />
               <n-button type="primary" ghost @click="getDataList">
@@ -25,11 +25,11 @@
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 m:2 l:2" label="管理人员状态" path="managerStatus">
+          <n-form-item-gi span="6 s:3 m:2" label="管理人员状态" path="managerStatus">
             <n-select v-model:value="getDataListParams.managerStatus" :options="managerStatusList"
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
-          <n-form-item-gi span="6 m:2 l:2" label="管理人员类型" path="managerType">
+          <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="managerType">
             <n-select v-model:value="getDataListParams.managerType" :options="managerTypeList"
               placeholder="请选择管理人员类型" />
           </n-form-item-gi>

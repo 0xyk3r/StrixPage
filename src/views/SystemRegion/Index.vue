@@ -8,7 +8,7 @@
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
-          <n-gi span="6 m:2 l:2">
+          <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索条件（名称）" clearable />
               <n-button type="primary" ghost @click="getDataList">
