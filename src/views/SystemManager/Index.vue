@@ -38,7 +38,7 @@
     </strix-block>
 
     <n-data-table :loading="dataLoading" :columns="dataColumns" :data="dataData" :pagination="dataPagination"
-      :row-key="dataRowKey" :expanded-row-keys="dataExpandedRowKeys" table-layout="fixed"
+      :row-key="dataRowKey" :expanded-row-keys="dataExpandedRowKeys"
       @updateExpandedRowKeys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
