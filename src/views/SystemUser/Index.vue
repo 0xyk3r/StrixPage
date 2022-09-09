@@ -30,19 +30,21 @@
       :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
-      <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
-        label-width="auto" require-mark-placement="right-hanging">
-        <n-form-item label="用户昵称" path="nickname">
-          <n-input v-model:value="editDataForm.nickname" placeholder="请输入用户昵称" />
-        </n-form-item>
-        <n-form-item label="手机号码" path="phoneNumber">
-          <n-input v-model:value="editDataForm.phoneNumber" placeholder="请输入手机号码" />
-        </n-form-item>
-        <n-form-item label="用户状态" path="status">
-          <n-select v-model:value="editDataForm.status" :options="userStatusOptions" placeholder="请选择用户状态" />
-        </n-form-item>
-      </n-form>
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      <n-spin :show="editDataFormLoading">
+        <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
+          label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label="用户昵称" path="nickname">
+            <n-input v-model:value="editDataForm.nickname" placeholder="请输入用户昵称" />
+          </n-form-item>
+          <n-form-item label="手机号码" path="phoneNumber">
+            <n-input v-model:value="editDataForm.phoneNumber" placeholder="请输入手机号码" />
+          </n-form-item>
+          <n-form-item label="用户状态" path="status">
+            <n-select v-model:value="editDataForm.status" :options="userStatusOptions" placeholder="请选择用户状态" />
+          </n-form-item>
+        </n-form>
+      </n-spin>
 
       <template #footer>
         <n-space class="strix-form-modal-footer">
@@ -203,6 +205,7 @@ const userStatusOptions = [
 
 const initDataForm = () => {
   editDataModalShow.value = false
+  editDataFormLoading.value = false
   editDataId = ''
   editDataForm.value = {
     nickname: '',
@@ -212,6 +215,7 @@ const initDataForm = () => {
 }
 
 const editDataModalShow = ref(false)
+const editDataFormLoading = ref(false)
 let editDataId = ''
 const editDataForm = ref({
   nickname: '',
@@ -225,6 +229,8 @@ const editDataRules = {
   }]
 }
 const showEditDataModal = (id) => {
+  editDataModalShow.value = true
+  editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/user/${id}`).then(({ data: res }) => {
     if (res.code !== 200) {
@@ -236,8 +242,8 @@ const showEditDataModal = (id) => {
     })
     editDataId = id
     editDataForm.value = _.pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
   })
-  editDataModalShow.value = true
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {

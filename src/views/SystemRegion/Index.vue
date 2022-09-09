@@ -33,7 +33,7 @@
       v-model:expanded-row-keys="dataExpandedRowKeys" @load="onDataChildrenLoad" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="地区名称" path="name">
@@ -62,23 +62,25 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
-      <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
-        label-width="auto" require-mark-placement="right-hanging">
-        <n-form-item label="地区名称" path="name">
-          <n-input v-model:value="editDataForm.name" placeholder="请输入地区名称" />
-        </n-form-item>
-        <n-form-item label="父级地区" path="parentId">
-          <n-tree-select v-model:value="editDataForm.parentId" :options="systemRegionCascaderOptions"
-            placeholder="选择父级地区" cascade clearable filterable check-strategy="all" key-field="value" />
-        </n-form-item>
-        <n-form-item label="备注信息" path="remarks">
-          <n-input v-model:value="editDataForm.remarks" placeholder="在此输入备注信息" type="textarea" :autosize="{
-            minRows: 3,
-            maxRows: 5
-          }" />
-        </n-form-item>
-      </n-form>
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      <n-spin :show="editDataFormLoading">
+        <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
+          label-width="auto" require-mark-placement="right-hanging">
+          <n-form-item label="地区名称" path="name">
+            <n-input v-model:value="editDataForm.name" placeholder="请输入地区名称" />
+          </n-form-item>
+          <n-form-item label="父级地区" path="parentId">
+            <n-tree-select v-model:value="editDataForm.parentId" :options="systemRegionCascaderOptions"
+              placeholder="选择父级地区" cascade clearable filterable check-strategy="all" key-field="value" />
+          </n-form-item>
+          <n-form-item label="备注信息" path="remarks">
+            <n-input v-model:value="editDataForm.remarks" placeholder="在此输入备注信息" type="textarea" :autosize="{
+              minRows: 3,
+              maxRows: 5
+            }" />
+          </n-form-item>
+        </n-form>
+      </n-spin>
 
       <template #footer>
         <n-space class="strix-form-modal-footer">
@@ -296,6 +298,7 @@ const getSystemRegionSelectList = () => {
 const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
+  editDataFormLoading.value = false
   addDataForm.value = {
     name: '',
     parentId: '',
@@ -346,6 +349,7 @@ const addData = () => {
 }
 
 const editDataModalShow = ref(false)
+const editDataFormLoading = ref(false)
 let editDataId = ''
 const editDataForm = ref({
   name: '',
@@ -359,6 +363,8 @@ const editDataRules = {
   }]
 }
 const showEditDataModal = (id) => {
+  editDataModalShow.value = true
+  editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
   proxy.$http.get(`system/region/${id}`).then(({ data: res }) => {
@@ -371,8 +377,8 @@ const showEditDataModal = (id) => {
     })
     editDataId = id
     editDataForm.value = _.pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
   })
-  editDataModalShow.value = true
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
