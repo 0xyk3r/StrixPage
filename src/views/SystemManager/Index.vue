@@ -42,7 +42,7 @@
       @updateExpandedRowKeys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
-      size="huge">
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="管理人员昵称" path="nickname">
@@ -76,7 +76,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      size="huge">
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
       <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
         label-width="auto" require-mark-placement="right-hanging">
         <n-form-item label="管理人员昵称" path="nickname">
@@ -127,6 +127,12 @@ const quickMenuStore = useQuickMenuStore()
 
 // 本页面操作提示关键词
 const funName = '系统人员'
+
+defineProps({
+  isSmallWindow: {
+    type: Boolean, default: false
+  }
+})
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({

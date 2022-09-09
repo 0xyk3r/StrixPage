@@ -50,7 +50,7 @@
           <router-view v-slot="{ Component }" @refresh-menu="getMenuList">
             <transition name="strix-zoom-in-top">
               <keep-alive :include="cachedRoutes">
-                <component :is="Component" />
+                <component :is="Component" :isSmallWindow="isSmallWindow" />
               </keep-alive>
             </transition>
           </router-view>
@@ -77,16 +77,16 @@ import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
-import { kebabCase, throttle } from 'lodash'
-import { useDialog, useLoadingBar } from 'naive-ui'
+import { kebabCase } from 'lodash'
+import { useLoadingBar } from 'naive-ui'
 import ScreenFull from 'screenfull'
-import { computed, h, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, h, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
+import elementResizeDetectorMaker from 'element-resize-detector'
 
 const { proxy } = useCurrentInstance()
 const $router = useRouter()
 
-const dialog = useDialog()
 initStrixLoadingBar(useLoadingBar())
 initStrixNotify()
 
@@ -276,37 +276,22 @@ const handleAvatarDropdownSelect = (key) => {
   }
 }
 
-// 检查可视区域是否过小
-const ignoreCheckMinimumScreenLimitWarn = ref(false)
-const checkMinimumScreenLimit = () => {
-  if (!globalSettingsStore.ignoreScreenSizeWarning) {
-    dialog.warning({
-      title: '提示',
-      content: '您的浏览器窗口过小，可能无法获得正常的使用体验',
-      positiveText: '不再提示',
-      negativeText: '哦',
-      onPositiveClick: () => {
-        globalSettingsStore.setIgnoreScreenSizeWarning(true)
-      }
-    })
-  }
-}
-onMounted(() => handleWindowSizeChange())
-const handleWindowSizeChange = throttle(function () {
-  const clientWidth = document.documentElement.clientWidth
-  globalSettingsStore.setIsSmallWindow(clientWidth < 640)
-  if (globalSettingsStore.isSmallWindow) {
+const windowWidth = ref(0)
+watch(windowWidth, (value) => {
+  globalSettingsStore.setIsSmallWindow(value < 640)
+  if (value < 640) {
     siderCollapsed.value = true
-    if (!ignoreCheckMinimumScreenLimitWarn.value) {
-      ignoreCheckMinimumScreenLimitWarn.value = true
-      checkMinimumScreenLimit()
-    }
   }
-}, 100)
+})
+let erd = null
 onMounted(() => {
-  window.onresize = () => {
-    handleWindowSizeChange()
-  }
+  erd = elementResizeDetectorMaker({ strategy: "scroll" })
+  erd.listenTo(document.getElementById("app"), (element) => {
+    windowWidth.value = element.offsetWidth
+  })
+})
+onBeforeUnmount(() => {
+  erd.uninstall(document.getElementById("app"))
 })
 
 const theme = proxy.$Theme

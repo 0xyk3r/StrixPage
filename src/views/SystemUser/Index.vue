@@ -30,7 +30,7 @@
       :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      size="huge">
+      :class="isSmallWindow ? 'strix-full-modal':''" size="huge">
       <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
         label-width="auto" require-mark-placement="right-hanging">
         <n-form-item label="用户昵称" path="nickname">
@@ -69,6 +69,12 @@ const { proxy } = useCurrentInstance()
 
 // 本页面操作提示关键词
 const funName = '系统用户'
+
+defineProps({
+  isSmallWindow: {
+    type: Boolean, default: false
+  }
+})
 
 // 获取列表请求参数
 const getDataListParams = ref({
