@@ -21,8 +21,7 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true,
-        ecma: 2015
+        drop_console: true
       }
     }
   }

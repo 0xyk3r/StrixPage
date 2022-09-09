@@ -28,7 +28,7 @@
   </n-el>
 </template>
 <script setup>
-import { defineProps, h, useSlots, ref, computed, watch, onBeforeUnmount, onMounted } from 'vue'
+import { h, useSlots, ref, computed, watch, onBeforeUnmount, onMounted } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useGlobalSettingsStore } from '@/stores/global-settings'
 import useCurrentInstance from '@/utils/strix-instance-tool'
