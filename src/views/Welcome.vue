@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>Welcome</h3>
+    <h2>Welcome to use Strix.</h2>
   </div>
 </template>
 
