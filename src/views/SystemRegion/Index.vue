@@ -37,7 +37,7 @@
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="地区名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入地区名称" />
+          <n-input v-model:value="addDataForm.name" placeholder="请输入地区名称" clearable />
         </n-form-item>
         <n-form-item label="父级地区" path="parentId">
           <n-tree-select v-model:value="addDataForm.parentId" :options="systemRegionCascaderOptions"
@@ -67,7 +67,7 @@
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
           <n-form-item label="地区名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入地区名称" />
+            <n-input v-model:value="editDataForm.name" placeholder="请输入地区名称" clearable />
           </n-form-item>
           <n-form-item label="父级地区" path="parentId">
             <n-tree-select v-model:value="editDataForm.parentId" :options="systemRegionCascaderOptions"

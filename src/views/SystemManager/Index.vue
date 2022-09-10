@@ -46,19 +46,21 @@
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="管理人员昵称" path="nickname">
-          <n-input v-model:value="addDataForm.nickname" placeholder="请输入管理人员昵称" />
+          <n-input v-model:value="addDataForm.nickname" placeholder="请输入管理人员昵称" clearable />
         </n-form-item>
         <n-form-item label="登录账号" path="loginName">
-          <n-input v-model:value="addDataForm.loginName" placeholder="请输入登录账号" />
+          <n-input v-model:value="addDataForm.loginName" placeholder="请输入登录账号" clearable />
         </n-form-item>
         <n-form-item label="登录密码" path="loginPassword">
-          <n-input v-model:value="addDataForm.loginPassword" placeholder="请输入登录密码" />
+          <n-input v-model:value="addDataForm.loginPassword" placeholder="请输入登录密码" clearable />
         </n-form-item>
         <n-form-item label="管理人员状态" path="managerStatus">
-          <n-select v-model:value="addDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态" />
+          <n-select v-model:value="addDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态"
+            clearable />
         </n-form-item>
         <n-form-item label="管理人员类型" path="managerType">
-          <n-select v-model:value="addDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型" />
+          <n-select v-model:value="addDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型"
+            clearable />
         </n-form-item>
         <n-form-item v-if="addDataForm.managerType == 2" label="平台地区权限" path="regionId">
           <n-tree-select v-model:value="addDataForm.regionId" :options="systemRegionCascaderOptions"
@@ -81,19 +83,21 @@
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
           <n-form-item label="管理人员昵称" path="nickname">
-            <n-input v-model:value="editDataForm.nickname" placeholder="请输入管理人员昵称" />
+            <n-input v-model:value="editDataForm.nickname" placeholder="请输入管理人员昵称" clearable />
           </n-form-item>
           <n-form-item label="登录账号" path="loginName">
-            <n-input v-model:value="editDataForm.loginName" placeholder="请输入登录账号" />
+            <n-input v-model:value="editDataForm.loginName" placeholder="请输入登录账号" clearable />
           </n-form-item>
           <n-form-item label="登录密码" path="loginPassword">
-            <n-input v-model:value="editDataForm.loginPassword" placeholder="请输入登录密码" />
+            <n-input v-model:value="editDataForm.loginPassword" placeholder="请输入登录密码" clearable />
           </n-form-item>
           <n-form-item label="管理人员状态" path="managerStatus">
-            <n-select v-model:value="editDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态" />
+            <n-select v-model:value="editDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态"
+              clearable />
           </n-form-item>
           <n-form-item label="管理人员类型" path="managerType">
-            <n-select v-model:value="editDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型" />
+            <n-select v-model:value="editDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型"
+              clearable />
           </n-form-item>
           <n-form-item v-if="editDataForm.managerType == 2" label="平台地区权限" path="regionId">
             <n-tree-select v-model:value="editDataForm.regionId" :options="systemRegionCascaderOptions"
@@ -344,12 +348,12 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  // 清除展开行
   proxy.$http.get('system/manager', { params: getDataListParams.value }).then(({ data: res }) => {
     if (res.code !== 200) {
       return createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
     }
     dataLoading.value = false
+    // 清除展开行
     dataExpandedRowKeys.value = []
     dataData.value = res.data.systemManagerList
     dataPagination.itemCount = res.data.total
@@ -369,7 +373,7 @@ const dataExpandedRowKeysChange = (value) => {
         if (res.code !== 200) {
           return createStrixNotify('error', '获取角色的详细信息失败', res.msg)
         }
-        row.roleIdArray = res.data.roleIds.split(',')
+        row.roleIdArray = res.data.roleIds?.split(',')
       })
     }
   })
@@ -425,7 +429,7 @@ const changeSystemManagerRoles = (systemManagerId, roles) => {
       return createStrixNotify('error', `更变${funName}角色失败`, res.msg)
     } else {
       createStrixNotify('success', '提示信息', `更变${funName}角色成功`)
-      row.roleIdArray = res.data.roleIds.split(',')
+      row.roleIdArray = res.data.roleIds?.split(',')
     }
   })
 }

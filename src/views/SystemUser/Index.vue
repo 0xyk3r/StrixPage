@@ -21,7 +21,7 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="用户状态" path="status">
-            <n-select v-model:value="getDataListParams.status" :options="userStatusOptions" placeholder="请选择用户状态" />
+            <n-select v-model:value="getDataListParams.status" :options="userStatusOptions" placeholder="请选择用户状态" clearable />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -35,13 +35,13 @@
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
           <n-form-item label="用户昵称" path="nickname">
-            <n-input v-model:value="editDataForm.nickname" placeholder="请输入用户昵称" />
+            <n-input v-model:value="editDataForm.nickname" placeholder="请输入用户昵称" clearable />
           </n-form-item>
           <n-form-item label="手机号码" path="phoneNumber">
-            <n-input v-model:value="editDataForm.phoneNumber" placeholder="请输入手机号码" />
+            <n-input v-model:value="editDataForm.phoneNumber" placeholder="请输入手机号码" clearable />
           </n-form-item>
           <n-form-item label="用户状态" path="status">
-            <n-select v-model:value="editDataForm.status" :options="userStatusOptions" placeholder="请选择用户状态" />
+            <n-select v-model:value="editDataForm.status" :options="userStatusOptions" placeholder="请选择用户状态" clearable />
           </n-form-item>
         </n-form>
       </n-spin>

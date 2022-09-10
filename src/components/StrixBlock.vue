@@ -4,12 +4,12 @@
     <div class="source">
       <slot name="show"></slot>
     </div>
-    <div ref="meta" class="meta">
+    <div v-show="showClearButton || $slots.default" ref="meta" class="meta">
       <div v-if="$slots.default" class="description">
         <slot></slot>
       </div>
     </div>
-    <div ref="control" class="strix-block-control" :class="{ 'is-fixed': fixedControl }" @click="changeExpand">
+    <div v-show="showClearButton || $slots.default" ref="control" class="strix-block-control" :class="{ 'is-fixed': fixedControl }" @click="changeExpand">
       <component v-if="$slots.default" :is="expandedIcon"></component>
       <transition name="text-slide">
         <span v-if="$slots.default" v-show="hovering">{{ isExpanded ? '收起' : '显示全部' }}</span>
