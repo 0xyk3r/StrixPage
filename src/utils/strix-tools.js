@@ -14,3 +14,19 @@ export const deepSearch = (data, value, key = 'id', sub = 'children', tempObj = 
     }
     return false;
 }
+
+/* 深度map */
+export const deepMap = (data, key = 'id', sub = 'children') => {
+    if (!data) return false
+    const results = []
+
+    data.forEach((d) => {
+        if (d[key]) results.push(d[key])
+        if (d[sub]) {
+            const subMap = deepMap(d[sub], key, sub)
+            if (subMap) results.push(...subMap)
+        }
+    })
+
+    return results;
+}

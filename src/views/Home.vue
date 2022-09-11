@@ -10,7 +10,8 @@
       <!-- 侧边菜单区域 -->
       <n-spin :show="menuList.length == 0">
         <n-menu ref="menuRef" key-field="id" label-field="name" children-field="children" :collapsed-width="70"
-          :render-label="renderMenuLabel" :options="menuList" v-model:value="menuSelected" />
+          :root-indent="32" :indent="16" :render-label="renderMenuLabel" :options="menuList"
+          v-model:value="menuSelected" />
       </n-spin>
     </n-layout-sider>
     <n-layout>
