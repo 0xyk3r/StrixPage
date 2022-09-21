@@ -26,6 +26,9 @@
         </n-grid-item>
       </n-grid>
     </n-card>
+    <div class="beian">
+      <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
+    </div>
   </div>
 </template>
 
@@ -136,6 +139,22 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  .beian {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-size: 12px;
+
+    a {
+      color: #aaa;
+      text-decoration: none;
+    }
+  }
 }
 
 .login-form-panel {

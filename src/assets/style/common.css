@@ -33,3 +33,11 @@
 .n-data-table-table {
     table-layout: fixed !important;
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-transition-delay: 99999s !important;
+    -webkit-transition: color 99999s ease-out, background-color 99999s ease-out !important;
+}
