@@ -118,6 +118,12 @@ export default {
 }
 </script>
 <style>
+img[src=""],
+img[src="data:image/png;base64,"],
+img:not([src]){
+    opacity:0;
+}
+
 .verifybox {
   position: relative;
   box-sizing: border-box;
@@ -297,8 +303,6 @@ export default {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
   border-radius: 3px;
   position: relative;
 }

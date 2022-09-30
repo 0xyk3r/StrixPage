@@ -321,7 +321,7 @@ export default {
           else if (res.repCode == '6201') { tipWords.value = '请求次数过多，请稍后重试' }
           else if (res.repCode == '6202') { tipWords.value = '错误次数过多，请稍后重试' }
           else if (res.repCode == '6204') { tipWords.value = '验证次数过多，请稍后重试' }
-          tipWords.value = res.repMsg;
+          else { tipWords.value = res.repMsg }
         }
       })
     }
