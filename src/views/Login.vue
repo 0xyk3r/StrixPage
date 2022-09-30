@@ -18,7 +18,7 @@
                 <n-input type="password" v-model:value="loginForm.loginPassword" placeholder="请输入登录密码"
                   class="login-input" show-password-on="mousedown" clearable></n-input>
               </n-form-item>
-              <n-button type="primary" :loading="isLogging" class="login-btn" @click="login">
+              <n-button type="primary" :loading="isLogging" class="login-btn" @click="showLoginVerify">
                 {{ isLogging ? '登录中...' : '登录' }}
               </n-button>
             </n-form>
@@ -26,6 +26,14 @@
         </n-grid-item>
       </n-grid>
     </n-card>
+    <Verify
+      v-if="loginVerifyShowStatus"
+      ref="verifyRef"
+      mode="pop"
+      captchaType="blockPuzzle"
+      :imgSize="{width:'400px',height:'200px'}"
+      @success="verifySuccess"
+    ></Verify>
     <div class="beian">
       <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
     </div>
@@ -33,12 +41,13 @@
 </template>
 
 <script setup>
+import Verify from '@/components/verifition/Verify.vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import useCurrentInstance from '@/utils/strix-instance-tool'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { useLoadingBar } from 'naive-ui'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const { proxy } = useCurrentInstance()
@@ -56,8 +65,9 @@ const loggedJumpPath = $route.query.to || '/'
 const isLogging = ref(false)
 const loginFormRef = ref(null)
 const loginForm = ref({
-  loginName: null,
-  loginPassword: null
+  loginName: '',
+  loginPassword: '',
+  captchaVerification: ''
 })
 const loginFormRules = {
   loginName: [
@@ -86,6 +96,21 @@ const loginFormRules = {
       trigger: 'blur'
     }
   ]
+}
+
+
+const verifyRef = ref(null)
+const loginVerifyShowStatus = ref(false)
+const showLoginVerify = () => {
+  loginVerifyShowStatus.value = true
+  nextTick(()=>{
+    verifyRef.value?.show()
+  })
+}
+const verifySuccess = (params) => {
+  loginVerifyShowStatus.value = false
+  loginForm.value.captchaVerification = params.captchaVerification
+  login()
 }
 
 const login = () => {
