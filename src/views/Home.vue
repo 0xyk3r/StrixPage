@@ -45,7 +45,7 @@
         <!-- 标签栏 -->
         <strix-tabs-bar></strix-tabs-bar>
       </n-layout-header>
-      <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false">
+      <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false" embedded>
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
           <router-view v-slot="{ Component }" @refresh-menu="getMenuList">
