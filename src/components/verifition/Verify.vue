@@ -16,13 +16,13 @@
     </div>
   </div>
 </template>
-<script type="text/babel">
+<script>
 import { computed, ref, toRefs, watchEffect } from 'vue';
 import VerifyPoints from './Verify/VerifyPoints.vue';
 import VerifySlide from './Verify/VerifySlide.vue';
 
 export default {
-  name: 'Vue2Verify',
+  name: 'LoginVerify',
   components: {
     VerifySlide,
     VerifyPoints
@@ -114,14 +114,14 @@ export default {
       closeBox,
       show
     }
-  },
+  }
 }
 </script>
 <style>
 img[src=""],
 img[src="data:image/png;base64,"],
-img:not([src]){
-    opacity:0;
+img:not([src]) {
+  opacity: 0;
 }
 
 .verifybox {

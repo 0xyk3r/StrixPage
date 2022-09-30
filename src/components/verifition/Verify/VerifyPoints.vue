@@ -35,7 +35,7 @@
     </div>
   </div>
 </template>
-<script type="text/babel">
+<script>
 import { getCurrentInstance, nextTick, onMounted, reactive, ref, toRefs } from 'vue';
 import { reqCheck, reqGet } from "./../api/index";
 import { aesEncrypt } from "./../utils/ase";
