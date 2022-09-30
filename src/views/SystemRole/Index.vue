@@ -206,6 +206,7 @@ const dataColumns = [
     }
   }, {
     key: 'name',
+    minWidth: 100,
     title: '角色名称'
   }, {
     title: '操作',
