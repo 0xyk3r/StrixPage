@@ -79,7 +79,7 @@ import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import { kebabCase } from 'lodash'
-import { useLoadingBar } from 'naive-ui'
+import { useLoadingBar, useOsTheme } from 'naive-ui'
 import ScreenFull from 'screenfull'
 import { computed, h, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
@@ -87,6 +87,7 @@ import elementResizeDetectorMaker from 'element-resize-detector'
 
 const { proxy } = useCurrentInstance()
 const $router = useRouter()
+const osTheme = useOsTheme()
 
 initStrixLoadingBar(useLoadingBar())
 initStrixNotify()
@@ -94,7 +95,13 @@ initStrixNotify()
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useGlobalSettingsStore()
 
-const theme = computed(() => globalSettingsStore.theme)
+const theme = computed(() => {
+  if (globalSettingsStore.theme === 'auto') {
+    return osTheme.value
+  } else {
+    return globalSettingsStore.theme
+  }
+})
 
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 // 左侧菜单栏折叠
