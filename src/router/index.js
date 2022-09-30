@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const Login = () => import('@/views/Login.vue')
 const Home = () => import('@/views/Home.vue')
@@ -12,6 +12,10 @@ const SystemPermissionIndex = () => import('@/views/SystemPermission/Index.vue')
 const SystemRegionIndex = () => import('@/views/SystemRegion/Index.vue')
 const SystemRoleIndex = () => import('@/views/SystemRole/Index.vue')
 const SystemUserIndex = () => import('@/views/SystemUser/Index.vue')
+
+const SystemMonitorServerIndex = () => import('@/views/SystemMonitor/Server/Index.vue')
+const SystemMonitorCacheIndex = () => import('@/views/SystemMonitor/Cache/Index.vue')
+const SystemMonitorCacheList = () => import('@/views/SystemMonitor/Cache/List.vue')
 
 const routes = [
   {
@@ -88,19 +92,54 @@ const routes = [
           }
         ]
       }, {
-        path: '/system/user',
+        path: 'system/user',
         name: 'SystemUserIndex',
         component: SystemUserIndex,
         meta: {
           title: '系统用户管理'
         }
       }, {
-        path: '/system/region',
+        path: 'system/region',
         name: 'SystemRegionIndex',
         component: SystemRegionIndex,
         meta: {
           title: '系统地区管理'
         }
+      }, {
+        path: 'system/monitor',
+        name: 'SystemMonitor',
+        component: EmptyLayout,
+        meta: {
+          title: '系统信息管理',
+          empty: true
+        },
+        children: [
+          {
+            path: 'server',
+            name: 'SystemMonitorServerIndex',
+            component: SystemMonitorServerIndex,
+            meta: {
+              title: '系统运行信息',
+              empty: false
+            }
+          }, {
+            path: 'cache',
+            name: 'SystemMonitorCacheIndex',
+            component: SystemMonitorCacheIndex,
+            meta: {
+              title: '系统缓存信息',
+              empty: false
+            }
+          }, {
+            path: 'cache/list',
+            name: 'SystemMonitorCacheList',
+            component: SystemMonitorCacheList,
+            meta: {
+              title: '系统缓存列表',
+              empty: false
+            }
+          }
+        ]
       }
     ]
   }
