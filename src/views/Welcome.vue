@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h2>Welcome to use Strix.</h2>
+    <n-gradient-text type="info" :size="36">
+      Welcome to the Strix Management System.
+    </n-gradient-text>
   </div>
 </template>
 
