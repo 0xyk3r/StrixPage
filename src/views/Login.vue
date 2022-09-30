@@ -26,14 +26,8 @@
         </n-grid-item>
       </n-grid>
     </n-card>
-    <Verify
-      v-if="loginVerifyShowStatus"
-      ref="verifyRef"
-      mode="pop"
-      captchaType="blockPuzzle"
-      :imgSize="{width:'400px',height:'200px'}"
-      @success="verifySuccess"
-    ></Verify>
+    <Verify v-if="loginVerifyShowStatus" ref="verifyRef" mode="pop" captchaType="blockPuzzle"
+      :imgSize="{width:'400px',height:'200px'}" @success="verifySuccess"></Verify>
     <div class="beian">
       <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
     </div>
@@ -102,9 +96,15 @@ const loginFormRules = {
 const verifyRef = ref(null)
 const loginVerifyShowStatus = ref(false)
 const showLoginVerify = () => {
-  loginVerifyShowStatus.value = true
-  nextTick(()=>{
-    verifyRef.value?.show()
+  loginFormRef.value?.validate((errors) => {
+    if (!errors) {
+      loginVerifyShowStatus.value = true
+      nextTick(() => {
+        verifyRef.value?.show()
+      })
+    } else {
+      createStrixNotify('error', '登录失败', '内容校验失败，请检查您填写的内容')
+    }
   })
 }
 const verifySuccess = (params) => {
