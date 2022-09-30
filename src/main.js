@@ -27,7 +27,6 @@ pinia.use(piniaPluginPersistedstate)
 app.use(naive)
 // 创建Mitt全局事件总线
 app.config.globalProperties.$EventBus = Mitt()
-app.config.globalProperties.$Theme = { name: '' }
 installAxios(app)
 installStrixLocalCache(app)
 

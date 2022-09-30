@@ -4,7 +4,7 @@
       show-trigger="arrow-circle" class="home-sider" bordered="" :native-scrollbar="false">
       <!-- Logo -->
       <div class="home-logo-container">
-        <img v-if="theme.name === 'dark'" class="home-logo" src="../assets/img/logo-w.png" />
+        <img v-if="theme === 'dark'" class="home-logo" src="../assets/img/logo-w.png" />
         <img v-else class="home-logo" src="../assets/img/logo.png" />
       </div>
       <!-- 侧边菜单区域 -->
@@ -93,6 +93,8 @@ initStrixNotify()
 
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useGlobalSettingsStore()
+
+const theme = computed(() => globalSettingsStore.theme)
 
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 // 左侧菜单栏折叠
@@ -294,8 +296,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   erd.uninstall(document.getElementById("app"))
 })
-
-const theme = proxy.$Theme
 
 </script>
 

@@ -4,7 +4,8 @@ export const useGlobalSettingsStore = defineStore('globalSettings', {
   state: () => ({
     siderCollapsed: false,
     ignoreScreenSizeWarning: false,
-    isSmallWindow: false
+    isSmallWindow: false,
+    theme: 'auto'
   }),
   getters: {
   },
@@ -20,6 +21,9 @@ export const useGlobalSettingsStore = defineStore('globalSettings', {
     },
     setIsSmallWindow(value) {
       this.set('isSmallWindow', value)
+    },
+    setTheme(value) {
+      this.set('theme', value)
     }
   },
   persist: {

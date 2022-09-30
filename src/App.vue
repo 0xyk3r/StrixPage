@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme="themeNew" :locale="zhCN" :date-locale="dateZhCN">
+  <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
     <n-loading-bar-provider>
       <n-notification-provider>
         <n-dialog-provider>
@@ -12,31 +12,43 @@
 </template>
 
 <script setup>
+import { useGlobalSettingsStore } from '@/stores/global-settings';
 import useCurrentInstance from '@/utils/strix-instance-tool';
 import { darkTheme, dateZhCN, NConfigProvider, NGlobalStyle, useOsTheme, zhCN } from 'naive-ui';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const { proxy } = useCurrentInstance()
+const globalSettingsStore = useGlobalSettingsStore()
 const osTheme = useOsTheme()
-const currentTheme = ref(osTheme.value)
-
-onMounted(() => {
-  if (proxy) {
-    proxy.$Theme.name = currentTheme.value
-  }
-})
+const themeSetting = ref(globalSettingsStore.theme)
 
 // 监听主题改变事件
 proxy?.$EventBus.on('changeTheme', () => {
-  if (currentTheme.value === 'dark') {
-    currentTheme.value = 'light'
+  if (themeSetting.value === 'auto') {
+    if (osTheme.value === 'dark') {
+      themeSetting.value = 'light'
+    } else {
+      themeSetting.value = 'dark'
+    }
   } else {
-    currentTheme.value = 'dark'
+    if (themeSetting.value === 'dark') {
+      themeSetting.value = 'light'
+    } else {
+      themeSetting.value = 'dark'
+    }
   }
-  proxy.$Theme.name = currentTheme.value
+  globalSettingsStore.setTheme(themeSetting.value)
 })
 
-const themeNew = computed(() => (currentTheme.value === 'dark' ? darkTheme : null))
+const currentTheme = computed(() => {
+  if (themeSetting.value === 'auto') {
+    return osTheme.value === 'dark' ? darkTheme : null
+  } else if (themeSetting.value === 'dark') {
+    return darkTheme
+  } else {
+    return null
+  }
+})
 </script>
 
 <style>
