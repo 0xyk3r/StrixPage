@@ -1,5 +1,10 @@
 <template>
   <div>
+    <n-h3 prefix="bar" align-text type="success">
+      <n-text type="success">
+        系统运行信息
+      </n-text>
+    </n-h3>
     <n-grid x-gap="12" :cols="2">
       <n-gi>
         <n-card title="CPU Info">
@@ -40,8 +45,8 @@
               <thead>
                 <tr>
                   <th>属性</th>
-                  <th>ALL</th>
-                  <th>JVM</th>
+                  <th>ALL (GB)</th>
+                  <th>JVM (MB)</th>
                 </tr>
               </thead>
               <tbody>

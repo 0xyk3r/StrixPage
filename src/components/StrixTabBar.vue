@@ -45,10 +45,7 @@ export default defineComponent({
     // tabs的右击相关逻辑
     const showRightMenuRef = ref()
     let contextmenuRoutesIndex = ''
-    const contextmenuPosition = {
-      x: 0,
-      y: 0
-    }
+    const contextmenuPosition = ref({ x: 0, y: 0 })
     const contextmenuList = [
       {
         key: 'reloadRouter',
@@ -76,10 +73,10 @@ export default defineComponent({
       }
     ]
     const handleTabContextmenu = (e, index) => {
-      contextmenuRoutesIndex = index
       showRightMenuRef.value = true
-      contextmenuPosition.x = e.x
-      contextmenuPosition.y = e.y
+      contextmenuRoutesIndex = index
+      contextmenuPosition.value.x = e.x
+      contextmenuPosition.value.y = e.y
     }
     const handleContextmenuSelect = (key) => {
       showRightMenuRef.value = false
@@ -259,6 +256,28 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.tabs-bar-container {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 50px;
+  padding: 0 20px;
+  user-select: none;
+  border-top: 1px solid var(--n-border-color);
+  box-shadow: 0 2px 4px 0 rgba(36, 38, 47, .2) !important;
+  z-index: 499;
+  transition: border .3s var(--n-bezier);
+
+  .tabs-content {
+    width: calc(100% - 90px);
+    height: 34px;
+  }
+}
+
 ::v-deep(.tabs-content) {
   .n-tabs-wrapper {
     .n-tabs-tab-wrapper {
@@ -272,19 +291,10 @@ export default defineComponent({
           width: 0;
           overflow: hidden;
           transform-origin: 100% 50%;
-          transition: all .3s var(--n-bezier);
-        }
+          transition: width .3s var(--n-bezier);
 
-        &:hover {
-          border: 1px solid var(--n-tab-text-color-hover);
-
-          .n-base-close {
-            width: 18px;
-          }
-
-          &:after {
-            width: 100%;
-            transition: all .3s var(--n-bezier), border 0s, color .1s, font-size 0s
+          .n-base-icon {
+            overflow: hidden;
           }
         }
 
@@ -297,6 +307,18 @@ export default defineComponent({
           content: "";
           background-color: var(--n-tab-text-color-active);
           transition: all .3s var(--n-bezier), border 0s, color .1s, font-size 0s;
+        }
+
+        &:hover {
+          border: 1px solid var(--n-tab-text-color-hover);
+
+          .n-base-close {
+            width: 18px;
+          }
+
+          &:after {
+            width: 100%;
+          }
         }
       }
 
@@ -324,74 +346,16 @@ export default defineComponent({
   }
 }
 
-.tabs-bar-container {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  align-content: center;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 50px;
-  padding: 0 20px;
-  user-select: none;
-  border-top: 1px solid var(--n-border-color);
-  box-shadow: 0 2px 4px 0 rgba(36, 38, 47, .2) !important;
-  z-index: 499;
-  transition: border .3s var(--n-bezier);
-
-  .tabs-content {
-    width: calc(100% - 90px);
-    height: 34px;
-  }
-}
-
-.more {
-  display: flex;
-  align-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.transitionRightMenu {
-  transition: all .3s var(--n-bezier), border 0s, color .1s, font-size 0s;
-  z-index: 520;
-}
-
 .tabs-common-handler {
   color: var(--n-tab-text-color);
   font-size: 20px;
+  outline: none;
   cursor: pointer;
-  animation: rotates90 .5s ease-out 0s;
-}
-
-@keyframes rotate90 {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(90deg);
-  }
-}
-
-@keyframes rotates90 {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(-90deg);
-  }
+  transition: transform 1s;
 }
 
 .tabs-common-handler:hover {
-  animation: rotate90 .5s ease-out 0s;
   color: #63e2b7;
-}
-
-.tabs-common-handler-active {
-  color: var(--n-tab-text-color-active);
-  animation: rotate90 .5s ease-out 0s;
+  transform: rotate(90deg);
 }
 </style>
