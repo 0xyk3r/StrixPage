@@ -85,7 +85,18 @@ axios.interceptors.request.use(async config => {
   }
 
   if (config.method === 'get') {
-    const queryString = qs.stringify(config.params, { addQueryPrefix: true })
+    // 20221227修改 去除get请求中的null参数
+    let params = config.params
+    if (params) {
+      for (const key in params) {
+        if (params[key] == null) {
+          console.log(key)
+          params = _.omit(params, key)
+        }
+      }
+    }
+
+    const queryString = qs.stringify(params, { addQueryPrefix: true })
     const urlParams = {
       _requestUrl: '/' + config.url + (queryString || '')
     }
