@@ -13,13 +13,13 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
         with: 
           clean: false
       - name: Npm Install
-        run: npm install
+        run: pnpm install
       - name: Npm Run Build
-        run: npm run build
+        run: pnpm run build
       - name: Start Docker Container
         run: docker restart nginx
       - name: Upload Nginx Server Config
