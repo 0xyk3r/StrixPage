@@ -138,6 +138,14 @@ axios.interceptors.response.use(async response => {
     }
   }
   return response
+}, error => {
+  if (error.response?.data?.code === 401) {
+    // 登录失效 清除登录信息并刷新
+    window.localStorage.removeItem('strix_login_token')
+    window.localStorage.removeItem('strix_login_token_expire')
+    window.localStorage.removeItem('strix_login_info')
+    location.href = '/login?to=' + location.pathname
+  }
 })
 
 function paramsSign(url, params, timestamp) {
