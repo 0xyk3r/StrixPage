@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 // HTTP请求根路径
 axios.defaults.baseURL = '/api/'
 
+const iv = 'fuCkUCrAck32fUcK'
 const pk01 = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCIXjpS5HSOeAauqi/'
 const pk02 = '3j9R4X7lbLfClo+CSO0yDsGdTsWHgpjE8l96dqsNay7xSKNDKvJCDId9aLIRhUVUDuV+ad6g3jNKW0ywiFHXobMPusDS8Jab18QE0N/'
 const pk03 = 'JDCzh+5MejQb+ccwWvWcOwXJevgemMqpXXq2rpAfwigl+sYxi8BwIDAQAB'
@@ -22,7 +23,7 @@ function enc(data) {
   }
   const parsedData = JSON.stringify(data)
   const aes = CryptoJS.AES.encrypt(parsedData, CryptoJS.enc.Utf8.parse(key), {
-    iv: CryptoJS.enc.Utf8.parse('fuckyou0babyFUCK'),
+    iv: CryptoJS.enc.Utf8.parse(iv),
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
   })
@@ -103,7 +104,7 @@ axios.interceptors.request.use(async config => {
     const encryptJson = JSON.stringify(urlParams)
 
     const aes = CryptoJS.AES.encrypt(encryptJson, CryptoJS.enc.Utf8.parse('fUCkUon' + config.headers.timestamp + 'T1me'), {
-      iv: CryptoJS.enc.Utf8.parse('fuckyouObabyFUCK'),
+      iv: CryptoJS.enc.Utf8.parse(iv),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     })
