@@ -53,7 +53,7 @@ function dec(response) {
     const aesKey = jsEncrypt.decrypt(sign)
 
     const dec = CryptoJS.AES.decrypt(CryptoJS.format.Hex.parse(data), CryptoJS.enc.Utf8.parse(aesKey), {
-      iv: CryptoJS.enc.Utf8.parse('fuckyou0babyFUCK'),
+      iv: CryptoJS.enc.Utf8.parse(iv),
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7
     })
@@ -167,7 +167,7 @@ function paramsSign(url, params, timestamp) {
   const sortParamsJson = JSON.stringify(sortEncryptObj)
 
   const aes = CryptoJS.AES.encrypt(sortParamsJson, CryptoJS.enc.Utf8.parse('fUCkUon' + timestamp + 'T1me'), {
-    iv: CryptoJS.enc.Utf8.parse('fuckyouObabyFUCK'),
+    iv: CryptoJS.enc.Utf8.parse(iv),
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
   })
