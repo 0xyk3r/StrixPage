@@ -10,9 +10,8 @@ import { v4 as uuidv4 } from 'uuid'
 axios.defaults.baseURL = '/api/'
 
 const iv = 'fuCkUCrAck32fUcK'
-const pk01 = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCIXjpS5HSOeAauqi/'
-const pk02 = '3j9R4X7lbLfClo+CSO0yDsGdTsWHgpjE8l96dqsNay7xSKNDKvJCDId9aLIRhUVUDuV+ad6g3jNKW0ywiFHXobMPusDS8Jab18QE0N/'
-const pk03 = 'JDCzh+5MejQb+ccwWvWcOwXJevgemMqpXXq2rpAfwigl+sYxi8BwIDAQAB'
+const serverPubKey = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCIXjpS5HSOeAauqi/3j9R4X7lbLfClo+CSO0yDsGdTsWHgpjE8l96dqsNay7xSKNDKvJCDId9aLIRhUVUDuV+ad6g3jNKW0ywiFHXobMPusDS8Jab18QE0N/JDCzh+5MejQb+ccwWvWcOwXJevgemMqpXXq2rpAfwigl+sYxi8BwIDAQAB'
+const clientPriKey = 'MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBANBprui2mHZG6WvJxuWatDrMIhUecappAMF0h3IofTfisMQg11H1hsfDOm75qKlTPgwIa6BiL1VXndO4hg/q7ICrxjOOIw4cRWfTsCxepeA+RYlh1ZMIYJCWvmOEU+PY/F/SDbTyMrJ8OTsuEJ08eLIwnWXwbi3mUEXkAmFao3X7AgMBAAECgYAx34h2sfNsIm4LWD7bhRjqFR121lE3CWef48Xh4KSOchYA6Sb9uvak6SgblGzzEDOB56XxvG09S/k9yCN0vbAYb+370Yhz0HhajKbjifVPZuAjvCO9cdWxJWeWlAtGMdgMyG1PxTlhamPfI/YvvjQxpf9845lGwXsBaTrGwbSLOQJBAOx3tJCnMPvajzcODwud67YKnuCwISK4XSNj7K+TPH66j53JycTjD+e7eVaa4j2TdP85t8zYO4q3oEut30nyXt0CQQDhoLzMaUg1nmUoAv2o0CO8hYEIzWc6gP4STHmtZjOqqYWhjInMk3slfMTllzLBEDy/womSuqb68wPXscvrtt63AkEAyjj81BAHFfstKtn9B+Q/peijQmedjsG39QIJcYUq4P3OwBPHV3cPLQ/ojqXaAOrPzUyg4K+zC8hJby78m5KIiQJASF7DUBmQ9MnajmvvKt+gJs73pXgk3UoUtI/dE3ZNqjb3yuqGJJ1Fia+shCvsNqrboXJnqC3Ac4vRNrUrwG6GnwJAAlZK9BZg2ORZ9vSGg0+Ah0Ji7BSaozJUFEXtZ+A2cU3S+LN8/4aOaAhFECvXjTjJYddffMhXnqJ6/z5DvxncnQ=='
 
 function enc(data) {
   const library = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
@@ -29,7 +28,7 @@ function enc(data) {
   })
 
   const jsEncrypt = new JSEncrypt()
-  jsEncrypt.setPublicKey(pk01 + pk02 + pk03)
+  jsEncrypt.setPublicKey(serverPubKey)
   const rsa = jsEncrypt.encrypt(key)
 
   return {
@@ -48,8 +47,7 @@ function dec(response) {
 
   if (data && sign) {
     const jsEncrypt = new JSEncrypt()
-    jsEncrypt.setPublicKey(pk01 + pk02 + pk03)
-    // 注意JSEncrypt原生不支持公钥解密，这里对JSEncrypt源码做了修改，后续版本若升级，则修改部分可能被覆盖
+    jsEncrypt.setPrivateKey(clientPriKey)
     const aesKey = jsEncrypt.decrypt(sign)
 
     const dec = CryptoJS.AES.decrypt(CryptoJS.format.Hex.parse(data), CryptoJS.enc.Utf8.parse(aesKey), {
