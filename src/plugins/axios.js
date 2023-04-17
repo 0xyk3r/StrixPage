@@ -68,7 +68,7 @@ axios.interceptors.request.use(async config => {
   if (token) {
     config.headers.token = token
   }
-  config.headers.timestamp = new Date().getTime()
+  config.headers.timestamp = new Date().getTime() + ""
 
   if (config.strixRequestGroup) {
     config.strixRequestId = uuidv4()
@@ -86,30 +86,29 @@ axios.interceptors.request.use(async config => {
   }
 
   if (config.method === 'get') {
-    // 20221227修改 去除get请求中的null参数
+    // 去除get请求中的null参数
     let params = config.params
     if (params) {
       for (const key in params) {
         if (params[key] == null) {
-          console.log(key)
           params = _.omit(params, key)
         }
       }
     }
+    // const queryString = qs.stringify(params, { addQueryPrefix: true })
+    // 转换get请求参数为对象
+    const queryString = qs.stringify(params)
+    const urlParams = qs.parse(queryString)
+    // urlParams['_requestUrl'] = '/' + config.url + (queryString || '')
+    // const encryptJson = JSON.stringify(urlParams)
+    config.headers.sign = paramsSign('/' + config.url, urlParams, config.headers.timestamp)
+    // const aes = CryptoJS.AES.encrypt(encryptJson, CryptoJS.enc.Utf8.parse('fUCkUon' + config.headers.timestamp + 'T1me'), {
+    //   iv: CryptoJS.enc.Utf8.parse(iv),
+    //   mode: CryptoJS.mode.CBC,
+    //   padding: CryptoJS.pad.Pkcs7
+    // })
 
-    const queryString = qs.stringify(params, { addQueryPrefix: true })
-    const urlParams = {
-      _requestUrl: '/' + config.url + (queryString || '')
-    }
-    const encryptJson = JSON.stringify(urlParams)
-
-    const aes = CryptoJS.AES.encrypt(encryptJson, CryptoJS.enc.Utf8.parse('fUCkUon' + config.headers.timestamp + 'T1me'), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    })
-
-    config.headers.sign = aes.ciphertext.toString()
+    // config.headers.sign = aes.ciphertext.toString()
   } else {
     config.headers.sign = paramsSign('/' + config.url, config.data, config.headers.timestamp)
     if (config.data) {
@@ -150,29 +149,34 @@ axios.interceptors.response.use(async response => {
 })
 
 function paramsSign(url, params, timestamp) {
-  const urlParams = {
-    _requestUrl: url
+  const baseParams = {
+    _requestUrl: url,
+    _timestamp: timestamp
   }
-  let encryptObj = urlParams
+  let encryptObj = baseParams
   if (params) {
     for (const key in params) {
       if (params[key] == null || params[key] === '') {
         params = _.omit(params, key)
       }
     }
-    encryptObj = _.merge(urlParams, params)
+    encryptObj = _.merge(baseParams, params)
   }
 
   const sortEncryptObj = sortAsc(encryptObj)
   const sortParamsJson = JSON.stringify(sortEncryptObj)
 
-  const aes = CryptoJS.AES.encrypt(sortParamsJson, CryptoJS.enc.Utf8.parse('fUCkUon' + timestamp + 'T1me'), {
-    iv: CryptoJS.enc.Utf8.parse(iv),
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7
-  })
+  // 将sortParamsJson进行md5加密
+  const sign = CryptoJS.MD5(sortParamsJson).toString()
+  return sign
 
-  return aes.ciphertext.toString()
+  // const aes = CryptoJS.AES.encrypt(sortParamsJson, CryptoJS.enc.Utf8.parse('fUCkUon' + timestamp + 'T1me'), {
+  //   iv: CryptoJS.enc.Utf8.parse(iv),
+  //   mode: CryptoJS.mode.CBC,
+  //   padding: CryptoJS.pad.Pkcs7
+  // })
+
+  // return aes.ciphertext.toString()
 }
 
 function sortAsc(jsonObj) {
