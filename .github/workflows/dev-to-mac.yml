@@ -3,8 +3,8 @@ name: Build and Run with Nginx in Docker
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+#  pull_request:
+#    branches: [ "master" ]
 
   workflow_dispatch:
 
