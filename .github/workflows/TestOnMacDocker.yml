@@ -1,4 +1,4 @@
-name: Build and Run with Nginx in Docker
+name: Test On Mac Docker
 
 on:
   push:
@@ -20,13 +20,13 @@ jobs:
         run: pnpm install
       - name: Npm Run Build
         run: pnpm run build
-      - name: Start Docker Container
-        run: docker restart nginx
+      - name: Check Docker Container Exist If Not Create
+        run: docker ps -a | grep StrixNginx > /dev/null || docker run -p 13232:13232 --name StrixNginx -d nginx:stable
       - name: Upload Nginx Server Config
-        run: docker cp nginx-strix.conf nginx:/etc/nginx/conf.d/default.conf
+        run: docker cp nginx-strix.conf StrixNginx:/etc/nginx/conf.d/strix.conf
       - name: Delete Old Dist Files
-        run: docker exec -i nginx bash -c "rm -rf /mnt/strixweb"
+        run: docker exec -i StrixNginx bash -c "rm -rf /mnt/strixweb"
       - name: Copy New Dist Files
-        run: docker cp dist nginx:/mnt/strixweb
+        run: docker cp dist StrixNginx:/mnt/strixweb
       - name: Reload Nginx Config
-        run: docker exec -i nginx bash -c "nginx -s reload"
+        run: docker exec -i StrixNginx bash -c "nginx -s reload"
