@@ -31,8 +31,8 @@
           <n-form-item-gi span="2 s:1" label="菜单名称" path="name">
             <n-input v-model:value="addDataForm.name" placeholder="请输入菜单名称" clearable />
           </n-form-item-gi>
-          <n-form-item-gi span="2 s:1" label="父级地区" path="parentId">
-            <n-tree-select v-model:value="addDataForm.parentId" :options="dataData" placeholder="选择父级地区" cascade
+          <n-form-item-gi span="2 s:1" label="父级菜单" path="parentId">
+            <n-tree-select v-model:value="addDataForm.parentId" :options="dataData" placeholder="选择父级菜单" cascade
               clearable filterable check-strategy="all" key-field="id" label-field="name" />
           </n-form-item-gi>
           <n-form-item-gi span="2 s:2" label="菜单路由" path="url">
@@ -66,8 +66,8 @@
             <n-form-item-gi span="2 s:1" label="菜单名称" path="name">
               <n-input v-model:value="editDataForm.name" placeholder="请输入菜单名称" clearable />
             </n-form-item-gi>
-            <n-form-item-gi span="2 s:1" label="父级地区" path="parentId">
-              <n-tree-select v-model:value="editDataForm.parentId" :options="dataData" placeholder="选择父级地区" cascade
+            <n-form-item-gi span="2 s:1" label="父级菜单" path="parentId">
+              <n-tree-select v-model:value="editDataForm.parentId" :options="dataData" placeholder="选择父级菜单" cascade
                 clearable filterable check-strategy="all" key-field="id" label-field="name" />
             </n-form-item-gi>
             <n-form-item-gi span="2 s:2" label="菜单路由" path="url">

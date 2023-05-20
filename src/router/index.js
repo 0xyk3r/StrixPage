@@ -1,32 +1,18 @@
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createRouter, createWebHistory } from 'vue-router'
 
-const Login = () => import('@/views/Login.vue')
-const Home = () => import('@/views/Home.vue')
-const Welcome = () => import('@/views/Welcome.vue')
 const EmptyLayout = () => import('@/components/EmptyLayout.vue')
-
-const SystemManagerIndex = () => import('@/views/SystemManager/Index.vue')
-const SystemMenuIndex = () => import('@/views/SystemMenu/Index.vue')
-const SystemPermissionIndex = () => import('@/views/SystemPermission/Index.vue')
-const SystemRegionIndex = () => import('@/views/SystemRegion/Index.vue')
-const SystemRoleIndex = () => import('@/views/SystemRole/Index.vue')
-const SystemUserIndex = () => import('@/views/SystemUser/Index.vue')
-
-const SystemMonitorServerIndex = () => import('@/views/SystemMonitor/Server/Index.vue')
-const SystemMonitorCacheIndex = () => import('@/views/SystemMonitor/Cache/Index.vue')
-const SystemMonitorCacheList = () => import('@/views/SystemMonitor/Cache/List.vue')
 
 const routes = [
   {
     path: '/login',
     name: 'LoginIndex',
-    component: Login
+    component: () => import('@/views/Login.vue')
   },
   {
     path: '/',
     name: 'HomeIndex',
-    component: Home,
+    component: () => import('@/views/Home.vue'),
     redirect: '/welcome',
     meta: {
       title: 'Strix管理系统'
@@ -43,7 +29,7 @@ const routes = [
       {
         path: '/welcome',
         name: 'WelcomeIndex',
-        component: Welcome,
+        component: () => import('@/views/Welcome.vue'),
         meta: {
           title: '欢迎页',
           icon: 'fa fa-home',
@@ -53,14 +39,14 @@ const routes = [
       }, {
         path: '/system/manager',
         name: 'SystemManagerIndex',
-        component: SystemManagerIndex,
+        component: () => import('@/views/SystemManager/Index.vue'),
         meta: {
           title: '系统人员管理'
         }
       }, {
         path: '/system/menu',
         name: 'SystemMenuIndex',
-        component: SystemMenuIndex,
+        component: () => import('@/views/SystemMenu/Index.vue'),
         meta: {
           title: '系统菜单管理'
         }
@@ -76,7 +62,7 @@ const routes = [
           {
             path: 'permission',
             name: 'SystemPermissionIndex',
-            component: SystemPermissionIndex,
+            component: () => import('@/views/SystemPermission/Index.vue'),
             meta: {
               title: '系统权限列表',
               empty: false
@@ -84,7 +70,7 @@ const routes = [
           }, {
             path: 'role',
             name: 'SystemRoleIndex',
-            component: SystemRoleIndex,
+            component: () => import('@/views/SystemRole/Index.vue'),
             meta: {
               title: '系统角色管理',
               empty: false
@@ -94,14 +80,14 @@ const routes = [
       }, {
         path: 'system/user',
         name: 'SystemUserIndex',
-        component: SystemUserIndex,
+        component: () => import('@/views/SystemUser/Index.vue'),
         meta: {
           title: '系统用户管理'
         }
       }, {
         path: 'system/region',
         name: 'SystemRegionIndex',
-        component: SystemRegionIndex,
+        component: () => import('@/views/SystemRegion/Index.vue'),
         meta: {
           title: '系统地区管理'
         }
@@ -117,7 +103,7 @@ const routes = [
           {
             path: 'server',
             name: 'SystemMonitorServerIndex',
-            component: SystemMonitorServerIndex,
+            component: () => import('@/views/SystemMonitor/Server/Index.vue'),
             meta: {
               title: '系统运行信息',
               empty: false
@@ -125,7 +111,7 @@ const routes = [
           }, {
             path: 'cache',
             name: 'SystemMonitorCacheIndex',
-            component: SystemMonitorCacheIndex,
+            component: () => import('@/views/SystemMonitor/Cache/Index.vue'),
             meta: {
               title: '系统缓存信息',
               empty: false
@@ -133,11 +119,57 @@ const routes = [
           }, {
             path: 'cache/list',
             name: 'SystemMonitorCacheList',
-            component: SystemMonitorCacheList,
+            component: () => import('@/views/SystemMonitor/Cache/List.vue'),
             meta: {
               title: '系统缓存列表',
               empty: false
             }
+          }
+        ]
+      }, {
+        path: 'system/module',
+        name: 'SystemModule',
+        component: EmptyLayout,
+        meta: {
+          title: '系统功能配置',
+          empty: true
+        },
+        children: [
+          {
+            path: 'sms',
+            name: 'SystemModuleSmsIndex',
+            component: EmptyLayout,
+            meta: {
+              title: '短信服务配置',
+              empty: true
+            },
+            children: [
+              {
+                path: 'config',
+                name: 'SystemModuleSmsIndex',
+                component: () => import('@/views/SystemModule/Sms/Index.vue'),
+                meta: {
+                  title: '短信服务配置',
+                  empty: false
+                }
+              },{
+                path: 'sign',
+                name: 'SystemModuleSmsSign',
+                component: () => import('@/views/SystemModule/Sms/Sign.vue'),
+                meta: {
+                  title: '短信签名列表',
+                  empty: false
+                }
+              },{
+                path: 'template',
+                name: 'SystemModuleSmsTemplate',
+                component: () => import('@/views/SystemModule/Sms/Template.vue'),
+                meta: {
+                  title: '短信模板列表',
+                  empty: false
+                }
+              }
+            ]
           }
         ]
       }

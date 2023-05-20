@@ -134,6 +134,7 @@ axios.interceptors.response.use(async response => {
     if (response.data.code !== 200 && !response.data.msg) {
       response.data.msg = '未知错误'
     }
+    console.log(response.data)
   }
   return response
 }, error => {
