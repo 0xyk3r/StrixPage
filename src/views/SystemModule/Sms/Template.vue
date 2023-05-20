@@ -98,7 +98,8 @@ const dataColumns = [
       })
     }
   },
-  { key: 'content', title: '模板内容', width: 600 }
+  { key: 'content', title: '模板内容', width: 600 },
+  { title: '创建时间', key: 'createTime', width: 160 }
 ]
 // 分页配置
 const dataPagination = reactive({
