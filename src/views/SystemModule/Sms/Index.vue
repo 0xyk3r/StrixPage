@@ -150,8 +150,8 @@ const dataColumns = [
       const expandSmsTemplateChildrenVNode = [
         h(NDataTable, {
           columns: [
-            { title: '模板 Code', key: 'code', width: 140 },
-            { title: '模板名称', key: 'name', width: 150 },
+            { title: '模板 Code', key: 'code', width: 160 },
+            { title: '模板名称', key: 'name', width: 160 },
             {
               title: '模板类型', key: 'type', width: 100, render: (row) => {
                 let tagType = 'primary'
@@ -218,7 +218,7 @@ const dataColumns = [
                 })
               }
             },
-            { title: '模板内容', key: 'content' },
+            { title: '模板内容', key: 'content', width: 600 },
             { title: '创建时间', key: 'createTime', width: 160 }
           ],
           data: row.templates,

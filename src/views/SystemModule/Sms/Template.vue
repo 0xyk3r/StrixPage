@@ -74,7 +74,7 @@ const dataColumns = [
   {
     key: 'type',
     title: '类型',
-    width: 120,
+    width: 100,
     render(row) {
       const option = _.find(smsTemplateTypeOptions, function (o) { return o.value === row.type })
       return h(NTag, {
@@ -87,7 +87,7 @@ const dataColumns = [
   }, {
     key: 'status',
     title: '状态',
-    width: 120,
+    width: 100,
     render(row) {
       const option = _.find(smsTemplateStatusOptions, function (o) { return o.value === row.status })
       return h(NTag, {
@@ -98,7 +98,7 @@ const dataColumns = [
       })
     }
   },
-  { key: 'content', title: '模板内容' }
+  { key: 'content', title: '模板内容', width: 600 }
 ]
 // 分页配置
 const dataPagination = reactive({
