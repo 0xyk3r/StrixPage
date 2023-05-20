@@ -248,7 +248,7 @@ const dataColumns = [
   { key: 'id', width: 150, title: '配置 ID' },
   {
     key: 'platform',
-    witdh: 100,
+    width: 100,
     title: '平台',
     render(row) {
       let tagType = 'default'
@@ -271,9 +271,9 @@ const dataColumns = [
       })
     }
   },
-  { key: 'regionId', witdh: 100, title: '地域' },
-  { key: 'accessKey', witdh: 150, title: 'AccessKey' },
-  { key: 'createTime', witdh: 150, title: '创建时间' },
+  { key: 'regionId', width: 100, title: '地域' },
+  { key: 'accessKey', width: 150, title: 'AccessKey' },
+  { key: 'createTime', width: 150, title: '创建时间' },
   {
     title: '操作',
     width: 240,

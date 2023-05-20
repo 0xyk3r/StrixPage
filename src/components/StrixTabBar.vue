@@ -8,7 +8,7 @@
     </n-tabs>
 
     <n-dropdown trigger="hover" placement="bottom-start" :options="contextmenuList" @select="handleContextmenuSelect">
-      <Icon icon="ion:grid" class="tabs-common-handler" :witdh="20" />
+      <Icon icon="ion:grid" class="tabs-common-handler" :width="20" />
     </n-dropdown>
 
     <teleport to=".n-config-provider">
