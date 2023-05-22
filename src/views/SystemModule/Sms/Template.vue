@@ -70,7 +70,7 @@ const getDataListParams = ref({
 const dataColumns = [
   { key: 'code', title: '模板 Code', width: 160 },
   { key: 'name', title: '模板名称', width: 160 },
-  { key: 'configId', title: '短信配置 ID', width: 150 },
+  { key: 'configKey', title: '短信配置 Key', width: 150 },
   {
     key: 'type',
     title: '类型',
@@ -81,7 +81,7 @@ const dataColumns = [
         type: 'default',
         bordered: false
       }, {
-        default: () => option.label || '未知'
+        default: () => option?.label || '未知'
       })
     }
   }, {
@@ -91,10 +91,10 @@ const dataColumns = [
     render(row) {
       const option = _.find(smsTemplateStatusOptions, function (o) { return o.value === row.status })
       return h(NTag, {
-        type: option.type || 'default',
+        type: option?.type || 'default',
         bordered: false
       }, {
-        default: () => option.label || '未知'
+        default: () => option?.label || '未知'
       })
     }
   },

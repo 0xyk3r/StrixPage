@@ -16,6 +16,11 @@
               </n-button>
             </n-input-group>
           </n-gi>
+          <n-gi :span="1">
+            <n-button type="primary" @click="showAddDataModal()">
+              添加{{ funName }}
+            </n-button>
+          </n-gi>
         </n-grid>
       </template>
     </strix-block>
@@ -28,8 +33,30 @@
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
-        <n-form-item label="角色名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入角色名称" clearable />
+        <n-form-item label="配置 Key" path="key">
+          <n-input v-model:value="addDataForm.key" placeholder="请输入配置 Key" clearable />
+        </n-form-item>
+        <n-form-item label="配置名称" path="name">
+          <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
+        </n-form-item>
+        <n-form-item label="短信平台" path="platform">
+          <n-select v-model:value="addDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+            clearable />
+        </n-form-item>
+        <n-form-item label="所属地域" path="regionId">
+          <n-input v-model:value="addDataForm.regionId" placeholder="请输入所属地域" clearable />
+        </n-form-item>
+        <n-form-item label="AccessKey" path="accessKey">
+          <n-input v-model:value="addDataForm.accessKey" placeholder="请输入AccessKey" clearable />
+        </n-form-item>
+        <n-form-item label="AccessSecret" path="accessSecret">
+          <n-input v-model:value="addDataForm.accessSecret" placeholder="请输入AccessSecret" clearable />
+        </n-form-item>
+        <n-form-item label="备注信息" path="remark">
+          <n-input v-model:value="addDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
+            minRows: 3,
+            maxRows: 5
+          }" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -47,8 +74,30 @@
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
-          <n-form-item label="角色名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入角色名称" clearable />
+          <n-form-item label="配置 Key" path="key">
+            <n-input v-model:value="editDataForm.key" placeholder="请输入配置 Key" clearable />
+          </n-form-item>
+          <n-form-item label="配置名称" path="name">
+            <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
+          </n-form-item>
+          <n-form-item label="短信平台" path="platform">
+            <n-select v-model:value="editDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+              clearable />
+          </n-form-item>
+          <n-form-item label="所属地域" path="regionId">
+            <n-input v-model:value="editDataForm.regionId" placeholder="请输入所属地域" clearable />
+          </n-form-item>
+          <n-form-item label="AccessKey" path="accessKey">
+            <n-input v-model:value="editDataForm.accessKey" placeholder="请输入AccessKey" clearable />
+          </n-form-item>
+          <n-form-item label="AccessSecret" path="accessSecret">
+            <n-input v-model:value="editDataForm.accessSecret" placeholder="请输入新的AccessSecret (不输入则不改变)" clearable />
+          </n-form-item>
+          <n-form-item label="备注信息" path="remark">
+            <n-input v-model:value="editDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
+              minRows: 3,
+              maxRows: 5
+            }" />
           </n-form-item>
         </n-form>
       </n-spin>
@@ -245,34 +294,25 @@ const dataColumns = [
       )
     }
   },
-  { key: 'id', width: 150, title: '配置 ID' },
+  { key: 'key', width: 120, title: '配置 Key' },
+  { key: 'name', width: 120, title: '配置名称' },
   {
     key: 'platform',
     width: 100,
     title: '平台',
     render(row) {
-      let tagType = 'default'
-      let tagLabel = ''
-      switch (row.platform) {
-        case 1:
-          tagType = 'warning'
-          tagLabel = '阿里云'
-          break
-        case 2:
-          tagType = 'primary'
-          tagLabel = '腾讯云'
-          break
-      }
+      const option = _.find(smsConfigPlatformOptions, function (o) { return o.value === row.platform })
       return h(NTag, {
-        type: tagType,
+        type: option?.type || 'default',
         bordered: false
       }, {
-        default: () => tagLabel
+        default: () => option?.label || '未知'
       })
     }
   },
   { key: 'regionId', width: 100, title: '地域' },
   { key: 'accessKey', width: 150, title: 'AccessKey' },
+  { key: 'remark', width: 150, title: '备注' },
   { key: 'createTime', width: 150, title: '创建时间' },
   {
     title: '操作',
@@ -389,30 +429,70 @@ const initDataForm = () => {
   editDataModalShow.value = false
   editDataFormLoading.value = false
   addDataForm.value = {
-    name: ''
+    key: '',
+    name: '',
+    platform: '',
+    regionId: '',
+    accessKey: '',
+    accessSecret: '',
+    remark: ''
   }
   editDataId = ''
   editDataForm.value = {
-    name: ''
+    key: '',
+    name: '',
+    platform: '',
+    regionId: '',
+    accessKey: '',
+    accessSecret: '',
+    remark: ''
   }
 }
 
 const addDataModalShow = ref(false)
 const addDataForm = ref({
-  name: ''
+  key: '',
+  name: '',
+  platform: '',
+  regionId: '',
+  accessKey: '',
+  accessSecret: '',
+  remark: ''
 })
 const addDataRules = {
+  key: [
+    { required: true, message: '请输入配置 Key', trigger: 'blur' },
+    { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
   name: [
+    { required: true, message: '请输入配置名称', trigger: 'blur' },
+    { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
+  platform: [
     {
-      required: true,
-      message: '请输入角色名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '角色名称昵称长度需在2-12之间',
-      trigger: 'blur'
+      trigger: 'change',
+      validator(rule, value) {
+        if (value === '') {
+          return new Error('请选择平台')
+        }
+        return true
+      }
     }
+  ],
+  regionId: [
+    { required: true, message: '请输入区域', trigger: 'blur' },
+    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
+  ],
+  accessKey: [
+    { required: true, message: '请输入 AccessKey', trigger: 'blur' },
+    { max: 64, message: 'AccessKey 长度需在 64 字之内', trigger: 'blur' }
+  ],
+  accessSecret: [
+    { required: true, message: '请输入 AccessSecret', trigger: 'blur' },
+    { max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }
+  ],
+  remark: [
+    { max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }
   ]
 }
 const showAddDataModal = (id) => {
@@ -424,7 +504,7 @@ const showAddDataModal = (id) => {
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (!errors) {
-      proxy.$http.post('system/role/update', addDataForm.value).then(({ data: res }) => {
+      proxy.$http.post('system/sms/update', addDataForm.value).then(({ data: res }) => {
         if (res.code !== 200) {
           return createStrixNotify('warning', `添加${funName}失败`, res.msg)
         }
@@ -442,20 +522,47 @@ const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
 let editDataId = ''
 const editDataForm = ref({
-  name: ''
+  key: '',
+  name: '',
+  platform: '',
+  regionId: '',
+  accessKey: '',
+  accessSecret: '',
+  remark: ''
 })
 const editDataRules = {
+  key: [
+    { required: true, message: '请输入配置 Key', trigger: 'blur' },
+    { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
   name: [
+    { required: true, message: '请输入配置名称', trigger: 'blur' },
+    { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
+  platform: [
     {
-      required: true,
-      message: '请输入角色名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '角色名称长度需在2-12之间',
-      trigger: 'blur'
+      trigger: 'change',
+      validator(rule, value) {
+        if (value === '') {
+          return new Error('请选择平台')
+        }
+        return true
+      }
     }
+  ],
+  regionId: [
+    { required: true, message: '请输入区域', trigger: 'blur' },
+    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
+  ],
+  accessKey: [
+    { required: true, message: '请输入 AccessKey', trigger: 'blur' },
+    { max: 64, message: 'AccessKey 长度需在 64 字之内', trigger: 'blur' }
+  ],
+  accessSecret: [
+    { max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }
+  ],
+  remark: [
+    { max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }
   ]
 }
 const showEditDataModal = (id) => {
@@ -501,6 +608,12 @@ const deleteData = (id) => {
     getDataList()
   })
 }
+
+const smsConfigPlatformOptions = [
+  { value: '', label: '未选择' },
+  { value: 1, label: '阿里云', type: 'warning' },
+  { value: 2, label: '腾讯云', type: 'primary' },
+]
 
 </script>
 <script>

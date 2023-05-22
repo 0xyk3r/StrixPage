@@ -345,7 +345,7 @@ const addDataRules = {
     }, {
       min: 2,
       max: 12,
-      message: '角色名称昵称长度需在2-12之间',
+      message: '角色名称长度需在2-12之间',
       trigger: 'blur'
     }
   ]

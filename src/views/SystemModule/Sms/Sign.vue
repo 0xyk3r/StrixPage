@@ -22,7 +22,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="smsSignStatusOptions" placeholder="请选择状态"
-            @update:value="getDataList" @clear="getDataListParams.status = ''" clearable />
+              @update:value="getDataList" @clear="getDataListParams.status = ''" clearable />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -63,25 +63,18 @@ const getDataListParams = ref({
 })
 // 展示列信息
 const dataColumns = [
-  {
-    key: 'name',
-    title: '签名',
-    width: 160
-  }, {
-    key: 'configId',
-    title: '短信配置 ID',
-    width: 150
-  }, {
+  { key: 'name', title: '签名', width: 160 },
+  { key: 'configKey', title: '短信配置 Key', width: 150 }, {
     key: 'status',
     title: '状态',
     width: 120,
     render(row) {
       const option = _.find(smsSignStatusOptions, function (o) { return o.value === row.status })
       return h(NTag, {
-        type: option.type || 'default',
+        type: option?.type || 'default',
         bordered: false
       }, {
-        default: () => option.label || '未知'
+        default: () => option?.label || '未知'
       })
     }
   }
@@ -134,7 +127,7 @@ const clearSearch = () => {
 }
 
 const smsSignStatusOptions = [
-{ value: '', label: '未选择' },
+  { value: '', label: '未选择' },
   { value: 1, label: '待审核', type: 'warning' },
   { value: 2, label: '审核通过', type: 'success' },
   { value: 3, label: '审核未通过', type: 'error' },
