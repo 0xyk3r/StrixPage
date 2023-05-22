@@ -10,7 +10,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" placeholder="请输入搜索关键字（模板Code、名称）" clearable />
+              <n-input v-model:value="getDataListParams.keyword" placeholder="按手机号码搜索" clearable />
               <n-button type="primary" ghost @click="getDataList">
                 搜索
               </n-button>
@@ -25,13 +25,9 @@
               value-field="id" label-field="name" @update:value="getDataList" @clear="getDataListParams.configKey = ''"
               clearable />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
-            <n-select v-model:value="getDataListParams.status" :options="smsTemplateStatusOptions" placeholder="请选择状态"
+          <n-form-item-gi span="6 s:3 m:2" label="发送状态" path="status">
+            <n-select v-model:value="getDataListParams.status" :options="smsLogStatusOptions" placeholder="请选择短信发送状态"
               @update:value="getDataList" @clear="getDataListParams.status = ''" clearable />
-          </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="类型" path="type">
-            <n-select v-model:value="getDataListParams.type" :options="smsTemplateTypeOptions" placeholder="请选择类型"
-              @update:value="getDataList" @clear="getDataListParams.type = ''" clearable />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -54,7 +50,7 @@ import _ from 'lodash'
 const { proxy } = useCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '短信模板'
+const funName = '短信日志'
 
 defineProps({
   isSmallWindow: {
@@ -65,7 +61,6 @@ defineProps({
 // 获取列表请求参数
 const getDataListParams = ref({
   keyword: '',
-  type: '',
   status: '',
   parentId: '',
   current: 1,
@@ -73,28 +68,14 @@ const getDataListParams = ref({
 })
 // 展示列信息
 const dataColumns = [
-  { key: 'code', title: '模板 Code', width: 160 },
-  { key: 'name', title: '模板名称', width: 160 },
-  { key: 'configKey', title: '短信配置 Key', width: 150 },
+  { key: 'configKey', title: '短信配置 Key', width: 120 },
+  { key: 'phoneNumber', title: '手机号码', width: 150 },
   {
-    key: 'type',
-    title: '类型',
+    key: 'platform',
+    title: '短信平台',
     width: 100,
     render(row) {
-      const option = _.find(smsTemplateTypeOptions, function (o) { return o.value === row.type })
-      return h(NTag, {
-        type: 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
-    }
-  }, {
-    key: 'status',
-    title: '状态',
-    width: 100,
-    render(row) {
-      const option = _.find(smsTemplateStatusOptions, function (o) { return o.value === row.status })
+      const option = _.find(smsConfigPlatformOptions, function (o) { return o.value === row.platform })
       return h(NTag, {
         type: option?.type || 'default',
         bordered: false
@@ -103,8 +84,26 @@ const dataColumns = [
       })
     }
   },
-  { key: 'content', title: '模板内容', width: 600 },
-  { title: '创建时间', key: 'createTime', width: 160 }
+  { key: 'signName', title: '签名', width: 150 },
+  { key: 'templateCode', title: '模板 Code', width: 150 },
+  { key: 'templateParam', title: '模板参数', width: 250 },
+  { key: 'requesterIp', title: 'IP 地址', width: 100 },
+  {
+    key: 'status',
+    title: '状态',
+    width: 120,
+    render(row) {
+      const option = _.find(smsLogStatusOptions, function (o) { return o.value === row.status })
+      return h(NTag, {
+        type: option?.type || 'default',
+        bordered: false
+      }, {
+        default: () => option?.label || '未知'
+      })
+    }
+  },
+  { key: 'platformResponse', title: '平台响应', width: 250 },
+  { key: 'createTime', title: '时间', width: 160 },
 ]
 // 分页配置
 const dataPagination = reactive({
@@ -134,12 +133,12 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/sms/template', { params: getDataListParams.value }).then(({ data: res }) => {
+  proxy.$http.get('system/sms/log', { params: getDataListParams.value }).then(({ data: res }) => {
     if (res.code !== 200) {
       createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
     }
     dataLoading.value = false
-    dataData.value = res.data.templates
+    dataData.value = res.data.logs
     dataPagination.itemCount = res.data.total
   })
 }
@@ -149,7 +148,6 @@ onMounted(() => {
 const dataRowKey = (rowData) => rowData.id
 const clearSearch = () => {
   getDataListParams.value.keyword = ''
-  getDataListParams.value.type = ''
   getDataListParams.value.status = ''
   getDataList()
 }
@@ -167,26 +165,22 @@ const getSmsConfigSelectList = () => {
 }
 onMounted(getSmsConfigSelectList)
 
-const smsTemplateTypeOptions = [
+const smsConfigPlatformOptions = [
   { value: '', label: '未选择' },
-  { value: 1, label: '验证码' },
-  { value: 2, label: '通知短信' },
-  { value: 3, label: '推广短信' },
-  { value: 4, label: '国际短信' },
-  { value: 5, label: '数字短信' },
+  { value: 1, label: '阿里云', type: 'warning' },
+  { value: 2, label: '腾讯云', type: 'primary' },
 ]
-const smsTemplateStatusOptions = [
+const smsLogStatusOptions = [
   { value: '', label: '未选择' },
-  { value: 1, label: '待审核', type: 'warning' },
-  { value: 2, label: '审核通过', type: 'success' },
-  { value: 3, label: '审核未通过', type: 'error' },
-  { value: 4, label: '审核取消', type: 'default' },
+  { value: 1, label: '待发送', type: 'warning' },
+  { value: 2, label: '已发送', type: 'success' },
+  { value: 3, label: '发送失败', type: 'error' },
 ]
 
 </script>
 <script>
 export default {
-  name: 'SystemModuleSmsTemplate'
+  name: 'SystemModuleSmsLog'
 }
 </script>
 

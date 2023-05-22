@@ -10,7 +10,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" placeholder="按名称搜索" clearable />
+              <n-input v-model:value="getDataListParams.keyword" placeholder="按签名搜索" clearable />
               <n-button type="primary" ghost @click="getDataList">
                 搜索
               </n-button>
@@ -20,6 +20,11 @@
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+          <n-form-item-gi span="6 s:3 m:2" label="配置 Key" path="configKey">
+            <n-select v-model:value="getDataListParams.configKey" :options="smsConfigSelectList" placeholder="请选择短信配置 Key"
+              value-field="id" label-field="name" @update:value="getDataList" @clear="getDataListParams.configKey = ''"
+              clearable />
+          </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="smsSignStatusOptions" placeholder="请选择状态"
               @update:value="getDataList" @clear="getDataListParams.status = ''" clearable />
@@ -125,6 +130,19 @@ const clearSearch = () => {
   getDataListParams.value.status = ''
   getDataList()
 }
+
+
+// 加载短信配置选项
+const smsConfigSelectList = ref([])
+const getSmsConfigSelectList = () => {
+  proxy.$http.get('system/sms/config/select').then(({ data: res }) => {
+    if (res.code !== 200) {
+      return createStrixNotify('error', '加载短信配置下拉列表失败', res.msg)
+    }
+    smsConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getSmsConfigSelectList)
 
 const smsSignStatusOptions = [
   { value: '', label: '未选择' },

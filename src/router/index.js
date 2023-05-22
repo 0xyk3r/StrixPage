@@ -153,6 +153,14 @@ const routes = [
                   empty: false
                 }
               },{
+                path: 'log',
+                name: 'SystemModuleSmsLog',
+                component: () => import('@/views/SystemModule/Sms/Log.vue'),
+                meta: {
+                  title: '短信日志列表',
+                  empty: false
+                }
+              },{
                 path: 'sign',
                 name: 'SystemModuleSmsSign',
                 component: () => import('@/views/SystemModule/Sms/Sign.vue'),
