@@ -3,8 +3,6 @@ name: Test On Mac Docker
 on:
   push:
     branches: [ "master" ]
-#  pull_request:
-#    branches: [ "master" ]
 
   workflow_dispatch:
 
@@ -21,12 +19,6 @@ jobs:
       - name: Npm Run Build
         run: pnpm run build
       - name: Check Docker Container Exist If Not Create
-        run: docker ps -a | grep StrixNginx > /dev/null || docker run -p 13232:13232 --name StrixNginx -d nginx:stable
-      - name: Upload Nginx Server Config
-        run: docker cp nginx-strix.conf StrixNginx:/etc/nginx/conf.d/strix.conf
-      - name: Delete Old Dist Files
-        run: docker exec -i StrixNginx bash -c "rm -rf /mnt/strixweb"
-      - name: Copy New Dist Files
-        run: docker cp dist StrixNginx:/mnt/strixweb
+        run: docker ps -a | grep StrixNginx > /dev/null || docker run --restart=no -p 13232:13232 --name StrixNginx -v /Users/anjiongyi/Develop/GithubActions/StrixPage/_work/StrixPage/StrixPage/nginx.conf:/etc/nginx/conf.d/app.conf -v /Users/anjiongyi/Develop/GithubActions/StrixPage/_work/StrixPage/StrixPage/dist:/mnt/app -d nginx:stable
       - name: Reload Nginx Config
         run: docker exec -i StrixNginx bash -c "nginx -s reload"
