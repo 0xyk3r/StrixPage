@@ -1,10 +1,9 @@
 <template>
   <div id="tabs-bar-container" class="tabs-bar-container">
-    <n-tabs :value="tabActive" type="card" class="tabs-content" @update:value="handleTabClick" @close="handleTabRemove"
-      animated>
+    <n-tabs :value="tabActive" type="card" class="tabs-content" animated @update:value="handleTabClick"
+      @close="handleTabRemove">
       <n-tab v-for="(item, index) in visitedRoutes" :key="item.name" :name="item.meta.title" :closable="!isAffix(item)"
-        @contextmenu.prevent.stop="handleTabContextmenu($event, index)">
-      </n-tab>
+        @contextmenu.prevent.stop="handleTabContextmenu($event, index)" />
     </n-tabs>
 
     <n-dropdown trigger="hover" placement="bottom-start" :options="contextmenuList" @select="handleContextmenuSelect">
@@ -13,18 +12,17 @@
 
     <teleport to=".n-config-provider">
       <n-dropdown placement="bottom-start" trigger="manual" :x="contextmenuPosition.x" :y="contextmenuPosition.y"
-        :options="contextmenuList" :show="showRightMenu" @select="handleContextmenuSelect">
-      </n-dropdown>
+        :options="contextmenuList" :show="showRightMenu" @select="handleContextmenuSelect" />
     </teleport>
   </div>
 </template>
 
 <script>
-import { defineComponent, computed, onMounted, ref, watch, getCurrentInstance, nextTick } from 'vue'
-import { useTabsBarStore } from '@/stores/tabs-bar'
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import { useRoute, useRouter } from 'vue-router'
+import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
+import { computed, defineComponent, getCurrentInstance, nextTick, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'StrixTabsBar',
@@ -286,12 +284,14 @@ export default defineComponent({
         height: 34px;
         line-height: 34px;
         transition: all .3s var(--n-bezier), width .6s !important;
+        padding-right: 20px;
 
         .n-base-close {
           width: 0;
+          margin-left: 0;
           overflow: hidden;
           transform-origin: 100% 50%;
-          transition: width .3s var(--n-bezier);
+          transition: all .3s var(--n-bezier);
 
           .n-base-icon {
             overflow: hidden;
@@ -312,8 +312,13 @@ export default defineComponent({
         &:hover {
           border: 1px solid var(--n-tab-text-color-hover);
 
-          .n-base-close {
-            width: 18px;
+          &.n-tabs-tab--closable {
+            padding-right: 10px;
+
+            .n-base-close {
+              width: 18px;
+              margin-left: 6px;
+            }
           }
 
           &:after {

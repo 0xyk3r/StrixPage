@@ -30,19 +30,18 @@
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="managerType">
-            <n-select v-model:value="getDataListParams.managerType" :options="managerTypeList"
-              placeholder="请选择管理人员类型" />
+            <n-select v-model:value="getDataListParams.managerType" :options="managerTypeList" placeholder="请选择管理人员类型" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
-    <n-data-table :loading="dataLoading" :columns="dataColumns" :data="dataData" :pagination="dataPagination"
+    <n-data-table :loading="dataLoading" :columns="dataColumns" :data="dataRef" :pagination="dataPagination"
       :row-key="dataRowKey" :expanded-row-keys="dataExpandedRowKeys"
-      @updateExpandedRowKeys="dataExpandedRowKeysChange" />
+      @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="管理人员昵称" path="nickname">
@@ -78,7 +77,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -119,16 +118,16 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import { createPagination } from '@/plugins/pagination.js'
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import useCurrentInstance from '@/utils/strix-instance-tool'
 import { createStrixNotify } from '@/utils/strix-notify'
+import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
-import { Icon } from '@iconify/vue'
-import _ from 'lodash'
-import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NPopconfirm, NSpace, NSpin, NTag } from 'naive-ui'
-import { h, nextTick, onActivated, onDeactivated, onMounted, reactive, ref } from 'vue'
+import { differenceWith, find, forOwn, isEqual, pick } from 'lodash'
+import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NSpace, NSpin, NTag } from 'naive-ui'
+import { getCurrentInstance, h, nextTick, onActivated, onDeactivated, onMounted, ref } from 'vue'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const quickMenuStore = useQuickMenuStore()
 
 // 本页面操作提示关键词
@@ -165,9 +164,15 @@ const getDataListParams = ref({
   keyword: '',
   managerStatus: '',
   managerType: '',
-  current: 1,
-  size: 10
+  pageIndex: 1,
+  pageSize: 10
 })
+const clearSearch = () => {
+  getDataListParams.value.keyword = ''
+  getDataListParams.value.managerStatus = ''
+  getDataListParams.value.managerType = ''
+  getDataList()
+}
 // 展示列信息
 const dataColumns = [
   {
@@ -176,186 +181,74 @@ const dataColumns = [
       if (!row.roleIdArray) {
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
-      const rolesCheckboxRender = []
-      systemRoleSelectList.value.forEach(role => {
-        rolesCheckboxRender.push(
-          h(NCheckbox,
-            {
-              value: role.id,
-              label: role.name
-            }
-          )
+      const rolesCheckboxRender = systemRoleSelectList.value.map(({ value, label }) => h(NCheckbox, { value, label }))
+      return h('div', { style: 'padding: 5px 10px;' }, [
+        h(NH6, { prefix: 'bar', alignText: true }, () => '人员角色设置'),
+        h(NCheckboxGroup, { value: row.roleIdArray, 'onUpdate:value': (value) => changeSystemManagerRoles(row.id, value) }, () =>
+          h(NSpace, { itemStyle: 'display: flex;' }, () => rolesCheckboxRender)
         )
-      })
-      return h('div',
-        { style: 'padding: 5px 10px;' },
-        [
-          h(NH6,
-            {
-              prefix: 'bar',
-              alignText: true,
-            },
-            () => '人员角色设置'
-          ),
-          h(NCheckboxGroup,
-            {
-              value: row.roleIdArray,
-              'onUpdate:value': (value) => changeSystemManagerRoles(row.id, value)
-            },
-            () =>
-              h(NSpace,
-                {
-                  itemStyle: 'display: flex;'
-                },
-                () => rolesCheckboxRender
-              )
-          )]
-      )
+      ])
     }
-  }, {
-    key: 'nickname',
-    title: '昵称',
-    width: 120
-  }, {
-    key: 'loginName',
-    title: '登录名',
-    width: 120
-  }, {
-    key: 'managerStatus',
-    title: '账户状态',
-    width: 100,
+  },
+  { key: 'nickname', title: '昵称', width: 120 },
+  { key: 'loginName', title: '登录名', width: 120 },
+  {
+    key: 'managerStatus', title: '账户状态', width: 100,
     render(row) {
-      let tagType = 'default'
-      switch (row.managerStatus) {
-        case 0:
-          tagType = 'error'
-          break
-        case 1:
-          tagType = 'info'
-          break
-      }
-      return h(NTag, {
-        type: tagType,
-        bordered: false
-      }, {
-        default: () => _.find(managerStatusList, function (o) { return o.value === row.managerStatus })?.label
+      return h(NTag, { type: row.managerStatus === 0 ? 'error' : 'info', bordered: false }, {
+        default: () => find(managerStatusList, o => o.value === row.managerStatus)?.label
       })
     }
-  }, {
-    key: 'managerType',
-    title: '账户类型',
-    width: 100,
+  },
+  {
+    key: 'managerType', title: '账户类型', width: 100,
     render(row) {
-      let tagType = 'default'
-      switch (row.managerType) {
-        case 1:
-          tagType = 'success'
-          break
-        case 2:
-          tagType = 'info'
-          break
-      }
-      return h(NTag, {
-        type: tagType,
-        bordered: false
-      }, {
-        default: () => _.find(managerTypeList, function (o) { return o.value === row.managerType })?.label
+      return h(NTag, { type: row.managerType === 1 ? 'success' : 'info', bordered: false }, {
+        default: () => find(managerTypeList, o => o.value === row.managerType)?.label
       })
     }
-  }, {
-    key: 'regionId',
-    title: '地区权限',
-    width: 140,
+  },
+  {
+    key: 'regionId', title: '地区权限', width: 140,
     render(row) {
-      let tagType = 'default'
-      let tagText = ''
-      if (row.managerType == 1) {
-        tagType = 'success'
-        tagText = '所有地区'
-      } else {
-        tagType = 'info'
-        tagText = managerRegionName(row.regionId)
-      }
-      return h(NTag, {
-        type: tagType,
-        bordered: false
-      }, {
+      const tagText = row.managerType === 1 ? '所有地区' : managerRegionName(row.regionId);
+      return h(NTag, { type: row.managerType === 1 ? 'success' : 'info', bordered: false }, {
         default: () => tagText
       })
     }
-  }, {
-    key: 'createTime',
-    title: '创建时间',
-    width: 160
-  }, {
+  },
+  { key: 'createTime', title: '创建时间', width: 160 },
+  {
     title: '操作',
     width: 160,
     render(row) {
-      return [
-        h(NButton,
-          {
-            size: 'medium',
-            type: 'warning',
-            style: 'margin-right: 10px',
-            onClick: () => showEditDataModal(row.id)
-          },
-          () => h(Icon, { icon: 'ion:create-outline' })
-        ),
-        h(NPopconfirm,
-          {
-            onPositiveClick: () => deleteData(row.id)
-          }, {
-          trigger: () => h(NButton,
-            {
-              size: 'medium',
-              type: 'error',
-              style: 'margin-right: 10px'
-            },
-            () => h(Icon, { icon: 'ion:trash-outline' })
-          ),
-          default: () => '是否确认删除这条数据? 该操作不可恢复!'
+      return handleOperate([
+        { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
+        {
+          type: 'error',
+          label: '删除',
+          icon: 'ion:trash-outline',
+          onClick: () => deleteData(row.id),
+          popconfirm: true,
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
-        )
-      ]
+      ])
     }
   }
 ]
 // 分页配置
-const dataPagination = reactive({
-  page: 1,
-  pageSize: 10,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 50, 100],
-  prefix({ itemCount }) {
-    return `共 ${itemCount} 条`
-  },
-  onChange: (page) => {
-    dataPagination.page = page
-    getDataListParams.value.current = page
-    getDataList()
-  },
-  onUpdatePageSize: (pageSize) => {
-    dataPagination.pageSize = pageSize
-    dataPagination.page = 1
-    getDataListParams.value.size = pageSize
-    getDataListParams.value.current = 1
-    getDataList()
-  }
-})
+const dataPagination = createPagination(getDataListParams, () => { getDataList() })
 // 加载列表
-const dataData = ref()
+const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/manager', { params: getDataListParams.value }).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
-    }
+  proxy.$http.get('system/manager', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
-    dataData.value = res.data.systemManagerList
+    dataRef.value = res.data.systemManagerList
     dataPagination.itemCount = res.data.total
   })
 }
@@ -364,32 +257,22 @@ const dataRowKey = (rowData) => rowData.id
 const dataExpandedRowKeys = ref([])
 const dataExpandedRowKeysChange = (value) => {
   // 只获取新展开的
-  const diffs = _.differenceWith(value, dataExpandedRowKeys.value, _.isEqual);
+  const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual);
   dataExpandedRowKeys.value = value
   diffs.forEach(diff => {
-    const row = _.find(dataData.value, { id: diff })
+    const row = find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/manager/${row.id}`).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('error', '获取角色的详细信息失败', res.msg)
-        }
+      proxy.$http.get(`system/manager/${row.id}`, { operate: '加载角色详细信息' }).then(({ data: res }) => {
         row.roleIdArray = res.data.roleIds?.split(',')
       })
     }
   })
 }
-const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataList()
-}
 
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  proxy.$http.get('system/region/cascader').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('warning', `加载${funName}下拉列表失败`, res.msg)
-    }
+  proxy.$http.get('system/region/cascader', { operate: `加载${funName}下拉列表` }).then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options
   })
 }
@@ -397,10 +280,7 @@ onMounted(getSystemRegionSelectList)
 // 加载所有人员角色选项
 const systemRoleSelectList = ref([])
 const getSystemRoleSelectList = () => {
-  proxy.$http.get('system/role/select').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '加载系统角色下拉列表失败', res.msg)
-    }
+  proxy.$http.get('system/role/select', { operate: '加载系统角色下拉列表' }).then(({ data: res }) => {
     systemRoleSelectList.value = res.data.options
   })
 }
@@ -420,17 +300,12 @@ const managerRegionName = (regionId) => {
 }
 
 const changeSystemManagerRoles = (systemManagerId, roles) => {
-  const row = _.find(dataData.value, { id: systemManagerId })
+  const row = find(dataRef.value, { id: systemManagerId })
   proxy.$http.post(`system/manager/modify/${systemManagerId}`, {
     field: 'role',
     value: roles.join(',')
-  }).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `更变${funName}角色失败`, res.msg)
-    } else {
-      createStrixNotify('success', '提示信息', `更变${funName}角色成功`)
-      row.roleIdArray = res.data.roleIds?.split(',')
-    }
+  }, { operate: `更变${funName}角色` }).then(({ data: res }) => {
+    row.roleIdArray = res.data.roleIds?.split(',')
   })
 }
 
@@ -468,85 +343,36 @@ const addDataForm = ref({
 })
 const addDataRules = {
   nickname: [
-    {
-      required: true,
-      message: '请输入管理人员昵称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 16,
-      message: '管理人员昵称长度需在2-16之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
+    { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }
   ],
   loginName: [
-    {
-      required: true,
-      message: '请输入登录账号',
-      trigger: 'blur'
-    }, {
-      min: 4,
-      max: 16,
-      message: '登录账号长度需在4-16之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入登录账号', trigger: 'blur' },
+    { min: 4, max: 16, message: '登录账号长度需在4-16之间', trigger: 'blur' }
   ],
   loginPassword: [
-    {
-      required: true,
-      message: '请输入登录密码',
-      trigger: 'blur'
-    }, {
-      min: 6,
-      max: 16,
-      message: '登录密码长度需在6-16之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入登录密码', trigger: 'blur' },
+    { min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }
   ],
   managerStatus: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择管理人员状态')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }
   ],
   managerType: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择管理人员类型')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }
   ]
 }
-const showAddDataModal = (id) => {
+const showAddDataModal = () => {
   getSystemRegionSelectList()
-  if (id) {
-    addDataForm.value.parentId = id
-  }
   addDataModalShow.value = true
 }
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post('system/manager/update', addDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `添加${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `添加${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    proxy.$http.post('system/manager/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -563,58 +389,21 @@ const editDataForm = ref({
 })
 const editDataRules = {
   nickname: [
-    {
-      required: true,
-      message: '请输入管理人员昵称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 16,
-      message: '管理人员昵称长度需在2-16之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
+    { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }
   ],
   loginName: [
-    {
-      required: true,
-      message: '请输入登录账号',
-      trigger: 'blur'
-    }, {
-      min: 4,
-      max: 16,
-      message: '登录账号长度需在4-16之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入登录账号', trigger: 'blur' },
+    { min: 4, max: 16, message: '登录账号长度需在4-16之间', trigger: 'blur' }
   ],
   loginPassword: [
-    {
-      min: 6,
-      max: 16,
-      message: '登录密码长度需在6-16之间',
-      trigger: 'blur'
-    }
+    { min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }
   ],
   managerStatus: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择管理人员状态')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }
   ],
   managerType: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择管理人员类型')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }
   ]
 }
 const showEditDataModal = (id) => {
@@ -622,42 +411,29 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  proxy.$http.get(`system/manager/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `查询${funName}信息失败`, res.msg)
-    }
+  proxy.$http.get(`system/manager/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
-    _.forOwn(editDataForm.value, function (value, key) {
+    forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
     })
     editDataId = id
-    editDataForm.value = _.pick(res.data, canUpdateFields)
+    editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post(`system/manager/update/${editDataId}`, editDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `修改${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `修改${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    proxy.$http.post(`system/manager/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/manager/remove/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `删除${funName}失败`, res.msg)
-    }
-    createStrixNotify('success', '提示信息', `删除${funName}成功`)
+  proxy.$http.post(`system/manager/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
     getDataList()
   })
 }
@@ -669,6 +445,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

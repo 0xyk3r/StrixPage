@@ -14,11 +14,11 @@ jobs:
         uses: actions/checkout@v3.3.0
         with: 
           clean: false
-      - name: Npm Install
+      - name: Install with pnpm
         run: pnpm install
-      - name: Npm Run Build
+      - name: Build with pnpm
         run: pnpm run build
-      - name: Check Docker Container Exist If Not Create
+      - name: Run Docker Container
         run: docker ps -a | grep StrixNginx > /dev/null || docker run --restart=no -p 13232:13232 --name StrixNginx -v $PWD/nginx.conf:/etc/nginx/conf.d/app.conf -v $PWD/dist:/mnt/app -d nginx:stable
       - name: Reload Nginx Config
         run: docker exec -i StrixNginx bash -c "nginx -s reload"

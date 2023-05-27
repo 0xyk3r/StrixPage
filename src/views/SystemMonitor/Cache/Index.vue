@@ -1,9 +1,7 @@
 <template>
   <div>
     <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">
-        系统缓存信息
-      </n-text>
+      <n-text type="success">系统缓存信息</n-text>
     </n-h3>
     <n-card title="Redis Info">
       <n-spin :show="!cacheInfo">
@@ -53,7 +51,7 @@
     <n-grid x-gap="12" :cols="2">
       <n-gi>
         <n-card title="命令统计" style="margin-top: 15px;">
-          <div id="commandstats" style="height: 420px"></div>
+          <div id="commandstats" style="height: 420px" />
         </n-card>
       </n-gi>
       <n-gi>
@@ -62,104 +60,94 @@
         </n-card>
       </n-gi>
     </n-grid>
-
   </div>
 </template>
 <script setup>
-import useCurrentInstance from '@/utils/strix-instance-tool';
-import { createStrixNotify } from '@/utils/strix-notify';
 import * as echarts from 'echarts';
-import { onMounted, ref } from 'vue';
+import { getCurrentInstance, onMounted, ref } from 'vue';
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const loading = ref(true)
 const cacheInfo = ref({})
 
 const getData = () => {
+  const commandstats = echarts.init(document.getElementById("commandstats"));
+  const usedmemory = echarts.init(document.getElementById("usedmemory"));
+
   loading.value = true
-  proxy.$http.get('system/monitor/cache').then(({ data: res }) => {
-    if (res.code !== 200) {
-      createStrixNotify('warning', `获取系统运行信息失败`, res.msg)
-    }
+  proxy.$http.get('system/monitor/cache', { operate: '加载系统缓存信息' }).then(({ data: res }) => {
     loading.value = false
     cacheInfo.value = res.data
 
-    const commandstats = echarts.init(document.getElementById("commandstats"));
+    const usedMemoryKB = (res.data.info.used_memory / 1024).toFixed(2)
+
     commandstats.setOption({
       tooltip: {
         trigger: "item",
         formatter: "{a} <br/>{b} : {c} ({d}%)",
       },
-      series: [
-        {
-          name: "命令",
-          type: "pie",
-          roseType: "radius",
-          radius: [50, 150],
-          itemStyle: {
-            borderRadius: 8
-          },
-          center: ["50%", "50%"],
-          data: res.data.commandStats,
-          animationEasing: "cubicInOut",
-          animationDuration: 1000,
-        }
-      ]
+      series: [{
+        name: "命令",
+        type: "pie",
+        roseType: "radius",
+        radius: [50, 150],
+        itemStyle: { borderRadius: 8 },
+        center: ["50%", "50%"],
+        data: res.data.commandStats,
+        animationEasing: "cubicInOut",
+        animationDuration: 1000,
+      }]
     })
-    const usedmemory = echarts.init(document.getElementById("usedmemory"));
+
     usedmemory.setOption({
       tooltip: {
         formatter: "{b} <br/>{a} : " + res.data.info.used_memory_human,
       },
-      series: [
-        {
-          name: "峰值",
-          type: "gauge",
-          axisLine: {
-            lineStyle: {
-              width: 20,
-              color: [
-                [0.3, '#67e0e3'],
-                [0.7, '#37a2da'],
-                [1, '#fd666d']
-              ]
-            }
-          },
-          axisTick: {
-            distance: -20,
-            length: 8,
-            lineStyle: {
-              color: '#fff',
-              width: 2
-            }
-          },
-          splitLine: {
-            distance: -20,
-            length: 20,
-            lineStyle: {
-              color: '#fff',
-              width: 4
-            }
-          },
-          axisLabel: {
-            color: 'auto',
-            distance: 30,
-            fontSize: 12
-          },
-          min: 0,
-          max: 10000,
-          detail: {
-            color: 'auto',
-            formatter: res.data.info.used_memory_human,
-          },
-          data: [
-            {
-              value: parseFloat(res.data.info.used_memory_human),
-              name: "内存消耗"
-            }
-          ]
-        }
-      ]
+      series: [{
+        name: "峰值",
+        type: "gauge",
+        axisLine: {
+          lineStyle: {
+            width: 20,
+            color: [
+              [0.3, '#67e0e3'],
+              [0.7, '#37a2da'],
+              [1, '#fd666d']
+            ]
+          }
+        },
+        axisTick: {
+          distance: -20,
+          length: 8,
+          lineStyle: {
+            color: '#fff',
+            width: 2
+          }
+        },
+        splitLine: {
+          distance: -20,
+          length: 20,
+          lineStyle: {
+            color: '#fff',
+            width: 4
+          }
+        },
+        axisLabel: {
+          color: 'inherit',
+          distance: 30,
+          fontSize: 12
+        },
+        min: 0,
+        max: 10000,
+        detail: {
+          color: 'inherit',
+          formatter: usedMemoryKB,
+        },
+        data: [{
+          value: usedMemoryKB,
+          name: "内存消耗"
+        }]
+      }]
     })
   })
 }
@@ -171,6 +159,4 @@ export default {
   name: 'SystemMonitorCacheIndex'
 }
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

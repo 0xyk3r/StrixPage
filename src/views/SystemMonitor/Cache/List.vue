@@ -1,8 +1,7 @@
 <template>
   <div>
     <n-grid x-gap="24" :cols="2">
-      <n-gi>1</n-gi>
-      <n-gi>1</n-gi>
+      <n-gi>CacheList</n-gi>
     </n-grid>
   </div>
 </template>

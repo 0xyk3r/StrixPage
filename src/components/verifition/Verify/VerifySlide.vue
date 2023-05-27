@@ -244,7 +244,7 @@ export default {
           "token": backToken.value
         }
 
-        proxy.$http.post('captcha/check', data).then(({ data: res }) => {
+        proxy.$http.post('captcha/check', data, { operate: '验证码校验', notify: false }).then(({ data: res }) => {
           if (res.repCode == "0000") {
             moveBlockBackgroundColor.value = '#5cb85c'
             leftBarBorderColor.value = '#5cb85c'
@@ -317,7 +317,7 @@ export default {
         captchaType: captchaType.value
       }
 
-      proxy.$http.post('captcha/get', data).then(({ data: res }) => {
+      proxy.$http.post('captcha/get', data, { operate: '验证码获取', notify: false }).then(({ data: res }) => {
         if (res.repCode == "0000") {
           backImgBase.value = res.repData.originalImageBase64
           blockBackImgBase.value = res.repData.jigsawImageBase64

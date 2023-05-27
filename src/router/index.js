@@ -149,10 +149,10 @@ const routes = [
                 name: 'SystemModuleSmsIndex',
                 component: () => import('@/views/SystemModule/Sms/Index.vue'),
                 meta: {
-                  title: '短信服务配置',
+                  title: '短信服务列表',
                   empty: false
                 }
-              },{
+              }, {
                 path: 'log',
                 name: 'SystemModuleSmsLog',
                 component: () => import('@/views/SystemModule/Sms/Log.vue'),
@@ -160,7 +160,7 @@ const routes = [
                   title: '短信日志列表',
                   empty: false
                 }
-              },{
+              }, {
                 path: 'sign',
                 name: 'SystemModuleSmsSign',
                 component: () => import('@/views/SystemModule/Sms/Sign.vue'),
@@ -168,12 +168,55 @@ const routes = [
                   title: '短信签名列表',
                   empty: false
                 }
-              },{
+              }, {
                 path: 'template',
                 name: 'SystemModuleSmsTemplate',
                 component: () => import('@/views/SystemModule/Sms/Template.vue'),
                 meta: {
                   title: '短信模板列表',
+                  empty: false
+                }
+              }
+            ]
+          }, {
+            path: 'oss',
+            name: 'SystemModuleOssIndex',
+            component: EmptyLayout,
+            meta: {
+              title: '存储服务配置',
+              empty: true
+            },
+            children: [
+              {
+                path: 'config',
+                name: 'SystemModuleOssIndex',
+                component: () => import('@/views/SystemModule/Oss/Index.vue'),
+                meta: {
+                  title: '存储服务列表',
+                  empty: false
+                }
+              }, {
+                path: 'bucket',
+                name: 'SystemModuleOssBucket',
+                component: () => import('@/views/SystemModule/Oss/Bucket.vue'),
+                meta: {
+                  title: '存储空间管理',
+                  empty: false
+                }
+              }, {
+                path: 'filegroup',
+                name: 'SystemModuleOssFileGroup',
+                component: () => import('@/views/SystemModule/Oss/FileGroup.vue'),
+                meta: {
+                  title: '文件分组管理',
+                  empty: false
+                }
+              }, {
+                path: 'file',
+                name: 'SystemModuleOssFile',
+                component: () => import('@/views/SystemModule/Oss/File.vue'),
+                meta: {
+                  title: '存储文件列表',
                   empty: false
                 }
               }
@@ -192,8 +235,10 @@ const router = createRouter({
 
 // 前置路由导航守卫
 router.beforeEach((to, form, next) => {
-  // next() 放行    next('/login') 强制跳转
+  // 加载条
   controlStrixLoadingBar('start')
+  // 设置标题
+  to.meta.title ? document.title = to.meta.title + ' - Strix' : document.title = 'Strix'
   if (to.path === '/login') { return next() }
   const loginToken = window.localStorage.getItem('strix_login_token')
   if (!loginToken) { return next('/login?to=' + to.fullPath) }

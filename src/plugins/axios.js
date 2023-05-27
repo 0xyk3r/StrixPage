@@ -1,4 +1,5 @@
 import { useHttpCancelerStore } from '@/stores/http-canceler'
+import { createStrixNotify } from '@/utils/strix-notify'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import JSEncrypt from 'jsencrypt'
@@ -60,7 +61,7 @@ function dec(response) {
   return {}
 }
 
-axios.interceptors.request.use(async config => {
+axios.interceptors.request.use(config => {
   config.headers['Content-Type'] = 'application/json'
   const token = window.localStorage.getItem('strix_login_token')
   if (token) {
@@ -116,36 +117,46 @@ axios.interceptors.request.use(async config => {
 
   return config
 })
-axios.interceptors.response.use(async response => {
+axios.interceptors.response.use(response => {
+  // 成功通知 get请求默认不显示 post请求默认显示
+  const notify = response.config.method === 'get' ? response.config.notify === true : response.config.notify !== false
+
   if (response.config.strixRequestGroup) {
     const httpCancelerStore = useHttpCancelerStore()
     httpCancelerStore.delRequestingApiById(response.config.strixRequestId)
   }
   if (response.data) {
     response.data = dec(response.data)
+    console.log(response.data)
+    if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
+      handleError(response)
+    } else if (notify) {
+      createStrixNotify('success', (response.config.operate || '操作') + '成功', '操作成功')
+    }
+  }
+  return response
+}, error => {
+  createStrixNotify('error', '网络请求失败', error.message)
+})
+
+function handleError(response) {
+  const operate = (response.config.operate || '操作') + '失败'
+  let errMsg = '未知错误'
+  if (response.data) {
+    errMsg = response.data.msg
+    // 登录失效 清除登录信息并跳转到登录页
     if (response.data.code === 401) {
-      // 登录失效 清除登录信息并刷新
       window.localStorage.removeItem('strix_login_token')
       window.localStorage.removeItem('strix_login_token_expire')
       window.localStorage.removeItem('strix_login_info')
       location.href = '/login?to=' + location.pathname
     }
-    // 填充默认错误信息
-    if (response.data.code !== 200 && !response.data.msg) {
-      response.data.msg = '未知错误'
-    }
-    console.log(response.data)
+    // 错误信息为空时 填充默认错误信息
+    response.data.msg = response.data.msg || '未知错误'
   }
-  return response
-}, error => {
-  if (error.response?.data?.code === 401) {
-    // 登录失效 清除登录信息并刷新
-    window.localStorage.removeItem('strix_login_token')
-    window.localStorage.removeItem('strix_login_token_expire')
-    window.localStorage.removeItem('strix_login_info')
-    location.href = '/login?to=' + location.pathname
-  }
-})
+  createStrixNotify('error', operate, errMsg)
+  throw new Error(operate)
+}
 
 function paramsSign(url, params, timestamp) {
   const baseParams = {

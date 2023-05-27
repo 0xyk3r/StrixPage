@@ -17,7 +17,7 @@
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()">
+            <n-button type="primary" @click="showAddDataModal">
               添加{{ funName }}
             </n-button>
           </n-gi>
@@ -39,12 +39,15 @@
         <n-form-item label="配置名称" path="name">
           <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
         </n-form-item>
-        <n-form-item label="短信平台" path="platform">
-          <n-select v-model:value="addDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+        <n-form-item label="存储平台" path="platform">
+          <n-select v-model:value="addDataForm.platform" :options="ossConfigPlatformOptions" placeholder="请选择存储平台"
             clearable />
         </n-form-item>
-        <n-form-item label="所属地域" path="regionId">
-          <n-input v-model:value="addDataForm.regionId" placeholder="请输入所属地域" clearable />
+        <n-form-item label="公网节点" path="publicEndpoint">
+          <n-input v-model:value="addDataForm.publicEndpoint" placeholder="请输入公网节点" clearable />
+        </n-form-item>
+        <n-form-item label="内网节点" path="privateEndpoint">
+          <n-input v-model:value="addDataForm.privateEndpoint" placeholder="请输入内网节点" clearable />
         </n-form-item>
         <n-form-item label="AccessKey" path="accessKey">
           <n-input v-model:value="addDataForm.accessKey" placeholder="请输入AccessKey" clearable />
@@ -80,12 +83,15 @@
           <n-form-item label="配置名称" path="name">
             <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
           </n-form-item>
-          <n-form-item label="短信平台" path="platform">
-            <n-select v-model:value="editDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+          <n-form-item label="存储平台" path="platform">
+            <n-select v-model:value="editDataForm.platform" :options="ossConfigPlatformOptions" placeholder="请选择存储平台"
               clearable />
           </n-form-item>
-          <n-form-item label="所属地域" path="regionId">
-            <n-input v-model:value="editDataForm.regionId" placeholder="请输入所属地域" clearable />
+          <n-form-item label="公网节点" path="publicEndpoint">
+            <n-input v-model:value="editDataForm.publicEndpoint" placeholder="请输入公网节点" clearable />
+          </n-form-item>
+          <n-form-item label="内网节点" path="privateEndpoint">
+            <n-input v-model:value="editDataForm.privateEndpoint" placeholder="请输入内网节点" clearable />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
             <n-input v-model:value="editDataForm.accessKey" placeholder="请输入AccessKey" clearable />
@@ -125,7 +131,7 @@ import { getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '短信服务'
+const funName = '存储服务'
 
 defineProps({
   isSmallWindow: {
@@ -148,57 +154,41 @@ const dataColumns = [
   {
     type: "expand",
     renderExpand: (row) => {
-      if (!row.expandTab) row.expandTab = 'sign'
+      if (!row.expandTab) row.expandTab = 'bucket'
       if (!row.loaded) {
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
 
-      const expandSmsSignChildrenVNode = [
+      const expandOssSignChildrenVNode = [
         h(NDataTable, {
           columns: [
-            { title: '签名', key: 'name', width: 200 },
+            { title: 'Bucket 名称', key: 'name', width: 200 },
             {
-              title: '签名状态', key: 'status', width: 80, render: (row) => {
-                let tagType = 'default'
-                let tagLabel = ''
-                switch (row.status) {
-                  case 1:
-                    tagType = 'warning'
-                    tagLabel = '待审核'
-                    break
-                  case 2:
-                    tagType = 'success'
-                    tagLabel = '审核通过'
-                    break
-                  case 3:
-                    tagType = 'error'
-                    tagLabel = '审核未通过'
-                    break
-                  case 4:
-                    tagType = 'default'
-                    tagLabel = '审核取消'
-                    break
-                  default:
-                    tagType = 'default'
-                    tagLabel = '未知'
-                    break
+              title: '存储类型',
+              key: 'storageClass',
+              width: 80,
+              render: (row) => {
+                const storageClassMap = {
+                  Standard: { type: 'success', label: '标准存储' },
+                  IA: { type: 'info', label: '低频访问存储' },
+                  Archive: { type: 'warning', label: '归档存储' },
+                  ColdArchive: { type: 'error', label: '冷归档存储' },
+                  default: { type: 'default', label: '未知' }
                 }
-                return h(NTag, {
-                  type: tagType,
-                  bordered: false
-                }, {
-                  default: () => tagLabel
-                })
+                const { type, label } = storageClassMap[row.storageClass] || storageClassMap.default
+                return h(NTag, { type, bordered: false }, { default: () => label })
               }
             },
-            { title: '创建时间', key: 'createTime', width: 160 }
+            { title: '地域', key: 'region', width: 160 },
+            { title: '创建时间', key: 'createTime', width: 160 },
+            { title: '备注', key: 'remark', width: 160 }
           ],
-          data: row.signs,
+          data: row.buckets,
           rowKey: (row) => row.id,
         }, null)
       ]
 
-      const expandSmsTemplateChildrenVNode = [
+      const expandOssTemplateChildrenVNode = [
         h(NDataTable, {
           columns: [
             { title: '模板 Code', key: 'code', width: 160 },
@@ -286,11 +276,11 @@ const dataColumns = [
           'onUpdate:value': (value) => { row.expandTab = value }
         },
         () => [
-          h(NTabPane, { name: 'sign', tab: '短信签名', class: 'expand-sign-pane' }, () =>
-            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandSmsSignChildrenVNode]))
+          h(NTabPane, { name: 'bucket', tab: '存储空间', class: 'expand-sign-pane' }, () =>
+            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandOssSignChildrenVNode]))
           ),
-          h(NTabPane, { name: 'template', tab: '短信模板', class: 'expand-template-pane' }, () =>
-            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandSmsTemplateChildrenVNode]))
+          h(NTabPane, { name: 'template', tab: 'TODO', class: 'expand-template-pane' }, () =>
+            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandOssTemplateChildrenVNode]))
           )
         ]
       )
@@ -303,7 +293,7 @@ const dataColumns = [
     width: 100,
     title: '平台',
     render(row) {
-      const option = _.find(smsConfigPlatformOptions, function (o) { return o.value === row.platform })
+      const option = _.find(ossConfigPlatformOptions, function (o) { return o.value === row.platform })
       return h(NTag, {
         type: option?.type || 'default',
         bordered: false
@@ -312,7 +302,8 @@ const dataColumns = [
       })
     }
   },
-  { key: 'regionId', width: 100, title: '地域' },
+  { key: 'publicEndpoint', width: 150, title: '公网节点' },
+  { key: 'privateEndpoint', width: 150, title: '内网节点' },
   { key: 'accessKey', width: 150, title: 'AccessKey' },
   { key: 'remark', width: 150, title: '备注' },
   { key: 'createTime', width: 150, title: '创建时间' },
@@ -343,7 +334,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/sms', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/oss', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
@@ -361,8 +352,8 @@ const dataExpandedRowKeysChange = (value) => {
   diffs.forEach(diff => {
     const row = _.find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/sms/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
-        row.signs = res.data.signs
+      proxy.$http.get(`system/oss/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+        row.buckets = res.data.buckets
         row.templates = res.data.templates
         row.loaded = true
       })
@@ -378,7 +369,8 @@ const initDataForm = () => {
     key: '',
     name: '',
     platform: '',
-    regionId: '',
+    publicEndpoint: '',
+    privateEndpoint: '',
     accessKey: '',
     accessSecret: '',
     remark: ''
@@ -388,7 +380,8 @@ const initDataForm = () => {
     key: '',
     name: '',
     platform: '',
-    regionId: '',
+    publicEndpoint: '',
+    privateEndpoint: '',
     accessKey: '',
     accessSecret: '',
     remark: ''
@@ -400,7 +393,8 @@ const addDataForm = ref({
   key: '',
   name: '',
   platform: '',
-  regionId: '',
+  publicEndpoint: '',
+  privateEndpoint: '',
   accessKey: '',
   accessSecret: '',
   remark: ''
@@ -440,7 +434,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/sms/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+    proxy.$http.post('system/oss/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -454,7 +448,8 @@ const editDataForm = ref({
   key: '',
   name: '',
   platform: '',
-  regionId: '',
+  publicEndpoint: '',
+  privateEndpoint: '',
   accessKey: '',
   accessSecret: '',
   remark: ''
@@ -471,9 +466,13 @@ const editDataRules = {
   platform: [
     { type: 'number', required: true, message: '请选择平台', trigger: 'change' }
   ],
-  regionId: [
-    { required: true, message: '请输入区域', trigger: 'blur' },
-    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
+  publicEndpoint: [
+    { required: true, message: '请输入公网节点', trigger: 'blur' },
+    { min: 1, max: 128, message: '公网节点长度需在 1 - 128 字之内', trigger: 'blur' }
+  ],
+  privateEndpoint: [
+    { required: true, message: '请输入内网节点', trigger: 'blur' },
+    { min: 1, max: 128, message: '内网节点长度需在 1 - 128 字之内', trigger: 'blur' }
   ],
   accessKey: [
     { required: true, message: '请输入 AccessKey', trigger: 'blur' },
@@ -490,7 +489,7 @@ const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/sms/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/oss/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     _.forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -504,7 +503,7 @@ const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post(`system/sms/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post(`system/oss/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -512,12 +511,12 @@ const editData = () => {
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/sms/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
+  proxy.$http.post(`system/oss/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
     getDataList()
   })
 }
 
-const smsConfigPlatformOptions = [
+const ossConfigPlatformOptions = [
   { value: '', label: '未选择' },
   { value: 1, label: '阿里云', type: 'warning' },
   { value: 2, label: '腾讯云', type: 'primary' },
@@ -526,7 +525,7 @@ const smsConfigPlatformOptions = [
 </script>
 <script>
 export default {
-  name: 'SystemModuleSmsIndex'
+  name: 'SystemModuleOssIndex'
 }
 </script>
 

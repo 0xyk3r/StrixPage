@@ -1,6 +1,6 @@
 <template>
   <transition name="quick-menus-show">
-    <n-el tag="ul" v-if="quickMenus && quickMenus.length > 0" class="strix-quick-menu"
+    <n-el v-if="quickMenus && quickMenus.length > 0" tag="ul" class="strix-quick-menu"
       :class="autoActive ? 'auto-active' : ''">
       <transition-group name="quick-menu-list">
         <li v-for="item in quickMenus" :key="item.id" :class="'color-' + item.color">
@@ -21,8 +21,8 @@
 
 <script>
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import { defineComponent, computed, watch, ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 
 export default defineComponent({
   name: 'StrixQuickMenu',

@@ -4,14 +4,13 @@
       show-trigger="arrow-circle" class="home-sider" bordered="" :native-scrollbar="false">
       <!-- Logo -->
       <div class="home-logo-container">
-        <img v-if="theme === 'dark'" class="home-logo" src="../assets/img/logo-w.png" />
-        <img v-else class="home-logo" src="../assets/img/logo.png" />
+        <img v-if="theme === 'dark'" class="home-logo" src="../assets/img/logo-w.png">
+        <img v-else class="home-logo" src="../assets/img/logo.png">
       </div>
       <!-- 侧边菜单区域 -->
-      <n-spin :show="menuList.length == 0">
-        <n-menu ref="menuRef" key-field="id" label-field="name" children-field="children" :collapsed-width="70"
-          :root-indent="32" :indent="16" :render-label="renderMenuLabel" :options="menuList"
-          v-model:value="menuSelected" />
+      <n-spin :show="menuLoading">
+        <n-menu ref="menuRef" v-model:value="menuSelected" key-field="id" label-field="name" children-field="children"
+          :collapsed-width="70" :root-indent="32" :indent="16" :render-label="renderMenuLabel" :options="menuList" />
       </n-spin>
     </n-layout-sider>
     <n-layout>
@@ -20,7 +19,7 @@
           <n-gi :span="12">
             <div class="home-header-top-left">
               <!-- 面包屑导航 -->
-              <strix-breadcrumb></strix-breadcrumb>
+              <strix-breadcrumb />
             </div>
           </n-gi>
           <n-gi :span="12">
@@ -33,7 +32,7 @@
               <n-dropdown trigger="hover" placement="bottom-start" :options="avatarDropdownOptions"
                 @select="handleAvatarDropdownSelect">
                 <span class="avatar-dropdown">
-                  <img v-if="!isSmallWindow" class="user-avatar" src="../assets/img/avatar.png" alt="" />
+                  <img v-if="!isSmallWindow" class="user-avatar" src="../assets/img/avatar.png" alt="">
                   <span class="user-name">
                     {{ loginManagerInfo ? loginManagerInfo.nickname : '未知' }}
                   </span>
@@ -43,7 +42,7 @@
           </n-gi>
         </n-grid>
         <!-- 标签栏 -->
-        <strix-tabs-bar></strix-tabs-bar>
+        <strix-tabs-bar />
       </n-layout-header>
       <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false" embedded>
         <!-- 动态路由区域 -->
@@ -51,7 +50,7 @@
           <router-view v-slot="{ Component }" @refresh-menu="getMenuList">
             <transition name="strix-zoom-in-top">
               <keep-alive :include="cachedRoutes">
-                <component :is="Component" :isSmallWindow="isSmallWindow" />
+                <component :is="Component" :is-small-window="isSmallWindow" />
               </keep-alive>
             </transition>
           </router-view>
@@ -60,7 +59,7 @@
       <!-- <n-layout-footer class="home-footer">footer</n-layout-footer> -->
     </n-layout>
 
-    <strix-quick-menu></strix-quick-menu>
+    <strix-quick-menu />
     <!-- 水印 -->
     <n-watermark content="Powered By ProjectAn Strix" cross fullscreen :font-size="16" :line-height="16" :width="384"
       :height="384" :x-offset="12" :y-offset="60" :rotate="-15" font-color="rgba(128, 128, 128, .06)" />
@@ -72,20 +71,18 @@ import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/StrixTabBar.vue'
 import { useGlobalSettingsStore } from '@/stores/global-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
-import { dateToString, getDiff } from '@/utils/strix-date-util'
-import useCurrentInstance from '@/utils/strix-instance-tool'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
+import elementResizeDetectorMaker from 'element-resize-detector'
 import { kebabCase } from 'lodash'
 import { useLoadingBar, useOsTheme } from 'naive-ui'
 import ScreenFull from 'screenfull'
-import { computed, h, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, getCurrentInstance, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
-import elementResizeDetectorMaker from 'element-resize-detector'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const $router = useRouter()
 const osTheme = useOsTheme()
 
@@ -95,15 +92,9 @@ initStrixNotify()
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useGlobalSettingsStore()
 
-const theme = computed(() => {
-  if (globalSettingsStore.theme === 'auto') {
-    return osTheme.value
-  } else {
-    return globalSettingsStore.theme
-  }
-})
-
+const theme = computed(() => globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme)
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
+
 // 左侧菜单栏折叠
 const siderCollapsed = ref(globalSettingsStore.siderCollapsed)
 watch(siderCollapsed, (value) => {
@@ -112,14 +103,9 @@ watch(siderCollapsed, (value) => {
 
 // 加载路由信息
 const visitedRoutes = tabsBarStore.visitedRoutes
+// 需要缓存的路由
 const cachedRoutes = computed(() => {
-  const cachedRoutesArr = ['EmptyLayout']
-  visitedRoutes.forEach((item) => {
-    if (!item.meta.noKeepAlive) {
-      cachedRoutesArr.push(item.name)
-    }
-  })
-  return cachedRoutesArr
+  return ['EmptyLayout', ...visitedRoutes.filter(item => !item.meta.noKeepAlive).map(item => item.name)]
 })
 
 const loginManagerInfo = ref(null)
@@ -131,34 +117,23 @@ onMounted(() => {
 
 // 登出
 const logout = () => {
-  window.localStorage.removeItem('strix_login_token')
-  window.localStorage.removeItem('strix_login_token_expire')
-  window.localStorage.removeItem('strix_login_info')
-  $router.push('/login')
+  proxy.$http.post('system/logout', null, { operate: '登出 ', notify: false }).finally(() => {
+    window.localStorage.removeItem('strix_login_token')
+    window.localStorage.removeItem('strix_login_token_expire')
+    window.localStorage.removeItem('strix_login_info')
+    $router.push('/login')
+  })
 }
 // Token续期
-const renewToken = (force) => {
-  const nowDateStr = dateToString(new Date())
-  const expireMinute = getDiff(nowDateStr, window.localStorage.getItem('strix_login_token_expire'), 'minute')
-  // 当剩余有效期小于3天则续期
-  if (expireMinute < 4320 || force) {
-    proxy.$http.post('system/renewToken').then(({ data: res }) => {
-      if (res.code !== 200) {
-        createStrixNotify('error', 'Token续期失败', (res.msg ? res.msg : '未知错误'))
-      } else {
-        window.localStorage.setItem('strix_login_token', res.data.token)
-        window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
-        window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
-        loginManagerInfo.value = res.data.info
-      }
-    }).catch(() => {
-      createStrixNotify('error', 'Token续期失败', '网络异常')
-    })
-  }
+const renewToken = () => {
+  proxy.$http.post('system/renewToken', null, { operate: '续期 Token ', notify: false }).then(({ data: res }) => {
+    window.localStorage.setItem('strix_login_token', res.data.token)
+    window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
+    window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
+    loginManagerInfo.value = res.data.info
+  })
 }
-onMounted(() => {
-  renewToken()
-})
+onMounted(renewToken)
 
 // 点击任意地方的全局通知
 const clickContainer = () => {
@@ -168,8 +143,7 @@ const clickContainer = () => {
 // 切换全屏状态
 const switchFullscreen = () => {
   if (!ScreenFull.isEnabled) {
-    createStrixNotify('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
-    return false
+    return createStrixNotify('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
   }
   ScreenFull.toggle()
 }
@@ -199,17 +173,11 @@ const menuRef = ref(null)
 const menuLoading = ref(false)
 const menuList = ref([])
 const getMenuList = () => {
-  // TODO 全屏loading动画
-  proxy.$http.get('system/menus').then(({ data: res }) => {
-    menuLoading.value = true
-    if (res.code !== 200) {
-      createStrixNotify('error', '加载菜单数据时出错', (res.msg ? res.msg : '未知错误'))
-    } else {
-      menuList.value = handleMenuIconField(res.data.menuList)
-      syncCurrentSelectMenu()
-    }
-  }).catch(() => {
-    createStrixNotify('error', '加载菜单数据失败', '加载菜单数据时出错')
+  menuLoading.value = true
+  proxy.$http.get('system/menus', { operate: '加载系统主菜单' }).then(({ data: res }) => {
+    menuList.value = handleMenuIconField(res.data.menuList)
+    syncCurrentSelectMenu()
+  }).finally(() => {
     menuLoading.value = false
   })
 }
@@ -267,13 +235,8 @@ const renderMenuLabel = (option) => {
 
 // 右上角头像下拉菜单
 const avatarDropdownOptions = [
-  {
-    key: 'setting',
-    label: '个人设置'
-  }, {
-    key: 'logout',
-    label: '退出登录'
-  }
+  { key: 'setting', label: '个人设置' },
+  { key: 'logout', label: '退出登录' }
 ]
 const handleAvatarDropdownSelect = (key) => {
   switch (key) {

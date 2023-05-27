@@ -26,10 +26,10 @@
     </strix-block>
 
     <n-data-table :loading="dataLoading" :columns="dataColumns" :data="filterDataList" :row-key="dataRowKey"
-      :expanded-row-keys="dataExpandedRowKeys" @updateExpandedRowKeys="dataExpandedRowKeysChange" />
+      :expanded-row-keys="dataExpandedRowKeys" @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="角色名称" path="name">
@@ -47,7 +47,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -67,10 +67,10 @@
     </n-modal>
 
     <n-modal v-model:show="editRoleMenusModalShow" preset="card" :title="'修改' + funName + '菜单权限'"
-      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal':''" size="huge"
+      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
       @after-leave="initModifyForm">
       <n-spin :show="editRoleMenusLoading">
-        <n-tree block-line cascade checkable :data="systemMenuTreeData" v-model:checked-keys="editRoleMenusCheckedKeys"
+        <n-tree v-model:checked-keys="editRoleMenusCheckedKeys" block-line cascade checkable :data="systemMenuTreeData"
           key-field="id" label-field="name" />
       </n-spin>
       <template #footer>
@@ -84,11 +84,11 @@
     </n-modal>
 
     <n-modal v-model:show="editRolePermissionsModalShow" preset="card" :title="'修改' + funName + '系统权限'"
-      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal':''" size="huge"
+      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
       @after-leave="initModifyForm">
       <n-spin :show="editRolePermissionsLoading">
-        <n-transfer ref="transfer" :options="systemPermissionTransferData"
-          v-model:value="editRolePermissionsCheckedKeys" :render-source-label="renderSystemPermissionTransferData"
+        <n-transfer ref="transfer" v-model:value="editRolePermissionsCheckedKeys" :options="systemPermissionTransferData"
+          :render-source-label="renderSystemPermissionTransferData"
           :render-target-label="renderSystemPermissionTransferData" />
       </n-spin>
       <template #footer>
@@ -105,15 +105,14 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
-import useCurrentInstance from '@/utils/strix-instance-tool'
 import { createStrixNotify } from '@/utils/strix-notify'
+import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap } from '@/utils/strix-tools'
-import { Icon } from '@iconify/vue'
 import _ from 'lodash'
-import { NButton, NDataTable, NDivider, NEmpty, NGi, NGrid, NPopconfirm, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
-import { computed, h, onMounted, ref } from 'vue'
+import { NButton, NDataTable, NDivider, NEmpty, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
+import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
 const funName = '系统角色'
@@ -151,34 +150,17 @@ const dataColumns = [
     type: "expand",
     renderExpand: (row) => {
       if (!row.expandTab) row.expandTab = 'menu'
-      if (!row.loaded) {
-        return h(NSpin, { size: 'large', description: '加载中...' })
-      }
+      if (!row.loaded) return h(NSpin, { size: 'large', description: '加载中...' })
 
-      // 菜单权限渲染
       const expandMenuChildrenVNode = renderExpandMenuChildren(row, row.menus, 0)
-      if (expandMenuChildrenVNode.length == 0) {
-        expandMenuChildrenVNode.push(h(NEmpty, { description: 'TA好像没有可用菜单权限' }))
-      }
-      // 系统权限渲染
-      const RWPermissionVNodeList = []
-      const RPermissionVNodeList = []
-      row.permissionsReadAndWrite.forEach(p => {
-        RWPermissionVNodeList.push(
-          h(NTag, { type: 'info', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)
-        )
-      })
-      row.permissionsRead.forEach(p => {
-        RPermissionVNodeList.push(
-          h(NTag, { type: 'success', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)
-        )
-      })
-      if (RWPermissionVNodeList.length == 0) {
-        RWPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统读写权限' }))
-      }
-      if (RPermissionVNodeList.length == 0) {
-        RPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统只读权限' }))
-      }
+      if (expandMenuChildrenVNode.length == 0) expandMenuChildrenVNode.push(h(NEmpty, { description: 'TA好像没有可用菜单权限' }))
+
+      const RWPermissionVNodeList = [], RPermissionVNodeList = []
+      row.permissionsReadAndWrite.forEach(p => RWPermissionVNodeList.push(h(NTag, { type: 'info', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)))
+      row.permissionsRead.forEach(p => RPermissionVNodeList.push(h(NTag, { type: 'success', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)))
+      if (RWPermissionVNodeList.length == 0) RWPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统读写权限' }))
+      if (RPermissionVNodeList.length == 0) RPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统只读权限' }))
+
       const expandPermissionChildrenVNode = [
         h(NDivider, { titlePlacement: 'left' }, () => '读写权限'),
         ...RWPermissionVNodeList,
@@ -213,68 +195,34 @@ const dataColumns = [
     title: '操作',
     width: 240,
     render(row) {
-      return [
-        h(NButton,
-          {
-            size: 'medium',
-            type: 'info',
-            style: 'margin-right: 10px',
-            onClick: () => showEditRoleMenusModal(row)
-          },
-          () => h(Icon, { icon: 'ion:logo-slack' })
-        ),
-        h(NButton,
-          {
-            size: 'medium',
-            type: 'info',
-            style: 'margin-right: 10px',
-            onClick: () => showEditRolePermissionsModal(row)
-          },
-          () => h(Icon, { icon: 'ion:key-outline' })
-        ),
-        h(NButton,
-          {
-            size: 'medium',
-            type: 'warning',
-            style: 'margin-right: 10px',
-            onClick: () => showEditDataModal(row.id)
-          },
-          () => h(Icon, { icon: 'ion:create-outline' })
-        ),
-        h(NPopconfirm,
-          {
-            onPositiveClick: () => deleteData(row.id)
-          }, {
-          trigger: () => h(NButton,
-            {
-              size: 'medium',
-              type: 'error',
-              style: 'margin-right: 10px'
-            },
-            () => h(Icon, { icon: 'ion:trash-outline' })
-          ),
-          default: () => '是否确认删除这条数据? 该操作不可恢复!'
+      return handleOperate([
+        { type: 'info', label: '编辑菜单权限', icon: 'ion:logo-slack', onClick: () => showEditRoleMenusModal(row) },
+        { type: 'info', label: '编辑系统权限', icon: 'ion:key-outline', onClick: () => showEditRolePermissionsModal(row) },
+        { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
+        {
+          type: 'error',
+          label: '删除',
+          icon: 'ion:trash-outline',
+          onClick: () => deleteData(row.id),
+          popconfirm: true,
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
-        )
-      ]
+      ])
     }
   }
 ]
 
 // 加载列表
-const dataData = ref()
+const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/role').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
-    }
+  proxy.$http.get('system/role', { operate: `加载${funName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
-    dataData.value = res.data.systemRoleList
+    dataRef.value = res.data.systemRoleList
   })
 }
 onMounted(getDataList)
@@ -282,8 +230,11 @@ onMounted(getDataList)
 const filterDataListParams = ref({
   keyword: ''
 })
+const clearSearch = () => {
+  filterDataListParams.value.keyword = ''
+}
 const filterDataList = computed(() =>
-  dataData.value?.filter((d) => {
+  dataRef.value?.filter((d) => {
     let filterd = true
     if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0) filterd = false
     return filterd
@@ -297,26 +248,13 @@ const dataExpandedRowKeysChange = (value) => {
   const diffs = _.differenceWith(value, dataExpandedRowKeys.value, _.isEqual);
   dataExpandedRowKeys.value = value
   diffs.forEach(diff => {
-    const row = _.find(dataData.value, { id: diff })
+    const row = _.find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/role/${row.id}`).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('error', '获取角色的详细信息失败', res.msg)
-        }
-        row.menus = res.data.menus
-        row.permissionsRead = res.data.permissions.filter(p => {
-          return p.permissionType === 1
-        })
-        row.permissionsReadAndWrite = res.data.permissions.filter(p => {
-          return p.permissionType === 2
-        })
-        row.loaded = true
+      proxy.$http.get(`system/role/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+        handleEditSuccessResponse(row, res.data)
       })
     }
   })
-}
-const clearSearch = () => {
-  filterDataListParams.value.keyword = ''
 }
 
 const initDataForm = () => {
@@ -338,38 +276,21 @@ const addDataForm = ref({
 })
 const addDataRules = {
   name: [
-    {
-      required: true,
-      message: '请输入角色名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '角色名称长度需在2-12之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入角色名称', trigger: 'blur' },
+    { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
   ]
 }
-const showAddDataModal = (id) => {
-  if (id) {
-    addDataForm.value.parentId = id
-  }
+const showAddDataModal = () => {
   addDataModalShow.value = true
 }
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post('system/role/update', addDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `添加${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `添加${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    proxy.$http.post('system/role/update', addDataForm.value, { operate: `修改${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -381,26 +302,15 @@ const editDataForm = ref({
 })
 const editDataRules = {
   name: [
-    {
-      required: true,
-      message: '请输入角色名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '角色名称长度需在2-12之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入角色名称', trigger: 'blur' },
+    { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
   ]
 }
 const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `查询${funName}信息失败`, res.msg)
-    }
+  proxy.$http.get(`system/role/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     _.forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -412,66 +322,41 @@ const showEditDataModal = (id) => {
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post(`system/role/update/${editDataId}`, editDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `修改${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `修改${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    proxy.$http.post(`system/role/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/role/remove/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `删除${funName}失败`, res.msg)
-    }
-    createStrixNotify('success', '提示信息', `删除${funName}成功`)
+  proxy.$http.post(`system/role/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
     getDataList()
   })
 }
 
 const removeRoleMenu = (row, menuId) => {
-  proxy.$http.post(`system/role/remove/${row.id}/menu/${menuId}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '移除角色与菜单权限失败', res.msg)
-    }
-    createStrixNotify('success', '提示信息', '移除角色菜单权限成功')
+  proxy.$http.post(`system/role/remove/${row.id}/menu/${menuId}`, null, { operate: '移除角色菜单权限' }).then(({ data: res }) => {
     handleEditSuccessResponse(row, res.data)
   })
 }
 const removeRolePermission = (row, permissionId) => {
-  proxy.$http.post(`system/role/remove/${row.id}/permission/${permissionId}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '移除角色系统权限失败', res.msg)
-    }
-    createStrixNotify('success', '提示信息', '移除角色系统权限成功')
+  proxy.$http.post(`system/role/remove/${row.id}/permission/${permissionId}`, null, { operate: '移除角色系统权限' }).then(({ data: res }) => {
     handleEditSuccessResponse(row, res.data)
   })
 }
 const handleEditSuccessResponse = (row, data) => {
   row.menus = data.menus
-  row.permissionsRead = data.permissions?.filter(p => {
-    return p.permissionType === 1
-  })
-  row.permissionsReadAndWrite = data.permissions?.filter(p => {
-    return p.permissionType === 2
-  })
+  row.permissionsRead = data.permissions?.filter(p => p.permissionType === 1)
+  row.permissionsReadAndWrite = data.permissions?.filter(p => p.permissionType === 2)
   row.loaded = true
 }
 
 const systemMenuTreeData = ref([])
 const getSystemMenuTreeData = () => {
-  proxy.$http.get('system/menu').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '加载系统菜单树菜单数据失败', res.msg)
-    }
+  proxy.$http.get('system/menu', { operate: `加载系统菜单树` }).then(({ data: res }) => {
     systemMenuTreeData.value = res.data.systemMenuList
     // 去除children为空的展开按钮
     systemMenuTreeData.value.forEach((m) => {
@@ -482,26 +367,18 @@ const getSystemMenuTreeData = () => {
 onMounted(getSystemMenuTreeData)
 const systemPermissionTransferData = ref([])
 const getSystemPermissionTransferData = () => {
-  proxy.$http.get('system/permission/transfer').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '加载系统权限穿梭框数据失败', res.msg)
-    }
+  proxy.$http.get('system/permission/transfer', { operate: `加载系统权限穿梭框数据` }).then(({ data: res }) => {
     systemPermissionTransferData.value = res.data.transferData
-    // TODO 转为后端处理
-    systemPermissionTransferData.value.forEach((p) => p.value = p.key)
   })
 }
 onMounted(getSystemPermissionTransferData)
 const renderSystemPermissionTransferData = ({ option }) => {
   return h(
-    'div',
-    {
-      style: { color: option.status == 1 ? '#F4A460' : '#1E90FF' }
-    },
-    {
-      default: () => option.label + ' （' + (option.status == 1 ? '只读' : '读写') + '）'
-    }
-  )
+    'div', {
+    style: { color: option.status == 1 ? '#F4A460' : '#1E90FF' }
+  }, {
+    default: () => option.label + ' (' + (option.status == 1 ? '只读' : '读写') + ')'
+  })
 }
 
 const initModifyForm = () => {
@@ -525,10 +402,7 @@ const showEditRoleMenusModal = (roleRow) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${roleRow.id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `查询${funName}信息失败`, res.msg)
-    }
+  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${funName}菜单信息` }).then(({ data: res }) => {
     editRoleMenusRoleId = res.data.id
     editRoleMenusRoleRow = roleRow
     editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
@@ -539,11 +413,7 @@ const editRoleMenus = () => {
   proxy.$http.post(`system/role/modify/${editRoleMenusRoleId}`, {
     field: 'menus',
     value: editRoleMenusCheckedKeys.value.join(',')
-  }).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `更改${funName}菜单权限失败`, res.msg)
-    }
-    createStrixNotify('success', '操作成功', `更改${funName}菜单权限成功`)
+  }, { operate: `更改${funName}菜单权限` }).then(({ data: res }) => {
     editRoleMenusModalShow.value = false
     handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
   })
@@ -559,10 +429,7 @@ const showEditRolePermissionsModal = (roleRow) => {
   editRolePermissionsLoading.value = true
   editRolePermissionsModalShow.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${roleRow.id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `查询${funName}信息失败`, res.msg)
-    }
+  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${funName}权限信息` }).then(({ data: res }) => {
     editRolePermissionsRoleId = res.data.id
     editRolePermissionsRoleRow = roleRow
     editRolePermissionsCheckedKeys.value = deepMap(res.data.permissions, 'id')
@@ -573,11 +440,7 @@ const editRolePermissions = () => {
   proxy.$http.post(`system/role/modify/${editRolePermissionsRoleId}`, {
     field: 'permissions',
     value: editRolePermissionsCheckedKeys.value.join(',')
-  }).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `更改${funName}系统权限失败`, res.msg)
-    }
-    createStrixNotify('success', '操作成功', `更改${funName}系统权限成功`)
+  }, { operate: `更改${funName}系统权限` }).then(({ data: res }) => {
     editRolePermissionsModalShow.value = false
     handleEditSuccessResponse(editRolePermissionsRoleRow, res.data)
   })
@@ -595,11 +458,12 @@ export default {
   .n-grid:not(:last-child) {
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--n-border-color);
   }
 
   .n-grid {
     align-items: center;
+    transition: all .3s cubic-bezier(.4, 0, .2, 1);
   }
 }
 

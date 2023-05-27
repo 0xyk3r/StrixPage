@@ -22,36 +22,34 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="配置 Key" path="configKey">
             <n-select v-model:value="getDataListParams.configKey" :options="smsConfigSelectList" placeholder="请选择短信配置 Key"
-              value-field="id" label-field="name" @update:value="getDataList" @clear="getDataListParams.configKey = ''"
-              clearable />
+              clearable @update:value="getDataList"
+              @clear="getDataListParams.configKey = ''" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="smsTemplateStatusOptions" placeholder="请选择状态"
-              @update:value="getDataList" @clear="getDataListParams.status = ''" clearable />
+              clearable @update:value="getDataList" @clear="getDataListParams.status = ''" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="类型" path="type">
             <n-select v-model:value="getDataListParams.type" :options="smsTemplateTypeOptions" placeholder="请选择类型"
-              @update:value="getDataList" @clear="getDataListParams.type = ''" clearable />
+              clearable @update:value="getDataList" @clear="getDataListParams.type = ''" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
-    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataData"
+    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
       :pagination="dataPagination" :row-key="dataRowKey" />
-
   </div>
 </template>
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
-import { h, onMounted, reactive, ref } from 'vue'
-import { createStrixNotify } from '@/utils/strix-notify'
-import { NButton, NTag, NDataTable, NPopconfirm } from 'naive-ui'
-import useCurrentInstance from '@/utils/strix-instance-tool'
+import { createPagination } from '@/plugins/pagination.js'
 import _ from 'lodash'
+import { NButton, NDataTable, NTag } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, ref } from 'vue'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
 const funName = '短信模板'
@@ -67,10 +65,15 @@ const getDataListParams = ref({
   keyword: '',
   type: '',
   status: '',
-  parentId: '',
-  current: 1,
-  size: 10
+  pageIndex: 1,
+  pageSize: 10
 })
+const clearSearch = () => {
+  getDataListParams.value.keyword = ''
+  getDataListParams.value.type = ''
+  getDataListParams.value.status = ''
+  getDataList()
+}
 // 展示列信息
 const dataColumns = [
   { key: 'code', title: '模板 Code', width: 160 },
@@ -107,61 +110,26 @@ const dataColumns = [
   { title: '创建时间', key: 'createTime', width: 160 }
 ]
 // 分页配置
-const dataPagination = reactive({
-  page: 1,
-  pageSize: 10,
-  showSizePicker: true,
-  pageSizes: [10, 20, 30, 50, 100],
-  prefix({ itemCount }) {
-    return `共 ${itemCount} 条`
-  },
-  onChange: (page) => {
-    dataPagination.page = page
-    getDataListParams.value.current = page
-    getDataList()
-  },
-  onUpdatePageSize: (pageSize) => {
-    dataPagination.pageSize = pageSize
-    dataPagination.page = 1
-    getDataListParams.value.size = pageSize
-    getDataListParams.value.current = 1
-    getDataList()
-  }
-})
+const dataPagination = createPagination(getDataListParams, () => { getDataList() })
 // 加载列表
-const dataData = ref()
+const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/sms/template', { params: getDataListParams.value }).then(({ data: res }) => {
-    if (res.code !== 200) {
-      createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
-    }
+  proxy.$http.get('system/sms/template', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
-    dataData.value = res.data.templates
+    dataRef.value = res.data.templates
     dataPagination.itemCount = res.data.total
   })
 }
-onMounted(() => {
-  getDataList()
-})
+onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
-const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.type = ''
-  getDataListParams.value.status = ''
-  getDataList()
-}
-
 
 // 加载短信配置选项
 const smsConfigSelectList = ref([])
 const getSmsConfigSelectList = () => {
-  proxy.$http.get('system/sms/config/select').then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', '加载短信配置下拉列表失败', res.msg)
-    }
+  proxy.$http.get('system/sms/config/select', { operate: '加载短信配置下拉列表' }).then(({ data: res }) => {
     smsConfigSelectList.value = res.data.options
   })
 }

@@ -35,7 +35,7 @@
     <n-data-table :loading="dataLoading" :columns="dataColumns" :data="filterDataList" :row-key="dataRowKey" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="权限名称" path="name">
@@ -63,7 +63,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal':''" size="huge" @after-leave="initDataForm">
+      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -74,8 +74,8 @@
             <n-input v-model:value="editDataForm.permissionKey" placeholder="请输入权限标识" clearable />
           </n-form-item>
           <n-form-item label="系统权限类型" path="permissionType">
-            <n-select v-model:value="editDataForm.permissionType" :options="permissionTypeOptions"
-              placeholder="请选择系统权限类型" clearable />
+            <n-select v-model:value="editDataForm.permissionType" :options="permissionTypeOptions" placeholder="请选择系统权限类型"
+              clearable />
           </n-form-item>
           <n-form-item label="权限介绍" path="description">
             <n-input v-model:value="editDataForm.description" placeholder="请输入权限介绍" clearable />
@@ -96,14 +96,13 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
-import useCurrentInstance from '@/utils/strix-instance-tool'
 import { createStrixNotify } from '@/utils/strix-notify'
 import { Icon } from '@iconify/vue'
 import { forOwn, pick } from 'lodash'
 import { NButton, NDataTable, NPopconfirm, NTag } from 'naive-ui'
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
 const funName = '系统权限'
@@ -116,111 +115,63 @@ defineProps({
 
 // 展示列信息
 const dataColumns = [
+  { key: 'name', title: '权限名称', width: 140 },
+  { key: 'permissionKey', title: '权限标识', width: 200 },
   {
-    key: 'name',
-    title: '权限名称',
-    width: 140
-  }, {
-    key: 'permissionKey',
-    title: '权限标识',
-    width: 200
-  }, {
     key: 'permissionType',
     title: '权限类型',
     width: 80,
     render(row) {
-      let tagType = 'default'
-      let tagContent = '权限'
-      switch (row.permissionType) {
-        case 1:
-          tagType = 'success'
-          tagContent = '只读权限'
-          break
-        case 2:
-          tagType = 'info'
-          tagContent = '读写权限'
-          break
-      }
-      return h(NTag, {
-        type: tagType,
-        bordered: false
-      }, {
-        default: () => tagContent
-      })
+      const tagType = row.permissionType === 1 ? 'success' : 'info'
+      const tagContent = row.permissionType === 1 ? '只读权限' : '读写权限'
+      return h(NTag, { type: tagType, bordered: false }, { default: () => tagContent })
     }
-  }, {
-    key: 'description',
-    title: '权限介绍',
-    width: 260
-  }, {
+  },
+  { key: 'description', title: '权限介绍', width: 260 },
+  {
     title: '操作',
     width: 140,
     render(row) {
       return [
-        h(NButton,
-          {
-            size: 'medium',
-            type: 'warning',
-            style: 'margin-right: 10px',
-            onClick: () => showEditDataModal(row.id)
-          },
-          () => h(Icon, { icon: 'ion:create-outline' })
-        ),
-        h(NPopconfirm,
-          {
-            onPositiveClick: () => deleteData(row.id)
-          }, {
-          trigger: () => h(NButton,
-            {
-              size: 'medium',
-              type: 'error',
-              style: 'margin-right: 10px'
-            },
-            () => h(Icon, { icon: 'ion:trash-outline' })
-          ),
+        h(NButton, { size: 'medium', type: 'warning', style: 'margin-right: 10px', onClick: () => showEditDataModal(row.id) }, () => h(Icon, { icon: 'ion:create-outline' })),
+        h(NPopconfirm, { onPositiveClick: () => deleteData(row.id) }, {
+          trigger: () => h(NButton, { size: 'medium', type: 'error', style: 'margin-right: 10px' }, () => h(Icon, { icon: 'ion:trash-outline' })),
           default: () => '是否确认删除这条数据? 该操作不可恢复!'
-        }
-        )
+        })
       ]
     }
   }
 ]
 // 加载列表
-const dataData = ref()
+const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/permission').then(({ data: res }) => {
-    if (res.code !== 200) {
-      createStrixNotify('warning', `获取${funName}列表失败`, res.msg)
-    }
+  proxy.$http.get('system/permission', { operate: `加载${funName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
-    dataData.value = res.data.systemPermissionList
+    dataRef.value = res.data.systemPermissionList
   })
 }
-onMounted(() => {
-  getDataList()
-})
+onMounted(getDataList)
 // 本地筛选数据
 const filterDataListParams = ref({
   keyword: '',
   permissionType: ''
 })
 const filterDataList = computed(() =>
-  dataData.value?.filter((d) => {
+  dataRef.value?.filter((d) => {
     let filterd = true
     if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0 && d.permissionKey.indexOf(filterDataListParams.value.keyword) < 0) filterd = false
     if (filterDataListParams.value.permissionType && filterDataListParams.value.permissionType != d.permissionType) filterd = false
     return filterd
   })
 )
-
-const dataRowKey = (rowData) => rowData.id
 const clearSearch = () => {
   filterDataListParams.value.keyword = ''
   filterDataListParams.value.permissionType = ''
 }
+const dataRowKey = (rowData) => rowData.id
 
 const permissionTypeOptions = [
   { value: '', label: '未选择' },
@@ -256,72 +207,34 @@ const addDataForm = ref({
 })
 const addDataRules = {
   name: [
-    {
-      required: true,
-      message: '请输入权限名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '系统权限名称长度需在2-12之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限名称', trigger: 'blur' },
+    { min: 2, max: 12, message: '系统权限名称长度需在2-12之间', trigger: 'blur' }
   ],
   permissionKey: [
-    {
-      required: true,
-      message: '请输入权限标识',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 32,
-      message: '权限标识长度需在2-32之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限标识', trigger: 'blur' },
+    { min: 2, max: 32, message: '权限标识长度需在2-32之间', trigger: 'blur' }
   ],
   permissionType: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择权限类型')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择权限类型', trigger: 'change' }
   ],
   description: [
-    {
-      required: true,
-      message: '请输入权限介绍',
-      trigger: 'blur'
-    }, {
-      max: 128,
-      message: '权限介绍长度需在1-128之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限介绍', trigger: 'blur' },
+    { max: 128, message: '权限介绍长度需在1-128之间', trigger: 'blur' }
   ]
 }
-const showAddDataModal = (id) => {
-  if (id) {
-    addDataForm.value.parentId = id
-  }
+const showAddDataModal = () => {
   addDataModalShow.value = true
 }
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post('system/permission/update', addDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `添加${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `添加${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
+    if (errors) {
+      createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      return
     }
+    proxy.$http.post('system/permission/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -336,60 +249,26 @@ const editDataForm = ref({
 })
 const editDataRules = {
   name: [
-    {
-      required: true,
-      message: '请输入权限名称',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 12,
-      message: '系统权限名称长度需在2-12之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限名称', trigger: 'blur' },
+    { min: 2, max: 12, message: '系统权限名称长度需在2-12之间', trigger: 'blur' }
   ],
   permissionKey: [
-    {
-      required: true,
-      message: '请输入权限标识',
-      trigger: 'blur'
-    }, {
-      min: 2,
-      max: 32,
-      message: '权限标识长度需在2-32之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限标识', trigger: 'blur' },
+    { min: 2, max: 32, message: '权限标识长度需在2-32之间', trigger: 'blur' }
   ],
   permissionType: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value === '') {
-          return new Error('请选择权限类型')
-        }
-        return true
-      }
-    }
+    { type: 'number', required: true, message: '请选择权限类型', trigger: 'change' }
   ],
   description: [
-    {
-      required: true,
-      message: '请输入权限介绍',
-      trigger: 'blur'
-    }, {
-      max: 128,
-      message: '权限介绍长度需在1-128之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入权限介绍', trigger: 'blur' },
+    { max: 128, message: '权限介绍长度需在1-128之间', trigger: 'blur' }
   ]
 }
 const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/permission/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `查询${funName}信息失败`, res.msg)
-    }
+  proxy.$http.get(`system/permission/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -401,27 +280,17 @@ const showEditDataModal = (id) => {
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (!errors) {
-      proxy.$http.post(`system/permission/update/${editDataId}`, editDataForm.value).then(({ data: res }) => {
-        if (res.code !== 200) {
-          return createStrixNotify('warning', `修改${funName}失败`, res.msg)
-        }
-        createStrixNotify('success', '操作成功', `修改${funName}成功`)
-        initDataForm()
-        getDataList()
-      })
-    } else {
-      createStrixNotify('warning', '表单校验失败', '请检查表单中的错误提示并修改')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    proxy.$http.post(`system/permission/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/permission/remove/${id}`).then(({ data: res }) => {
-    if (res.code !== 200) {
-      return createStrixNotify('error', `删除${funName}失败`, res.msg)
-    }
-    createStrixNotify('success', '提示信息', `删除${funName}成功`)
+  proxy.$http.post(`system/permission/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
     getDataList()
   })
 }
@@ -433,6 +302,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

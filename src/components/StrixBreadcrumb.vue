@@ -10,9 +10,9 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useGlobalSettingsStore } from '@/stores/global-settings'
+import { computed, defineComponent, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'StrixBreadcrumb',

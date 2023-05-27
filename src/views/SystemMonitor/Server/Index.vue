@@ -155,20 +155,15 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
-import useCurrentInstance from '@/utils/strix-instance-tool'
-import { createStrixNotify } from '@/utils/strix-notify'
+import { getCurrentInstance, onMounted, ref } from 'vue';
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const loading = ref(true)
 const serverInfo = ref({})
 
 const getData = () => {
   loading.value = true
-  proxy.$http.get('system/monitor/server').then(({ data: res }) => {
-    if (res.code !== 200) {
-      createStrixNotify('warning', `获取系统运行信息失败`, res.msg)
-    }
+  proxy.$http.get('system/monitor/server', { operate: '加载系统运行信息' }).then(({ data: res }) => {
     loading.value = false
     serverInfo.value = res.data.server
   })

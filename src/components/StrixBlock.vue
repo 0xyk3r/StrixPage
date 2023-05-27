@@ -2,15 +2,16 @@
   <n-el tag="div" class="strix-block" :class="[{ 'hover': hovering }]" @mouseenter="hovering = true"
     @mouseleave="hovering = false">
     <div class="source">
-      <slot name="show"></slot>
+      <slot name="show" />
     </div>
     <div v-show="showClearButton || $slots.default" ref="meta" class="meta">
       <div v-if="$slots.default" class="description">
-        <slot></slot>
+        <slot />
       </div>
     </div>
-    <div v-show="showClearButton || $slots.default" ref="control" class="strix-block-control" :class="{ 'is-fixed': fixedControl }" @click="changeExpand">
-      <component v-if="$slots.default" :is="expandedIcon"></component>
+    <div v-show="showClearButton || $slots.default" ref="control" class="strix-block-control"
+      :class="{ 'is-fixed': fixedControl }" @click="changeExpand">
+      <component :is="expandedIcon" v-if="$slots.default" />
       <transition name="text-slide">
         <span v-if="$slots.default" v-show="hovering">{{ isExpanded ? '收起' : '显示全部' }}</span>
       </transition>
@@ -22,20 +23,18 @@
         </n-button>
       </div>
       <!-- 右侧按钮 -->
-      <div class="control-button-container">
-      </div>
+      <div class="control-button-container" />
     </div>
   </n-el>
 </template>
 <script setup>
-import { h, useSlots, ref, computed, watch, onBeforeUnmount, onMounted } from 'vue'
-import { Icon } from '@iconify/vue'
 import { useGlobalSettingsStore } from '@/stores/global-settings'
-import useCurrentInstance from '@/utils/strix-instance-tool'
-import { NButton } from 'naive-ui'
+import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
+import { NButton } from 'naive-ui'
+import { computed, getCurrentInstance, h, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const globalSettingsStore = useGlobalSettingsStore()
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 

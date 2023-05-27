@@ -3,7 +3,7 @@
     <n-card class="login-form-panel" content-style="padding: 0; height: 100%;">
       <n-grid style="height: 100%" cols="24" item-responsive>
         <n-grid-item span="0:0 800:16">
-          <div class="login-left"></div>
+          <div class="login-left" />
         </n-grid-item>
         <n-grid-item span="0:24 800:8">
           <div class="login-right">
@@ -11,12 +11,11 @@
             <n-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="60px" class="login-form"
               @submit.prevent>
               <n-form-item label="登录用户" path="loginName">
-                <n-input v-model:value="loginForm.loginName" placeholder="请输入登录账号" class="login-input" clearable>
-                </n-input>
+                <n-input v-model:value="loginForm.loginName" placeholder="请输入登录账号" class="login-input" clearable />
               </n-form-item>
               <n-form-item label="登录密码" path="loginPassword">
-                <n-input type="password" v-model:value="loginForm.loginPassword" placeholder="请输入登录密码"
-                  class="login-input" show-password-on="mousedown" clearable></n-input>
+                <n-input v-model:value="loginForm.loginPassword" type="password" placeholder="请输入登录密码" class="login-input"
+                  show-password-on="mousedown" clearable />
               </n-form-item>
               <n-button type="primary" :loading="isLogging" class="login-btn" @click="showLoginVerify">
                 {{ isLogging ? '登录中...' : '登录' }}
@@ -26,8 +25,8 @@
         </n-grid-item>
       </n-grid>
     </n-card>
-    <Verify v-if="loginVerifyShowStatus" ref="verifyRef" mode="pop" captchaType="blockPuzzle"
-      :imgSize="{width:'400px',height:'200px'}" @success="verifySuccess"></Verify>
+    <Verify v-if="loginVerifyShowStatus" ref="verifyRef" mode="pop" captcha-type="blockPuzzle"
+      :img-size="{ width: '400px', height: '200px' }" @success="verifySuccess" />
     <div class="beian">
       <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
     </div>
@@ -37,14 +36,13 @@
 <script setup>
 import Verify from '@/components/verifition/Verify.vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
-import useCurrentInstance from '@/utils/strix-instance-tool'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
 import { useLoadingBar } from 'naive-ui'
-import { nextTick, ref } from 'vue'
+import { getCurrentInstance, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const { proxy } = useCurrentInstance()
+const { proxy } = getCurrentInstance()
 const $route = useRoute()
 const $router = useRouter()
 const loadingBar = useLoadingBar()
@@ -65,46 +63,25 @@ const loginForm = ref({
 })
 const loginFormRules = {
   loginName: [
-    {
-      required: true,
-      message: '请输入登录账号',
-      trigger: 'blur'
-    },
-    {
-      min: 2,
-      max: 16,
-      message: '长度在2-16字符之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入登录账号', trigger: 'blur' },
+    { min: 2, max: 16, message: '长度在2-16字符之间', trigger: 'blur' }
   ],
   loginPassword: [
-    {
-      required: true,
-      message: '请输入登录密码',
-      trigger: 'blur'
-    },
-    {
-      min: 5,
-      max: 16,
-      message: '长度在5-16字符之间',
-      trigger: 'blur'
-    }
+    { required: true, message: '请输入登录密码', trigger: 'blur' },
+    { min: 5, max: 16, message: '长度在5-16字符之间', trigger: 'blur' }
   ]
 }
-
 
 const verifyRef = ref(null)
 const loginVerifyShowStatus = ref(false)
 const showLoginVerify = () => {
   loginFormRef.value?.validate((errors) => {
-    if (!errors) {
-      loginVerifyShowStatus.value = true
-      nextTick(() => {
-        verifyRef.value?.show()
-      })
-    } else {
-      createStrixNotify('error', '登录失败', '内容校验失败，请检查您填写的内容')
-    }
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+
+    loginVerifyShowStatus.value = true
+    nextTick(() => {
+      verifyRef.value?.show()
+    })
   })
 }
 const verifySuccess = (params) => {
@@ -115,31 +92,22 @@ const verifySuccess = (params) => {
 
 const login = () => {
   loginFormRef.value?.validate((errors) => {
-    if (!errors) {
-      isLogging.value = true
+    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      proxy?.$http.post('system/login', loginForm.value).then(({ data: res }) => {
-        isLogging.value = false
-        if (res.code !== 200) {
-          loginForm.value.loginPassword = null
-          createStrixNotify('error', '登录失败', (res.msg ? res.msg : '未知错误'))
-        } else {
-          const loginManagerType = res.data.info.managerType
-          window.localStorage.setItem('strix_login_token', res.data.token)
-          window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
-          window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
-          tabBarStore.delAllVisitedRoutes()
-          createStrixNotify('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
-          $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
-        }
-      }).catch((e) => {
-        console.log(e)
-        isLogging.value = false
-        createStrixNotify('error', '登录失败', '网络异常')
-      })
-    } else {
-      createStrixNotify('error', '登录失败', '内容校验失败，请检查您填写的内容')
-    }
+    isLogging.value = true
+    proxy.$http.post('system/login', loginForm.value, { operate: '登录', notify: false }).then(({ data: res }) => {
+      isLogging.value = false
+      const loginManagerType = res.data.info.managerType
+      window.localStorage.setItem('strix_login_token', res.data.token)
+      window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
+      window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
+      tabBarStore.delAllVisitedRoutes()
+      createStrixNotify('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
+      $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
+    }).catch(() => {
+      loginForm.value.loginPassword = null
+      isLogging.value = false
+    })
   })
 }
 
@@ -185,6 +153,7 @@ export default {
 .login-form-panel {
   border-radius: 4px;
   width: 60vw;
+  min-width: 300px;
   max-width: 950px;
   height: 500px;
   border: 0;
