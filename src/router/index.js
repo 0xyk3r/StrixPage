@@ -11,14 +11,25 @@ const routes = [
     component: () => import('@/views/Login.vue')
   },
   {
-    path: '/',
+    path: '',
     name: 'HomeIndex',
     component: () => import('@/views/Home.vue'),
-    redirect: '/welcome',
+    redirect: '/index',
     meta: {
       title: 'Strix管理系统'
     },
     children: [
+      {
+        path: 'index',
+        name: 'IndexIndex',
+        component: () => import('@/views/Index.vue'),
+        meta: {
+          title: '首页',
+          icon: 'fa fa-home',
+          fixed: true,
+          fixedIndex: 0
+        }
+      },
       {
         path: '/redirect',
         name: 'StrixRedirect',
@@ -31,16 +42,6 @@ const routes = [
           path: ':pathMatch(.*)*',
           component: Redirect
         }]
-      }, {
-        path: '/welcome',
-        name: 'WelcomeIndex',
-        component: () => import('@/views/Welcome.vue'),
-        meta: {
-          title: '欢迎页',
-          icon: 'fa fa-home',
-          fixed: true,
-          fixedIndex: 0
-        }
       }, {
         path: '/system/manager',
         name: 'SystemManagerIndex',
