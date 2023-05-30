@@ -127,7 +127,7 @@ axios.interceptors.response.use(response => {
   }
   if (response.data) {
     response.data = dec(response.data)
-    console.log(response.data)
+    console.log(response.config.operate, response.data)
     if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
       handleError(response)
     } else if (notify) {

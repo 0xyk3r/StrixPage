@@ -1,7 +1,7 @@
 <template>
   <div>
     <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">{{ funName }}管理</n-text>
+      <n-text type="success">{{ _baseName }}管理</n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
@@ -14,7 +14,7 @@
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal()">
-              添加{{ funName }}
+              添加{{ _baseName }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -28,7 +28,7 @@
       :columns="dataColumns" :data="dataRef" :pagination="dataPagination" :row-key="dataRowKey" :cascade="false"
       :allow-checking-not-loaded="true" @load="onDataChildrenLoad" />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
+    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
@@ -55,7 +55,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
+    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
@@ -98,7 +98,7 @@ import { getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '系统地区'
+const _baseName = '系统地区'
 
 defineProps({
   isSmallWindow: {
@@ -173,7 +173,7 @@ const getDataList = () => {
   dataLoading.value = true
   // 清除展开行
   dataExpandedRowKeys.value = []
-  proxy.$http.get('system/region', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/region', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     dataRef.value = res.data.systemRegionList
     dataPagination.itemCount = res.data.total
@@ -185,7 +185,7 @@ const dataRowKey = (rowData) => rowData.id
 const dataExpandedRowKeys = ref([])
 const onDataChildrenLoad = (row) => {
   return new Promise((resolve) => {
-    proxy.$http.get(`system/region/${row.id}/children`, { operate: `加载${funName}子级列表` }).then(({ data: res }) => {
+    proxy.$http.get(`system/region/${row.id}/children`, { operate: `加载${_baseName}子级列表` }).then(({ data: res }) => {
       const children = res.data.children
       handleAddIsLeaf(children)
       row.children = children
@@ -198,7 +198,7 @@ const onDataChildrenLoad = (row) => {
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  proxy.$http.get('system/region/cascader', { operate: `加载${funName}下拉列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/region/cascader', { operate: `加载${_baseName}下拉列表` }).then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options
   })
 }
@@ -238,7 +238,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/region/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+    proxy.$http.post('system/region/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -261,7 +261,7 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  proxy.$http.get(`system/region/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/region/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -275,7 +275,7 @@ const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post(`system/region/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post(`system/region/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -283,7 +283,7 @@ const editData = () => {
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/region/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
+  proxy.$http.post(`system/region/remove/${id}`, null, { operate: `删除${_baseName}` }).then(() => {
     getDataList()
   })
 }

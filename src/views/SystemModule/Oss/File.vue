@@ -2,7 +2,7 @@
   <div>
     <n-h3 prefix="bar" align-text type="success">
       <n-text type="success">
-        {{ funName }}管理
+        {{ _baseName }}管理
       </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
@@ -46,7 +46,7 @@ import { getCurrentInstance, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '存储文件'
+const _baseName = '存储文件'
 
 defineProps({
   isSmallWindow: {
@@ -102,7 +102,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/oss/file', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/oss/file', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     dataRef.value = res.data.files
     dataPagination.itemCount = res.data.total

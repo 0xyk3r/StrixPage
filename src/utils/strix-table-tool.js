@@ -19,7 +19,7 @@ export const handleOperate = (buttons) => {
             default: () => popconfirmMessage
         }) : h(NButton, buttonProps, () => h(Icon, { icon }))
 
-        return label ? h(NPopover, { trigger: 'hover' }, {
+        return label ? h(NPopover, { trigger: 'hover', duration: 0 }, {
             trigger: () => content,
             default: () => h('div', null, label)
         }) : content

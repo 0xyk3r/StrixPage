@@ -2,7 +2,7 @@
   <div>
     <n-h3 prefix="bar" align-text type="success">
       <n-text type="success">
-        {{ funName }}管理
+        {{ _baseName }}管理
       </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
@@ -16,7 +16,7 @@
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal">
-              添加{{ funName }}
+              添加{{ _baseName }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -34,7 +34,7 @@
     <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
       :pagination="dataPagination" :row-key="dataRowKey" />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
+    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
@@ -72,7 +72,7 @@ import { getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '存储空间'
+const _baseName = '存储空间'
 
 defineProps({
   isSmallWindow: {
@@ -115,7 +115,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/oss/bucket', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/oss/bucket', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     dataRef.value = res.data.buckets
     dataPagination.itemCount = res.data.total
@@ -175,7 +175,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/oss/bucket/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+    proxy.$http.post('system/oss/bucket/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })

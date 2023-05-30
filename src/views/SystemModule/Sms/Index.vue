@@ -2,7 +2,7 @@
   <div>
     <n-h3 prefix="bar" align-text type="success">
       <n-text type="success">
-        {{ funName }}管理
+        {{ _baseName }}管理
       </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
@@ -18,7 +18,7 @@
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal()">
-              添加{{ funName }}
+              添加{{ _baseName }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -29,7 +29,7 @@
       :pagination="dataPagination" :expanded-row-keys="dataExpandedRowKeys"
       @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
+    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
@@ -69,7 +69,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
+    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
@@ -125,7 +125,7 @@ import { getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '短信服务'
+const _baseName = '短信服务'
 
 defineProps({
   isSmallWindow: {
@@ -343,7 +343,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/sms', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/sms', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
@@ -361,7 +361,7 @@ const dataExpandedRowKeysChange = (value) => {
   diffs.forEach(diff => {
     const row = _.find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/sms/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+      proxy.$http.get(`system/sms/${row.id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
         row.signs = res.data.signs
         row.templates = res.data.templates
         row.loaded = true
@@ -440,7 +440,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/sms/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+    proxy.$http.post('system/sms/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -490,7 +490,7 @@ const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/sms/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/sms/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     _.forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -504,7 +504,7 @@ const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post(`system/sms/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post(`system/sms/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -512,7 +512,7 @@ const editData = () => {
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/sms/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
+  proxy.$http.post(`system/sms/remove/${id}`, null, { operate: `删除${_baseName}` }).then(() => {
     getDataList()
   })
 }

@@ -21,7 +21,7 @@
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
-import { computed, defineComponent, getCurrentInstance, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, getCurrentInstance, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -170,11 +170,12 @@ export default defineComponent({
         view.oldIndex = view.meta.fixed ? view.meta.fixedIndex : oldIndex
         tabsBarStore.addRefreshRoutes(view)
         tabsBarStore.delVisitedRoute(view)
-        await $router.push('/empty')
+        // await $router.push('/empty')
+        await $router.push('/redirect' + currentPath)
         quickMenuStore.delAllQuickMenu()
-        nextTick(() => {
-          $router.push(currentPath)
-        })
+        // nextTick(() => {
+        //   $router.push(currentPath)
+        // })
       }
     }
     const reloadAllRouter = () => {

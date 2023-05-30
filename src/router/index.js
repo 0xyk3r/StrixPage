@@ -1,7 +1,8 @@
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createRouter, createWebHistory } from 'vue-router'
 
-const EmptyLayout = () => import('@/components/EmptyLayout.vue')
+// const EmptyLayout = () => import('@/components/EmptyLayout.vue')
+const Redirect = () => import('@/components/StrixRedirect.vue')
 
 const routes = [
   {
@@ -19,14 +20,18 @@ const routes = [
     },
     children: [
       {
-        path: '/empty',
-        name: 'EmptyLayout',
-        component: EmptyLayout,
+        path: '/redirect',
+        name: 'StrixRedirect',
+        component: Redirect,
         meta: {
-          ignore: true
-        }
-      },
-      {
+          ignore: true,
+          isRedirect: true
+        },
+        children: [{
+          path: ':pathMatch(.*)*',
+          component: Redirect
+        }]
+      }, {
         path: '/welcome',
         name: 'WelcomeIndex',
         component: () => import('@/views/Welcome.vue'),
@@ -53,7 +58,6 @@ const routes = [
       }, {
         path: 'system/authorization',
         name: 'SystemAuthorization',
-        component: EmptyLayout,
         meta: {
           title: '系统权限控制',
           empty: true
@@ -92,9 +96,24 @@ const routes = [
           title: '系统地区管理'
         }
       }, {
+        path: 'system/dict',
+        name: 'SystemDictIndex',
+        component: () => import('@/views/SystemDict/Index.vue'),
+        meta: {
+          title: '系统字典管理'
+        }
+      }, {
+        path: 'system/dict/:dictKey',
+        name: 'SystemDictDataIndex',
+        component: () => import('@/views/SystemDict/Data.vue'),
+        meta: {
+          title: '字典数据管理',
+          empty: false,
+          titleTemplate: '字典数据管理 / {dictKey}'
+        }
+      }, {
         path: 'system/monitor',
         name: 'SystemMonitor',
-        component: EmptyLayout,
         meta: {
           title: '系统信息管理',
           empty: true
@@ -129,7 +148,6 @@ const routes = [
       }, {
         path: 'system/module',
         name: 'SystemModule',
-        component: EmptyLayout,
         meta: {
           title: '系统功能配置',
           empty: true
@@ -138,7 +156,6 @@ const routes = [
           {
             path: 'sms',
             name: 'SystemModuleSmsIndex',
-            component: EmptyLayout,
             meta: {
               title: '短信服务配置',
               empty: true
@@ -181,7 +198,6 @@ const routes = [
           }, {
             path: 'oss',
             name: 'SystemModuleOssIndex',
-            component: EmptyLayout,
             meta: {
               title: '存储服务配置',
               empty: true
@@ -235,8 +251,21 @@ const router = createRouter({
 
 // 前置路由导航守卫
 router.beforeEach((to, form, next) => {
+  // 处理相同路由跳转问题
+  if (to.meta.title && !to.meta.isRedirect && to.name === form.name) {
+    return next(`/redirect${to.path}`)
+  }
+
   // 加载条
   controlStrixLoadingBar('start')
+
+  // 处理动态标题
+  if (to.meta.titleTemplate && to.params) {
+    for (const param in to.params) {
+      to.meta.title = to.meta.titleTemplate.replace(`{${param}}`, to.params[param])
+    }
+  }
+
   // 设置标题
   to.meta.title ? document.title = to.meta.title + ' - Strix' : document.title = 'Strix'
   if (to.path === '/login') { return next() }

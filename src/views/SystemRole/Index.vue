@@ -2,7 +2,7 @@
   <div>
     <n-h3 prefix="bar" align-text type="success">
       <n-text type="success">
-        {{ funName }}管理
+        {{ _baseName }}管理
       </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
@@ -18,7 +18,7 @@
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal()">
-              添加{{ funName }}
+              添加{{ _baseName }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -28,7 +28,7 @@
     <n-data-table :loading="dataLoading" :columns="dataColumns" :data="filterDataList" :row-key="dataRowKey"
       :expanded-row-keys="dataExpandedRowKeys" @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
+    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
@@ -46,7 +46,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
+    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
@@ -66,7 +66,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editRoleMenusModalShow" preset="card" :title="'修改' + funName + '菜单权限'"
+    <n-modal v-model:show="editRoleMenusModalShow" preset="card" :title="'修改' + _baseName + '菜单权限'"
       class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
       @after-leave="initModifyForm">
       <n-spin :show="editRoleMenusLoading">
@@ -83,7 +83,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editRolePermissionsModalShow" preset="card" :title="'修改' + funName + '系统权限'"
+    <n-modal v-model:show="editRolePermissionsModalShow" preset="card" :title="'修改' + _baseName + '系统权限'"
       class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
       @after-leave="initModifyForm">
       <n-spin :show="editRolePermissionsLoading">
@@ -115,7 +115,7 @@ import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '系统角色'
+const _baseName = '系统角色'
 
 defineProps({
   isSmallWindow: {
@@ -196,7 +196,7 @@ const dataColumns = [
     width: 240,
     render(row) {
       return handleOperate([
-        { type: 'info', label: '编辑菜单权限', icon: 'ion:logo-slack', onClick: () => showEditRoleMenusModal(row) },
+        { type: 'info', label: '编辑菜单权限', icon: 'ion:bookmarks-outline', onClick: () => showEditRoleMenusModal(row) },
         { type: 'info', label: '编辑系统权限', icon: 'ion:key-outline', onClick: () => showEditRolePermissionsModal(row) },
         { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
         {
@@ -218,7 +218,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/role', { operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/role', { operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
@@ -250,7 +250,7 @@ const dataExpandedRowKeysChange = (value) => {
   diffs.forEach(diff => {
     const row = _.find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/role/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+      proxy.$http.get(`system/role/${row.id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
         handleEditSuccessResponse(row, res.data)
       })
     }
@@ -287,7 +287,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/role/update', addDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post('system/role/update', addDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -310,7 +310,7 @@ const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/role/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     _.forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -324,7 +324,7 @@ const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post(`system/role/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post(`system/role/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -332,7 +332,7 @@ const editData = () => {
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/role/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
+  proxy.$http.post(`system/role/remove/${id}`, null, { operate: `删除${_baseName}` }).then(() => {
     getDataList()
   })
 }
@@ -402,7 +402,7 @@ const showEditRoleMenusModal = (roleRow) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${funName}菜单信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${_baseName}菜单信息` }).then(({ data: res }) => {
     editRoleMenusRoleId = res.data.id
     editRoleMenusRoleRow = roleRow
     editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
@@ -413,7 +413,7 @@ const editRoleMenus = () => {
   proxy.$http.post(`system/role/modify/${editRoleMenusRoleId}`, {
     field: 'menus',
     value: editRoleMenusCheckedKeys.value.join(',')
-  }, { operate: `更改${funName}菜单权限` }).then(({ data: res }) => {
+  }, { operate: `更改${_baseName}菜单权限` }).then(({ data: res }) => {
     editRoleMenusModalShow.value = false
     handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
   })
@@ -429,7 +429,7 @@ const showEditRolePermissionsModal = (roleRow) => {
   editRolePermissionsLoading.value = true
   editRolePermissionsModalShow.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${funName}权限信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${_baseName}权限信息` }).then(({ data: res }) => {
     editRolePermissionsRoleId = res.data.id
     editRolePermissionsRoleRow = roleRow
     editRolePermissionsCheckedKeys.value = deepMap(res.data.permissions, 'id')
@@ -440,7 +440,7 @@ const editRolePermissions = () => {
   proxy.$http.post(`system/role/modify/${editRolePermissionsRoleId}`, {
     field: 'permissions',
     value: editRolePermissionsCheckedKeys.value.join(',')
-  }, { operate: `更改${funName}系统权限` }).then(({ data: res }) => {
+  }, { operate: `更改${_baseName}系统权限` }).then(({ data: res }) => {
     editRolePermissionsModalShow.value = false
     handleEditSuccessResponse(editRolePermissionsRoleRow, res.data)
   })

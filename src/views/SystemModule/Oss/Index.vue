@@ -2,7 +2,7 @@
   <div>
     <n-h3 prefix="bar" align-text type="success">
       <n-text type="success">
-        {{ funName }}管理
+        {{ _baseName }}管理
       </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
@@ -18,7 +18,7 @@
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal">
-              添加{{ funName }}
+              添加{{ _baseName }}
             </n-button>
           </n-gi>
         </n-grid>
@@ -29,7 +29,7 @@
       :pagination="dataPagination" :expanded-row-keys="dataExpandedRowKeys"
       @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + funName" class="strix-model-primary"
+    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
@@ -72,7 +72,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + funName" class="strix-model-primary"
+    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
       :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
@@ -131,7 +131,7 @@ import { getCurrentInstance, h, onMounted, ref } from 'vue'
 const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
-const funName = '存储服务'
+const _baseName = '存储服务'
 
 defineProps({
   isSmallWindow: {
@@ -159,7 +159,7 @@ const dataColumns = [
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
 
-      const expandOssSignChildrenVNode = [
+      const expandOssBucketChildrenVNode = [
         h(NDataTable, {
           columns: [
             { title: 'Bucket 名称', key: 'name', width: 200 },
@@ -188,81 +188,27 @@ const dataColumns = [
         }, null)
       ]
 
-      const expandOssTemplateChildrenVNode = [
+      const expandOssFileGroupChildrenVNode = [
         h(NDataTable, {
           columns: [
-            { title: '模板 Code', key: 'code', width: 160 },
-            { title: '模板名称', key: 'name', width: 160 },
+            { key: 'key', title: '文件组 Key', width: 120 },
+            { key: 'name', title: '文件组名称', width: 120 },
+            { key: 'configKey', title: '存储服务 Key', width: 120 },
+            { key: 'bucketName', title: '所属 Bucket', width: 120 },
+            { key: 'bucketDomain', title: '自定义域名', width: 150 },
+            { key: 'baseDir', title: '基础路径', width: 120 },
+            { key: 'allowExtension', title: '允许的拓展名', width: 150 },
             {
-              title: '模板类型', key: 'type', width: 100, render: (row) => {
-                let tagType = 'primary'
-                let tagLabel = ''
-                switch (row.status) {
-                  case 1:
-                    tagLabel = '验证码'
-                    break
-                  case 2:
-                    tagLabel = '通知短信'
-                    break
-                  case 3:
-                    tagLabel = '推广短信'
-                    break
-                  case 4:
-                    tagLabel = '国际短信'
-                    break
-                  case 5:
-                    tagLabel = '数字短信'
-                    break
-                  default:
-                    tagLabel = '未知'
-                    break
-                }
-                return h(NTag, {
-                  type: tagType,
-                  bordered: false
-                }, {
-                  default: () => tagLabel
+              key: 'secretType', title: '文件权限类型', width: 100, render(row) {
+                const tagText = row.secretType === 1 ? '管理端文件' : '用户端文件';
+                return h(NTag, { type: row.secretType === 1 ? 'success' : 'info', bordered: false }, {
+                  default: () => tagText + '/' + row.secretLevel
                 })
               }
             },
-            {
-              title: '模板状态', key: 'status', width: 100, render: (row) => {
-                let tagType = 'default'
-                let tagLabel = ''
-                switch (row.status) {
-                  case 1:
-                    tagType = 'warning'
-                    tagLabel = '待审核'
-                    break
-                  case 2:
-                    tagType = 'success'
-                    tagLabel = '审核通过'
-                    break
-                  case 3:
-                    tagType = 'error'
-                    tagLabel = '审核未通过'
-                    break
-                  case 4:
-                    tagType = 'default'
-                    tagLabel = '审核取消'
-                    break
-                  default:
-                    tagType = 'default'
-                    tagLabel = '未知'
-                    break
-                }
-                return h(NTag, {
-                  type: tagType,
-                  bordered: false
-                }, {
-                  default: () => tagLabel
-                })
-              }
-            },
-            { title: '模板内容', key: 'content', width: 600 },
-            { title: '创建时间', key: 'createTime', width: 160 }
+            { key: 'remark', title: '备注', width: 150 }
           ],
-          data: row.templates,
+          data: row.fileGroups,
           rowKey: (row) => row.id,
         }, null)
       ]
@@ -277,10 +223,10 @@ const dataColumns = [
         },
         () => [
           h(NTabPane, { name: 'bucket', tab: '存储空间', class: 'expand-sign-pane' }, () =>
-            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandOssSignChildrenVNode]))
+            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandOssBucketChildrenVNode]))
           ),
-          h(NTabPane, { name: 'template', tab: 'TODO', class: 'expand-template-pane' }, () =>
-            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandOssTemplateChildrenVNode]))
+          h(NTabPane, { name: 'template', tab: '文件分组', class: 'expand-template-pane' }, () =>
+            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandOssFileGroupChildrenVNode]))
           )
         ]
       )
@@ -334,7 +280,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/oss', { params: getDataListParams.value, operate: `加载${funName}列表` }).then(({ data: res }) => {
+  proxy.$http.get('system/oss', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
@@ -352,9 +298,9 @@ const dataExpandedRowKeysChange = (value) => {
   diffs.forEach(diff => {
     const row = _.find(dataRef.value, { id: diff })
     if (row) {
-      proxy.$http.get(`system/oss/${row.id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+      proxy.$http.get(`system/oss/${row.id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
         row.buckets = res.data.buckets
-        row.templates = res.data.templates
+        row.fileGroups = res.data.fileGroups
         row.loaded = true
       })
     }
@@ -434,7 +380,7 @@ const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post('system/oss/update', addDataForm.value, { operate: `添加${funName}` }).then(() => {
+    proxy.$http.post('system/oss/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -489,7 +435,7 @@ const showEditDataModal = (id) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  proxy.$http.get(`system/oss/${id}`, { operate: `加载${funName}信息` }).then(({ data: res }) => {
+  proxy.$http.get(`system/oss/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
     const canUpdateFields = []
     _.forOwn(editDataForm.value, function (value, key) {
       canUpdateFields.push(key)
@@ -503,7 +449,7 @@ const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
     if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    proxy.$http.post(`system/oss/update/${editDataId}`, editDataForm.value, { operate: `修改${funName}` }).then(() => {
+    proxy.$http.post(`system/oss/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()
       getDataList()
     })
@@ -511,7 +457,7 @@ const editData = () => {
 }
 
 const deleteData = (id) => {
-  proxy.$http.post(`system/oss/remove/${id}`, null, { operate: `删除${funName}` }).then(() => {
+  proxy.$http.post(`system/oss/remove/${id}`, null, { operate: `删除${_baseName}` }).then(() => {
     getDataList()
   })
 }

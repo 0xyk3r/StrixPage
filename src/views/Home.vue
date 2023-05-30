@@ -47,10 +47,11 @@
       <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false" embedded>
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
-          <router-view v-slot="{ Component }" @refresh-menu="getMenuList">
+          <router-view v-slot="{ Component, route }" @refresh-menu="getMenuList">
             <transition name="strix-zoom-in-top">
+              <!-- 根据 fullPath 缓存组件 解决动态路由缓存问题 -->
               <keep-alive :include="cachedRoutes">
-                <component :is="Component" :is-small-window="isSmallWindow" />
+                <component :is="Component" :key="route.fullPath" :is-small-window="isSmallWindow" />
               </keep-alive>
             </transition>
           </router-view>
@@ -290,7 +291,14 @@ export default {
 
       .home-logo {
         width: 60%;
+        -webkit-user-drag: none;
+        user-select: none;
       }
+    }
+
+    ::v-deep(.n-menu .n-menu-item-content a) {
+      -webkit-user-drag: none !important;
+      user-select: none;
     }
   }
 

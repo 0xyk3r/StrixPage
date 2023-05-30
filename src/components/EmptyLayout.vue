@@ -1,7 +1,7 @@
 <template>
-  <router-view v-slot="{ Component }">
+  <router-view v-slot="{ Component, route }">
     <keep-alive :include="cachedRoutes">
-      <component :is="Component" />
+      <component :is="Component" :key="route.fullPath" />
     </keep-alive>
   </router-view>
 </template>
@@ -30,5 +30,4 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>
