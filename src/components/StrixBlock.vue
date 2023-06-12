@@ -28,14 +28,14 @@
   </n-el>
 </template>
 <script setup>
-import { useGlobalSettingsStore } from '@/stores/global-settings'
+import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
 import { NButton } from 'naive-ui'
 import { computed, getCurrentInstance, h, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 
 const { proxy } = getCurrentInstance()
-const globalSettingsStore = useGlobalSettingsStore()
+const globalSettingsStore = useStrixSettingsStore()
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 
 defineProps({

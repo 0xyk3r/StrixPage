@@ -12,12 +12,12 @@
 </template>
 
 <script setup>
-import { useGlobalSettingsStore } from '@/stores/global-settings';
+import { useStrixSettingsStore } from '@/stores/strix-settings';
 import { darkTheme, dateZhCN, NConfigProvider, NGlobalStyle, useOsTheme, zhCN } from 'naive-ui';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 const { proxy } = getCurrentInstance()
-const globalSettingsStore = useGlobalSettingsStore()
+const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
 const themeSetting = ref(globalSettingsStore.theme)
 

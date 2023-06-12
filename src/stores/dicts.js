@@ -23,8 +23,12 @@ export const useDictsStore = defineStore('dicts', () => {
    */
   async function loadDictData(key) {
     const { data: res } = await proxy.$http.get(`system/common/dict/${key}`, { operate: '获取字典数据', notify: false })
-    dictMap.value[key] = res.data;
-    return res.data.dictDataList;
+    if (res) {
+      dictMap.value[key] = res.data;
+      return res.data.dictDataList;
+    } else {
+      return [];
+    }
   }
 
   /**

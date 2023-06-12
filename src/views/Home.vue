@@ -70,7 +70,7 @@
 import StrixBreadcrumb from '@/components/StrixBreadcrumb.vue'
 import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/StrixTabBar.vue'
-import { useGlobalSettingsStore } from '@/stores/global-settings'
+import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
@@ -91,7 +91,7 @@ initStrixLoadingBar(useLoadingBar())
 initStrixNotify()
 
 const tabsBarStore = useTabsBarStore()
-const globalSettingsStore = useGlobalSettingsStore()
+const globalSettingsStore = useStrixSettingsStore()
 
 const theme = computed(() => globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme)
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)

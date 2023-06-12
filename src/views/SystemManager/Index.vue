@@ -287,8 +287,8 @@ const getSystemRoleSelectList = () => {
 onMounted(getSystemRoleSelectList)
 const managerStatusList = [
   { value: '', label: '未选择' },
-  { value: 0, label: '禁止登录' },
-  { value: 1, label: '正常用户' }
+  { value: 1, label: '正常用户' },
+  { value: 2, label: '禁止登录' }
 ]
 const managerTypeList = [
   { value: '', label: '未选择' },

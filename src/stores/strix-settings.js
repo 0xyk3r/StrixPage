@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useGlobalSettingsStore = defineStore('globalSettings', {
+export const useStrixSettingsStore = defineStore('globalSettings', {
   state: () => ({
     siderCollapsed: false,
     ignoreScreenSizeWarning: false,
@@ -27,7 +27,7 @@ export const useGlobalSettingsStore = defineStore('globalSettings', {
     }
   },
   persist: {
-    key: '$global-settings',
+    key: '$strix-settings',
     storage: localStorage
   }
 })

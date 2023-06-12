@@ -10,14 +10,14 @@
 </template>
 
 <script setup>
-import { useGlobalSettingsStore } from '@/stores/global-settings';
+import { useStrixSettingsStore } from '@/stores/strix-settings';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const $route = useRoute()
 const $router = useRouter()
 
-const globalSettingsStore = useGlobalSettingsStore()
+const globalSettingsStore = useStrixSettingsStore()
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 watch(isSmallWindow, () => {
   getBreadcrumbList()
