@@ -10,7 +10,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen" style="margin-bottom: 15px">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" placeholder="按名称搜索" clearable />
+              <n-input v-model:value="getDataListParams.keyword" placeholder="按字典标识或名称搜索" clearable />
               <n-button type="primary" ghost @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -21,14 +21,18 @@
           </n-gi>
         </n-grid>
       </template>
-      <!-- <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
+      <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
-            <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
+          <n-form-item-gi span="6 s:3 m:2" label="字典状态" path="status">
+            <n-select v-model:value="getDataListParams.status" :options="dictStatusRef" placeholder="请选择字典状态" clearable
+              @update:value="getDataList" @clear="getDataListParams.status = ''" />
+          </n-form-item-gi>
+          <n-form-item-gi span="6 s:3 m:2" label="是否内置" path="provided">
+            <n-select v-model:value="getDataListParams.provided" :options="dictProvidedRef" placeholder="请选择字典是否内置"
+              clearable @update:value="getDataList" @clear="getDataListParams.provided = ''" />
           </n-form-item-gi>
         </n-grid>
-      </n-form> -->
+      </n-form>
     </strix-block>
 
     <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
@@ -44,8 +48,11 @@
         <n-form-item label="字典名称" path="name">
           <n-input v-model:value="addDataForm.name" placeholder="请输入字典名称" clearable />
         </n-form-item>
+        <n-form-item label="数据类型" path="dataType">
+          <n-select v-model:value="addDataForm.dataType" :options="dictDataTypeRef" placeholder="请选择字典数据类型" clearable />
+        </n-form-item>
         <n-form-item label="字典状态" path="status">
-          <n-select v-model:value="addDataForm.status" :options="dictStatusOptions" placeholder="请选择字典状态" clearable />
+          <n-select v-model:value="addDataForm.status" :options="dictStatusRef" placeholder="请选择字典状态" clearable />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input v-model:value="addDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
@@ -75,8 +82,12 @@
           <n-form-item label="字典名称" path="name">
             <n-input v-model:value="editDataForm.name" placeholder="请输入字典名称" clearable />
           </n-form-item>
+          <n-form-item label="数据类型" path="dataType">
+            <n-select v-model:value="editDataForm.dataType" :options="dictDataTypeRef" placeholder="请选择字典数据类型"
+              clearable />
+          </n-form-item>
           <n-form-item label="字典状态" path="status">
-            <n-select v-model:value="editDataForm.status" :options="dictStatusOptions" placeholder="请选择字典状态" clearable />
+            <n-select v-model:value="editDataForm.status" :options="dictStatusRef" placeholder="请选择字典状态" clearable />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input v-model:value="editDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
@@ -100,16 +111,19 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixNotify } from '@/utils/strix-notify'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { forOwn, pick } from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { proxy } = getCurrentInstance()
 const $router = useRouter()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统字典'
@@ -118,6 +132,19 @@ defineProps({
   isSmallWindow: {
     type: Boolean, default: false
   }
+})
+
+// 加载字典
+const dictStatusRef = ref([])
+const dictProvidedRef = ref([])
+const dictDataTypeRef = ref([])
+provide('DictStatusDict', dictStatusRef)
+provide('DictProvidedDict', dictProvidedRef)
+provide('DictDataTypeDict', dictDataTypeRef)
+onMounted(() => {
+  dictsStore.getDictData('DictStatus', dictStatusRef)
+  dictsStore.getDictData('DictProvided', dictProvidedRef)
+  dictsStore.getDictData('DictDataType', dictDataTypeRef)
 })
 
 // 获取列表请求参数
@@ -141,18 +168,17 @@ const dataColumns = [
   { key: 'version', title: '字典版本', width: 100 },
   {
     key: 'status', title: '字典状态', width: 100, render(row) {
-      const status = dictStatusOptions.find(item => item.value === row.status)
-      return h(NTag, { type: status.type, bordered: false }, {
-        default: () => status.label
-      })
+      return h(StrixTag, { value: row.status, dictName: 'DictStatus' })
+    }
+  },
+  {
+    key: 'dataType', title: '字典数据类型', width: 150, render(row) {
+      return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
     }
   },
   {
     key: 'provided', title: '是否内置', width: 100, render(row) {
-      const tagText = row.provided === 1 ? '是' : '否';
-      return h(NTag, { type: row.provided === 1 ? 'success' : 'info', bordered: false }, {
-        default: () => tagText
-      })
+      return h(StrixTag, { value: row.provided, dictName: 'DictProvided' })
     }
   },
   { key: 'remark', title: '备注', width: 250 },
@@ -162,11 +188,12 @@ const dataColumns = [
     render(row) {
       return handleOperate([
         { type: 'info', label: '查看字典数据', icon: 'ion:list-outline', onClick: () => viewDictData(row.key) },
-        { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
+        { type: 'warning', label: '编辑', icon: 'ion:create-outline', disabled: row.provided === 1, onClick: () => showEditDataModal(row.id) },
         {
           type: 'error',
           label: '删除',
           icon: 'ion:trash-outline',
+          disabled: row.provided === 1,
           onClick: () => deleteData(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
@@ -192,11 +219,6 @@ const getDataList = () => {
 onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
 
-const dictStatusOptions = [
-  { value: 1, label: '启用', type: 'success' },
-  { value: 2, label: '禁用', type: 'error' },
-]
-
 const viewDictData = (key) => {
   $router.push({ path: `/system/dict/${key}` })
 }
@@ -208,6 +230,7 @@ const initDataForm = () => {
   addDataForm.value = {
     key: '',
     name: '',
+    dataType: 2,
     status: 1,
     remark: ''
   }
@@ -215,6 +238,7 @@ const initDataForm = () => {
   editDataForm.value = {
     key: '',
     name: '',
+    dataType: null,
     status: null,
     remark: ''
   }
@@ -224,6 +248,7 @@ const addDataModalShow = ref(false)
 const addDataForm = ref({
   key: '',
   name: '',
+  dataType: 2,
   status: 1,
   remark: ''
 })
@@ -235,6 +260,9 @@ const addDataRules = {
   name: [
     { required: true, message: '请输入字典名称', trigger: 'blur' },
     { min: 2, max: 32, message: '字典名称长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
+  dataType: [
+    { type: 'number', required: true, message: '请选择字典数据类型', trigger: 'change' }
   ],
   status: [
     { type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }
@@ -263,6 +291,7 @@ let editDataId = ''
 const editDataForm = ref({
   key: '',
   name: '',
+  dataType: null,
   status: null,
   remark: ''
 })
@@ -274,6 +303,9 @@ const editDataRules = {
   name: [
     { required: true, message: '请输入字典名称', trigger: 'blur' },
     { min: 2, max: 32, message: '字典名称长度需在 2 - 32 字之内', trigger: 'blur' }
+  ],
+  dataType: [
+    { type: 'number', required: true, message: '请选择字典数据类型', trigger: 'change' }
   ],
   status: [
     { type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }

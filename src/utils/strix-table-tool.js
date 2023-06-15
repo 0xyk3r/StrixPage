@@ -4,10 +4,11 @@ import { h } from "vue"
 
 export const handleOperate = (buttons) => {
     return buttons.map(button => {
-        const { type, label, icon, onClick, popconfirm, popconfirmMessage } = button
+        const { type, label, icon, disabled, onClick, popconfirm, popconfirmMessage } = button
         const buttonProps = {
             size: 'medium',
             type,
+            disabled,
             style: 'margin-right: 10px',
             onClick: !popconfirm ? onClick : undefined
         }

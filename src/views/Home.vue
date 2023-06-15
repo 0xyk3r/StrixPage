@@ -106,7 +106,7 @@ watch(siderCollapsed, (value) => {
 const visitedRoutes = tabsBarStore.visitedRoutes
 // 需要缓存的路由
 const cachedRoutes = computed(() => {
-  return ['EmptyLayout', ...visitedRoutes.filter(item => !item.meta.noKeepAlive).map(item => item.name)]
+  return visitedRoutes.filter(route => !route.meta.noKeepAlive).map(route => route.name)
 })
 
 const loginManagerInfo = ref(null)

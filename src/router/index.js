@@ -1,7 +1,6 @@
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createRouter, createWebHistory } from 'vue-router'
 
-// const EmptyLayout = () => import('@/components/EmptyLayout.vue')
 const Redirect = () => import('@/components/StrixRedirect.vue')
 
 const routes = [
@@ -105,7 +104,7 @@ const routes = [
         }
       }, {
         path: 'system/dict/:dictKey',
-        name: 'SystemDictDataIndex',
+        name: 'SystemDictData',
         component: () => import('@/views/SystemDict/Data.vue'),
         meta: {
           title: '字典数据管理',

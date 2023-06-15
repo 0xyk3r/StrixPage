@@ -21,14 +21,14 @@
           </n-gi>
         </n-grid>
       </template>
-      <!-- <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
+      <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
-            <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
+          <n-form-item-gi span="6 s:3 m:2" label="字典状态" path="status">
+            <n-select v-model:value="getDataListParams.status" :options="dictDataStatusRef" placeholder="请选择字典数据状态"
+              clearable @update:value="getDataList" @clear="getDataListParams.status = ''" />
           </n-form-item-gi>
         </n-grid>
-      </n-form> -->
+      </n-form>
     </strix-block>
 
     <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
@@ -48,10 +48,10 @@
           <n-input-number v-model:value="addDataForm.sort" placeholder="请输入字典排序" clearable />
         </n-form-item>
         <n-form-item label="字典样式" path="style">
-          <n-select v-model:value="addDataForm.style" :options="dictDataStyleOptions" placeholder="请选择字典样式" clearable />
+          <n-select v-model:value="addDataForm.style" :options="dictDataStyleRef" placeholder="请选择字典样式" clearable />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
-          <n-select v-model:value="addDataForm.status" :options="dictDataStatusOptions" placeholder="请选择字典状态" clearable />
+          <n-select v-model:value="addDataForm.status" :options="dictDataStatusRef" placeholder="请选择字典状态" clearable />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input v-model:value="addDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
@@ -85,12 +85,10 @@
             <n-input-number v-model:value="editDataForm.sort" placeholder="请输入字典排序" clearable />
           </n-form-item>
           <n-form-item label="字典样式" path="style">
-            <n-select v-model:value="editDataForm.style" :options="dictDataStyleOptions" placeholder="请选择字典样式"
-              clearable />
+            <n-select v-model:value="editDataForm.style" :options="dictDataStyleRef" placeholder="请选择字典样式" clearable />
           </n-form-item>
           <n-form-item label="字典状态" path="status">
-            <n-select v-model:value="editDataForm.status" :options="dictDataStatusOptions" placeholder="请选择字典状态"
-              clearable />
+            <n-select v-model:value="editDataForm.status" :options="dictDataStatusRef" placeholder="请选择字典状态" clearable />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input v-model:value="editDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
@@ -114,16 +112,19 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixNotify } from '@/utils/strix-notify'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { forOwn, pick } from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const { proxy } = getCurrentInstance()
 const $route = useRoute()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统字典数据'
@@ -135,6 +136,16 @@ defineProps({
 })
 
 const dictKey = $route.params.dictKey
+
+// 加载字典
+const dictDataStyleRef = ref([])
+const dictDataStatusRef = ref([])
+provide('DictDataStyleDict', dictDataStyleRef)
+provide('DictDataStatusDict', dictDataStatusRef)
+onMounted(() => {
+  dictsStore.getDictData('DictDataStyle', dictDataStyleRef)
+  dictsStore.getDictData('DictDataStatus', dictDataStatusRef)
+})
 
 // 获取列表请求参数
 const getDataListParams = ref({
@@ -155,16 +166,12 @@ const dataColumns = [
   { key: 'sort', title: '字典排序', width: 100 },
   {
     key: 'style', title: '字典样式预览', width: 100, render(row) {
-      if (!row.style) return row.label
-      return h(NTag, { type: row.style, bordered: false }, { default: () => row.label })
+      return h(StrixTag, { value: row.style, dictName: 'DictDataStyle' })
     }
   },
   {
     key: 'status', title: '字典状态', width: 100, render(row) {
-      const status = dictDataStatusOptions.find(item => item.value === row.status)
-      return h(NTag, { type: status.type, bordered: false }, {
-        default: () => status.label
-      })
+      return h(StrixTag, { value: row.status, dictName: 'DictDataStatus' })
     }
   },
   { key: 'remark', title: '备注', width: 250 },
@@ -202,19 +209,6 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
-
-const dictDataStyleOptions = [
-  { value: 'default', label: '默认' },
-  { value: 'primary', label: '主要' },
-  { value: 'success', label: '成功' },
-  { value: 'warning', label: '警告' },
-  { value: 'error', label: '危险' },
-  { value: 'info', label: '信息' },
-]
-const dictDataStatusOptions = [
-  { value: 1, label: '启用', type: 'success' },
-  { value: 2, label: '禁用', type: 'error' },
-]
 
 const initDataForm = () => {
   addDataModalShow.value = false
@@ -363,7 +357,7 @@ const deleteData = (id) => {
 </script>
 <script>
 export default {
-  name: 'SystemDictIndex'
+  name: 'SystemDictData'
 }
 </script>
 
