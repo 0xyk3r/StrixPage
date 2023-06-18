@@ -22,16 +22,15 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="配置 Key" path="configKey">
             <n-select v-model:value="getDataListParams.configKey" :options="smsConfigSelectList" placeholder="请选择短信配置 Key"
-              clearable @update:value="getDataList"
-              @clear="getDataListParams.configKey = ''" />
+              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
-            <n-select v-model:value="getDataListParams.status" :options="smsTemplateStatusOptions" placeholder="请选择状态"
-              clearable @update:value="getDataList" @clear="getDataListParams.status = ''" />
+            <n-select v-model:value="getDataListParams.status" :options="strixSmsTemplateStatusRef" placeholder="请选择状态"
+              clearable @update:value="getDataList" @clear="getDataListParams.status = null" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="类型" path="type">
-            <n-select v-model:value="getDataListParams.type" :options="smsTemplateTypeOptions" placeholder="请选择类型"
-              clearable @update:value="getDataList" @clear="getDataListParams.type = ''" />
+            <n-select v-model:value="getDataListParams.type" :options="strixSmsTemplateTypeRef" placeholder="请选择类型"
+              clearable @update:value="getDataList" @clear="getDataListParams.type = null" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -44,12 +43,14 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import _ from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { useDictsStore } from '@/stores/dicts'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '短信模板'
@@ -60,18 +61,28 @@ defineProps({
   }
 })
 
+// 加载字典
+const strixSmsTemplateTypeRef = ref([])
+const strixSmsTemplateStatusRef = ref([])
+provide('StrixSmsTemplateTypeDict', strixSmsTemplateTypeRef)
+provide('StrixSmsTemplateStatusDict', strixSmsTemplateStatusRef)
+onMounted(() => {
+  dictsStore.getDictData('StrixSmsTemplateType', strixSmsTemplateTypeRef)
+  dictsStore.getDictData('StrixSmsTemplateStatus', strixSmsTemplateStatusRef)
+})
+
 // 获取列表请求参数
 const getDataListParams = ref({
   keyword: '',
-  type: '',
-  status: '',
+  type: null,
+  status: null,
   pageIndex: 1,
   pageSize: 10
 })
 const clearSearch = () => {
   getDataListParams.value.keyword = ''
-  getDataListParams.value.type = ''
-  getDataListParams.value.status = ''
+  getDataListParams.value.type = null
+  getDataListParams.value.status = null
   getDataList()
 }
 // 展示列信息
@@ -84,26 +95,14 @@ const dataColumns = [
     title: '类型',
     width: 100,
     render(row) {
-      const option = _.find(smsTemplateTypeOptions, function (o) { return o.value === row.type })
-      return h(NTag, {
-        type: 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.type, dictName: 'StrixSmsTemplateType' })
     }
   }, {
     key: 'status',
     title: '状态',
     width: 100,
     render(row) {
-      const option = _.find(smsTemplateStatusOptions, function (o) { return o.value === row.status })
-      return h(NTag, {
-        type: option?.type || 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.status, dictName: 'StrixSmsTemplateStatus' })
     }
   },
   { key: 'content', title: '模板内容', width: 600 },
@@ -134,22 +133,6 @@ const getSmsConfigSelectList = () => {
   })
 }
 onMounted(getSmsConfigSelectList)
-
-const smsTemplateTypeOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '验证码' },
-  { value: 2, label: '通知短信' },
-  { value: 3, label: '推广短信' },
-  { value: 4, label: '国际短信' },
-  { value: 5, label: '数字短信' },
-]
-const smsTemplateStatusOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '待审核', type: 'warning' },
-  { value: 2, label: '审核通过', type: 'success' },
-  { value: 3, label: '审核未通过', type: 'error' },
-  { value: 4, label: '审核取消', type: 'default' },
-]
 
 </script>
 <script>

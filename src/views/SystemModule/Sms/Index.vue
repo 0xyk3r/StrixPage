@@ -40,7 +40,7 @@
           <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
         </n-form-item>
         <n-form-item label="短信平台" path="platform">
-          <n-select v-model:value="addDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+          <n-select v-model:value="addDataForm.platform" :options="strixSmsPlatformRef" placeholder="请选择短信平台"
             clearable />
         </n-form-item>
         <n-form-item label="所属地域" path="regionId">
@@ -81,7 +81,7 @@
             <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
           </n-form-item>
           <n-form-item label="短信平台" path="platform">
-            <n-select v-model:value="editDataForm.platform" :options="smsConfigPlatformOptions" placeholder="请选择短信平台"
+            <n-select v-model:value="editDataForm.platform" :options="strixSmsPlatformRef" placeholder="请选择短信平台"
               clearable />
           </n-form-item>
           <n-form-item label="所属地域" path="regionId">
@@ -115,14 +115,17 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import _ from 'lodash'
 import { NButton, NDataTable, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '短信服务'
@@ -131,6 +134,13 @@ defineProps({
   isSmallWindow: {
     type: Boolean, default: false
   }
+})
+
+// 加载字典
+const strixSmsPlatformRef = ref([])
+provide('StrixSmsPlatformDict', strixSmsPlatformRef)
+onMounted(() => {
+  dictsStore.getDictData('StrixSmsPlatform', strixSmsPlatformRef)
 })
 
 // 获取列表请求参数
@@ -303,13 +313,7 @@ const dataColumns = [
     width: 100,
     title: '平台',
     render(row) {
-      const option = _.find(smsConfigPlatformOptions, function (o) { return o.value === row.platform })
-      return h(NTag, {
-        type: option?.type || 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.platform, dictName: 'StrixSmsPlatform' })
     }
   },
   { key: 'regionId', width: 100, title: '地域' },
@@ -377,7 +381,7 @@ const initDataForm = () => {
   addDataForm.value = {
     key: '',
     name: '',
-    platform: '',
+    platform: null,
     regionId: '',
     accessKey: '',
     accessSecret: '',
@@ -399,7 +403,7 @@ const addDataModalShow = ref(false)
 const addDataForm = ref({
   key: '',
   name: '',
-  platform: '',
+  platform: null,
   regionId: '',
   accessKey: '',
   accessSecret: '',
@@ -516,12 +520,6 @@ const deleteData = (id) => {
     getDataList()
   })
 }
-
-const smsConfigPlatformOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '阿里云', type: 'warning' },
-  { value: 2, label: '腾讯云', type: 'primary' },
-]
 
 </script>
 <script>

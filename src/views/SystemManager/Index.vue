@@ -26,11 +26,11 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="管理人员状态" path="managerStatus">
-            <n-select v-model:value="getDataListParams.managerStatus" :options="managerStatusList"
+            <n-select v-model:value="getDataListParams.managerStatus" :options="systemManagerStatusRef"
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="managerType">
-            <n-select v-model:value="getDataListParams.managerType" :options="managerTypeList" placeholder="请选择管理人员类型" />
+            <n-select v-model:value="getDataListParams.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -54,11 +54,11 @@
           <n-input v-model:value="addDataForm.loginPassword" placeholder="请输入登录密码" clearable />
         </n-form-item>
         <n-form-item label="管理人员状态" path="managerStatus">
-          <n-select v-model:value="addDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态"
+          <n-select v-model:value="addDataForm.managerStatus" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
             clearable />
         </n-form-item>
         <n-form-item label="管理人员类型" path="managerType">
-          <n-select v-model:value="addDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型"
+          <n-select v-model:value="addDataForm.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
             clearable />
         </n-form-item>
         <n-form-item v-if="addDataForm.managerType == 2" label="平台地区权限" path="regionId">
@@ -91,11 +91,11 @@
             <n-input v-model:value="editDataForm.loginPassword" placeholder="请输入登录密码" clearable />
           </n-form-item>
           <n-form-item label="管理人员状态" path="managerStatus">
-            <n-select v-model:value="editDataForm.managerStatus" :options="managerStatusList" placeholder="请选择管理人员状态"
+            <n-select v-model:value="editDataForm.managerStatus" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
               clearable />
           </n-form-item>
           <n-form-item label="管理人员类型" path="managerType">
-            <n-select v-model:value="editDataForm.managerType" :options="managerTypeList" placeholder="请选择管理人员类型"
+            <n-select v-model:value="editDataForm.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
               clearable />
           </n-form-item>
           <n-form-item v-if="editDataForm.managerType == 2" label="平台地区权限" path="regionId">
@@ -118,17 +118,20 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, forOwn, isEqual, pick } from 'lodash'
 import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NSpace, NSpin, NTag } from 'naive-ui'
-import { getCurrentInstance, h, nextTick, onActivated, onDeactivated, onMounted, ref } from 'vue'
+import { getCurrentInstance, h, nextTick, onActivated, onDeactivated, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
 const quickMenuStore = useQuickMenuStore()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统人员'
@@ -157,6 +160,16 @@ onActivated(() => {
 })
 onDeactivated(() => {
   quickMenuStore.delQuickMenu('RefreshSystemManagersRole')
+})
+
+// 加载字典
+const systemManagerStatusRef = ref([])
+const systemManagerTypeRef = ref([])
+provide('SystemManagerStatusDict', systemManagerStatusRef)
+provide('SystemManagerTypeDict', systemManagerTypeRef)
+onMounted(() => {
+  dictsStore.getDictData('SystemManagerStatus', systemManagerStatusRef)
+  dictsStore.getDictData('SystemManagerType', systemManagerTypeRef)
 })
 
 // 获取列表请求参数
@@ -195,17 +208,13 @@ const dataColumns = [
   {
     key: 'managerStatus', title: '账户状态', width: 100,
     render(row) {
-      return h(NTag, { type: row.managerStatus === 0 ? 'error' : 'info', bordered: false }, {
-        default: () => find(managerStatusList, o => o.value === row.managerStatus)?.label
-      })
+      return h(StrixTag, { value: row.managerStatus, dictName: 'SystemManagerStatus' })
     }
   },
   {
     key: 'managerType', title: '账户类型', width: 100,
     render(row) {
-      return h(NTag, { type: row.managerType === 1 ? 'success' : 'info', bordered: false }, {
-        default: () => find(managerTypeList, o => o.value === row.managerType)?.label
-      })
+      return h(StrixTag, { value: row.managerType, dictName: 'SystemManagerType' })
     }
   },
   {
@@ -285,16 +294,6 @@ const getSystemRoleSelectList = () => {
   })
 }
 onMounted(getSystemRoleSelectList)
-const managerStatusList = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '正常用户' },
-  { value: 2, label: '禁止登录' }
-]
-const managerTypeList = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '超级账户' },
-  { value: 2, label: '平台账户' }
-]
 const managerRegionName = (regionId) => {
   return deepSearch(systemRegionCascaderOptions.value, regionId, 'value').label
 }

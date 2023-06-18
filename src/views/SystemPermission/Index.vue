@@ -26,7 +26,7 @@
       <n-form :model="filterDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="权限类型" path="permissionType">
-            <n-select v-model:value="filterDataListParams.permissionType" :options="permissionTypeOptions"
+            <n-select v-model:value="filterDataListParams.permissionType" :options="systemPermissionTypeRef"
               placeholder="请选择权限类型" clearable />
           </n-form-item-gi>
         </n-grid>
@@ -45,7 +45,7 @@
           <n-input v-model:value="addDataForm.permissionKey" placeholder="请输入权限标识" clearable />
         </n-form-item>
         <n-form-item label="系统权限类型" path="permissionType">
-          <n-select v-model:value="addDataForm.permissionType" :options="permissionTypeOptions" placeholder="请选择系统权限类型"
+          <n-select v-model:value="addDataForm.permissionType" :options="systemPermissionTypeRef" placeholder="请选择系统权限类型"
             clearable />
         </n-form-item>
         <n-form-item label="权限介绍" path="description">
@@ -74,8 +74,8 @@
             <n-input v-model:value="editDataForm.permissionKey" placeholder="请输入权限标识" clearable />
           </n-form-item>
           <n-form-item label="系统权限类型" path="permissionType">
-            <n-select v-model:value="editDataForm.permissionType" :options="permissionTypeOptions" placeholder="请选择系统权限类型"
-              clearable />
+            <n-select v-model:value="editDataForm.permissionType" :options="systemPermissionTypeRef"
+              placeholder="请选择系统权限类型" clearable />
           </n-form-item>
           <n-form-item label="权限介绍" path="description">
             <n-input v-model:value="editDataForm.description" placeholder="请输入权限介绍" clearable />
@@ -96,13 +96,16 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
 import { forOwn, pick } from 'lodash'
-import { NButton, NDataTable, NPopconfirm, NTag } from 'naive-ui'
-import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
+import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
+import { computed, getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统权限'
@@ -111,6 +114,13 @@ defineProps({
   isSmallWindow: {
     type: Boolean, default: false
   }
+})
+
+// 加载字典
+const systemPermissionTypeRef = ref([])
+provide('SystemPermissionTypeDict', systemPermissionTypeRef)
+onMounted(() => {
+  dictsStore.getDictData('SystemPermissionType', systemPermissionTypeRef)
 })
 
 // 展示列信息
@@ -122,9 +132,7 @@ const dataColumns = [
     title: '权限类型',
     width: 80,
     render(row) {
-      const tagType = row.permissionType === 1 ? 'success' : 'info'
-      const tagContent = row.permissionType === 1 ? '只读权限' : '读写权限'
-      return h(NTag, { type: tagType, bordered: false }, { default: () => tagContent })
+      return h(StrixTag, { value: row.permissionType, dictName: 'SystemPermissionType' })
     }
   },
   { key: 'description', title: '权限介绍', width: 260 },
@@ -172,12 +180,6 @@ const clearSearch = () => {
   filterDataListParams.value.permissionType = ''
 }
 const dataRowKey = (rowData) => rowData.id
-
-const permissionTypeOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '只读权限' },
-  { value: 2, label: '读写权限' }
-]
 
 const initDataForm = () => {
   addDataModalShow.value = false

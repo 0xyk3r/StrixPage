@@ -1,6 +1,6 @@
 <template>
     <n-tag :type="tag.type" :bordered="false" :disabled="loading">
-        {{ tag.label }}
+        {{ beforeLabel }}{{ tag.label }}{{ afterLabel }}
     </n-tag>
 </template>
 <script setup>
@@ -14,6 +14,18 @@ const $props = defineProps({
     dictName: {
         type: String,
         required: true
+    },
+    beforeLabel: {
+        type: String,
+        default: ''
+    },
+    afterLabel: {
+        type: String,
+        default: ''
+    },
+    notFoundLabel: {
+        type: String,
+        default: '未知'
     }
 })
 
@@ -32,6 +44,12 @@ const tag = computed(() => {
     }
 
     const item = dictRef.value.find(item => item.value == $props.value)
+    if(!item) {
+        return {
+            label: $props.notFoundLabel,
+            type: ''
+        }
+    }
     return {
         label: item.label,
         type: item.style

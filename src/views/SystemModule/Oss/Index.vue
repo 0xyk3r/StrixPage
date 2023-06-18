@@ -40,7 +40,7 @@
           <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
         </n-form-item>
         <n-form-item label="存储平台" path="platform">
-          <n-select v-model:value="addDataForm.platform" :options="ossConfigPlatformOptions" placeholder="请选择存储平台"
+          <n-select v-model:value="addDataForm.platform" :options="strixOssPlatformRef" placeholder="请选择存储平台"
             clearable />
         </n-form-item>
         <n-form-item label="公网节点" path="publicEndpoint">
@@ -84,7 +84,7 @@
             <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
           </n-form-item>
           <n-form-item label="存储平台" path="platform">
-            <n-select v-model:value="editDataForm.platform" :options="ossConfigPlatformOptions" placeholder="请选择存储平台"
+            <n-select v-model:value="editDataForm.platform" :options="strixOssPlatformRef" placeholder="请选择存储平台"
               clearable />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
@@ -121,14 +121,17 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import _ from 'lodash'
 import { NButton, NDataTable, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '存储服务'
@@ -137,6 +140,13 @@ defineProps({
   isSmallWindow: {
     type: Boolean, default: false
   }
+})
+
+// 加载字典
+const strixOssPlatformRef = ref([])
+provide('StrixOssPlatformDict', strixOssPlatformRef)
+onMounted(() => {
+  dictsStore.getDictData('StrixOssPlatform', strixOssPlatformRef)
 })
 
 // 获取列表请求参数
@@ -239,13 +249,7 @@ const dataColumns = [
     width: 100,
     title: '平台',
     render(row) {
-      const option = _.find(ossConfigPlatformOptions, function (o) { return o.value === row.platform })
-      return h(NTag, {
-        type: option?.type || 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.platform, dictName: 'StrixOssPlatform' })
     }
   },
   { key: 'publicEndpoint', width: 150, title: '公网节点' },
@@ -461,12 +465,6 @@ const deleteData = (id) => {
     getDataList()
   })
 }
-
-const ossConfigPlatformOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '阿里云', type: 'warning' },
-  { value: 2, label: '腾讯云', type: 'primary' },
-]
 
 </script>
 <script>

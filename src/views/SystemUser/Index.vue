@@ -17,8 +17,8 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="用户状态" path="status">
-            <n-select v-model:value="getDataListParams.status" :options="userStatusOptions" placeholder="请选择用户状态"
-              clearable @clear="getDataListParams.status = ''" />
+            <n-select v-model:value="getDataListParams.status" :options="systemUserStatusRef" placeholder="请选择用户状态"
+              clearable @clear="getDataListParams.status = null" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -38,7 +38,8 @@
             <n-input v-model:value="editDataForm.phoneNumber" placeholder="请输入手机号码" clearable />
           </n-form-item>
           <n-form-item label="用户状态" path="status">
-            <n-select v-model:value="editDataForm.status" :options="userStatusOptions" placeholder="请选择用户状态" clearable />
+            <n-select v-model:value="editDataForm.status" :options="systemUserStatusRef" placeholder="请选择用户状态"
+              clearable />
           </n-form-item>
         </n-form>
       </n-spin>
@@ -55,14 +56,17 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import _ from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -73,16 +77,23 @@ defineProps({
   }
 })
 
+// 加载字典
+const systemUserStatusRef = ref([])
+provide('SystemUserStatusDict', systemUserStatusRef)
+onMounted(() => {
+  dictsStore.getDictData('SystemUserStatus', systemUserStatusRef)
+})
+
 // 获取列表请求参数
 const getDataListParams = ref({
   keyword: '',
-  status: '',
+  status: null,
   pageIndex: 1,
   pageSize: 10
 })
 const clearSearch = () => {
   getDataListParams.value.keyword = ''
-  getDataListParams.value.status = ''
+  getDataListParams.value.status = null
   getDataList()
 }
 // 展示列信息
@@ -94,10 +105,7 @@ const dataColumns = [
     title: '用户状态',
     width: 120,
     render(row) {
-      const tagType = row.status === 0 ? 'error' : 'primary'
-      return h(NTag, { type: tagType, bordered: false }, {
-        default: () => _.find(userStatusOptions, o => o.value === row.status)?.label
-      })
+      return h(StrixTag, { value: row.status, dictName: 'SystemUserStatus' })
     }
   },
   {
@@ -134,12 +142,6 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
-
-const userStatusOptions = [
-  { value: '', label: '未选择' },
-  { value: 0, label: '禁止登录' },
-  { value: 1, label: '正常用户' }
-]
 
 const initDataForm = () => {
   editDataModalShow.value = false

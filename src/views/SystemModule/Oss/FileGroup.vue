@@ -65,7 +65,7 @@
             @create="handleAllowExtensionCreate($event, 1)" />
         </n-form-item>
         <n-form-item label="查看权限类型" path="secretType">
-          <n-select v-model:value="addDataForm.secretType" :options="ossFileGroupSecretTypeOptions"
+          <n-select v-model:value="addDataForm.secretType" :options="strixOssFileGroupSecretTypeRef"
             placeholder="请选择查看权限类型" clearable />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
@@ -107,7 +107,7 @@
               @create="handleAllowExtensionCreate($event, 2)" />
           </n-form-item>
           <n-form-item label="查看权限类型" path="secretType">
-            <n-select v-model:value="editDataForm.secretType" :options="ossFileGroupSecretTypeOptions"
+            <n-select v-model:value="editDataForm.secretType" :options="strixOssFileGroupSecretTypeRef"
               placeholder="请选择查看权限类型" clearable />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
@@ -135,14 +135,17 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, forOwn, pick } from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, nextTick, onMounted, ref } from 'vue'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, nextTick, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '文件分组'
@@ -151,6 +154,13 @@ defineProps({
   isSmallWindow: {
     type: Boolean, default: false
   }
+})
+
+// 加载字典
+const strixOssFileGroupSecretTypeRef = ref([])
+provide('StrixOssFileGroupSecretTypeDict', strixOssFileGroupSecretTypeRef)
+onMounted(() => {
+  dictsStore.getDictData('StrixOssFileGroupSecretType', strixOssFileGroupSecretTypeRef)
 })
 
 // 获取列表请求参数
@@ -174,10 +184,7 @@ const dataColumns = [
   { key: 'allowExtension', title: '允许的拓展名', width: 150 },
   {
     key: 'secretType', title: '文件权限类型', width: 100, render(row) {
-      const tagText = row.secretType === 1 ? '管理端文件' : '用户端文件';
-      return h(NTag, { type: row.secretType === 1 ? 'success' : 'info', bordered: false }, {
-        default: () => tagText + '/' + row.secretLevel
-      })
+      return h(StrixTag, { value: row.secretType, dictName: 'StrixOssFileGroupSecretType', afterLabel: ' / ' + row.secretLevel })
     }
   },
   { key: 'remark', title: '备注', width: 150 },
@@ -224,12 +231,6 @@ const getOssConfigSelectList = () => {
   })
 }
 onMounted(getOssConfigSelectList)
-
-// 文件查看权限类型
-const ossFileGroupSecretTypeOptions = [
-  { value: 1, label: '管理端文件', type: 'primary' },
-  { value: 2, label: '用户端文件', type: 'success' },
-]
 
 const handleAllowExtensionCreate = (label, type) => {
   if (!/^\.?\w+$/.test(label)) return createStrixMessage('warning', '操作失败', '请输入正确的文件拓展名')

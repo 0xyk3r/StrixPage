@@ -25,8 +25,8 @@
               clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="发送状态" path="status">
-            <n-select v-model:value="getDataListParams.status" :options="smsLogStatusOptions" placeholder="请选择短信发送状态"
-              clearable @update:value="getDataList" @clear="getDataListParams.status = ''" />
+            <n-select v-model:value="getDataListParams.status" :options="strixSmsLogStatusRef" placeholder="请选择短信发送状态"
+              clearable @update:value="getDataList" @clear="getDataListParams.status = null" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -39,12 +39,14 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
+import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import _ from 'lodash'
-import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { useDictsStore } from '@/stores/dicts'
+import { NButton, NDataTable } from 'naive-ui'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '短信日志'
@@ -55,16 +57,26 @@ defineProps({
   }
 })
 
+// 加载字典
+const strixSmsPlatformRef = ref([])
+const strixSmsLogStatusRef = ref([])
+provide('StrixSmsPlatformDict', strixSmsPlatformRef)
+provide('StrixSmsLogStatusDict', strixSmsLogStatusRef)
+onMounted(() => {
+  dictsStore.getDictData('StrixSmsPlatform', strixSmsPlatformRef)
+  dictsStore.getDictData('StrixSmsLogStatus', strixSmsLogStatusRef)
+})
+
 // 获取列表请求参数
 const getDataListParams = ref({
   keyword: '',
-  status: '',
+  status: null,
   pageIndex: 1,
   pageSize: 10
 })
 const clearSearch = () => {
   getDataListParams.value.keyword = ''
-  getDataListParams.value.status = ''
+  getDataListParams.value.status = null
   getDataList()
 }
 // 展示列信息
@@ -76,13 +88,7 @@ const dataColumns = [
     title: '短信平台',
     width: 100,
     render(row) {
-      const option = _.find(smsConfigPlatformOptions, function (o) { return o.value === row.platform })
-      return h(NTag, {
-        type: option?.type || 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.platform, dictName: 'StrixSmsPlatform' })
     }
   },
   { key: 'signName', title: '签名', width: 150 },
@@ -94,13 +100,7 @@ const dataColumns = [
     title: '状态',
     width: 120,
     render(row) {
-      const option = _.find(smsLogStatusOptions, function (o) { return o.value === row.status })
-      return h(NTag, {
-        type: option?.type || 'default',
-        bordered: false
-      }, {
-        default: () => option?.label || '未知'
-      })
+      return h(StrixTag, { value: row.status, dictName: 'StrixSmsLogStatus' })
     }
   },
   { key: 'platformResponse', title: '平台响应', width: 250 },
@@ -131,18 +131,6 @@ const getSmsConfigSelectList = () => {
   })
 }
 onMounted(getSmsConfigSelectList)
-
-const smsConfigPlatformOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '阿里云', type: 'warning' },
-  { value: 2, label: '腾讯云', type: 'primary' },
-]
-const smsLogStatusOptions = [
-  { value: '', label: '未选择' },
-  { value: 1, label: '待发送', type: 'warning' },
-  { value: 2, label: '已发送', type: 'success' },
-  { value: 3, label: '发送失败', type: 'error' },
-]
 
 </script>
 <script>
