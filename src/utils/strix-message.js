@@ -14,6 +14,7 @@ export const createStrixMessage = (type, title, content, duration = 3000) => {
     message = useMessage()
   }
   message[type](content || '', {
+    duration: duration,
     render: (props) => {
       const { type } = props;
       return h(
