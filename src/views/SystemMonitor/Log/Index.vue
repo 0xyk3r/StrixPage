@@ -20,29 +20,29 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="操作类型" path="operationType">
             <n-select v-model:value="getDataListParams.operationType" :options="smsConfigSelectList" placeholder="请选择操作类型"
-              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="操作分组" path="operationGroup">
             <n-select v-model:value="getDataListParams.operationGroup" :options="smsSignStatusOptions"
-              placeholder="请选择操作分组" clearable @update:value="getDataList"
-              @clear="getDataListParams.operationGroup = ''" />
+              placeholder="请选择操作分组" clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="响应状态码" path="responseCode">
             <n-select v-model:value="getDataListParams.responseCode" :options="smsSignStatusOptions"
-              placeholder="请选择响应状态码" clearable @update:value="getDataList" @clear="getDataListParams.responseCode = ''" />
+              placeholder="请选择响应状态码" clearable @update:value="getDataList" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
-    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef" :pagination="dataPagination"
-      :row-key="dataRowKey" />
+    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
+      :pagination="dataPagination" :row-key="dataRowKey" />
   </div>
 </template>
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { cloneDeep } from 'lodash'
 import { NButton, NDataTable, NTag } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, ref } from 'vue'
 
@@ -51,26 +51,18 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '系统日志'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
-  operationType: '',
-  operationGroup: '',
-  responseCode: '',
+const initGetDataListParams = {
+  keyword: null,
+  operationType: null,
+  operationGroup: null,
+  responseCode: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.operationType = ''
-  getDataListParams.value.operationGroup = ''
-  getDataListParams.value.responseCode = ''
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -125,8 +117,6 @@ const getDataList = () => {
     dataLoading.value = false
     dataRef.value = res.data.items
     dataPagination.itemCount = res.data.total
-    console.log(res.data.total)
-    console.log(dataPagination)
   })
 }
 onMounted(getDataList)

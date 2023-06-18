@@ -1,43 +1,36 @@
 .app-main-height {
-    user-select: text;
+  user-select: text;
 }
 
 .strix-zoom-in-top-enter-active,
 .strix-zoom-in-top-leave-active {
-    filter: none;
-    transition: filter .4s ease, transform .4s ease;
+  filter: none;
+  transition: filter 0.4s ease, transform 0.4s ease;
 }
 
 .strix-zoom-in-top-enter-from,
 .strix-zoom-in-top-leave-from {
-    filter: blur(20px);
+  filter: blur(20px);
 }
 
 .strix-zoom-in-top-leave-active {
-    display: none;
+  display: none;
 }
 
+/* model */
 .strix-model-primary {
-    width: 65vw;
-    max-width: 800px;
+  width: 65vw;
+  max-width: 800px;
 }
 
-.strix-full-modal {
-    width: 95vw;
+/* model 在移动设备上宽度占满全屏 */
+@media only screen and (max-width: 768px) {
+  .strix-model-primary {
+    width: calc(100vw - 10px);
+    max-width: none;
+  }
 }
 
 .strix-form-modal-footer {
-    justify-content: flex-end !important;
-}
-
-.n-data-table-table {
-    table-layout: fixed !important;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-transition-delay: 99999s !important;
-    -webkit-transition: color 99999s ease-out, background-color 99999s ease-out !important;
+  justify-content: flex-end !important;
 }

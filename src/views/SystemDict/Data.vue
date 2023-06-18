@@ -25,7 +25,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="字典状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="dictDataStatusRef" placeholder="请选择字典数据状态"
-              clearable @update:value="getDataList" @clear="getDataListParams.status = ''" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -35,7 +35,7 @@
       :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="字典值" path="value">
@@ -71,7 +71,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -117,7 +117,7 @@ import { createPagination } from '@/plugins/pagination.js'
 import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { forOwn, pick } from 'lodash'
+import { cloneDeep, pick } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -129,12 +129,7 @@ const dictsStore = useDictsStore()
 // 本页面操作提示关键词
 const _baseName = '系统字典数据'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
+// 路由参数
 const dictKey = $route.params.dictKey
 
 // 加载字典
@@ -148,15 +143,15 @@ onMounted(() => {
 })
 
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   status: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.status = null
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -214,37 +209,22 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    key: dictKey,
-    value: '',
-    label: '',
-    sort: 0,
-    style: null,
-    status: 1,
-    remark: ''
-  }
-  editDataId = ''
-  editDataForm.value = {
-    key: dictKey,
-    value: '',
-    label: '',
-    sort: null,
-    style: null,
-    status: null,
-    remark: ''
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
+const initAddDataForm = {
   key: dictKey,
-  value: '',
-  label: '',
+  value: null,
+  label: null,
   sort: 0,
   style: null,
   status: 1,
-  remark: ''
-})
+  remark: null
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   key: [
     { required: true, message: '请输入字典标识', trigger: 'blur' },
@@ -287,16 +267,17 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
+let editDataId = null
+const initEditDataForm = {
   key: dictKey,
-  value: '',
-  label: '',
+  value: null,
+  label: null,
   sort: null,
   style: null,
   status: null,
-  remark: ''
-})
+  remark: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   key: [
     { required: true, message: '请输入字典标识', trigger: 'blur' },
@@ -328,11 +309,8 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/dict/data/${dictKey}/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

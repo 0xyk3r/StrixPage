@@ -29,7 +29,7 @@
       :allow-checking-not-loaded="true" @load="onDataChildrenLoad" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="地区名称" path="name">
@@ -56,7 +56,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -91,7 +91,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool.js'
-import { forOwn, pick } from 'lodash'
+import { cloneDeep, pick } from 'lodash'
 import { NButton, NDataTable, NTag } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, ref } from 'vue'
 
@@ -100,21 +100,16 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '系统地区'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
-  parentId: '',
+const initGetDataListParams = {
+  keyword: null,
+  parentId: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -207,25 +202,18 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    name: '',
-    parentId: '',
-    remarks: ''
-  }
-  editDataId = ''
-  editDataForm.value = {
-    name: '',
-    parentId: '',
-    remarks: ''
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
-  name: '',
-  parentId: '',
-  remarks: ''
-})
+const initAddDataForm = {
+  name: null,
+  parentId: null,
+  remarks: null
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }],
 }
@@ -247,12 +235,13 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  name: '',
-  parentId: '',
-  remarks: ''
-})
+let editDataId = null
+const initEditDataForm = {
+  name: null,
+  parentId: null,
+  remarks: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }],
 }
@@ -262,11 +251,8 @@ const showEditDataModal = (id) => {
   getSystemRegionSelectList()
   // 加载编辑前信息
   proxy.$http.get(`system/region/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

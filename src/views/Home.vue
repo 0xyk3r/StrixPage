@@ -51,7 +51,7 @@
             <transition name="strix-zoom-in-top">
               <!-- 根据 fullPath 缓存组件 解决动态路由缓存问题 -->
               <keep-alive :include="cachedRoutes">
-                <component :is="Component" :key="route.fullPath" :is-small-window="isSmallWindow" />
+                <component :is="Component" :key="route.fullPath" />
               </keep-alive>
             </transition>
           </router-view>

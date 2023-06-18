@@ -20,11 +20,11 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
             <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getOssFileGroupSelectList($event)" @clear="getDataListParams.configKey = ''" />
+              clearable @update:value="getOssFileGroupSelectList($event)" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="文件组 Key" path="groupKey">
             <n-select v-model:value="getDataListParams.groupKey" :options="ossFileGroupSelectList"
-              placeholder="请选择文件组 Key" clearable @update:value="getDataList" @clear="getDataListParams.groupKey = ''" />
+              placeholder="请选择文件组 Key" clearable @update:value="getDataList" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -40,6 +40,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { downloadBlob } from '@/utils/strix-file.js'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { cloneDeep } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
 import { getCurrentInstance, onMounted, ref } from 'vue'
 
@@ -48,24 +49,17 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '存储文件'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   configKey: null,
   groupKey: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.configKey = null
-  getDataListParams.value.groupKey = null
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -122,7 +116,6 @@ onMounted(getOssConfigSelectList)
 // 加载文件组配置选项
 const ossFileGroupSelectList = ref([])
 const getOssFileGroupSelectList = (configKey) => {
-  console.log(configKey)
   if (configKey) {
     getDataListParams.value.groupKey = null
     getDataList()

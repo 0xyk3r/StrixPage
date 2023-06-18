@@ -29,7 +29,7 @@
       :expanded-row-keys="dataExpandedRowKeys" @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="角色名称" path="name">
@@ -47,7 +47,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -67,8 +67,7 @@
     </n-modal>
 
     <n-modal v-model:show="editRoleMenusModalShow" preset="card" :title="'修改' + _baseName + '菜单权限'"
-      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
-      @after-leave="initModifyForm">
+      class="strix-model-primary" size="huge" @after-leave="initModifyForm">
       <n-spin :show="editRoleMenusLoading">
         <n-tree v-model:checked-keys="editRoleMenusCheckedKeys" block-line cascade checkable :data="systemMenuTreeData"
           key-field="id" label-field="name" />
@@ -84,8 +83,7 @@
     </n-modal>
 
     <n-modal v-model:show="editRolePermissionsModalShow" preset="card" :title="'修改' + _baseName + '系统权限'"
-      class="strix-model-primary" :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge"
-      @after-leave="initModifyForm">
+      class="strix-model-primary" size="huge" @after-leave="initModifyForm">
       <n-spin :show="editRolePermissionsLoading">
         <n-transfer ref="transfer" v-model:value="editRolePermissionsCheckedKeys" :options="systemPermissionTransferData"
           :render-source-label="renderSystemPermissionTransferData"
@@ -108,7 +106,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap } from '@/utils/strix-tools'
-import _ from 'lodash'
+import _, { cloneDeep } from 'lodash'
 import { NButton, NDataTable, NDivider, NEmpty, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
 
@@ -116,12 +114,6 @@ const { proxy } = getCurrentInstance()
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
-
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
 
 const colorList = ['info', 'warning', 'error', 'success', '']
 const renderExpandMenuChildren = (row, children, colorIndex) => {
@@ -261,19 +253,16 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    name: ''
-  }
-  editDataId = ''
-  editDataForm.value = {
-    name: ''
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
-  name: ''
-})
+const initAddDataForm = {
+  name: null
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
@@ -296,10 +285,11 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  name: ''
-})
+let editDataId = null
+const initEditDataForm = {
+  name: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
@@ -311,11 +301,8 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/role/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    _.forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = _.pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

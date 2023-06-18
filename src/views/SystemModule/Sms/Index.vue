@@ -30,7 +30,7 @@
       @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="配置 Key" path="key">
@@ -40,8 +40,7 @@
           <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
         </n-form-item>
         <n-form-item label="短信平台" path="platform">
-          <n-select v-model:value="addDataForm.platform" :options="strixSmsPlatformRef" placeholder="请选择短信平台"
-            clearable />
+          <n-select v-model:value="addDataForm.platform" :options="strixSmsPlatformRef" placeholder="请选择短信平台" clearable />
         </n-form-item>
         <n-form-item label="所属地域" path="regionId">
           <n-input v-model:value="addDataForm.regionId" placeholder="请输入所属地域" clearable />
@@ -70,7 +69,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -120,7 +119,7 @@ import { createPagination } from '@/plugins/pagination.js'
 import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import _ from 'lodash'
+import _, { cloneDeep } from 'lodash'
 import { NButton, NDataTable, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
@@ -130,12 +129,6 @@ const dictsStore = useDictsStore()
 // 本页面操作提示关键词
 const _baseName = '短信服务'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 加载字典
 const strixSmsPlatformRef = ref([])
 provide('StrixSmsPlatformDict', strixSmsPlatformRef)
@@ -144,13 +137,14 @@ onMounted(() => {
 })
 
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -378,37 +372,22 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    key: '',
-    name: '',
-    platform: null,
-    regionId: '',
-    accessKey: '',
-    accessSecret: '',
-    remark: ''
-  }
-  editDataId = ''
-  editDataForm.value = {
-    key: '',
-    name: '',
-    platform: '',
-    regionId: '',
-    accessKey: '',
-    accessSecret: '',
-    remark: ''
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
-  key: '',
-  name: '',
+const initAddDataForm = {
+  key: null,
+  name: null,
   platform: null,
-  regionId: '',
-  accessKey: '',
-  accessSecret: '',
-  remark: ''
-})
+  regionId: null,
+  accessKey: null,
+  accessSecret: null,
+  remark: null
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   key: [
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
@@ -453,16 +432,17 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  key: '',
-  name: '',
-  platform: '',
-  regionId: '',
-  accessKey: '',
-  accessSecret: '',
-  remark: ''
-})
+let editDataId = null
+const initEditDataForm = {
+  key: null,
+  name: null,
+  platform: null,
+  regionId: null,
+  accessKey: null,
+  accessSecret: null,
+  remark: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   key: [
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
@@ -495,11 +475,8 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/sms/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    _.forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = _.pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

@@ -18,7 +18,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="用户状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="systemUserStatusRef" placeholder="请选择用户状态"
-              clearable @clear="getDataListParams.status = null" />
+              clearable />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -27,7 +27,7 @@
       :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -61,7 +61,7 @@ import { createPagination } from '@/plugins/pagination.js'
 import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import _ from 'lodash'
+import _, { cloneDeep } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
@@ -71,12 +71,6 @@ const dictsStore = useDictsStore()
 // 本页面操作提示关键词
 const _baseName = '系统用户'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 加载字典
 const systemUserStatusRef = ref([])
 provide('SystemUserStatusDict', systemUserStatusRef)
@@ -85,15 +79,15 @@ onMounted(() => {
 })
 
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   status: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.status = null
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -146,22 +140,19 @@ const dataRowKey = (rowData) => rowData.id
 const initDataForm = () => {
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  editDataId = ''
-  editDataForm.value = {
-    nickname: '',
-    status: '',
-    phoneNumber: ''
-  }
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  nickname: '',
-  status: '',
-  phoneNumber: ''
-})
+let editDataId = null
+const initEditDataForm = {
+  nickname: null,
+  status: null,
+  phoneNumber: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   nickname: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }],
 }
@@ -170,11 +161,8 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/user/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    _.forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = _.pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

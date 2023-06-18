@@ -30,18 +30,19 @@
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="managerType">
-            <n-select v-model:value="getDataListParams.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型" />
+            <n-select v-model:value="getDataListParams.managerType" :options="systemManagerTypeRef"
+              placeholder="请选择管理人员类型" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
     <n-data-table :loading="dataLoading" :columns="dataColumns" :data="dataRef" :pagination="dataPagination"
-      :row-key="dataRowKey" :expanded-row-keys="dataExpandedRowKeys"
+      :row-key="dataRowKey" :expanded-row-keys="dataExpandedRowKeys" table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="管理人员昵称" path="nickname">
@@ -77,7 +78,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -125,7 +126,7 @@ import { useQuickMenuStore } from '@/stores/quick-menu'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
-import { differenceWith, find, forOwn, isEqual, pick } from 'lodash'
+import { differenceWith, find, cloneDeep, isEqual, pick } from 'lodash'
 import { NButton, NCheckbox, NCheckboxGroup, NDataTable, NH6, NSpace, NSpin, NTag } from 'naive-ui'
 import { getCurrentInstance, h, nextTick, onActivated, onDeactivated, onMounted, provide, ref } from 'vue'
 
@@ -135,12 +136,6 @@ const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统人员'
-
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({
@@ -173,17 +168,16 @@ onMounted(() => {
 })
 
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
-  managerStatus: '',
-  managerType: '',
+const initGetDataListParams = {
+  keyword: null,
+  managerStatus: null,
+  managerType: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.managerStatus = ''
-  getDataListParams.value.managerType = ''
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -298,6 +292,7 @@ const managerRegionName = (regionId) => {
   return deepSearch(systemRegionCascaderOptions.value, regionId, 'value').label
 }
 
+// 更改系统人员角色
 const changeSystemManagerRoles = (systemManagerId, roles) => {
   const row = find(dataRef.value, { id: systemManagerId })
   proxy.$http.post(`system/manager/modify/${systemManagerId}`, {
@@ -312,34 +307,21 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    nickname: '',
-    loginName: '',
-    loginPassword: '',
-    managerStatus: 1,
-    managerType: 1,
-    regionId: ''
-  }
-  editDataId = ''
-  editDataForm.value = {
-    nickname: '',
-    loginName: '',
-    loginPassword: '',
-    managerStatus: '',
-    managerType: '',
-    regionId: ''
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
-  nickname: '',
-  loginName: '',
-  loginPassword: '',
+const initAddDataForm = {
+  nickname: null,
+  loginName: null,
+  loginPassword: null,
   managerStatus: 1,
   managerType: 1,
-  regionId: ''
-})
+  regionId: null
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
@@ -377,15 +359,16 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  nickname: '',
-  loginName: '',
-  loginPassword: '',
-  managerStatus: '',
-  managerType: '',
-  regionId: ''
-})
+let editDataId = null
+const initEditDataForm = {
+  nickname: null,
+  loginName: null,
+  loginPassword: null,
+  managerStatus: null,
+  managerType: null,
+  regionId: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
@@ -411,11 +394,8 @@ const showEditDataModal = (id) => {
   getSystemRegionSelectList()
   // 加载编辑前信息
   proxy.$http.get(`system/manager/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

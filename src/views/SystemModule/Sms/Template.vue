@@ -22,15 +22,15 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="配置 Key" path="configKey">
             <n-select v-model:value="getDataListParams.configKey" :options="smsConfigSelectList" placeholder="请选择短信配置 Key"
-              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
             <n-select v-model:value="getDataListParams.status" :options="strixSmsTemplateStatusRef" placeholder="请选择状态"
-              clearable @update:value="getDataList" @clear="getDataListParams.status = null" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="类型" path="type">
             <n-select v-model:value="getDataListParams.type" :options="strixSmsTemplateTypeRef" placeholder="请选择类型"
-              clearable @update:value="getDataList" @clear="getDataListParams.type = null" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -46,6 +46,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { useDictsStore } from '@/stores/dicts'
+import { cloneDeep } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
@@ -54,12 +55,6 @@ const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '短信模板'
-
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
 
 // 加载字典
 const strixSmsTemplateTypeRef = ref([])
@@ -72,17 +67,16 @@ onMounted(() => {
 })
 
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   type: null,
   status: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.type = null
-  getDataListParams.value.status = null
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息

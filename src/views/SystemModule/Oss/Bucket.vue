@@ -25,7 +25,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
             <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getDataList" @clear="getDataListParams.configKey = ''" />
+              clearable @update:value="getDataList" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -35,7 +35,7 @@
       :pagination="dataPagination" :row-key="dataRowKey" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-form-item label="存储配置 Key" path="configKey">
@@ -66,6 +66,7 @@
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { createStrixMessage } from '@/utils/strix-message'
+import { cloneDeep } from 'lodash'
 import { NButton, NDataTable, NTag } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, ref } from 'vue'
 
@@ -74,22 +75,16 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '存储空间'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 获取列表请求参数
-const getDataListParams = ref({
-  keyword: '',
+const initGetDataListParams = {
+  keyword: null,
   configKey: null,
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 const clearSearch = () => {
-  getDataListParams.value.keyword = ''
-  getDataListParams.value.configKey = null
+  getDataListParams.value = cloneDeep(initGetDataListParams)
   getDataList()
 }
 // 展示列信息
@@ -143,19 +138,16 @@ const storageClassOptions = [
 
 const initDataForm = () => {
   addDataModalShow.value = false
-  addDataForm.value = {
-    configKey: null,
-    name: '',
-    storageClass: null
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
+const initAddDataForm = {
   configKey: null,
-  name: '',
+  name: null,
   storageClass: null
-})
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   configKey: [
     { required: true, message: '请选择存储配置 Key', trigger: 'change' }

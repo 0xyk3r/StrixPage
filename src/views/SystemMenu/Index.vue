@@ -20,7 +20,7 @@
       :pagination="dataPagination" :row-key="dataRowKey" :cascade="false" :allow-checking-not-loaded="true" />
 
     <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
         require-mark-placement="right-hanging">
         <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
@@ -54,7 +54,7 @@
     </n-modal>
 
     <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      :class="isSmallWindow ? 'strix-full-modal' : ''" size="huge" @after-leave="initDataForm">
+      size="huge" @after-leave="initDataForm">
       <n-spin :show="editDataFormLoading">
         <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
           label-width="auto" require-mark-placement="right-hanging">
@@ -94,7 +94,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
-import { forOwn, kebabCase, pick } from 'lodash'
+import { cloneDeep, kebabCase, pick } from 'lodash'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, ref } from 'vue'
 
@@ -103,17 +103,12 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
 
-defineProps({
-  isSmallWindow: {
-    type: Boolean, default: false
-  }
-})
-
 // 获取列表请求参数
-const getDataListParams = ref({
+const initGetDataListParams = {
   pageIndex: 1,
   pageSize: 10
-})
+}
+const getDataListParams = ref(cloneDeep(initGetDataListParams))
 // 展示列信息
 const dataColumns = [
   { key: 'name', title: '菜单名称', width: 200 },
@@ -158,31 +153,20 @@ const initDataForm = () => {
   addDataModalShow.value = false
   editDataModalShow.value = false
   editDataFormLoading.value = false
-  addDataForm.value = {
-    name: '',
-    url: '/',
-    icon: '',
-    parentId: '',
-    sortValue: 0
-  }
-  editDataId = ''
-  editDataForm.value = {
-    name: '',
-    url: '',
-    icon: '',
-    parentId: '',
-    sortValue: 0
-  }
+  addDataForm.value = cloneDeep(initAddDataForm)
+  editDataId = null
+  editDataForm.value = cloneDeep(initEditDataForm)
 }
 
 const addDataModalShow = ref(false)
-const addDataForm = ref({
-  name: '',
+const initAddDataForm = {
+  name: null,
   url: '/',
-  icon: '',
-  parentId: '',
+  icon: null,
+  parentId: null,
   sortValue: 0
-})
+}
+const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataRules = {
   name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
   url: [{ required: true, message: '请输入菜单路由', trigger: 'blur' }],
@@ -210,14 +194,15 @@ const addData = () => {
 
 const editDataModalShow = ref(false)
 const editDataFormLoading = ref(false)
-let editDataId = ''
-const editDataForm = ref({
-  name: '',
-  url: '',
-  parentId: '',
-  icon: '',
-  sortValue: 0
-})
+let editDataId = null
+const initEditDataForm = {
+  name: null,
+  url: null,
+  icon: null,
+  parentId: null,
+  sortValue: null
+}
+const editDataForm = ref(cloneDeep(initEditDataForm))
 const editDataRules = {
   name: [{ required: true, message: '请输入菜单名称' }],
   url: [{ required: true, message: '请输入菜单路由' }],
@@ -231,11 +216,8 @@ const showEditDataModal = (id) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   proxy.$http.get(`system/menu/${id}`, { operate: `加载${_baseName}信息` }).then(({ data: res }) => {
-    const canUpdateFields = []
-    forOwn(editDataForm.value, function (value, key) {
-      canUpdateFields.push(key)
-    })
     editDataId = id
+    const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })
