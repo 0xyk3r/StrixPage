@@ -1,5 +1,5 @@
 import { useHttpCancelerStore } from '@/stores/http-canceler'
-import { createStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage } from '@/utils/strix-message'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import JSEncrypt from 'jsencrypt'
@@ -131,12 +131,12 @@ axios.interceptors.response.use(response => {
     if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
       handleError(response)
     } else if (notify) {
-      createStrixNotify('success', (response.config.operate || '操作') + '成功', '操作成功')
+      createStrixMessage('success', (response.config.operate || '操作') + '成功', '操作成功')
     }
   }
   return response
 }, error => {
-  createStrixNotify('error', '网络请求失败', error.message)
+  createStrixMessage('error', '网络请求失败', error.message)
 })
 
 function handleError(response) {
@@ -154,7 +154,7 @@ function handleError(response) {
     // 错误信息为空时 填充默认错误信息
     response.data.msg = response.data.msg || '未知错误'
   }
-  createStrixNotify('error', operate, errMsg)
+  createStrixMessage('error', operate, errMsg)
   throw new Error(operate)
 }
 

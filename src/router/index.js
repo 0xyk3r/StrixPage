@@ -143,6 +143,14 @@ const routes = [
               title: '系统缓存列表',
               empty: false
             }
+          }, {
+            path: 'log',
+            name: 'SystemMonitorLogIndex',
+            component: () => import('@/views/SystemMonitor/Log/Index.vue'),
+            meta: {
+              title: '系统日志列表',
+              empty: false
+            }
           }
         ]
       }, {

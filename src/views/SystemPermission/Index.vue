@@ -96,7 +96,7 @@
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
-import { createStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
 import { forOwn, pick } from 'lodash'
 import { NButton, NDataTable, NPopconfirm, NTag } from 'naive-ui'
@@ -228,7 +228,7 @@ const showAddDataModal = () => {
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
     if (errors) {
-      createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
       return
     }
     proxy.$http.post('system/permission/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
@@ -280,7 +280,7 @@ const showEditDataModal = (id) => {
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     proxy.$http.post(`system/permission/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()

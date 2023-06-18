@@ -73,7 +73,7 @@ import StrixTabsBar from '@/components/StrixTabBar.vue'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
-import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
@@ -88,7 +88,7 @@ const $router = useRouter()
 const osTheme = useOsTheme()
 
 initStrixLoadingBar(useLoadingBar())
-initStrixNotify()
+initStrixMessage()
 
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()
@@ -144,7 +144,7 @@ const clickContainer = () => {
 // 切换全屏状态
 const switchFullscreen = () => {
   if (!ScreenFull.isEnabled) {
-    return createStrixNotify('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
+    return createStrixMessage('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
   }
   ScreenFull.toggle()
 }
@@ -242,7 +242,7 @@ const avatarDropdownOptions = [
 const handleAvatarDropdownSelect = (key) => {
   switch (key) {
     case 'setting':
-      createStrixNotify('warning', '操作失败', '该功能暂未开放，敬请期待')
+      createStrixMessage('warning', '操作失败', '该功能暂未开放，敬请期待')
       break
     case 'logout':
       logout()

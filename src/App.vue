@@ -1,11 +1,11 @@
 <template>
   <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
     <n-loading-bar-provider>
-      <n-notification-provider>
+      <n-message-provider :keep-alive-on-hover="true">
         <n-dialog-provider>
           <router-view />
         </n-dialog-provider>
-      </n-notification-provider>
+      </n-message-provider>
     </n-loading-bar-provider>
     <n-global-style />
   </n-config-provider>

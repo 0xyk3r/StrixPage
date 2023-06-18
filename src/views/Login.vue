@@ -37,7 +37,7 @@
 import Verify from '@/components/verifition/Verify.vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
-import { createStrixNotify, initStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
 import { useLoadingBar } from 'naive-ui'
 import { getCurrentInstance, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -47,7 +47,7 @@ const $route = useRoute()
 const $router = useRouter()
 const loadingBar = useLoadingBar()
 initStrixLoadingBar(loadingBar)
-initStrixNotify()
+initStrixMessage()
 
 const tabBarStore = useTabsBarStore()
 
@@ -76,7 +76,7 @@ const verifyRef = ref(null)
 const loginVerifyShowStatus = ref(false)
 const showLoginVerify = () => {
   loginFormRef.value?.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     loginVerifyShowStatus.value = true
     nextTick(() => {
@@ -92,7 +92,7 @@ const verifySuccess = (params) => {
 
 const login = () => {
   loginFormRef.value?.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     isLogging.value = true
     proxy.$http.post('system/login', loginForm.value, { operate: '登录', notify: false }).then(({ data: res }) => {
@@ -102,7 +102,7 @@ const login = () => {
       window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
       window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
       tabBarStore.delAllVisitedRoutes()
-      createStrixNotify('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
+      createStrixMessage('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
       $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
     }).catch(() => {
       loginForm.value.loginPassword = null

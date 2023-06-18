@@ -122,7 +122,7 @@
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import { createStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import _ from 'lodash'
 import { NButton, NDataTable, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
@@ -378,7 +378,7 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     proxy.$http.post('system/oss/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
       initDataForm()
@@ -447,7 +447,7 @@ const showEditDataModal = (id) => {
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     proxy.$http.post(`system/oss/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
       initDataForm()

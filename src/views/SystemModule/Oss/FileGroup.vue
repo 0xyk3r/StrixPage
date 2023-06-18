@@ -136,7 +136,7 @@
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import { createStrixNotify } from '@/utils/strix-notify'
+import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, forOwn, pick } from 'lodash'
 import { NButton, NDataTable, NTag } from 'naive-ui'
@@ -232,7 +232,7 @@ const ossFileGroupSecretTypeOptions = [
 ]
 
 const handleAllowExtensionCreate = (label, type) => {
-  if (!/^\.?\w+$/.test(label)) return createStrixNotify('warning', '操作失败', '请输入正确的文件拓展名')
+  if (!/^\.?\w+$/.test(label)) return createStrixMessage('warning', '操作失败', '请输入正确的文件拓展名')
   const l = label.startsWith('.') ? label : '.' + label
   if (type === 1 && addDataForm.value.allowExtension.includes(l)) {
     nextTick(() => {
@@ -333,7 +333,7 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   proxy.$refs.addDataFormRef.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     // 克隆 addDataForm 然后处理allowExtension
     const data = cloneDeep(addDataForm.value)
@@ -407,7 +407,7 @@ const showEditDataModal = (id) => {
 }
 const editData = () => {
   proxy.$refs.editDataFormRef.validate((errors) => {
-    if (errors) return createStrixNotify('error', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     // 克隆 editDataForm 然后处理allowExtension
     const data = cloneDeep(editDataForm.value)
