@@ -18,10 +18,6 @@
             </n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="注意事项" type="error">
-          在已有业务数据使用过地区数据后，<b>不要修改地区的层级关系</b>，否则可能会导致业务数据地区层级结构异常。<br>
-          例如将<b>一级地区A</b>中的<b>二级地区</b>移动至<b>一级地区B</b>中，或移动至其他等级地区中。
-        </n-alert>
       </template>
     </strix-block>
     <n-data-table v-model:expanded-row-keys="dataExpandedRowKeys" :remote="true" :loading="dataLoading"
