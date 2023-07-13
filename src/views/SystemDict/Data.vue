@@ -118,7 +118,7 @@ import { useDictsStore } from '@/stores/dicts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash'
-import { NButton, NDataTable } from 'naive-ui'
+import { NButton, NDataTable, NTag } from 'naive-ui'
 import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -161,7 +161,7 @@ const dataColumns = [
   { key: 'sort', title: '字典排序', width: 100 },
   {
     key: 'style', title: '字典样式预览', width: 100, render(row) {
-      return h(StrixTag, { value: row.style, dictName: 'DictDataStyle' })
+      return h(NTag, { type: row.style, bordered: false }, { default: () => row.label })
     }
   },
   {

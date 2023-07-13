@@ -12,7 +12,7 @@
             <n-button type="primary" @click="showAddDataModal()">添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="提醒" type="warning">Strix 理论支持无限级别菜单，但便于前端展示，仍不建议配置超过 3 级菜单。</n-alert>
+        <n-alert title="提醒" type="warning">Strix 理论支持无限级别菜单，但为了便于前端展示，仍不建议配置超过 3 级菜单。</n-alert>
       </template>
     </strix-block>
 
