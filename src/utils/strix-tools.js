@@ -37,3 +37,13 @@ export const deepMap = (data, key = 'id', sub = 'children') => {
     ])
     return results.filter(Boolean)
 }
+
+export const flatTree = (data, sub = 'children', res = []) => {
+    data.forEach(item => {
+        res.push(item);
+        if (item[sub] && item[sub].length > 0) {
+            flatTree(item.children, sub, res);
+        }
+    });
+    return res;
+};

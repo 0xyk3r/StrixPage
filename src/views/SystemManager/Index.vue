@@ -25,12 +25,12 @@
       </template>
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="管理人员状态" path="managerStatus">
-            <n-select v-model:value="getDataListParams.managerStatus" :options="systemManagerStatusRef"
+          <n-form-item-gi span="6 s:3 m:2" label="管理人员状态" path="status">
+            <n-select v-model:value="getDataListParams.status" :options="systemManagerStatusRef"
               placeholder="请选择管理人员状态" />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="managerType">
-            <n-select v-model:value="getDataListParams.managerType" :options="systemManagerTypeRef"
+          <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="type">
+            <n-select v-model:value="getDataListParams.type" :options="systemManagerTypeRef"
               placeholder="请选择管理人员类型" />
           </n-form-item-gi>
         </n-grid>
@@ -54,17 +54,17 @@
         <n-form-item label="登录密码" path="loginPassword">
           <n-input v-model:value="addDataForm.loginPassword" placeholder="请输入登录密码" clearable />
         </n-form-item>
-        <n-form-item label="管理人员状态" path="managerStatus">
-          <n-select v-model:value="addDataForm.managerStatus" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
+        <n-form-item label="管理人员状态" path="status">
+          <n-select v-model:value="addDataForm.status" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
             clearable />
         </n-form-item>
-        <n-form-item label="管理人员类型" path="managerType">
-          <n-select v-model:value="addDataForm.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
+        <n-form-item label="管理人员类型" path="type">
+          <n-select v-model:value="addDataForm.type" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
             clearable />
         </n-form-item>
-        <n-form-item v-if="addDataForm.managerType == 2" label="平台地区权限" path="regionId">
+        <n-form-item v-if="addDataForm.type == 2" label="平台地区权限" path="regionId">
           <n-tree-select v-model:value="addDataForm.regionId" :options="systemRegionCascaderOptions"
-            placeholder="请选择平台地区权限" cascade clearable filterable check-strategy="all" key-field="value" />
+            placeholder="请选择平台地区权限" cascade clearable filterable key-field="value" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -91,17 +91,17 @@
           <n-form-item label="登录密码" path="loginPassword">
             <n-input v-model:value="editDataForm.loginPassword" placeholder="请输入登录密码" clearable />
           </n-form-item>
-          <n-form-item label="管理人员状态" path="managerStatus">
-            <n-select v-model:value="editDataForm.managerStatus" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
+          <n-form-item label="管理人员状态" path="status">
+            <n-select v-model:value="editDataForm.status" :options="systemManagerStatusRef" placeholder="请选择管理人员状态"
               clearable />
           </n-form-item>
-          <n-form-item label="管理人员类型" path="managerType">
-            <n-select v-model:value="editDataForm.managerType" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
+          <n-form-item label="管理人员类型" path="type">
+            <n-select v-model:value="editDataForm.type" :options="systemManagerTypeRef" placeholder="请选择管理人员类型"
               clearable />
           </n-form-item>
-          <n-form-item v-if="editDataForm.managerType == 2" label="平台地区权限" path="regionId">
+          <n-form-item v-if="editDataForm.type == 2" label="平台地区权限" path="regionId">
             <n-tree-select v-model:value="editDataForm.regionId" :options="systemRegionCascaderOptions"
-              placeholder="请选择平台地区权限" cascade clearable filterable check-strategy="all" key-field="value" />
+              placeholder="请选择平台地区权限" cascade clearable filterable key-field="value" />
           </n-form-item>
         </n-form>
       </n-spin>
@@ -170,8 +170,8 @@ onMounted(() => {
 // 获取列表请求参数
 const initGetDataListParams = {
   keyword: null,
-  managerStatus: null,
-  managerType: null,
+  status: null,
+  type: null,
   pageIndex: 1,
   pageSize: 10
 }
@@ -200,22 +200,22 @@ const dataColumns = [
   { key: 'nickname', title: '昵称', width: 120 },
   { key: 'loginName', title: '登录名', width: 120 },
   {
-    key: 'managerStatus', title: '账户状态', width: 100,
+    key: 'status', title: '账户状态', width: 100,
     render(row) {
-      return h(StrixTag, { value: row.managerStatus, dictName: 'SystemManagerStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'SystemManagerStatus' })
     }
   },
   {
-    key: 'managerType', title: '账户类型', width: 100,
+    key: 'type', title: '账户类型', width: 100,
     render(row) {
-      return h(StrixTag, { value: row.managerType, dictName: 'SystemManagerType' })
+      return h(StrixTag, { value: row.type, dictName: 'SystemManagerType' })
     }
   },
   {
     key: 'regionId', title: '地区权限', width: 140,
     render(row) {
-      const tagText = row.managerType === 1 ? '所有地区' : managerRegionName(row.regionId);
-      return h(NTag, { type: row.managerType === 1 ? 'success' : 'info', bordered: false }, {
+      const tagText = row.type === 1 ? '所有地区' : managerRegionName(row.regionId);
+      return h(NTag, { type: row.type === 1 ? 'success' : 'info', bordered: false }, {
         default: () => tagText
       })
     }
@@ -317,8 +317,8 @@ const initAddDataForm = {
   nickname: null,
   loginName: null,
   loginPassword: null,
-  managerStatus: 1,
-  managerType: 1,
+  status: 1,
+  type: 1,
   regionId: null
 }
 const addDataForm = ref(cloneDeep(initAddDataForm))
@@ -335,10 +335,10 @@ const addDataRules = {
     { required: true, message: '请输入登录密码', trigger: 'blur' },
     { min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }
   ],
-  managerStatus: [
+  status: [
     { type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }
   ],
-  managerType: [
+  type: [
     { type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }
   ]
 }
@@ -364,8 +364,8 @@ const initEditDataForm = {
   nickname: null,
   loginName: null,
   loginPassword: null,
-  managerStatus: null,
-  managerType: null,
+  status: null,
+  type: null,
   regionId: null
 }
 const editDataForm = ref(cloneDeep(initEditDataForm))
@@ -381,10 +381,10 @@ const editDataRules = {
   loginPassword: [
     { min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }
   ],
-  managerStatus: [
+  status: [
     { type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }
   ],
-  managerType: [
+  type: [
     { type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }
   ]
 }

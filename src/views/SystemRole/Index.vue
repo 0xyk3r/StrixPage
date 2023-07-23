@@ -69,30 +69,14 @@
     <n-modal v-model:show="editRoleMenusModalShow" preset="card" :title="'修改' + _baseName + '菜单权限'"
       class="strix-model-primary" size="huge" @after-leave="initModifyForm">
       <n-spin :show="editRoleMenusLoading">
-        <n-tree v-model:checked-keys="editRoleMenusCheckedKeys" block-line cascade checkable :data="systemMenuTreeData"
-          key-field="id" label-field="name" />
+        <n-tree ref="editRoleMenusTree" v-model:checked-keys="editRoleMenusCheckedKeys" block-line checkable
+          default-expand-all :data="systemMenuTreeData" :render-prefix="editRoleMenusRenderPrefix" key-field="id"
+          label-field="name" />
       </n-spin>
       <template #footer>
         <n-space class="strix-form-modal-footer">
           <n-button @click="editRoleMenusModalShow = false">取消</n-button>
           <n-button type="primary" @click="editRoleMenus">
-            确定
-          </n-button>
-        </n-space>
-      </template>
-    </n-modal>
-
-    <n-modal v-model:show="editRolePermissionsModalShow" preset="card" :title="'修改' + _baseName + '系统权限'"
-      class="strix-model-primary" size="huge" @after-leave="initModifyForm">
-      <n-spin :show="editRolePermissionsLoading">
-        <n-transfer ref="transfer" v-model:value="editRolePermissionsCheckedKeys" :options="systemPermissionTransferData"
-          :render-source-label="renderSystemPermissionTransferData"
-          :render-target-label="renderSystemPermissionTransferData" />
-      </n-spin>
-      <template #footer>
-        <n-space class="strix-form-modal-footer">
-          <n-button @click="editRolePermissionsModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editRolePermissions">
             确定
           </n-button>
         </n-space>
@@ -105,9 +89,9 @@
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { deepMap } from '@/utils/strix-tools'
+import { deepMap, flatTree } from '@/utils/strix-tools'
 import _, { cloneDeep } from 'lodash'
-import { NButton, NDataTable, NDivider, NEmpty, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
+import { NButton, NDataTable, NEmpty, NGi, NGrid, NScrollbar, NSpace, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 import { computed, getCurrentInstance, h, onMounted, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
@@ -115,17 +99,26 @@ const { proxy } = getCurrentInstance()
 // 本页面操作提示关键词
 const _baseName = '系统角色'
 
-const colorList = ['info', 'warning', 'error', 'success', '']
+const colorList = ['info', 'warning', 'error', 'success']
 const renderExpandMenuChildren = (row, children, colorIndex) => {
   if (!children) { return [] }
   if (colorIndex == colorList.length - 1) { colorIndex = 0 }
   const currentMenus = []
-  children?.forEach(currentMenu => {
-    const nextMenus = renderExpandMenuChildren(row, currentMenu.children, colorIndex + 1)
+  children?.forEach(menu => {
+    if (menu.type === 'permission') {
+      return currentMenus.push(
+        h(NGrid, { xGap: 10, cols: 6 }, () => [
+          h(NGi, { span: 1 }, () =>
+            h(NTag, { closable: true, onClose: () => removeRolePermission(row, menu.id) }, () => menu.name)
+          )
+        ])
+      )
+    }
+    const nextMenus = renderExpandMenuChildren(row, menu.children, colorIndex + 1)
     currentMenus.push(
       h(NGrid, { xGap: 10, cols: 6 }, () => [
         h(NGi, { span: 1 }, () =>
-          h(NTag, { type: colorList[colorIndex], closable: true, onClose: () => removeRoleMenu(row, currentMenu.id) }, () => currentMenu.name)
+          h(NTag, { type: colorList[colorIndex], closable: true, onClose: () => removeRoleMenu(row, menu.id) }, () => menu.name)
         ),
         h(NGi, { span: 5 }, () =>
           nextMenus
@@ -147,19 +140,6 @@ const dataColumns = [
       const expandMenuChildrenVNode = renderExpandMenuChildren(row, row.menus, 0)
       if (expandMenuChildrenVNode.length == 0) expandMenuChildrenVNode.push(h(NEmpty, { description: 'TA好像没有可用菜单权限' }))
 
-      const RWPermissionVNodeList = [], RPermissionVNodeList = []
-      row.permissionsReadAndWrite.forEach(p => RWPermissionVNodeList.push(h(NTag, { type: 'info', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)))
-      row.permissionsRead.forEach(p => RPermissionVNodeList.push(h(NTag, { type: 'success', closable: true, onClose: () => removeRolePermission(row, p.id) }, () => p.name)))
-      if (RWPermissionVNodeList.length == 0) RWPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统读写权限' }))
-      if (RPermissionVNodeList.length == 0) RPermissionVNodeList.push(h(NEmpty, { description: 'TA好像没有可用系统只读权限' }))
-
-      const expandPermissionChildrenVNode = [
-        h(NDivider, { titlePlacement: 'left' }, () => '读写权限'),
-        ...RWPermissionVNodeList,
-        h(NDivider, { titlePlacement: 'left' }, () => '只读权限'),
-        ...RPermissionVNodeList
-      ]
-
       return h(
         NTabs,
         {
@@ -169,11 +149,8 @@ const dataColumns = [
           'onUpdate:value': (value) => { row.expandTab = value }
         },
         () => [
-          h(NTabPane, { name: 'menu', tab: '菜单权限', class: 'expand-menu-pane' }, () =>
+          h(NTabPane, { name: 'menu', tab: '菜单权限 / 按钮权限', class: 'expand-menu-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 800px; padding-bottom: 10px;' }, [expandMenuChildrenVNode]))
-          ),
-          h(NTabPane, { name: 'permission', tab: '系统权限', class: 'expand-permission-pane' }, () =>
-            h(NScrollbar, { xScrollable: true }, () => h('div', { style: 'min-width: 800px; padding-bottom: 10px;' }, [expandPermissionChildrenVNode]))
           )
         ]
       )
@@ -189,7 +166,6 @@ const dataColumns = [
     render(row) {
       return handleOperate([
         { type: 'info', label: '编辑菜单权限', icon: 'ion:bookmarks-outline', onClick: () => showEditRoleMenusModal(row) },
-        { type: 'info', label: '编辑系统权限', icon: 'ion:key-outline', onClick: () => showEditRolePermissionsModal(row) },
         { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
         {
           type: 'error',
@@ -336,8 +312,6 @@ const removeRolePermission = (row, permissionId) => {
 }
 const handleEditSuccessResponse = (row, data) => {
   row.menus = data.menus
-  row.permissionsRead = data.permissions?.filter(p => p.permissionType === 1)
-  row.permissionsReadAndWrite = data.permissions?.filter(p => p.permissionType === 2)
   row.loaded = true
 }
 
@@ -345,40 +319,16 @@ const systemMenuTreeData = ref([])
 const getSystemMenuTreeData = () => {
   proxy.$http.get('system/menu', { operate: `加载系统菜单树` }).then(({ data: res }) => {
     systemMenuTreeData.value = res.data.systemMenuList
-    // 去除children为空的展开按钮
-    systemMenuTreeData.value.forEach((m) => {
-      if (m.children?.length == 0) { m.children = null }
-    })
   })
 }
 onMounted(getSystemMenuTreeData)
-const systemPermissionTransferData = ref([])
-const getSystemPermissionTransferData = () => {
-  proxy.$http.get('system/permission/transfer', { operate: `加载系统权限穿梭框数据` }).then(({ data: res }) => {
-    systemPermissionTransferData.value = res.data.transferData
-  })
-}
-onMounted(getSystemPermissionTransferData)
-const renderSystemPermissionTransferData = ({ option }) => {
-  return h(
-    'div', {
-    style: { color: option.status == 1 ? '#F4A460' : '#1E90FF' }
-  }, {
-    default: () => option.label + ' (' + (option.status == 1 ? '只读' : '读写') + ')'
-  })
-}
 
 const initModifyForm = () => {
   editRoleMenusModalShow.value = false
-  editRolePermissionsModalShow.value = false
   editRoleMenusLoading.value = false
-  editRolePermissionsLoading.value = false
   editRoleMenusRoleId = ''
-  editRolePermissionsRoleId = ''
   editRoleMenusRoleRow = null
-  editRolePermissionsRoleRow = null
   editRoleMenusCheckedKeys.value = []
-  editRolePermissionsCheckedKeys.value = []
 }
 const editRoleMenusModalShow = ref(false)
 const editRoleMenusLoading = ref(false)
@@ -393,44 +343,36 @@ const showEditRoleMenusModal = (roleRow) => {
     editRoleMenusRoleId = res.data.id
     editRoleMenusRoleRow = roleRow
     editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
+    editRoleMenusCheckedKeys.value.push(...deepMap(res.data.permissions, 'id'))
     editRoleMenusLoading.value = false
   })
 }
 const editRoleMenus = () => {
-  proxy.$http.post(`system/role/modify/${editRoleMenusRoleId}`, {
-    field: 'menus',
-    value: editRoleMenusCheckedKeys.value.join(',')
+  const flatMenu = flatTree(systemMenuTreeData.value)
+
+  const menuIds = []
+  const permissionIds = []
+
+  const checkedIds = [...proxy.$refs.editRoleMenusTree.getCheckedData().keys, ...proxy.$refs.editRoleMenusTree.getIndeterminateData().keys]
+
+  flatMenu.filter(m => checkedIds.includes(m.id)).forEach(m => {
+    if (m.type === 'menu') {
+      menuIds.push(m.id)
+    } else {
+      permissionIds.push(m.id)
+    }
+  })
+
+  proxy.$http.post(`system/role/update/${editRoleMenusRoleId}/menu`, {
+    menuIds: menuIds.join(','),
+    permissionIds: permissionIds.join(',')
   }, { operate: `更改${_baseName}菜单权限` }).then(({ data: res }) => {
     editRoleMenusModalShow.value = false
     handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
   })
 }
-
-
-const editRolePermissionsModalShow = ref(false)
-const editRolePermissionsLoading = ref(false)
-let editRolePermissionsRoleId = ''
-let editRolePermissionsRoleRow = null
-const editRolePermissionsCheckedKeys = ref([])
-const showEditRolePermissionsModal = (roleRow) => {
-  editRolePermissionsLoading.value = true
-  editRolePermissionsModalShow.value = true
-  // 加载编辑前信息
-  proxy.$http.get(`system/role/${roleRow.id}`, { operate: `加载${_baseName}权限信息` }).then(({ data: res }) => {
-    editRolePermissionsRoleId = res.data.id
-    editRolePermissionsRoleRow = roleRow
-    editRolePermissionsCheckedKeys.value = deepMap(res.data.permissions, 'id')
-    editRolePermissionsLoading.value = false
-  })
-}
-const editRolePermissions = () => {
-  proxy.$http.post(`system/role/modify/${editRolePermissionsRoleId}`, {
-    field: 'permissions',
-    value: editRolePermissionsCheckedKeys.value.join(',')
-  }, { operate: `更改${_baseName}系统权限` }).then(({ data: res }) => {
-    editRolePermissionsModalShow.value = false
-    handleEditSuccessResponse(editRolePermissionsRoleRow, res.data)
-  })
+const editRoleMenusRenderPrefix = ({ option }) => {
+  return h(NTag, { type: option.type === 'menu' ? 'success' : 'info', bordered: false, size: 'tiny' }, { default: () => option.type === 'menu' ? '菜单' : '按钮' })
 }
 
 </script>

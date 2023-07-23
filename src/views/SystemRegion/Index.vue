@@ -33,7 +33,7 @@
         </n-form-item>
         <n-form-item label="父级地区" path="parentId">
           <n-tree-select v-model:value="addDataForm.parentId" :options="systemRegionCascaderOptions" placeholder="选择父级地区"
-            cascade clearable filterable check-strategy="all" key-field="value" />
+            cascade clearable filterable key-field="value" />
         </n-form-item>
         <n-form-item label="备注信息" path="remarks">
           <n-input v-model:value="addDataForm.remarks" placeholder="在此输入备注信息" type="textarea" :autosize="{
@@ -61,7 +61,7 @@
           </n-form-item>
           <n-form-item label="父级地区" path="parentId">
             <n-tree-select v-model:value="editDataForm.parentId" :options="systemRegionCascaderOptions"
-              placeholder="选择父级地区" cascade clearable filterable check-strategy="all" key-field="value" />
+              placeholder="选择父级地区" cascade clearable filterable key-field="value" />
           </n-form-item>
           <n-form-item label="备注信息" path="remarks">
             <n-input v-model:value="editDataForm.remarks" placeholder="在此输入备注信息" type="textarea" :autosize="{

@@ -19,17 +19,17 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="操作类型" path="operationType">
-            <n-select v-model:value="getDataListParams.operationType" :options="smsConfigSelectList" placeholder="请选择操作类型"
+            <n-select v-model:value="getDataListParams.operationType" :options="sysLogOperTypeRef" placeholder="请选择操作类型"
               clearable @update:value="getDataList" />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="操作分组" path="operationGroup">
+          <!-- <n-form-item-gi span="6 s:3 m:2" label="操作分组" path="operationGroup">
             <n-select v-model:value="getDataListParams.operationGroup" :options="smsSignStatusOptions"
               placeholder="请选择操作分组" clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="响应状态码" path="responseCode">
             <n-select v-model:value="getDataListParams.responseCode" :options="smsSignStatusOptions"
               placeholder="请选择响应状态码" clearable @update:value="getDataList" />
-          </n-form-item-gi>
+          </n-form-item-gi> -->
         </n-grid>
       </n-form>
     </strix-block>
@@ -42,14 +42,23 @@
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
+import { useDictsStore } from '@/stores/dicts'
 import { cloneDeep } from 'lodash'
 import { NButton, NDataTable, NTag } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { getCurrentInstance, h, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
+const dictsStore = useDictsStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统日志'
+
+// 加载字典
+const sysLogOperTypeRef = ref([])
+provide('SysLogOperTypeDict', sysLogOperTypeRef)
+onMounted(() => {
+  dictsStore.getDictData('SysLogOperType', sysLogOperTypeRef)
+})
 
 // 获取列表请求参数
 const initGetDataListParams = {

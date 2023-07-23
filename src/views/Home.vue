@@ -127,12 +127,16 @@ const logout = () => {
 }
 // Token续期
 const renewToken = () => {
-  proxy.$http.post('system/renewToken', null, { operate: '续期 Token ', notify: false }).then(({ data: res }) => {
-    window.localStorage.setItem('strix_login_token', res.data.token)
-    window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
-    window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
-    loginManagerInfo.value = res.data.info
-  })
+  // 如果token过期时间小于30天，则续期  (tokenExpire是yyyy-MM-dd格式的字符串)
+  const tokenExpire = window.localStorage.getItem('strix_login_token_expire')
+  if (new Date(tokenExpire).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000) {
+    proxy.$http.post('system/renewToken', null, { operate: '续期 Token ', notify: false }).then(({ data: res }) => {
+      window.localStorage.setItem('strix_login_token', res.data.token)
+      window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
+      window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
+      loginManagerInfo.value = res.data.info
+    })
+  }
 }
 onMounted(renewToken)
 

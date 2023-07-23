@@ -97,7 +97,7 @@ const login = () => {
     isLogging.value = true
     proxy.$http.post('system/login', loginForm.value, { operate: '登录', notify: false }).then(({ data: res }) => {
       isLogging.value = false
-      const loginManagerType = res.data.info.managerType
+      const loginManagerType = res.data.info.type
       window.localStorage.setItem('strix_login_token', res.data.token)
       window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
       window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))

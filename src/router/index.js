@@ -49,38 +49,19 @@ const routes = [
           title: '系统人员管理'
         }
       }, {
+        path: '/system/role',
+        name: 'SystemRoleIndex',
+        component: () => import('@/views/SystemRole/Index.vue'),
+        meta: {
+          title: '系统角色管理'
+        }
+      }, {
         path: '/system/menu',
         name: 'SystemMenuIndex',
         component: () => import('@/views/SystemMenu/Index.vue'),
         meta: {
           title: '系统菜单管理'
         }
-      }, {
-        path: 'system/authorization',
-        name: 'SystemAuthorization',
-        meta: {
-          title: '系统权限控制',
-          empty: true
-        },
-        children: [
-          {
-            path: 'permission',
-            name: 'SystemPermissionIndex',
-            component: () => import('@/views/SystemPermission/Index.vue'),
-            meta: {
-              title: '系统权限列表',
-              empty: false
-            }
-          }, {
-            path: 'role',
-            name: 'SystemRoleIndex',
-            component: () => import('@/views/SystemRole/Index.vue'),
-            meta: {
-              title: '系统角色管理',
-              empty: false
-            }
-          }
-        ]
       }, {
         path: 'system/user',
         name: 'SystemUserIndex',
