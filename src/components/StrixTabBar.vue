@@ -21,7 +21,7 @@
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
-import { computed, defineComponent, getCurrentInstance, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, getCurrentInstance, h, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -47,27 +47,33 @@ export default defineComponent({
     const contextmenuList = [
       {
         key: 'reloadRouter',
-        label: '刷新'
+        label: '刷新',
+        icon: () => h(Icon, { icon: 'ion:reload-outline' })
       },
       {
         key: 'reloadAllRouter',
-        label: '刷新全部'
+        label: '刷新全部',
+        icon: () => h(Icon, { icon: 'ion:reload-circle-outline' })
       },
       {
         key: 'closeOtherTabs',
-        label: '关闭其他'
+        label: '关闭其他',
+        icon: () => h(Icon, { icon: 'ion:close-outline' })
       },
       {
         key: 'closeLeftTabs',
-        label: '关闭左侧'
+        label: '关闭左侧',
+        icon: () => h(Icon, { icon: 'ion:arrow-undo-outline' })
       },
       {
         key: 'closeRightTabs',
-        label: '关闭右侧'
+        label: '关闭右侧',
+        icon: () => h(Icon, { icon: 'ion:arrow-redo-outline' })
       },
       {
         key: 'closeAllTabs',
-        label: '关闭全部'
+        label: '关闭全部',
+        icon: () => h(Icon, { icon: 'ion:power-outline' })
       }
     ]
     const handleTabContextmenu = (e, index) => {
@@ -104,30 +110,28 @@ export default defineComponent({
       }, 50)
     }
     onMounted(() => {
+      // 点击任意地方隐藏右键菜单
       proxy.$EventBus.on('click-container', () => {
         showRightMenuRef.value = false
       })
     })
 
-    // Tabs的相关事件
+    // 初始化标签页
     const initTabs = () => {
+      // 添加 fixed 标签页
       const routes = $router.getRoutes()
       routes.forEach(r => {
         if (r.meta.fixed) {
           tabsBarStore.addVisitedRoute(r)
         }
       })
-    }
-    const addTabs = () => {
-      const {
-        name,
-        meta
-      } = $route
+      // 添加 当前路由 标签页
+      const { name, meta } = $route
       if (name && meta.title && !meta.empty) {
         tabsBarStore.addVisitedRoute($route)
       }
-      return false
     }
+
     const handleTabClick = (tab) => {
       const route = visitedRoutes.value.filter((item) => {
         if (item.meta.title === tab) {
@@ -162,6 +166,7 @@ export default defineComponent({
         }
       }
     }
+
     const reloadRouter = async () => {
       const oldIndex = contextmenuRoutesIndex || visitedRoutes.value.findIndex((r) => tabActiveRef.value === r.meta.title)
       const view = visitedRoutes.value[oldIndex]
@@ -170,12 +175,8 @@ export default defineComponent({
         view.oldIndex = view.meta.fixed ? view.meta.fixedIndex : oldIndex
         tabsBarStore.addRefreshRoutes(view)
         tabsBarStore.delVisitedRoute(view)
-        // await $router.push('/empty')
-        await $router.push('/redirect' + currentPath)
         quickMenuStore.delAllQuickMenu()
-        // nextTick(() => {
-        //   $router.push(currentPath)
-        // })
+        await $router.push('/redirect' + currentPath)
       }
     }
     const reloadAllRouter = () => {
@@ -185,23 +186,40 @@ export default defineComponent({
       const view = getContextmenuTagView()
       if (view) {
         tabsBarStore.delOthersVisitedRoute(view)
+        nextTick(() => {
+          // 如果激活的tab被删除了，需要跳转到被操作的tab
+          if (visitedRoutes.value.findIndex((r) => tabActiveRef.value === r.meta.title) === -1) {
+            $router.push('/redirect' + view.fullPath)
+          }
+        })
       }
     }
     const closeLeftTabs = () => {
       const view = getContextmenuTagView()
       if (view) {
         tabsBarStore.delLeftVisitedRoute(view)
+        nextTick(() => {
+          // 如果激活的tab被删除了，需要跳转到被操作的tab
+          if (visitedRoutes.value.findIndex((r) => tabActiveRef.value === r.meta.title) === -1) {
+            $router.push('/redirect' + view.fullPath)
+          }
+        })
       }
     }
     const closeRightTabs = () => {
       const view = getContextmenuTagView()
       if (view) {
         tabsBarStore.delRightVisitedRoute(view)
+        nextTick(() => {
+          // 如果激活的tab被删除了，需要跳转到被操作的tab
+          if (visitedRoutes.value.findIndex((r) => tabActiveRef.value === r.meta.title) === -1) {
+            $router.push('/redirect' + view.fullPath)
+          }
+        })
       }
     }
     const closeAllTabs = async () => {
       tabsBarStore.delAllVisitedRoutes()
-      // const { visitedRoutes } = await $store.dispatch('tabs-bar/delAllRoutes')
       const defaultView = visitedRoutes.value[0]
       if (defaultView) {
         await $router.push(defaultView)
@@ -224,18 +242,16 @@ export default defineComponent({
 
     watch(() => $router.currentRoute.value.path, () => {
       initTabs()
-      addTabs()
-      setTimeout(() => {
+      nextTick(() => {
         tabActiveRef.value = ''
         visitedRoutes.value.forEach((item) => {
           if (item.path === $route.path) {
             tabActiveRef.value = item.meta.title
           }
         })
-      }, 50)
+      })
     }, {
-      immediate: true,
-      deep: true
+      immediate: true
     })
 
     return {

@@ -8,6 +8,7 @@ export const useTabsBarStore = defineStore('tabsBar', {
   getters: {
   },
   actions: {
+    // 添加路由
     addVisitedRoute(route) {
       const target = this.visitedRoutes.find((item) => item.path === route.path)
       if (target) {
@@ -26,6 +27,7 @@ export const useTabsBarStore = defineStore('tabsBar', {
         this.visitedRoutes.push(Object.assign({}, route))
       }
     },
+    // 删除指定路由
     delVisitedRoute(route) {
       this.visitedRoutes.forEach((item, index) => {
         if (item.path === route.path) {
@@ -33,32 +35,35 @@ export const useTabsBarStore = defineStore('tabsBar', {
         }
       })
     },
+    // 删除其他路由
     delOthersVisitedRoute(route) {
-      this.visitedRoutes = this.visitedRoutes.filter(
-        (item) => item.meta.fixed || item.path === route.path
-      )
+      const fixedRoutes = this.visitedRoutes.filter((item) => item.meta.fixed)
+      const index = this.visitedRoutes.findIndex(item => item.path === route.path)
+      if (index !== -1) {
+        this.visitedRoutes.splice(index + 1, this.visitedRoutes.length)
+        this.visitedRoutes.splice(0, index, ...fixedRoutes)
+      }
     },
+    // 删除左侧路由
     delLeftVisitedRoute(route) {
-      let index = this.visitedRoutes.length
-      this.visitedRoutes = this.visitedRoutes.filter((item) => {
-        if (item.name === route.name) index = this.visitedRoutes.indexOf(item)
-        return item.meta.fixed || index <= this.visitedRoutes.indexOf(item)
+      this.visitedRoutes.forEach((item, index) => {
+        if (item.path === route.path) {
+          this.visitedRoutes.splice(0, index, ...this.visitedRoutes.filter((item) => item.meta.fixed))
+        }
       })
     },
+    // 删除右侧路由
     delRightVisitedRoute(route) {
-      let index = this.visitedRoutes.length
-      this.visitedRoutes = this.visitedRoutes.filter((item) => {
-        if (item.name === route.name) index = this.visitedRoutes.indexOf(item)
-        return item.meta.fixed || index >= this.visitedRoutes.indexOf(item)
+      this.visitedRoutes.forEach((item, index) => {
+        if (item.path === route.path) {
+          this.visitedRoutes.splice(index + 1, this.visitedRoutes.length)
+        }
       })
     },
+    // 删除所有路由
     delAllVisitedRoutes() {
-      this.visitedRoutes = this.visitedRoutes.filter((item) => item.meta.fixed)
-    },
-    updateVisitedRoute(route) {
-      this.visitedRoutes.forEach((item) => {
-        if (item.path === route.path) item = Object.assign(item, route)
-      })
+      const fixedRoutes = this.visitedRoutes.filter((item) => item.meta.fixed)
+      this.visitedRoutes.splice(0, this.visitedRoutes.length, ...fixedRoutes)
     },
     addRefreshRoutes(route) {
       const target = this.refreshRoutes.find((item) => item.path === route.path)
