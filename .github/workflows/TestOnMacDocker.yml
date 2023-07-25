@@ -15,7 +15,7 @@ jobs:
         with: 
           clean: false
       - name: Install with pnpm
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
       - name: Build with pnpm
         run: pnpm run build
       - name: Delete Docker Container
