@@ -303,6 +303,7 @@ const deleteData = (id) => {
 const removeRoleMenu = (row, menuId) => {
   proxy.$http.post(`system/role/remove/${row.id}/menu/${menuId}`, null, { operate: '移除角色菜单权限' }).then(({ data: res }) => {
     handleEditSuccessResponse(row, res.data)
+    proxy.$EventBus.emit('refresh-menu')
   })
 }
 const removeRolePermission = (row, permissionId) => {
@@ -369,6 +370,7 @@ const editRoleMenus = () => {
   }, { operate: `更改${_baseName}菜单权限` }).then(({ data: res }) => {
     editRoleMenusModalShow.value = false
     handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
+    proxy.$EventBus.emit('refresh-menu')
   })
 }
 const editRoleMenusRenderPrefix = ({ option }) => {

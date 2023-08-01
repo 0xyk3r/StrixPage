@@ -47,7 +47,7 @@
       <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false" embedded>
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
-          <router-view v-slot="{ Component, route }" @refresh-menu="getMenuList">
+          <router-view v-slot="{ Component, route }">
             <transition name="strix-zoom-in-top">
               <!-- 根据 fullPath 缓存组件 解决动态路由缓存问题 -->
               <keep-alive :include="cachedRoutes">
@@ -187,6 +187,12 @@ const getMenuList = () => {
   })
 }
 onMounted(getMenuList)
+// 监听来自其他页面的刷新菜单事件
+onMounted(() => {
+  proxy.$EventBus.on('refresh-menu', () => {
+    getMenuList()
+  })
+})
 // 监听路由变化以同步menu选中项
 const menuSelected = ref('')
 const syncCurrentSelectMenu = () => {

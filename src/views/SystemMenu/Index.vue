@@ -285,6 +285,7 @@ const addData = () => {
       proxy.$http.post('system/menu/update', addDataForm.value, { operate: `添加${_baseName}` }).then(() => {
         initDataForm()
         getDataList()
+        proxy.$EventBus.emit('refresh-menu')
       })
     })
   } else {
@@ -359,6 +360,7 @@ const editData = () => {
       proxy.$http.post(`system/menu/update/${editDataId}`, editDataForm.value, { operate: `修改${_baseName}` }).then(() => {
         initDataForm()
         getDataList()
+        proxy.$EventBus.emit('refresh-menu')
       })
     })
   } else {
@@ -377,6 +379,7 @@ const deleteData = ({ id, type }) => {
   if (type === 'menu') {
     proxy.$http.post(`system/menu/remove/${id}`, null, { operate: `删除${_baseName}` }).then(() => {
       getDataList()
+      proxy.$EventBus.emit('refresh-menu')
     })
   } else {
     proxy.$http.post(`system/permission/remove/${id}`, null, { operate: `删除系统权限` }).then(() => {
