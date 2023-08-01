@@ -185,7 +185,7 @@ const dataColumns = [
   {
     key: 'icon', title: '菜单图标', align: 'center', width: 90,
     render(row) {
-      return h(Icon, { icon: 'ion:' + kebabCase(row.icon), width: 24 })
+      return h(Icon, { icon: kebabCase(row.icon), width: 24 })
     }
   },
   { key: 'sortValue', title: '菜单排序', width: 90 },

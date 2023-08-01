@@ -143,6 +143,22 @@ const routes = [
         },
         children: [
           {
+            path: 'job',
+            name: 'SystemModuleJobIndex',
+            component: () => import('@/views/SystemModule/Job/Index.vue'),
+            meta: {
+              title: '定时任务列表',
+              empty: false
+            }
+          }, {
+            path: 'log',
+            name: 'SystemModuleJobLog',
+            component: () => import('@/views/SystemModule/Job/Index.vue'),
+            meta: {
+              title: '定时任务日志',
+              empty: false
+            }
+          }, {
             path: 'sms',
             name: 'SystemModuleSmsIndex',
             meta: {

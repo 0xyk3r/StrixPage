@@ -215,7 +215,7 @@ const handleMenuIconField = (list) => {
         child.iconName = child.icon
       }
       child.icon = () => {
-        return h(Icon, { icon: 'ion:' + kebabCase(child.iconName) })
+        return h(Icon, { icon: kebabCase(child.iconName) })
       }
     } else {
       child.icon = null
