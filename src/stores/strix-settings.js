@@ -7,8 +7,7 @@ export const useStrixSettingsStore = defineStore('globalSettings', {
     isSmallWindow: false,
     theme: 'auto'
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     set(key, value) {
       this[key] = value

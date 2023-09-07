@@ -4,8 +4,7 @@ export const useHttpCancelerStore = defineStore('httpCanceler', {
   state: () => ({
     requestingApi: []
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     addRequestingApi(api) {
       this.requestingApi.push(api)
@@ -18,14 +17,12 @@ export const useHttpCancelerStore = defineStore('httpCanceler', {
       })
     },
     delRequestingApiByGroup(group) {
-      this.requestingApi = this.requestingApi.filter(
-        (item) => item.strixRequestGroup !== group
-      )
+      this.requestingApi = this.requestingApi.filter((item) => item.strixRequestGroup !== group)
     },
-    delAllRequestingApi(){
+    delAllRequestingApi() {
       this.$reset()
     },
-    cancelRequestByGroup(group){
+    cancelRequestByGroup(group) {
       this.requestingApi.forEach((item) => {
         if (item.strixRequestGroup === group && typeof item.strixRequestCanceler === 'function') {
           item.strixRequestCanceler('取消请求')

@@ -38,7 +38,7 @@
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import { downloadBlob } from '@/utils/strix-file.js'
+import { downloadBlob } from '@/utils/strix-file-util.js'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'

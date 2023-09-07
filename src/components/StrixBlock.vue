@@ -1,6 +1,11 @@
 <template>
-  <n-el tag="div" class="strix-block" :class="[{ 'hover': hovering }]" @mouseenter="hovering = true"
-    @mouseleave="hovering = false">
+  <n-el
+    tag="div"
+    class="strix-block"
+    :class="[{ hover: hovering }]"
+    @mouseenter="hovering = true"
+    @mouseleave="hovering = false"
+  >
     <div class="source">
       <slot name="show" />
     </div>
@@ -9,16 +14,26 @@
         <slot />
       </div>
     </div>
-    <div v-show="showClearButton || $slots.default" ref="control" class="strix-block-control"
-      :class="{ 'is-fixed': fixedControl }" @click="changeExpand">
+    <div
+      v-show="showClearButton || $slots.default"
+      ref="control"
+      class="strix-block-control"
+      :class="{ 'is-fixed': fixedControl }"
+      @click="changeExpand"
+    >
       <component :is="expandedIcon" v-if="$slots.default" />
       <transition name="text-slide">
         <span v-if="$slots.default" v-show="hovering">{{ isExpanded ? '收起' : '显示全部' }}</span>
       </transition>
       <!-- 左侧按钮 -->
       <div class="control-button-container control-button-container-left">
-        <n-button v-if="showClearButton" :tertiary="isSmallWindow" :quaternary="!isSmallWindow" type="error"
-          @click.stop="$emit('clear-search')">
+        <n-button
+          v-if="showClearButton"
+          :tertiary="isSmallWindow"
+          :quaternary="!isSmallWindow"
+          type="error"
+          @click.stop="$emit('clear-search')"
+        >
           <span>{{ isSmallWindow ? '清除' : '清除搜索条件' }}</span>
         </n-button>
       </div>
@@ -39,10 +54,7 @@ const globalSettingsStore = useStrixSettingsStore()
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 
 defineProps({
-  showClearButton: {
-    type: Boolean,
-    default: false
-  }
+  showClearButton: { type: Boolean, default: false }
 })
 defineEmits(['clear-search'])
 
@@ -51,9 +63,8 @@ const isExpanded = ref(false)
 const fixedControl = ref(false)
 let scrollParent = null
 
-const expandedIcon = computed(() => isExpanded.value ?
-  h(Icon, { icon: 'ion:caret-up', inline: true }) :
-  h(Icon, { icon: 'ion:caret-down', inline: true })
+const expandedIcon = computed(() =>
+  isExpanded.value ? h(Icon, { icon: 'ion:caret-up', inline: true }) : h(Icon, { icon: 'ion:caret-down', inline: true })
 )
 const codeArea = computed(() => proxy.$el.getElementsByClassName('meta')[0])
 
@@ -61,7 +72,7 @@ const codeArea = computed(() => proxy.$el.getElementsByClassName('meta')[0])
 const descriptionHeight = ref(0)
 let erd = null
 onMounted(() => {
-  erd = elementResizeDetectorMaker({ strategy: "scroll" })
+  erd = elementResizeDetectorMaker({ strategy: 'scroll' })
   if (proxy.$el.getElementsByClassName('description')[0]) {
     erd.listenTo(proxy.$el.getElementsByClassName('description')[0], (element) => {
       descriptionHeight.value = element.offsetHeight
@@ -90,7 +101,9 @@ watch([isExpanded, descriptionHeight], (val) => {
     scrollHandler()
   }, 200)
 })
-onBeforeUnmount(() => { removeScrollHandler })
+onBeforeUnmount(() => {
+  removeScrollHandler
+})
 
 const $slots = useSlots()
 const changeExpand = () => {
@@ -110,8 +123,8 @@ const setCodeAreaHeight = () => {
 const scrollHandler = () => {
   const { top, bottom, left } = proxy.$refs.meta.getBoundingClientRect()
   const controlBarHeight = 44
-  fixedControl.value = bottom + controlBarHeight > document.documentElement.clientHeight &&
-    top <= document.documentElement.clientHeight
+  fixedControl.value =
+    bottom + controlBarHeight > document.documentElement.clientHeight && top <= document.documentElement.clientHeight
   proxy.$refs.control.style.left = fixedControl.value ? `${left}px` : '0'
 }
 const removeScrollHandler = () => {
@@ -125,10 +138,12 @@ const removeScrollHandler = () => {
   background-color: var(--card-color);
   border: solid 1px var(--border-color);
   border-radius: 3px;
-  transition: all .3s cubic-bezier(.4, 0, .2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.hover {
-    box-shadow: 0 -1px 4px 0 var(--border-color), 0 2px 4px 0 var(--border-color);
+    box-shadow:
+      0 -1px 4px 0 var(--border-color),
+      0 2px 4px 0 var(--border-color);
 
     .strix-block-control .iconify {
       transform: translateX(-40px);
@@ -144,7 +159,7 @@ const removeScrollHandler = () => {
     border-top: solid 1px var(--border-color);
     overflow: hidden;
     height: 0;
-    transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .description {
@@ -156,7 +171,7 @@ const removeScrollHandler = () => {
     word-break: break-word;
     margin: 10px;
     background-color: var(--card-color);
-    transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     p {
       margin: 0;
@@ -176,7 +191,7 @@ const removeScrollHandler = () => {
     color: var(--text-color-3);
     cursor: pointer;
     position: relative;
-    transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       color: var(--primary-color);
@@ -191,15 +206,15 @@ const removeScrollHandler = () => {
     .iconify {
       font-size: 16px;
       height: 100%;
-      transition: all .3s cubic-bezier(.4, 0, .2, 1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    >span {
+    > span {
       position: absolute;
       transform: translateX(-30px);
       font-size: 14px;
       line-height: 44px;
-      transition: all .3s cubic-bezier(.4, 0, .2, 1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-block;
     }
 

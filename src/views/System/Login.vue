@@ -8,14 +8,31 @@
         <n-grid-item span="0:24 800:8">
           <div class="login-right">
             <div class="login-title">Strix 控制中心</div>
-            <n-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="60px" class="login-form"
-              @submit.prevent>
+            <n-form
+              ref="loginFormRef"
+              :model="loginForm"
+              :rules="loginFormRules"
+              label-width="60px"
+              class="login-form"
+              @submit.prevent
+            >
               <n-form-item label="登录用户" path="loginName">
-                <n-input v-model:value="loginForm.loginName" placeholder="请输入登录账号" class="login-input" clearable />
+                <n-input
+                  v-model:value="loginForm.loginName"
+                  placeholder="请输入登录账号"
+                  class="login-input"
+                  clearable
+                />
               </n-form-item>
               <n-form-item label="登录密码" path="loginPassword">
-                <n-input v-model:value="loginForm.loginPassword" type="password" placeholder="请输入登录密码" class="login-input"
-                  show-password-on="mousedown" clearable />
+                <n-input
+                  v-model:value="loginForm.loginPassword"
+                  type="password"
+                  placeholder="请输入登录密码"
+                  class="login-input"
+                  show-password-on="mousedown"
+                  clearable
+                />
               </n-form-item>
               <n-button type="primary" :loading="isLogging" class="login-btn" @click="showLoginVerify">
                 {{ isLogging ? '登录中...' : '登录' }}
@@ -25,8 +42,14 @@
         </n-grid-item>
       </n-grid>
     </n-card>
-    <Verify v-if="loginVerifyShowStatus" ref="verifyRef" mode="pop" captcha-type="blockPuzzle"
-      :img-size="{ width: '400px', height: '200px' }" @success="verifySuccess" />
+    <Verify
+      v-if="loginVerifyShowStatus"
+      ref="verifyRef"
+      mode="pop"
+      captcha-type="blockPuzzle"
+      :img-size="{ width: '400px', height: '200px' }"
+      @success="verifySuccess"
+    />
     <div class="beian">
       <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
     </div>
@@ -38,6 +61,7 @@ import Verify from '@/components/verifition/Verify.vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
+import { setToken } from '@/utils/strix-token-util'
 import { useLoadingBar } from 'naive-ui'
 import { getCurrentInstance, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -95,22 +119,26 @@ const login = () => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     isLogging.value = true
-    proxy.$http.post('system/login', loginForm.value, { operate: '登录', notify: false }).then(({ data: res }) => {
-      isLogging.value = false
-      const loginManagerType = res.data.info.type
-      window.localStorage.setItem('strix_login_token', res.data.token)
-      window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
-      window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
-      tabBarStore.delAllVisitedRoutes()
-      createStrixMessage('success', '登录成功', `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname)
-      $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
-    }).catch(() => {
-      loginForm.value.loginPassword = null
-      isLogging.value = false
-    })
+    proxy.$http
+      .post('system/login', loginForm.value, { operate: '登录', notify: false })
+      .then(({ data: res }) => {
+        isLogging.value = false
+        const loginManagerType = res.data.info.type
+        setToken(res)
+        tabBarStore.delAllVisitedRoutes()
+        createStrixMessage(
+          'success',
+          '登录成功',
+          `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname
+        )
+        $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
+      })
+      .catch(() => {
+        loginForm.value.loginPassword = null
+        isLogging.value = false
+      })
   })
 }
-
 </script>
 <script>
 export default {
@@ -120,7 +148,7 @@ export default {
 
 <style lang="less" scoped>
 .login-container {
-  background: url(../assets/img/background.jpg) no-repeat center 0;
+  background: url(@/assets/img/background.jpg) no-repeat center 0;
   -webkit-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
@@ -160,7 +188,11 @@ export default {
 
   .n-grid {
     div {
-      transition: all .5s cubic-bezier(.645, .045, .355, 1), border 0s, color .1s, font-size 0s;
+      transition:
+        all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1),
+        border 0s,
+        color 0.1s,
+        font-size 0s;
     }
   }
 
@@ -168,7 +200,7 @@ export default {
     width: 100%;
     height: 100%;
     color: transparent;
-    background: url(../assets/img/login-image.jpg) no-repeat;
+    background: url(@/assets/img/login-image.jpg) no-repeat;
     background-size: 100% 100%;
   }
 

@@ -1,16 +1,34 @@
 <template>
   <n-layout class="home-layout" has-sider @click="clickContainer">
-    <n-layout-sider v-model:collapsed="siderCollapsed" :width="240" :collapsed-width="70" collapse-mode="width"
-      show-trigger="arrow-circle" class="home-sider" bordered="" :native-scrollbar="false">
+    <n-layout-sider
+      v-model:collapsed="siderCollapsed"
+      :width="240"
+      :collapsed-width="70"
+      collapse-mode="width"
+      show-trigger="arrow-circle"
+      class="home-sider"
+      bordered=""
+      :native-scrollbar="false"
+    >
       <!-- Logo -->
       <div class="home-logo-container">
-        <img v-if="theme === 'dark'" class="home-logo" src="../assets/img/logo-w.png">
-        <img v-else class="home-logo" src="../assets/img/logo.png">
+        <img v-if="theme === 'dark'" class="home-logo" src="@/assets/img/logo-w.png" />
+        <img v-else class="home-logo" src="@/assets/img/logo.png" />
       </div>
       <!-- 侧边菜单区域 -->
       <n-spin :show="menuLoading">
-        <n-menu ref="menuRef" v-model:value="menuSelected" key-field="id" label-field="name" children-field="children"
-          :collapsed-width="70" :root-indent="32" :indent="16" :render-label="renderMenuLabel" :options="menuList" />
+        <n-menu
+          ref="menuRef"
+          v-model:value="menuSelected"
+          key-field="id"
+          label-field="name"
+          children-field="children"
+          :collapsed-width="70"
+          :root-indent="32"
+          :indent="16"
+          :render-label="renderMenuLabel"
+          :options="menuList"
+        />
       </n-spin>
     </n-layout-sider>
     <n-layout>
@@ -29,10 +47,14 @@
                 <Icon icon="ion:expand" :width="18" @click="switchFullscreen" />
                 <Icon icon="ion:refresh" :width="18" @click="reloadAll" />
               </n-space>
-              <n-dropdown trigger="hover" placement="bottom-start" :options="avatarDropdownOptions"
-                @select="handleAvatarDropdownSelect">
+              <n-dropdown
+                trigger="hover"
+                placement="bottom-start"
+                :options="avatarDropdownOptions"
+                @select="handleAvatarDropdownSelect"
+              >
                 <span class="avatar-dropdown">
-                  <img v-if="!isSmallWindow" class="user-avatar" src="../assets/img/avatar.png" alt="">
+                  <img v-if="!isSmallWindow" class="user-avatar" src="@/assets/img/avatar.png" alt="" />
                   <span class="user-name">
                     {{ loginManagerInfo ? loginManagerInfo.nickname : '未知' }}
                   </span>
@@ -62,8 +84,19 @@
 
     <strix-quick-menu />
     <!-- 水印 -->
-    <n-watermark content="Powered By ProjectAn Strix" cross fullscreen :font-size="16" :line-height="16" :width="384"
-      :height="384" :x-offset="12" :y-offset="60" :rotate="-15" font-color="rgba(128, 128, 128, .06)" />
+    <n-watermark
+      content="Powered By ProjectAn Strix"
+      cross
+      fullscreen
+      :font-size="16"
+      :line-height="16"
+      :width="384"
+      :height="384"
+      :x-offset="12"
+      :y-offset="60"
+      :rotate="-15"
+      font-color="rgba(128, 128, 128, .06)"
+    />
   </n-layout>
 </template>
 <script setup>
@@ -74,6 +107,7 @@ import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
+import { setToken } from '@/utils/strix-token-util'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
@@ -93,7 +127,7 @@ initStrixMessage()
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()
 
-const theme = computed(() => globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme)
+const theme = computed(() => (globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme))
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
 
 // 左侧菜单栏折叠
@@ -106,7 +140,7 @@ watch(siderCollapsed, (value) => {
 const visitedRoutes = tabsBarStore.visitedRoutes
 // 需要缓存的路由
 const cachedRoutes = computed(() => {
-  return visitedRoutes.filter(route => !route.meta.noKeepAlive).map(route => route.name)
+  return visitedRoutes.filter((route) => !route.meta.noKeepAlive).map((route) => route.name)
 })
 
 const loginManagerInfo = ref(null)
@@ -131,9 +165,7 @@ const renewToken = () => {
   const tokenExpire = window.localStorage.getItem('strix_login_token_expire')
   if (new Date(tokenExpire).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000) {
     proxy.$http.post('system/renewToken', null, { operate: '续期 Token ', notify: false }).then(({ data: res }) => {
-      window.localStorage.setItem('strix_login_token', res.data.token)
-      window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)
-      window.localStorage.setItem('strix_login_info', JSON.stringify(res.data.info))
+      setToken(res)
       loginManagerInfo.value = res.data.info
     })
   }
@@ -179,12 +211,15 @@ const menuLoading = ref(false)
 const menuList = ref([])
 const getMenuList = () => {
   menuLoading.value = true
-  proxy.$http.get('system/menus', { operate: '加载系统主菜单' }).then(({ data: res }) => {
-    menuList.value = handleMenuIconField(res.data.menuList)
-    syncCurrentSelectMenu()
-  }).finally(() => {
-    menuLoading.value = false
-  })
+  proxy.$http
+    .get('system/menus', { operate: '加载系统主菜单' })
+    .then(({ data: res }) => {
+      menuList.value = handleMenuIconField(res.data.menuList)
+      syncCurrentSelectMenu()
+    })
+    .finally(() => {
+      menuLoading.value = false
+    })
 }
 onMounted(getMenuList)
 // 监听来自其他页面的刷新菜单事件
@@ -204,13 +239,10 @@ const syncCurrentSelectMenu = () => {
     }
   }
 }
-watch(() => $router.currentRoute.value.path,
-  syncCurrentSelectMenu,
-  {
-    immediate: true,
-    deep: true
-  }
-)
+watch(() => $router.currentRoute.value.path, syncCurrentSelectMenu, {
+  immediate: true,
+  deep: true
+})
 
 // 对系统菜单api的响应结果进行二次处理
 const handleMenuIconField = (list) => {
@@ -237,9 +269,13 @@ const handleMenuIconField = (list) => {
 
 const renderMenuLabel = (option) => {
   if (!option.children) {
-    return h(RouterLink, {
-      to: option.url
-    }, { default: () => option.name })
+    return h(
+      RouterLink,
+      {
+        to: option.url
+      },
+      { default: () => option.name }
+    )
   }
   return option.name
 }
@@ -269,15 +305,14 @@ watch(windowWidth, (value) => {
 })
 let erd = null
 onMounted(() => {
-  erd = elementResizeDetectorMaker({ strategy: "scroll" })
-  erd.listenTo(document.getElementById("app"), (element) => {
+  erd = elementResizeDetectorMaker({ strategy: 'scroll' })
+  erd.listenTo(document.getElementById('app'), (element) => {
     windowWidth.value = element.offsetWidth
   })
 })
 onBeforeUnmount(() => {
-  erd.uninstall(document.getElementById("app"))
+  erd.uninstall(document.getElementById('app'))
 })
-
 </script>
 
 <script>
@@ -291,7 +326,6 @@ export default {
   height: 100vh;
 
   .home-sider {
-
     .home-logo-container {
       box-sizing: border-box;
       padding: 15px 0;
@@ -378,6 +412,5 @@ export default {
   //.home-footer {
   //  height: 100px;
   //}
-
 }
 </style>

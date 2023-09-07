@@ -1,7 +1,11 @@
 <template>
   <transition name="quick-menus-show">
-    <n-el v-if="quickMenus && quickMenus.length > 0" tag="ul" class="strix-quick-menu"
-      :class="autoActive ? 'auto-active' : ''">
+    <n-el
+      v-if="quickMenus && quickMenus.length > 0"
+      tag="ul"
+      class="strix-quick-menu"
+      :class="autoActive ? 'auto-active' : ''"
+    >
       <transition-group name="quick-menu-list">
         <li v-for="item in quickMenus" :key="item.id" :class="'color-' + item.color">
           <n-tooltip class="item" trigger="hover" :delay="300" placement="left" style="max-width: 220px">
@@ -19,43 +23,34 @@
   </transition>
 </template>
 
-<script>
+<script setup>
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { Icon } from '@iconify/vue'
-import { computed, defineComponent, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-export default defineComponent({
-  name: 'StrixQuickMenu',
-  components: {
-    Icon
-  },
-  setup() {
-    const quickMenuStore = useQuickMenuStore()
-    const quickMenus = computed(() => quickMenuStore.quickMenus)
+const quickMenuStore = useQuickMenuStore()
+const quickMenus = computed(() => quickMenuStore.quickMenus)
 
-    const autoActiveRef = ref(false)
-    let autoActiveTimer = null
+const autoActive = ref(false)
+let autoActiveTimer = null
 
-    watch(() => quickMenus, () => {
-      if (autoActiveTimer != null) {
-        clearTimeout(autoActiveTimer)
-        autoActiveTimer = null
-      }
-      autoActiveRef.value = true
-      autoActiveTimer = setTimeout(() => {
-        autoActiveRef.value = false
-      }, 1000)
-    }, {
-      immediate: true,
-      deep: true
-    })
-
-    return {
-      quickMenus,
-      autoActive: autoActiveRef
+watch(
+  () => quickMenus,
+  () => {
+    if (autoActiveTimer != null) {
+      clearTimeout(autoActiveTimer)
+      autoActiveTimer = null
     }
+    autoActive.value = true
+    autoActiveTimer = setTimeout(() => {
+      autoActive.value = false
+    }, 1000)
+  },
+  {
+    immediate: true,
+    deep: true
   }
-})
+)
 </script>
 
 <style lang="less" scoped>
@@ -74,7 +69,7 @@ export default defineComponent({
   box-shadow: var(--box-shadow-1);
   box-sizing: border-box;
   width: 78px;
-  transition: all .25s cubic-bezier(.645, .045, .355, 1);
+  transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .strix-quick-menu:hover,
@@ -82,7 +77,7 @@ export default defineComponent({
   right: 0;
 }
 
-.strix-quick-menu>li {
+.strix-quick-menu > li {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,9 +87,9 @@ export default defineComponent({
   cursor: pointer;
 }
 
-.strix-quick-menu>li a {
+.strix-quick-menu > li a {
   color: var(--text-color-base);
-  opacity: .75;
+  opacity: 0.75;
   display: inline-block;
   width: 60px;
   height: 60px;
@@ -102,57 +97,61 @@ export default defineComponent({
   text-align: center;
   border-radius: 5.5px;
   box-sizing: border-box;
-  transition: color .15s ease, background-color .15s ease, border-color .15s ease, box-shadow .15s ease
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.strix-quick-menu>li.color-primary a {
+.strix-quick-menu > li.color-primary a {
   background: var(--primary-color-suppl);
 }
 
-.strix-quick-menu>li.color-primary a:hover {
+.strix-quick-menu > li.color-primary a:hover {
   background: var(--primary-color-pressed);
 }
 
-.strix-quick-menu>li.color-info a {
+.strix-quick-menu > li.color-info a {
   background: var(--info-color-suppl);
 }
 
-.strix-quick-menu>li.color-info a:hover {
+.strix-quick-menu > li.color-info a:hover {
   background: var(--info-color-pressed);
 }
 
-.strix-quick-menu>li.color-success a {
+.strix-quick-menu > li.color-success a {
   background: var(--success-color-suppl);
 }
 
-.strix-quick-menu>li.color-success a:hover {
+.strix-quick-menu > li.color-success a:hover {
   background: var(--success-color-pressed);
 }
 
-.strix-quick-menu>li.color-warning a {
+.strix-quick-menu > li.color-warning a {
   background: var(--warning-color-suppl);
 }
 
-.strix-quick-menu>li.color-warning a:hover {
+.strix-quick-menu > li.color-warning a:hover {
   background: var(--warning-color-pressed);
 }
 
-.strix-quick-menu>li.color-error a {
+.strix-quick-menu > li.color-error a {
   background: var(--error-color-suppl);
 }
 
-.strix-quick-menu>li.color-error a:hover {
+.strix-quick-menu > li.color-error a:hover {
   background: var(--error-color-pressed);
 }
 
-.strix-quick-menu>li a p {
+.strix-quick-menu > li a p {
   padding: 0;
   margin: 0;
   overflow: hidden;
   font-size: 12px;
   line-height: 25px;
   text-overflow: ellipsis;
-  white-space: nowrap
+  white-space: nowrap;
 }
 
 .quick-menus-show {

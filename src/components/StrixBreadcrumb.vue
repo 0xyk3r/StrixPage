@@ -1,8 +1,12 @@
 <template>
   <div class="breadcrumb-container">
     <n-breadcrumb separator="/">
-      <n-breadcrumb-item v-for="item in breadcrumbList" :key="item.path" :clickable="!item.meta.empty"
-        @click="jumpPage(item)">
+      <n-breadcrumb-item
+        v-for="item in breadcrumbList"
+        :key="item.path"
+        :clickable="!item.meta.empty"
+        @click="jumpPage(item)"
+      >
         {{ item.meta._title || item.meta.title }}
       </n-breadcrumb-item>
     </n-breadcrumb>
@@ -10,9 +14,9 @@
 </template>
 
 <script setup>
-import { useStrixSettingsStore } from '@/stores/strix-settings';
-import { computed, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useStrixSettingsStore } from '@/stores/strix-settings'
+import { computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const $route = useRoute()
 const $router = useRouter()
@@ -49,12 +53,16 @@ const getBreadcrumbList = () => {
   }
 }
 
-watch(() => $router.currentRoute.value.path, () => {
-  getBreadcrumbList()
-}, {
-  immediate: true,
-  deep: true
-})
+watch(
+  () => $router.currentRoute.value.path,
+  () => {
+    getBreadcrumbList()
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+)
 
 const jumpPage = (item) => {
   if (!item.meta.empty && item.path) {

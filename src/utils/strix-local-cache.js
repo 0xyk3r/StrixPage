@@ -15,7 +15,7 @@ export default (app) => {
       return JSON.parse(window.localStorage.getItem(group)) || {}
     },
     remove: function (group, key) {
-      const groupData = _.map(this.getGroup(group), o => _.omit(o, [key]))
+      const groupData = _.map(this.getGroup(group), (o) => _.omit(o, [key]))
       window.localStorage.setItem(group, JSON.stringify(groupData))
     },
     removeGroup: function (group) {

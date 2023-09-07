@@ -5,8 +5,7 @@ export const useTabsBarStore = defineStore('tabsBar', {
     visitedRoutes: [],
     refreshRoutes: []
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     // 添加路由
     addVisitedRoute(route) {
@@ -38,7 +37,7 @@ export const useTabsBarStore = defineStore('tabsBar', {
     // 删除其他路由
     delOthersVisitedRoute(route) {
       const fixedRoutes = this.visitedRoutes.filter((item) => item.meta.fixed)
-      const index = this.visitedRoutes.findIndex(item => item.path === route.path)
+      const index = this.visitedRoutes.findIndex((item) => item.path === route.path)
       if (index !== -1) {
         this.visitedRoutes.splice(index + 1, this.visitedRoutes.length)
         this.visitedRoutes.splice(0, index, ...fixedRoutes)

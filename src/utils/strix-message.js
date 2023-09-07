@@ -16,18 +16,18 @@ export const createStrixMessage = (type, title, content, duration = 3000) => {
   message[type](content || '', {
     duration: duration,
     render: (props) => {
-      const { type } = props;
+      const { type } = props
       return h(
         NAlert,
         {
           closable: props.closable,
           onClose: props.onClose,
-          type: type === "loading" ? "default" : type,
+          type: type === 'loading' ? 'default' : type,
           title: title || '系统提示',
           style: {
-            boxShadow: "var(--n-box-shadow)",
-            maxWidth: "calc(100vw - 32px)",
-            width: "480px"
+            boxShadow: 'var(--n-box-shadow)',
+            maxWidth: 'calc(100vw - 32px)',
+            width: '480px'
           }
         },
         {

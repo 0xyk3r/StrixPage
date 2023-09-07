@@ -5,7 +5,9 @@
 .strix-zoom-in-top-enter-active,
 .strix-zoom-in-top-leave-active {
   filter: none;
-  transition: filter 0.4s ease, transform 0.4s ease;
+  transition:
+    filter 0.4s ease,
+    transform 0.4s ease;
 }
 
 .strix-zoom-in-top-enter-from,
@@ -15,6 +17,11 @@
 
 .strix-zoom-in-top-leave-active {
   display: none;
+}
+
+/* n-alert */
+.n-alert .n-alert-body p {
+  margin: 0;
 }
 
 /* model */

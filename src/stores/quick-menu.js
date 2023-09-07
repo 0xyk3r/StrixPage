@@ -4,8 +4,7 @@ export const useQuickMenuStore = defineStore('quickMenu', {
   state: () => ({
     quickMenus: []
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     addQuickMenu(quickMenu) {
       if (!quickMenu.color) {
