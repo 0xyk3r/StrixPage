@@ -2,6 +2,7 @@ import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const Redirect = () => import('@/components/StrixRedirect.vue')
+const NotFound = () => import('@/components/StrixNotFound.vue')
 
 const customRoutes = []
 
@@ -270,7 +271,8 @@ const routes = [
             ]
           }
         ]
-      }
+      },
+      { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: { ignore: true } }
     ]
   }
 ]

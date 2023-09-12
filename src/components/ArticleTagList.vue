@@ -105,6 +105,6 @@ defineExpose({ reset })
 }
 
 .article-tag-unselected {
-  filter: brightness(0.6);
+  filter: brightness(0.75);
 }
 </style>
