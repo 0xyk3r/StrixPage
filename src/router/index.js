@@ -24,7 +24,7 @@ const routes = [
       {
         path: 'index',
         name: 'IndexIndex',
-        component: () => import('@/views/System/Index.vue'),
+        component: () => import('@/views/Index.vue'),
         meta: {
           title: '首页',
           icon: 'fa fa-home',
@@ -148,6 +148,28 @@ const routes = [
             meta: {
               title: '系统日志列表',
               empty: false
+            }
+          }
+        ]
+      },
+      {
+        path: 'system/tool',
+        name: 'SystemToolIndex',
+        meta: {
+          title: '系统工具管理'
+        },
+        children: [
+          {
+            path: '',
+            name: 'SystemToolIndex',
+            component: () => import('@/views/System/SystemTool/Index.vue')
+          },
+          {
+            path: 'popularity',
+            name: 'SystemToolPopularity',
+            component: () => import('@/views/System/SystemTool/Popularity.vue'),
+            meta: {
+              title: '热度工具'
             }
           }
         ]
