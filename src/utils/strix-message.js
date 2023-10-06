@@ -10,9 +10,7 @@ export const initStrixMessage = () => {
 }
 
 export const createStrixMessage = (type, title, content, duration = 3000) => {
-  if (message == null) {
-    message = useMessage()
-  }
+  initStrixMessage()
   message[type](content || '', {
     duration: duration,
     render: (props) => {

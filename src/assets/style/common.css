@@ -41,3 +41,25 @@
 .strix-form-modal-footer {
   justify-content: flex-end !important;
 }
+
+.strix-button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+  > * + * {
+    margin-left: 10px;
+  }
+}
+
+.full-h {
+  height: 100%;
+}
+
+.clear-bg-color {
+  background-color: unset !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}

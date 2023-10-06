@@ -1,15 +1,7 @@
-import { onMounted, ref } from 'vue'
-
-export function useToken() {
-  const token = ref('')
-
-  onMounted(() => {
-    token.value = localStorage.getItem('strix_login_token')
-  })
-
-  return { token }
-}
-
+/**
+ * 缓存token
+ * @param {*} res 服务端返回的数据
+ */
 export function setToken(res) {
   window.localStorage.setItem('strix_login_token', res.data.token)
   window.localStorage.setItem('strix_login_token_expire', res.data.tokenExpire)

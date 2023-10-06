@@ -87,7 +87,7 @@ axios.interceptors.request.use((config) => {
   }
 
   if (config.method === 'get') {
-    // 去除get请求中的null参数
+    // 去除 GET 请求中的 NULL 参数
     let params = config.params
     if (params) {
       for (const key in params) {
@@ -96,20 +96,10 @@ axios.interceptors.request.use((config) => {
         }
       }
     }
-    // const queryString = qs.stringify(params, { addQueryPrefix: true })
-    // 转换get请求参数为对象
+    // 转换 GET 请求参数为对象
     const queryString = qs.stringify(params)
     const urlParams = qs.parse(queryString)
-    // urlParams['_requestUrl'] = '/' + config.url + (queryString || '')
-    // const encryptJson = JSON.stringify(urlParams)
     config.headers.sign = paramsSign('/' + config.url, urlParams, config.headers.timestamp)
-    // const aes = CryptoJS.AES.encrypt(encryptJson, CryptoJS.enc.Utf8.parse('fUCkUon' + config.headers.timestamp + 'T1me'), {
-    //   iv: CryptoJS.enc.Utf8.parse(iv),
-    //   mode: CryptoJS.mode.CBC,
-    //   padding: CryptoJS.pad.Pkcs7
-    // })
-
-    // config.headers.sign = aes.ciphertext.toString()
   } else {
     config.headers.sign = paramsSign('/' + config.url, config.data, config.headers.timestamp)
     if (config.data) {
@@ -121,7 +111,7 @@ axios.interceptors.request.use((config) => {
 })
 axios.interceptors.response.use(
   (response) => {
-    // 成功通知 get请求默认不显示 post请求默认显示
+    // GET 请求默认不显示成功通知，POST 请求默认显示成功通知
     const notify = response.config.method === 'get' ? response.config.notify === true : response.config.notify !== false
 
     if (response.config.strixRequestGroup) {
@@ -181,33 +171,19 @@ function paramsSign(url, params, timestamp) {
 
   // console.log("待签名数据", sortParamsJson);
 
-  // 将sortParamsJson进行md5加密
+  // 将 sortParamsJson 进行 MD5 加密
   const sign = CryptoJS.MD5(sortParamsJson).toString()
   return sign
-
-  // const aes = CryptoJS.AES.encrypt(sortParamsJson, CryptoJS.enc.Utf8.parse('fUCkUon' + timestamp + 'T1me'), {
-  //   iv: CryptoJS.enc.Utf8.parse(iv),
-  //   mode: CryptoJS.mode.CBC,
-  //   padding: CryptoJS.pad.Pkcs7
-  // })
-
-  // return aes.ciphertext.toString()
 }
 
 function sortAsc(jsonObj) {
-  const arr = []
-  let num = 0
-  for (const i in jsonObj) {
-    arr[num] = i
-    num++
-  }
-  const sortArr = arr.sort()
+  const keys = Object.keys(jsonObj).sort()
   const sortObj = {}
-  for (const i in sortArr) {
-    if (jsonObj[sortArr[i]] != null) {
-      sortObj[sortArr[i]] = jsonObj[sortArr[i]]
+  keys.forEach((key) => {
+    if (jsonObj[key] != null) {
+      sortObj[key] = jsonObj[key]
     }
-  }
+  })
   return sortObj
 }
 

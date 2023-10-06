@@ -15,4 +15,3 @@ export const createStrixDialog = (type, title, content, duration) => {
     })
   }
 }
-// TODO 没搞完
