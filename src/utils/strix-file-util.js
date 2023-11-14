@@ -1,7 +1,7 @@
 /**
  * 下载图像文件
- * @param {*} res 通过 axios 请求得到的 blob 响应结果
- * @param {*} fileName 下载的文件名
+ * @param {object} res 通过 axios 请求得到的 blob 响应结果
+ * @param {string} fileName 下载的文件名
  */
 export const downloadBlob = (res, fileName) => {
   let blob = new Blob([res.data], { type: res.headers['content-type'] })
@@ -27,8 +27,8 @@ export const downloadBlob = (res, fileName) => {
 
 /**
  * 通过 blob 响应结果创建一个 blob url
- * @param {*} res 通过 axios 请求得到的 blob 响应结果
- * @returns blob url
+ * @param {object} res 通过 axios 请求得到的 blob 响应结果
+ * @returns {string} blob url
  */
 export const convertBlob = (res) => {
   let blob = new Blob([res.data], { type: res.headers['content-type'] })

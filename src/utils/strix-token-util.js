@@ -1,6 +1,6 @@
 /**
  * 缓存token
- * @param {*} res 服务端返回的数据
+ * @param {object} res 服务端返回的数据
  */
 export function setToken(res) {
   window.localStorage.setItem('strix_login_token', res.data.token)

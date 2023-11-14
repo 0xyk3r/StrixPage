@@ -1,6 +1,6 @@
 /**
  * 格式化日期 yyyy-MM-dd
- * @param {*} date Date 对象
+ * @param {Date} date Date对象
  * @returns String yyyy-MM-dd 格式的日期字符串
  */
 export const getFormattedDate = (date = new Date()) => {
@@ -12,10 +12,10 @@ export const getFormattedDate = (date = new Date()) => {
 
 /**
  * 获取日期差
- * @param {*} start 开始日期
- * @param {*} end 结束日期
- * @param {*} diffType 日期差结果单位 second minute hour day
- * @returns Number 日期差
+ * @param {string} start 开始日期
+ * @param {string} end 结束日期
+ * @param {'second'|'minute'|'hour'|'day'} diffType 日期差结果单位
+ * @returns {number} 日期差
  */
 export const getDiff = (start, end, diffType) => {
   const divNums = {
