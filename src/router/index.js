@@ -291,6 +291,25 @@ const routes = [
                 }
               }
             ]
+          },
+          {
+            path: 'workflow',
+            name: 'SystemModuleWorkflowIndex',
+            meta: {
+              title: '流程引擎配置',
+              empty: true
+            },
+            children: [
+              {
+                path: 'config',
+                name: 'SystemModuleWorkflowConfig',
+                component: () => import('@/views/System/SystemModule/Workflow/Index.vue'),
+                meta: {
+                  title: '流程引擎列表',
+                  empty: false
+                }
+              }
+            ]
           }
         ]
       },
