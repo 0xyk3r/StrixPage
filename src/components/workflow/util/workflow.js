@@ -2,11 +2,26 @@ import WorkflowNode from '@/components/workflow/WorkflowNode.vue'
 import { createStrixMessage } from '@/utils/strix-message'
 import { h } from 'vue'
 
+/**
+ * 获取节点类型名称
+ * @param {*} type  节点类型
+ * @returns  节点类型名称
+ */
+export const getTypeName = (type) => {
+  return typeMap[type]?.name || type
+}
+
+/**
+ * 渲染节点
+ * @param {*} node  节点
+ * @param {*} isBranch  是否是条件分支
+ * @param {*} parent  父节点
+ * @returns  节点组件
+ */
 export const renderNode = (node, isBranch = false, parent = null) => {
   if (!node) {
     return
   }
-
   const children = handleChildren(node)
 
   return h(
@@ -64,7 +79,12 @@ export const renderNode = (node, isBranch = false, parent = null) => {
   )
 }
 
-export const handleChildren = (node) => {
+/**
+ * 处理子节点
+ * @param {*} node  当前节点
+ * @returns  子节点
+ */
+const handleChildren = (node) => {
   if (node?.children) {
     if (node.children.type === 'EMPTY') {
       return node.children.children
@@ -163,6 +183,9 @@ const handleRemoveChildren = (parent, node) => {
   parent.children = { ...node.children }
 }
 
+/**
+ * 节点类型映射
+ */
 const typeMap = {
   root: {
     name: '发起人',
@@ -196,10 +219,11 @@ const typeMap = {
   }
 }
 
-export const getTypeName = (type) => {
-  return typeMap[type]?.name || type
-}
-
+/**
+ * 随机生成id
+ * @returns 随机生成的id
+ 
+ */
 const generateRandomId = () => {
   return Math.random().toString(36).substring(2)
 }

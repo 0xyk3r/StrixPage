@@ -4,7 +4,6 @@
       <div style="display: flex; justify-content: center; margin-bottom: 20px">
         <n-button-group>
           <n-button strong secondary type="primary" @click="addNode('condition')"> 添加条件节点 </n-button>
-          <!-- <n-button strong secondary type="primary" @click="addBranches"> 添加条件节点 </n-button> -->
           <n-button strong secondary type="error" @click="removeNode"> 删除条件分支 </n-button>
         </n-button-group>
       </div>
@@ -84,26 +83,13 @@ const $emit = defineEmits(['addNode', 'removeNode'])
 
 const addNodePopoverRef = ref()
 
-const addBranches = () => {
-  const br = $props.node.branches
-  br.push({
-    id: 'new' + br.length,
-    name: '新条件' + br.length,
-    desc: '新条件...',
-    type: 'condition',
-    props: null,
-    parentid: $props.node.id,
-    parenttype: $props.node.type,
-    branches: null,
-    children: null
-  })
-}
-
+// 添加节点
 const addNode = (type) => {
   $emit('addNode', type)
   addNodePopoverRef.value.setShow(false)
 }
 
+// 删除节点
 const removeNode = () => {
   $emit('removeNode')
 }
