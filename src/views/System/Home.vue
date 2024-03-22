@@ -66,7 +66,13 @@
         <!-- 标签栏 -->
         <strix-tabs-bar />
       </n-layout-header>
-      <n-layout-content class="home-content" content-style="padding: 24px;" :native-scrollbar="false" embedded>
+      <n-layout-content
+        class="home-content"
+        content-style="padding: 24px;"
+        :native-scrollbar="false"
+        :scrollbar-props="{ 'x-scrollable': true }"
+        embedded
+      >
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
           <router-view v-slot="{ Component, route }">

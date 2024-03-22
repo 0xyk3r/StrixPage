@@ -1,6 +1,7 @@
 {
   "name": "strix-future",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -24,6 +25,7 @@
     "screenfull": "^6.0.2",
     "uuid": "^9.0.1",
     "vue": "^3.4.21",
+    "vue-draggable-resizable": "^3.0.0",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {

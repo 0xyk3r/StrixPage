@@ -1,0 +1,220 @@
+<template>
+  <div>
+    <div class="wf-tool-bar-container">
+      <n-card class="wf-tool-bar" content-style="padding: 15px" hoverable>
+        <n-button-group>
+          <n-button @click="test">Print Data</n-button>
+          <n-button @click="containerZoomIn">+</n-button>
+          <n-button @click="containerZoomOut">-</n-button>
+        </n-button-group>
+      </n-card>
+    </div>
+    <vue-draggable-resizable w="auto" h="auto" style="z-index: 1">
+      <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
+        <NodeTree />
+      </n-el>
+    </vue-draggable-resizable>
+  </div>
+</template>
+<script setup>
+import { renderNode } from '@/components/workflow/util/workflow.js'
+import { NEl } from 'naive-ui'
+import { defineComponent, ref, reactive } from 'vue'
+import VueDraggableResizable from 'vue-draggable-resizable'
+// const $props = defineProps({
+// model: { type: Object, required: true }
+// })
+
+const flowDataJson =
+  '{"id":"root","name":"root节点","desc":"root节点...","type":"root","props":null,"parentid":null,"parenttype":null,"branches":null,"children":{"id":"shenpi1","name":"审批1","desc":"审批1...","type":"approval","props":null,"parentid":"root","parenttype":null,"branches":null,"children":{"id":"banli1","name":"办理1","desc":"办理1...","type":"task","props":null,"parentid":"shenpi1","parenttype":null,"branches":null,"children":{"id":"tiaojian-start","name":"条件组1开始","desc":"条件组1开始...","type":"conditions","props":null,"parentid":"banli1","parenttype":null,"branches":[{"id":"tiaojian1","name":"条件1","desc":"条件1...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":{"id":"shenpi2","name":"审批2","desc":"审批2...","type":"approval","props":null,"parentid":"tiaojian1","parenttype":null,"branches":null,"children":{"id":"banli2","name":"办理2","desc":"办理2...","type":"task","props":null,"parentid":"shenpi2","parenttype":null,"branches":null,"children":null}}},{"id":"tiaojian2","name":"条件2","desc":"条件2...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":null}],"children":{"id":"tiaojian-end","name":"条件组1结束","desc":"条件组1结束...","type":"empty","props":null,"parentid":"banli1","parenttype":null,"branches":null,"children":{"id":"chaosong1","name":"抄送1","desc":"抄送1...","type":"cc","props":null,"parentid":"tiaojian-end","parenttype":null,"branches":null,"children":null}}}}}}'
+
+const flowData = reactive(JSON.parse(flowDataJson))
+
+const NodeTree = defineComponent(() => {
+  return () => {
+    return renderNode(flowData)
+  }
+})
+
+const scale = ref(1)
+const containerZoomIn = () => {
+  if (scale.value >= 2) {
+    return
+  }
+  scale.value += 0.1
+}
+const containerZoomOut = () => {
+  if (scale.value <= 0.5) {
+    return
+  }
+  scale.value -= 0.1
+}
+
+const test = () => {
+  console.log('test', flowData)
+}
+</script>
+<style lang="scss">
+.wf-tool-bar-container {
+  .wf-tool-bar {
+    z-index: 100;
+    position: fixed;
+    width: auto;
+  }
+}
+
+.wf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 20px;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  .wf-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .wf-node-main {
+      // flex: 1;
+      width: 300px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--n-primary-color);
+      }
+
+      &.node-end {
+        width: 100px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        text-align: center;
+        border-radius: 10px;
+        background-color: var(--clear-color);
+      }
+
+      .node-header {
+        padding: 3px 10px;
+        height: 28px;
+        border-radius: 2px 2px 0 0;
+        background-color: var(--clear-color);
+        color: var(--text-color-1);
+
+        &.node-approval {
+          background-color: var(--primary-color-suppl);
+        }
+
+        &.node-task {
+          background-color: var(--warning-color-suppl);
+        }
+
+        &.node-cc {
+          background-color: var(--info-color-suppl);
+        }
+
+        .node-header-content {
+          font-size: 14px;
+          line-height: 14px;
+          display: flex;
+          align-items: stretch;
+
+          .n-icon {
+            margin-right: 5px;
+          }
+        }
+      }
+
+      .node-content {
+        padding: 20px;
+        font-size: 16px;
+        color: var(--n-text-color);
+        min-height: 60px;
+      }
+    }
+    .wf-node-footer {
+      width: 34px;
+      margin: 0 auto;
+      position: relative;
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        margin: auto;
+        width: 2px;
+        height: 100%;
+        background-color: var(--n-text-color);
+        opacity: 0.1;
+      }
+
+      .wf-node-btn {
+        z-index: 1;
+        margin: 20px auto;
+      }
+    }
+  }
+
+  .wf-node-branch {
+    position: relative;
+
+    .wf-node-footer {
+      // 覆盖wf-node下的footer样式
+      &::before {
+        opacity: 0;
+      }
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      margin: auto;
+      width: 2px;
+      height: 100%;
+      background-color: var(--n-text-color);
+      opacity: 0.1;
+    }
+
+    // &::after {
+    //   content: '';
+    //   position: absolute;
+    //   bottom: 0;
+    //   left: 50%;
+    //   width: 50%;
+    //   border-bottom: 2px solid var(--n-text-color);
+    //   opacity: 0.1;
+    // }
+  }
+
+  .wf-node-condition {
+    overflow-x: auto;
+
+    .wf-node-condition-main {
+      width: 300px;
+      margin: 10px 0;
+    }
+  }
+
+  .branches-card {
+    &:hover {
+      border-color: var(--n-primary-color);
+    }
+
+    .branches-card-content {
+      padding: 20px 36px 0 36px;
+    }
+  }
+}
+</style>
