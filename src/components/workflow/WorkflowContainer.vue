@@ -25,8 +25,10 @@ import VueDraggableResizable from 'vue-draggable-resizable'
 // model: { type: Object, required: true }
 // })
 
+// const flowDataJson =
+//   '{"id":"root","name":"root节点","desc":"root节点...","type":"root","props":null,"parentid":null,"parenttype":null,"branches":null,"children":{"id":"shenpi1","name":"审批1","desc":"审批1...","type":"approval","props":null,"parentid":"root","parenttype":null,"branches":null,"children":{"id":"banli1","name":"办理1","desc":"办理1...","type":"task","props":null,"parentid":"shenpi1","parenttype":null,"branches":null,"children":{"id":"tiaojian-start","name":"条件组1开始","desc":"条件组1开始...","type":"conditions","props":null,"parentid":"banli1","parenttype":null,"branches":[{"id":"tiaojian1","name":"条件1","desc":"条件1...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":{"id":"shenpi2","name":"审批2","desc":"审批2...","type":"approval","props":null,"parentid":"tiaojian1","parenttype":null,"branches":null,"children":{"id":"banli2","name":"办理2","desc":"办理2...","type":"task","props":null,"parentid":"shenpi2","parenttype":null,"branches":null,"children":null}}},{"id":"tiaojian2","name":"条件2","desc":"条件2...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":null}],"children":{"id":"tiaojian-end","name":"条件组1结束","desc":"条件组1结束...","type":"empty","props":null,"parentid":"banli1","parenttype":null,"branches":null,"children":{"id":"chaosong1","name":"抄送1","desc":"抄送1...","type":"cc","props":null,"parentid":"tiaojian-end","parenttype":null,"branches":null,"children":null}}}}}}'
 const flowDataJson =
-  '{"id":"root","name":"root节点","desc":"root节点...","type":"root","props":null,"parentid":null,"parenttype":null,"branches":null,"children":{"id":"shenpi1","name":"审批1","desc":"审批1...","type":"approval","props":null,"parentid":"root","parenttype":null,"branches":null,"children":{"id":"banli1","name":"办理1","desc":"办理1...","type":"task","props":null,"parentid":"shenpi1","parenttype":null,"branches":null,"children":{"id":"tiaojian-start","name":"条件组1开始","desc":"条件组1开始...","type":"conditions","props":null,"parentid":"banli1","parenttype":null,"branches":[{"id":"tiaojian1","name":"条件1","desc":"条件1...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":{"id":"shenpi2","name":"审批2","desc":"审批2...","type":"approval","props":null,"parentid":"tiaojian1","parenttype":null,"branches":null,"children":{"id":"banli2","name":"办理2","desc":"办理2...","type":"task","props":null,"parentid":"shenpi2","parenttype":null,"branches":null,"children":null}}},{"id":"tiaojian2","name":"条件2","desc":"条件2...","type":"condition","props":null,"parentid":"tiaojian-start","parenttype":null,"branches":null,"children":null}],"children":{"id":"tiaojian-end","name":"条件组1结束","desc":"条件组1结束...","type":"empty","props":null,"parentid":"banli1","parenttype":null,"branches":null,"children":{"id":"chaosong1","name":"抄送1","desc":"抄送1...","type":"cc","props":null,"parentid":"tiaojian-end","parenttype":null,"branches":null,"children":null}}}}}}'
+  '{"id":"root","name":"root节点","desc":"root节点...","type":"root","props":null,"parentid":null,"parenttype":null,"branches":null,"children":{"id":"node-ezpjrwwzu3p","name":"新审批人","desc":"新审批人...","type":"approval","props":{"assign":{"type":"USER","id":[],"mode":"ANY"},"timeLimit":{"value":0,"unit":"HOUR","handler":"NOTIFY"},"reject":{"type":"END","nodeId":""}},"parentid":"root","parenttype":"root","branches":null,"children":{"id":"node-ghglmwjxjs6","name":"新办理人","desc":"新办理人...","type":"task","props":{"assign":{"type":"USER","id":[],"mode":"ANY"},"timeLimit":{"value":0,"unit":"HOUR","handler":"NOTIFY"}},"parentid":"node-ezpjrwwzu3p","parenttype":"approval","branches":null,"children":{"id":"node-ezy9y4mq9g4-start","name":"新conditions","desc":"新conditions...","type":"conditions","props":null,"parentid":"node-ghglmwjxjs6","parenttype":"task","branches":[{"id":"node-5nolh6sdd3m","name":"新条件0","desc":"新条件...","type":"condition","props":{"type":"AND","groups":[{"type":"AND","conditions":[]}]},"parentid":"node-ezy9y4mq9g4-start","parenttype":"conditions","branches":null,"children":null},{"id":"node-iybaidskuas","name":"新条件1","desc":"新条件...","type":"condition","props":{"type":"AND","groups":[{"type":"AND","conditions":[]}]},"parentid":"node-ezy9y4mq9g4-start","parenttype":"conditions","branches":null,"children":null}],"children":{"id":"node-ezy9y4mq9g4-end","name":"新conditions","desc":"新conditions...","type":"empty","props":null,"parentid":"node-ghglmwjxjs6","parenttype":"task","branches":null,"children":{"id":"node-2sr6fenl55x","name":"新抄送人","desc":"新抄送人...","type":"cc","props":{"assign":{"type":"USER","id":[],"mode":"ALL"},"allowAdd":false},"parentid":"node-ezy9y4mq9g4-end","parenttype":"empty","branches":null,"children":null}}}}}}'
 
 const flowData = reactive(JSON.parse(flowDataJson))
 
@@ -58,7 +60,9 @@ const test = () => {
 .wf-tool-bar-container {
   .wf-tool-bar {
     z-index: 100;
-    position: fixed;
+    position: absolute;
+    right: 30px;
+    top: 30px;
     width: auto;
   }
 }
@@ -134,6 +138,16 @@ const test = () => {
         font-size: 16px;
         color: var(--n-text-color);
         min-height: 60px;
+
+        .node-body-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .n-icon {
+            margin-right: 5px;
+          }
+        }
       }
     }
     .wf-node-footer {
@@ -186,16 +200,6 @@ const test = () => {
       background-color: var(--n-text-color);
       opacity: 0.1;
     }
-
-    // &::after {
-    //   content: '';
-    //   position: absolute;
-    //   bottom: 0;
-    //   left: 50%;
-    //   width: 50%;
-    //   border-bottom: 2px solid var(--n-text-color);
-    //   opacity: 0.1;
-    // }
   }
 
   .wf-node-condition {

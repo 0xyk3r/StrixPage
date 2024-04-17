@@ -12,6 +12,13 @@ export const getTypeName = (type) => {
 }
 
 /**
+ * 获取节点操作名称
+ */
+export const getOperationName = (type) => {
+  return typeMap[type]?.operationName || type
+}
+
+/**
  * 渲染节点
  * @param {*} node  节点
  * @param {*} isBranch  是否是条件分支
@@ -30,11 +37,15 @@ export const renderNode = (node, isBranch = false, parent = null) => {
       node: node,
       icon: typeMap[node.type]?.icon || 'ion:help-circle',
       removable: typeMap[node.type]?.removable || false,
+      configable: typeMap[node.type]?.configable || false,
       onAddNode: (type) => {
         handleAddChildren(node, type)
       },
       onRemoveNode: () => {
         handleRemoveChildren(parent, node)
+      },
+      changeProps: (props) => {
+        node.props = props
       }
     },
     {
@@ -58,12 +69,16 @@ export const renderNode = (node, isBranch = false, parent = null) => {
                     node: branch,
                     icon: typeMap[branch.type]?.icon || 'ion:help-circle',
                     removable: typeMap[branch.type]?.removable || false,
+                    configable: typeMap[branch.type]?.configable || false,
                     className: 'wf-node wf-node-branch',
                     onAddNode: (type) => {
                       handleAddChildren(branch, type)
                     },
                     onRemoveNode: () => {
                       handleRemoveChildren(node, branch)
+                    },
+                    changeProps: (props) => {
+                      node.props = props
                     }
                   },
                   {
@@ -99,6 +114,8 @@ const handleChildren = (node) => {
  * @param {*} type  添加的节点类型
  */
 const handleAddChildren = (node, type) => {
+  console.log('handleAddChildren', node, type)
+
   const cacheChildren = { ...node.children }
 
   if (type === 'conditions') {
@@ -132,7 +149,7 @@ const handleAddChildren = (node, type) => {
       name: '新条件' + node.branches.length,
       desc: '新条件...',
       type: 'condition',
-      props: null,
+      props: typeMap[type]?.defaultProps || null,
       parentid: node.id,
       parenttype: node.type,
       branches: null,
@@ -144,7 +161,7 @@ const handleAddChildren = (node, type) => {
       name: '新' + getTypeName(type),
       desc: '新' + getTypeName(type) + '...',
       type: type,
-      props: null,
+      props: typeMap[type]?.defaultProps || null,
       parentid: node.id,
       parenttype: node.type,
       branches: null,
@@ -190,31 +207,86 @@ const typeMap = {
   root: {
     name: '发起人',
     removable: false,
+    configable: false,
     icon: 'ion:person-sharp'
   },
   approval: {
     name: '审批人',
+    operationName: '审批',
     removable: true,
-    icon: 'ion:checkmark-done-circle'
+    configable: true,
+    icon: 'ion:checkmark-done-circle',
+    defaultProps: {
+      assign: {
+        type: 'USER',
+        id: [],
+        mode: 'ALL'
+      },
+      timeLimit: {
+        value: 0,
+        unit: 'HOUR',
+        handler: 'NOTIFY'
+      },
+      reject: {
+        type: 'END',
+        nodeId: ''
+      }
+    }
   },
   task: {
     name: '办理人',
+    operationName: '办理',
     removable: true,
-    icon: 'ion:checkbox'
+    configable: true,
+    icon: 'ion:checkbox',
+    defaultProps: {
+      assign: {
+        type: 'USER',
+        id: [],
+        mode: 'ALL'
+      },
+      timeLimit: {
+        value: 0,
+        unit: 'HOUR',
+        handler: 'NOTIFY'
+      }
+    }
   },
   condition: {
     name: '条件节点',
+    operationName: '条件',
     removable: true,
-    icon: 'ion:git-branch-outline'
+    configable: true,
+    icon: 'ion:git-branch-outline',
+    defaultProps: {
+      type: 'AND',
+      groups: [
+        {
+          type: 'AND',
+          conditions: []
+        }
+      ]
+    }
   },
   cc: {
     name: '抄送人',
+    operationName: '抄送',
     removable: true,
-    icon: 'ion:paper-plane'
+    configable: true,
+    icon: 'ion:paper-plane',
+    defaultProps: {
+      assign: {
+        type: 'USER',
+        id: [],
+        mode: 'ALL'
+      },
+      allowAdd: false
+    }
   },
   empty: {
     name: '空节点',
     removable: false,
+    configable: false,
     icon: 'ion:square'
   }
 }

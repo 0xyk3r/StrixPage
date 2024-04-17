@@ -245,7 +245,7 @@ export default {
         }
 
         proxy.$http.post('captcha/check', data, { operate: '验证码校验', notify: false }).then(({ data: res }) => {
-          if (res.repCode == "0000") {
+          if (res.data.repCode == "0000") {
             moveBlockBackgroundColor.value = '#5cb85c'
             leftBarBorderColor.value = '#5cb85c'
             iconColor.value = '#fff'
@@ -318,17 +318,17 @@ export default {
       }
 
       proxy.$http.post('captcha/get', data, { operate: '验证码获取', notify: false }).then(({ data: res }) => {
-        if (res.repCode == "0000") {
-          backImgBase.value = res.repData.originalImageBase64
-          blockBackImgBase.value = res.repData.jigsawImageBase64
-          backToken.value = res.repData.token
-          secretKey.value = res.repData.secretKey
+        if (res.data.repCode == "0000") {
+          backImgBase.value = res.data.repData.originalImageBase64
+          blockBackImgBase.value = res.data.repData.jigsawImageBase64
+          backToken.value = res.data.repData.token
+          secretKey.value = res.data.repData.secretKey
         } else {
-          if (res.repCode == '6113') { tipWords.value = '行为验证系统未初始化，请稍后重试' }
-          else if (res.repCode == '6201') { tipWords.value = '请求次数过多，请稍后重试' }
-          else if (res.repCode == '6202') { tipWords.value = '错误次数过多，请稍后重试' }
-          else if (res.repCode == '6204') { tipWords.value = '验证次数过多，请稍后重试' }
-          else { tipWords.value = res.repMsg }
+          if (res.data.repCode == '6113') { tipWords.value = '行为验证系统未初始化，请稍后重试' }
+          else if (res.data.repCode == '6201') { tipWords.value = '请求次数过多，请稍后重试' }
+          else if (res.data.repCode == '6202') { tipWords.value = '错误次数过多，请稍后重试' }
+          else if (res.data.repCode == '6204') { tipWords.value = '验证次数过多，请稍后重试' }
+          else { tipWords.value = res.data.repMsg }
         }
       })
     }
