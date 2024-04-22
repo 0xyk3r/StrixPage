@@ -28,26 +28,31 @@ export const useDictsStore = defineStore(
 
     /**
      * 加载服务端字典数据
+     * *限流* 1s内仅在第一次调用时执行一次
      */
-    async function loadDictData(key) {
-      const { data: res } = await proxy.$http.get(`system/common/dict/${key}`, {
-        operate: '获取字典数据',
-        notify: false
-      })
-      if (res) {
-        dictMap.value[key] = res.data
-
-        res.data.dictDataList.forEach((item) => {
-          if (item.value != null) {
-            item.value = convertType(item.value, res.data.dataType)
-          }
+    const loadDictData = throttle(
+      async function loadDictData(key) {
+        const { data: res } = await proxy.$http.get(`system/common/dict/${key}`, {
+          operate: '获取字典数据',
+          notify: false
         })
+        if (res) {
+          dictMap.value[key] = res.data
 
-        return res.data.dictDataList
-      } else {
-        return []
-      }
-    }
+          res.data.dictDataList.forEach((item) => {
+            if (item.value != null) {
+              item.value = convertType(item.value, res.data.dataType)
+            }
+          })
+
+          return res.data.dictDataList
+        } else {
+          return []
+        }
+      },
+      1000,
+      { leading: true, trailing: false }
+    )
 
     /**
      * 获取字典数据
