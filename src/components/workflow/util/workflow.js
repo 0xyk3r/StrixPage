@@ -127,8 +127,8 @@ const handleAddChildren = (node, type) => {
       desc: '新' + getTypeName(type) + '...',
       type: type,
       props: null,
-      parentid: node.id,
-      parenttype: node.type,
+      parentId: node.id,
+      parentType: node.type,
       branches: [],
       children: {
         id: 'node-' + randomId + '-end',
@@ -136,8 +136,8 @@ const handleAddChildren = (node, type) => {
         desc: '新' + getTypeName(type) + '...',
         type: 'empty',
         props: null,
-        parentid: node.id,
-        parenttype: node.type,
+        parentId: node.id,
+        parentType: node.type,
         branches: null,
         children: node.children ? cacheChildren : null
       }
@@ -150,8 +150,8 @@ const handleAddChildren = (node, type) => {
       desc: '新条件...',
       type: 'condition',
       props: typeMap[type]?.defaultProps || null,
-      parentid: node.id,
-      parenttype: node.type,
+      parentId: node.id,
+      parentType: node.type,
       branches: null,
       children: null
     })
@@ -162,8 +162,8 @@ const handleAddChildren = (node, type) => {
       desc: '新' + getTypeName(type) + '...',
       type: type,
       props: typeMap[type]?.defaultProps || null,
-      parentid: node.id,
-      parenttype: node.type,
+      parentId: node.id,
+      parentType: node.type,
       branches: null,
       children: node.children ? cacheChildren : null
     }

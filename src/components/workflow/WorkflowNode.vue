@@ -1,5 +1,6 @@
 <template>
   <div class="wf-node">
+    <!-- 渲染条件分支 -->
     <n-card v-if="$slots.branches" class="branches-card" content-class="branches-card-content" hoverable>
       <div style="display: flex; justify-content: center; margin-bottom: 20px">
         <n-button-group>
@@ -7,11 +8,12 @@
           <n-button strong secondary type="error" @click="removeNode"> 删除条件分支 </n-button>
         </n-button-group>
       </div>
+      <!-- 子分支插槽 -->
       <n-flex justify="center" size="large" :wrap="false">
         <slot name="branches" />
       </n-flex>
     </n-card>
-    <!-- 不显示条件分支结尾的card -->
+    <!-- 节点渲染 (不含条件分支 & 空节点) -->
     <n-card
       v-else
       v-show="$props.node.type !== 'empty'"
@@ -40,7 +42,7 @@
         <div v-if="$props.configable"><Icon icon="ion:chevron-forward-outline" /></div>
       </div>
     </n-card>
-    <!-- 不显示条件分支起点的footer -->
+    <!-- 渲染节点Footer -->
     <div v-show="$props.node.type !== 'conditions'" class="wf-node-footer">
       <n-popover ref="addNodePopoverRef" trigger="click" content-style="padding: 15px;">
         <template #trigger>
@@ -59,10 +61,12 @@
         </n-button-group>
       </n-popover>
     </div>
+    <!-- 子节点插槽 -->
     <div class="wf-node-children">
       <slot />
     </div>
 
+    <!-- 配置项抽屉 -->
     <n-drawer v-model:show="showDrawer" :width="512">
       <n-drawer-content :title="getTypeName($props.node.type)" :native-scrollbar="false" closable>
         <component :is="choosePropsComponent" v-model="cacheProps" />
@@ -124,6 +128,7 @@ const openDrawer = () => {
   showDrawer.value = true
 }
 
+// 节点内容计算方法
 const showContent = computed(() => {
   const nodeType = $props.node.type
   if (nodeType === 'root') {
@@ -150,6 +155,7 @@ const showContent = computed(() => {
   return ''
 })
 
+// 配置项组件选择
 const choosePropsComponent = computed(() => {
   switch ($props.node.type) {
     case 'approval':
