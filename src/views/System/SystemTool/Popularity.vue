@@ -165,7 +165,7 @@
                   </n-tooltip>
                 </div>
               </div>
-              <n-empty v-else size="large" description="可以是大的" />
+              <n-empty v-else size="large" description="选择一个配置" />
             </n-card>
           </n-gi>
         </n-grid>

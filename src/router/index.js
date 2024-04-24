@@ -103,7 +103,7 @@ const routes = [
         meta: {
           title: '字典数据管理',
           empty: false,
-          titleTemplate: '字典数据管理 / {dictKey}'
+          titleTemplate: '字典数据管理 - {dictKey}'
         }
       },
       {
@@ -294,7 +294,7 @@ const routes = [
           },
           {
             path: 'workflow',
-            name: 'SystemModuleWorkflowIndex',
+            name: 'SystemModuleWorkflow',
             meta: {
               title: '流程引擎配置',
               empty: true
@@ -302,11 +302,21 @@ const routes = [
             children: [
               {
                 path: 'config',
-                name: 'SystemModuleWorkflowConfig',
+                name: 'SystemModuleWorkflowIndex',
                 component: () => import('@/views/System/SystemModule/Workflow/Index.vue'),
                 meta: {
                   title: '流程引擎列表',
                   empty: false
+                }
+              },
+              {
+                path: 'editor/:workflowId/:configId',
+                name: 'SystemModuleWorkflowEditor',
+                component: () => import('@/views/System/SystemModule/Workflow/Editor.vue'),
+                meta: {
+                  title: '流程绘制工具',
+                  empty: false,
+                  titleTemplate: '流程绘制工具 - {configId}'
                 }
               }
             ]

@@ -28,7 +28,8 @@ export const handleOperate = (buttons, size = 'medium') => {
       ? h(
           NPopconfirm,
           {
-            onPositiveClick: clickStop
+            onPositiveClick: clickStop,
+            positiveButtonProps: { type }
           },
           {
             trigger: () => h(NButton, buttonProps, () => h(Icon, { icon })),

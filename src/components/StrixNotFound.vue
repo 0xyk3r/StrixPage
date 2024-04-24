@@ -10,7 +10,7 @@
 
 <script setup>
 import { useTabsBarStore } from '@/stores/tabs-bar'
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const $route = useRoute()
@@ -35,4 +35,9 @@ onMounted(() => {
     }
   }, 1000)
 })
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
+
 </script>
