@@ -13,7 +13,7 @@
     "axios": "^1.6.8",
     "core-js": "^3.37.0",
     "crypto-js": "^4.2.0",
-    "dexie": "^3.2.6",
+    "dexie": "^4.0.7",
     "echarts": "^5.5.0",
     "element-resize-detector": "^1.2.4",
     "jsencrypt": "^3.3.2",
