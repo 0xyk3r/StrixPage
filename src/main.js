@@ -18,6 +18,8 @@ import installAxios from './plugins/axios'
 import installStrixLocalCache from './utils/strix-local-cache'
 // pinia 持久化插件
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+// 自定义指令
+import installDirectives from './directives/index'
 
 const app = createApp(App)
 
@@ -29,5 +31,6 @@ app.use(naive)
 app.config.globalProperties.$EventBus = Mitt()
 installAxios(app)
 installStrixLocalCache(app)
+installDirectives(app)
 
 app.use(pinia).use(router).mount('#app')
