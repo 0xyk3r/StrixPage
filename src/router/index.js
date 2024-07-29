@@ -6,6 +6,18 @@ const NotFound = () => import('@/components/StrixNotFound.vue')
 
 const customRoutes = []
 
+const developmentRoutes = []
+if (import.meta.env.MODE === 'development') {
+  developmentRoutes.push({
+    path: '/debug',
+    name: 'DebugPage',
+    component: () => import('@/views/System/Debug.vue'),
+    meta: {
+      title: 'Debug'
+    }
+  })
+}
+
 const routes = [
   {
     path: '/login',
@@ -48,6 +60,7 @@ const routes = [
         ]
       },
       ...customRoutes,
+      ...developmentRoutes,
       {
         path: '/system/manager',
         name: 'SystemManagerIndex',
@@ -133,15 +146,6 @@ const routes = [
             }
           },
           {
-            path: 'cache/list',
-            name: 'SystemMonitorCacheList',
-            component: () => import('@/views/System/SystemMonitor/Cache/List.vue'),
-            meta: {
-              title: '系统缓存列表',
-              empty: false
-            }
-          },
-          {
             path: 'log',
             name: 'SystemMonitorLogIndex',
             component: () => import('@/views/System/SystemMonitor/Log/Index.vue'),
@@ -154,7 +158,6 @@ const routes = [
       },
       {
         path: 'system/tool',
-        name: 'SystemToolIndex',
         meta: {
           title: '系统工具管理'
         },

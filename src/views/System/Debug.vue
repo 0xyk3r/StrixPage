@@ -1,8 +1,8 @@
 <template>
   <div>
-    <n-grid x-gap="24" :cols="2">
-      <n-gi>CacheList</n-gi>
-    </n-grid>
+    <n-h3 prefix="bar" align-text type="success">
+      <n-text type="success">Debug</n-text>
+    </n-h3>
     {{ dictStatus }}
   </div>
 </template>
@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 <script>
 export default {
-  name: 'SystemMonitorCacheList'
+  name: 'DebugPage'
 }
 </script>
 <style lang="scss" scoped></style>
