@@ -14,8 +14,6 @@ import 'vfonts/Lato.css'
 import naive from 'naive-ui'
 // axios 网络框架
 import installAxios from './plugins/axios'
-// 缓存工具
-import installStrixLocalCache from './utils/strix-local-cache'
 // pinia 持久化插件
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 // 自定义指令
@@ -30,7 +28,6 @@ app.use(naive)
 // 创建Mitt全局事件总线
 app.config.globalProperties.$EventBus = Mitt()
 installAxios(app)
-installStrixLocalCache(app)
 installDirectives(app)
 
 app.use(pinia).use(router).mount('#app')

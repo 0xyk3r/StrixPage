@@ -1,4 +1,6 @@
+import { useLoginInfoStore } from '@/stores/login-info'
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
+import { storeToRefs } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const Redirect = () => import('@/components/StrixRedirect.vue')
@@ -338,6 +340,9 @@ const router = createRouter({
 
 // 前置路由导航守卫
 router.beforeEach((to, form, next) => {
+  const loginInfoStore = useLoginInfoStore()
+  const { loginToken } = storeToRefs(loginInfoStore)
+
   // 处理相同路由跳转问题
   if (to.meta.title && !to.meta.isRedirect && to.name === form.name) {
     return next(`/redirect${to.path}`)
@@ -359,8 +364,7 @@ router.beforeEach((to, form, next) => {
   if (to.path === '/login') {
     return next()
   }
-  const loginToken = window.localStorage.getItem('strix_login_token')
-  if (!loginToken) {
+  if (!loginToken.value) {
     return next('/login?to=' + to.fullPath)
   }
   return next()

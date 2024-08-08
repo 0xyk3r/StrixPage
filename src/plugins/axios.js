@@ -1,11 +1,24 @@
 import { useHttpCancelerStore } from '@/stores/http-canceler'
+import { useLoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 import JSEncrypt from 'jsencrypt'
 import _ from 'lodash'
+import { storeToRefs } from 'pinia'
 import qs from 'qs'
 import { v4 as uuidv4 } from 'uuid'
+import { ref } from 'vue'
+
+let loginInfoStore = null
+let token = ref('')
+function initStore() {
+  if (!loginInfoStore) {
+    loginInfoStore = useLoginInfoStore()
+    const { loginToken } = storeToRefs(loginInfoStore)
+    token = loginToken
+  }
+}
 
 // HTTP请求根路径
 axios.defaults.baseURL = '/api/'
@@ -16,58 +29,11 @@ const serverPubKey =
 const clientPriKey =
   'MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBANBprui2mHZG6WvJxuWatDrMIhUecappAMF0h3IofTfisMQg11H1hsfDOm75qKlTPgwIa6BiL1VXndO4hg/q7ICrxjOOIw4cRWfTsCxepeA+RYlh1ZMIYJCWvmOEU+PY/F/SDbTyMrJ8OTsuEJ08eLIwnWXwbi3mUEXkAmFao3X7AgMBAAECgYAx34h2sfNsIm4LWD7bhRjqFR121lE3CWef48Xh4KSOchYA6Sb9uvak6SgblGzzEDOB56XxvG09S/k9yCN0vbAYb+370Yhz0HhajKbjifVPZuAjvCO9cdWxJWeWlAtGMdgMyG1PxTlhamPfI/YvvjQxpf9845lGwXsBaTrGwbSLOQJBAOx3tJCnMPvajzcODwud67YKnuCwISK4XSNj7K+TPH66j53JycTjD+e7eVaa4j2TdP85t8zYO4q3oEut30nyXt0CQQDhoLzMaUg1nmUoAv2o0CO8hYEIzWc6gP4STHmtZjOqqYWhjInMk3slfMTllzLBEDy/womSuqb68wPXscvrtt63AkEAyjj81BAHFfstKtn9B+Q/peijQmedjsG39QIJcYUq4P3OwBPHV3cPLQ/ojqXaAOrPzUyg4K+zC8hJby78m5KIiQJASF7DUBmQ9MnajmvvKt+gJs73pXgk3UoUtI/dE3ZNqjb3yuqGJJ1Fia+shCvsNqrboXJnqC3Ac4vRNrUrwG6GnwJAAlZK9BZg2ORZ9vSGg0+Ah0Ji7BSaozJUFEXtZ+A2cU3S+LN8/4aOaAhFECvXjTjJYddffMhXnqJ6/z5DvxncnQ=='
 
-function enc(data) {
-  const library = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
-  let key = ''
-  for (let i = 0; i < 24; i++) {
-    const randomPoz = Math.floor(Math.random() * library.length)
-    key += library.substring(randomPoz, randomPoz + 1)
-  }
-  const parsedData = JSON.stringify(data)
-  const aes = CryptoJS.AES.encrypt(parsedData, CryptoJS.enc.Utf8.parse(key), {
-    iv: CryptoJS.enc.Utf8.parse(iv),
-    mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7
-  })
-
-  const jsEncrypt = new JSEncrypt()
-  jsEncrypt.setPublicKey(serverPubKey)
-  const rsa = jsEncrypt.encrypt(key)
-
-  return {
-    data: aes.ciphertext.toString(),
-    sign: rsa
-  }
-}
-
-function dec(response) {
-  const data = response.data
-  const sign = response.sign
-
-  if ((!data || !sign) && response.code !== 200) {
-    return response
-  }
-
-  if (data && sign) {
-    const jsEncrypt = new JSEncrypt()
-    jsEncrypt.setPrivateKey(clientPriKey)
-    const aesKey = jsEncrypt.decrypt(sign)
-
-    const dec = CryptoJS.AES.decrypt(CryptoJS.format.Hex.parse(data), CryptoJS.enc.Utf8.parse(aesKey), {
-      iv: CryptoJS.enc.Utf8.parse(iv),
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    })
-    return JSON.parse(CryptoJS.enc.Utf8.stringify(dec))
-  }
-  return {}
-}
-
 axios.interceptors.request.use((config) => {
+  initStore()
   config.headers['Content-Type'] = 'application/json'
-  const token = window.localStorage.getItem('strix_login_token')
-  if (token) {
-    config.headers.token = token
+  if (token.value) {
+    config.headers.token = token.value
   }
   config.headers.timestamp = new Date().getTime() + ''
 
@@ -134,6 +100,53 @@ axios.interceptors.response.use(
   }
 )
 
+function enc(data) {
+  const library = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*'
+  let key = ''
+  for (let i = 0; i < 24; i++) {
+    const randomPoz = Math.floor(Math.random() * library.length)
+    key += library.substring(randomPoz, randomPoz + 1)
+  }
+  const parsedData = JSON.stringify(data)
+  const aes = CryptoJS.AES.encrypt(parsedData, CryptoJS.enc.Utf8.parse(key), {
+    iv: CryptoJS.enc.Utf8.parse(iv),
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7
+  })
+
+  const jsEncrypt = new JSEncrypt()
+  jsEncrypt.setPublicKey(serverPubKey)
+  const rsa = jsEncrypt.encrypt(key)
+
+  return {
+    data: aes.ciphertext.toString(),
+    sign: rsa
+  }
+}
+
+function dec(response) {
+  const data = response.data
+  const sign = response.sign
+
+  if ((!data || !sign) && response.code !== 200) {
+    return response
+  }
+
+  if (data && sign) {
+    const jsEncrypt = new JSEncrypt()
+    jsEncrypt.setPrivateKey(clientPriKey)
+    const aesKey = jsEncrypt.decrypt(sign)
+
+    const dec = CryptoJS.AES.decrypt(CryptoJS.format.Hex.parse(data), CryptoJS.enc.Utf8.parse(aesKey), {
+      iv: CryptoJS.enc.Utf8.parse(iv),
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7
+    })
+    return JSON.parse(CryptoJS.enc.Utf8.stringify(dec))
+  }
+  return {}
+}
+
 function handleError(response) {
   const operate = (response.config.operate || '操作') + '失败'
   let errMsg = '未知错误'
@@ -141,7 +154,7 @@ function handleError(response) {
     errMsg = response.data.msg
     // 登录失效 清除登录信息并跳转到登录页
     if (response.data.code === 401) {
-      window.localStorage.clear()
+      loginInfoStore.clearLoginInfo()
       location.href = '/login?to=' + location.pathname
     }
     // 错误信息为空时 填充默认错误信息

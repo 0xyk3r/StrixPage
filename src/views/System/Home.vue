@@ -109,16 +109,17 @@
 import StrixBreadcrumb from '@/components/StrixBreadcrumb.vue'
 import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/StrixTabBar.vue'
+import { useLoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
-import { setToken } from '@/utils/strix-token-util'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
 import { kebabCase } from 'lodash'
 import { useLoadingBar, useOsTheme } from 'naive-ui'
+import { storeToRefs } from 'pinia'
 import ScreenFull from 'screenfull'
 import { computed, getCurrentInstance, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
@@ -132,6 +133,7 @@ initStrixMessage()
 
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()
+const loginInfoStore = useLoginInfoStore()
 
 const theme = computed(() => (globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme))
 const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
@@ -152,26 +154,27 @@ const cachedRoutes = computed(() => {
 const loginManagerInfo = ref(null)
 // 获取本地存储中的用户信息
 onMounted(() => {
-  const cacheManagerInfo = window.localStorage.getItem('strix_login_info')
-  loginManagerInfo.value = JSON.parse(cacheManagerInfo || '')
+  const { loginInfo } = storeToRefs(loginInfoStore)
+  loginManagerInfo.value = loginInfo.value
 })
 
 // 登出
 const logout = () => {
   proxy.$http.post('system/logout', null, { operate: '登出 ', notify: false }).finally(() => {
-    window.localStorage.removeItem('strix_login_token')
-    window.localStorage.removeItem('strix_login_token_expire')
-    window.localStorage.removeItem('strix_login_info')
+    loginInfoStore.clearLoginInfo()
     $router.push('/login')
   })
 }
 // Token续期
 const renewToken = () => {
-  // 如果token过期时间小于30天，则续期  (tokenExpire是yyyy-MM-dd格式的字符串)
-  const tokenExpire = window.localStorage.getItem('strix_login_token_expire')
-  if (new Date(tokenExpire).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000) {
+  // 如果token过期时间小于30天，则续期  (yyyy-MM-dd格式的字符串)
+  const { loginTokenExpire } = storeToRefs(loginInfoStore)
+  if (
+    loginTokenExpire &&
+    new Date(loginTokenExpire.value).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000
+  ) {
     proxy.$http.post('system/renewToken', null, { operate: '续期 Token ', notify: false }).then(({ data: res }) => {
-      setToken(res)
+      loginInfoStore.updateLoginInfo(res)
       loginManagerInfo.value = res.data.info
     })
   }

@@ -58,10 +58,10 @@
 
 <script setup>
 import Verify from '@/components/verifition/Verify.vue'
+import { useLoginInfoStore } from '@/stores/login-info'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
-import { setToken } from '@/utils/strix-token-util'
 import { useLoadingBar } from 'naive-ui'
 import { getCurrentInstance, nextTick, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -74,6 +74,7 @@ initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
 
 const tabBarStore = useTabsBarStore()
+const loginInfoStore = useLoginInfoStore()
 
 // 获取地址栏的to参数
 const loggedJumpPath = $route.query.to || '/'
@@ -114,27 +115,29 @@ const verifySuccess = (params) => {
   login()
 }
 
+// 提交登录
 const login = () => {
   loginFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    isLogging.value = true
     proxy.$http
       .post('system/login', loginForm.value, { operate: '登录', notify: false })
       .then(({ data: res }) => {
         isLogging.value = false
         const loginManagerType = res.data.info.type
-        setToken(res)
+        loginInfoStore.updateLoginInfo(res)
         tabBarStore.delAllVisitedRoutes()
         createStrixMessage(
           'success',
           '登录成功',
-          `登录成功，${loginManagerType === 1 ? '超级账户' : '平台账户'}：` + res.data.info.nickname
+          `${loginManagerType === 1 ? '超级管理员' : '当前用户'}：` + res.data.info.nickname
         )
         $router.push(loggedJumpPath != '/login' ? loggedJumpPath : '/')
       })
       .catch(() => {
         loginForm.value.loginPassword = null
+      })
+      .finally(() => {
         isLogging.value = false
       })
   })
