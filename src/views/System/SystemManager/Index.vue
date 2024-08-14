@@ -212,7 +212,7 @@ const dataColumns = [
     }
   },
   {
-    key: 'regionId', title: '地区权限', width: 140,
+    key: 'regionId', title: '所属地区', width: 140,
     render(row) {
       const tagText = row.type === 1 ? '所有地区' : managerRegionName(row.regionId);
       return h(NTag, { type: row.type === 1 ? 'success' : 'info', bordered: false }, {
