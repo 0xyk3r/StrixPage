@@ -1,9 +1,7 @@
 <template>
   <div>
     <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">
-        {{ _baseName }}管理
-      </n-text>
+      <n-text type="success"> {{ _baseName }}管理 </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
@@ -19,26 +17,42 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
-            <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getOssFileGroupSelectList($event)" />
+            <n-select
+              v-model:value="getDataListParams.configKey"
+              :options="ossConfigSelectList"
+              placeholder="请选择存储配置 Key"
+              clearable
+              @update:value="getOssFileGroupSelectList($event)"
+            />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="文件组 Key" path="groupKey">
-            <n-select v-model:value="getDataListParams.groupKey" :options="ossFileGroupSelectList"
-              placeholder="请选择文件组 Key" clearable @update:value="getDataList" />
+            <n-select
+              v-model:value="getDataListParams.groupKey"
+              :options="ossFileGroupSelectList"
+              placeholder="请选择文件组 Key"
+              clearable
+              @update:value="getDataList"
+            />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
-    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
-      :pagination="dataPagination" :row-key="dataRowKey" />
+    <n-data-table
+      :remote="true"
+      :loading="dataLoading"
+      :columns="dataColumns"
+      :data="dataRef"
+      :pagination="dataPagination"
+      :row-key="dataRowKey"
+    />
   </div>
 </template>
 
 <script setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { createPagination } from '@/plugins/pagination.js'
-import { downloadBlob } from '@/utils/strix-file-util.js'
+import { downloadBlob, formatFileSize } from '@/utils/strix-file-util.js'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
@@ -67,7 +81,7 @@ const dataColumns = [
   { key: 'path', title: '文件路径', width: 300 },
   { key: 'configKey', title: '存储配置 Key', width: 140 },
   { key: 'groupKey', title: '文件组配置 Key', width: 140 },
-  { key: 'size', title: '文件大小 (byte)', width: 120 },
+  { key: 'size', title: '文件大小', width: 120, render: (row) => formatFileSize(row.size) },
   { key: 'ext', title: '文件拓展名', width: 100 },
   { key: 'createTime', title: '上传时间', width: 160 },
   {
@@ -89,18 +103,22 @@ const dataColumns = [
   }
 ]
 // 分页配置
-const dataPagination = createPagination(getDataListParams, () => { getDataList() })
+const dataPagination = createPagination(getDataListParams, () => {
+  getDataList()
+})
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/oss/file', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.files
-    dataPagination.itemCount = res.data.total
-  })
+  proxy.$http
+    .get('system/oss/file', { params: getDataListParams.value, operate: `加载${_baseName}列表` })
+    .then(({ data: res }) => {
+      dataLoading.value = false
+      dataRef.value = res.data.files
+      dataPagination.itemCount = res.data.total
+    })
 }
 onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
@@ -137,8 +155,6 @@ const deleteFile = (id) => {
     getDataList()
   })
 }
-
-
 </script>
 <script>
 export default {

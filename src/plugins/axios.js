@@ -65,11 +65,23 @@ axios.interceptors.request.use((config) => {
     // 转换 GET 请求参数为对象
     const queryString = qs.stringify(params)
     const urlParams = qs.parse(queryString)
-    console.log('%c 请求 %c ' + config.operate, 'background: #70c0e833;color: #70c0e8', '', urlParams)
+    console.log(
+      '%cStrix%c请求%c ' + config.operate,
+      'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
+      'background: #333333; color: #ffffff; padding: 2px 4px; border-radius: 2px;',
+      '',
+      urlParams
+    )
     config.headers.sign = paramsSign('/' + config.url, urlParams, config.headers.timestamp)
   } else {
     config.headers.sign = paramsSign('/' + config.url, config.data, config.headers.timestamp)
-    console.log('%c 请求 %c ' + config.operate, 'background: #70c0e833;color: #70c0e8', '', config.data)
+    console.log(
+      '%cStrix%c请求%c ' + config.operate,
+      'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
+      'background: #333333; color: #ffffff; padding: 2px 4px; border-radius: 2px;',
+      '',
+      urlParams
+    )
     if (config.data) {
       config.data = JSON.stringify(enc(config.data))
     }
@@ -88,7 +100,13 @@ axios.interceptors.response.use(
     }
     if (response.data) {
       response.data = dec(response.data)
-      console.log('%c 响应 %c ' + response.config.operate, 'background: black;color: #4CAF50', '', response.data)
+      console.log(
+        '%cStrix%c响应%c ' + response.config.operate,
+        'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
+        'background: #333333; color: #4CAF50; padding: 2px 4px; border-radius: 2px;',
+        '',
+        response.data
+      )
       if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
         handleError(response)
       } else if (notify) {

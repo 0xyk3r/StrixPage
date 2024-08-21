@@ -38,7 +38,7 @@
 import { renderNode } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import { NEl } from 'naive-ui'
-import { defineComponent, getCurrentInstance, reactive, ref } from 'vue'
+import { defineComponent, getCurrentInstance, reactive, ref, watch } from 'vue'
 import VueDraggableResizable from 'vue-draggable-resizable'
 
 const { proxy } = getCurrentInstance()
@@ -57,11 +57,19 @@ const $props = defineProps({
   }
 })
 
-const flowData = reactive(JSON.parse($props.dataJson))
+const flowData = ref({})
+watch(
+  () => $props.dataJson,
+  (val) => {
+    if (val) {
+      flowData.value = JSON.parse(val)
+    }
+  }
+)
 
 const NodeTree = defineComponent(() => {
   return () => {
-    return renderNode(flowData)
+    return renderNode(flowData.value)
   }
 })
 
@@ -80,21 +88,18 @@ const containerZoomOut = () => {
 }
 
 const saveData = () => {
-  console.log($props.dataId, flowData)
+  console.log($props.dataId, flowData.value)
 
   proxy.$http
     .post(
       `system/workflow/update/${$props.workflowId}/config`,
       {
-        content: JSON.stringify(flowData)
+        content: JSON.stringify(flowData.value)
       },
       {
         operate: '保存流程数据'
       }
     )
-    .then(() => {
-      console.log('保存成功')
-    })
 }
 </script>
 <style lang="scss">
