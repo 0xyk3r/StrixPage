@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">{{ _baseName }} / {{ configId }}</n-text>
-    </n-h3>
     <WorkflowContainer :workflow-id="workflowId" :config-id="configId" :data-json="dataJson" />
   </div>
 </template>

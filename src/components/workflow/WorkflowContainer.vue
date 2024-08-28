@@ -27,19 +27,21 @@
         </n-button-group>
       </n-card>
     </div>
-    <vue-draggable-resizable w="auto" h="auto" style="z-index: 1">
-      <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
-        <NodeTree />
-      </n-el>
-    </vue-draggable-resizable>
+
+    <div class="canvas-container" @wheel="onWheel" @mousedown="startDrag" @mouseup="endDrag" @mousemove="onDrag">
+      <div class="canvas" :style="canvasStyle">
+        <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
+          <NodeTree />
+        </n-el>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
 import { renderNode } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import { NEl } from 'naive-ui'
-import { defineComponent, getCurrentInstance, reactive, ref, watch } from 'vue'
-import VueDraggableResizable from 'vue-draggable-resizable'
+import { computed, defineComponent, getCurrentInstance, ref, watch } from 'vue'
 
 const { proxy } = getCurrentInstance()
 const $props = defineProps({
@@ -56,6 +58,39 @@ const $props = defineProps({
     required: true
   }
 })
+
+// 画布拖拽功能
+const canvasPosition = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
+const startMousePosition = ref({ x: 0, y: 0 })
+const canvasStyle = computed(() => ({
+  transform: `translate(${canvasPosition.value.x}px, ${canvasPosition.value.y}px)`
+}))
+const startDrag = (event) => {
+  isDragging.value = true
+  startMousePosition.value = { x: event.clientX, y: event.clientY }
+}
+const endDrag = () => {
+  isDragging.value = false
+}
+const onDrag = (event) => {
+  if (isDragging.value) {
+    const deltaX = event.clientX - startMousePosition.value.x
+    const deltaY = event.clientY - startMousePosition.value.y
+    canvasPosition.value.x += deltaX
+    canvasPosition.value.y += deltaY
+    startMousePosition.value = { x: event.clientX, y: event.clientY }
+  }
+}
+// 根据滚轮的方向来调整缩放比例
+const onWheel = (event) => {
+  event.preventDefault()
+  if (event.deltaY < 0) {
+    containerZoomIn()
+  } else {
+    containerZoomOut()
+  }
+}
 
 const flowData = ref({})
 watch(
@@ -86,20 +121,20 @@ const containerZoomOut = () => {
   }
   scale.value -= 0.1
 }
+// 响应鼠标滚轮事件
 
 const saveData = () => {
   console.log($props.dataId, flowData.value)
 
-  proxy.$http
-    .post(
-      `system/workflow/update/${$props.workflowId}/config`,
-      {
-        content: JSON.stringify(flowData.value)
-      },
-      {
-        operate: '保存流程数据'
-      }
-    )
+  proxy.$http.post(
+    `system/workflow/update/${$props.workflowId}/config`,
+    {
+      content: JSON.stringify(flowData.value)
+    },
+    {
+      operate: '保存流程数据'
+    }
+  )
 }
 </script>
 <style lang="scss">
@@ -113,12 +148,32 @@ const saveData = () => {
   }
 }
 
+.canvas-container {
+  width: 100%;
+  height: calc(100vh - 160px);
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+}
+
+.canvas-container:active {
+  cursor: grabbing;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .wf-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   flex-wrap: wrap;
-  width: 100%;
+  width: auto;
   padding: 20px;
   user-select: none;
   -webkit-user-drag: none;
