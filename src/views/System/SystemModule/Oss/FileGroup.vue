@@ -1,9 +1,7 @@
 <template>
   <div>
     <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">
-        {{ _baseName }}管理
-      </n-text>
+      <n-text type="success"> {{ _baseName }}管理 </n-text>
     </n-h3>
     <strix-block style="margin-bottom: 20px" show-clear-button @clear-search="clearSearch">
       <template #show>
@@ -15,9 +13,7 @@
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal">
-              添加{{ _baseName }}
-            </n-button>
+            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }} </n-button>
           </n-gi>
         </n-grid>
         <n-alert title="提醒" type="warning">
@@ -27,26 +23,53 @@
       <n-form :model="getDataListParams" label-placement="left" label-width="auto" :show-feedback="false">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
-            <n-select v-model:value="getDataListParams.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-              clearable @update:value="getDataList" />
+            <n-select
+              v-model:value="getDataListParams.configKey"
+              :options="ossConfigSelectList"
+              placeholder="请选择存储配置 Key"
+              clearable
+              @update:value="getDataList"
+            />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
 
-    <n-data-table :remote="true" :loading="dataLoading" :columns="dataColumns" :data="dataRef"
-      :pagination="dataPagination" :row-key="dataRowKey" />
+    <n-data-table
+      :remote="true"
+      :loading="dataLoading"
+      :columns="dataColumns"
+      :data="dataRef"
+      :pagination="dataPagination"
+      :row-key="dataRowKey"
+    />
 
-    <n-modal v-model:show="addDataModalShow" preset="card" :title="'添加' + _baseName" class="strix-model-primary"
-      size="huge" @after-leave="initDataForm">
-      <n-form ref="addDataFormRef" :model="addDataForm" :rules="addDataRules" label-placement="left" label-width="auto"
-        require-mark-placement="right-hanging">
+    <n-modal
+      v-model:show="addDataModalShow"
+      preset="card"
+      :title="'添加' + _baseName"
+      class="strix-model-primary"
+      size="huge"
+      @after-leave="initDataForm"
+    >
+      <n-form
+        ref="addDataFormRef"
+        :model="addDataForm"
+        :rules="addDataRules"
+        label-placement="left"
+        label-width="auto"
+        require-mark-placement="right-hanging"
+      >
         <n-form-item label="文件组配置 Key" path="key">
           <n-input v-model:value="addDataForm.key" placeholder="请输入文件组配置 Key" clearable />
         </n-form-item>
         <n-form-item label="存储配置 Key" path="configKey">
-          <n-select v-model:value="addDataForm.configKey" :options="ossConfigSelectList" placeholder="请选择存储配置 Key"
-            clearable />
+          <n-select
+            v-model:value="addDataForm.configKey"
+            :options="ossConfigSelectList"
+            placeholder="请选择存储配置 Key"
+            clearable
+          />
         </n-form-item>
         <n-form-item label="文件组名称" path="name">
           <n-input v-model:value="addDataForm.name" placeholder="请输入文件组名称" clearable />
@@ -58,41 +81,67 @@
           <n-input v-model:value="addDataForm.bucketDomain" placeholder="请输入Bucket自定义域名" clearable />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
-          <n-input v-model:value="addDataForm.baseDir" placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头" clearable />
+          <n-input
+            v-model:value="addDataForm.baseDir"
+            placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
+            clearable
+          />
         </n-form-item>
         <n-form-item label="允许的扩展名" path="allowExtension">
-          <n-dynamic-tags v-model:value="addDataForm.allowExtension" type="primary"
-            @create="handleAllowExtensionCreate($event, 1)" />
+          <n-dynamic-tags
+            v-model:value="addDataForm.allowExtension"
+            type="primary"
+            @create="handleAllowExtensionCreate($event, 1)"
+          />
         </n-form-item>
         <n-form-item label="查看权限类型" path="secretType">
-          <n-select v-model:value="addDataForm.secretType" :options="strixOssFileGroupSecretTypeRef"
-            placeholder="请选择查看权限类型" clearable />
+          <n-select
+            v-model:value="addDataForm.secretType"
+            :options="strixOssFileGroupSecretTypeRef"
+            placeholder="请选择查看权限类型"
+            clearable
+          />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
           <n-input-number v-model:value="addDataForm.secretLevel" placeholder="请输入查看权限等级" clearable />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
-          <n-input v-model:value="addDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
-            minRows: 3,
-            maxRows: 5
-          }" />
+          <n-input
+            v-model:value="addDataForm.remark"
+            placeholder="在此输入备注信息"
+            type="textarea"
+            :autosize="{
+              minRows: 3,
+              maxRows: 5
+            }"
+          />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-space class="strix-form-modal-footer">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData">
-            确定
-          </n-button>
+          <n-button type="primary" @click="addData"> 确定 </n-button>
         </n-space>
       </template>
     </n-modal>
 
-    <n-modal v-model:show="editDataModalShow" preset="card" :title="'修改' + _baseName" class="strix-model-primary"
-      size="huge" @after-leave="initDataForm">
+    <n-modal
+      v-model:show="editDataModalShow"
+      preset="card"
+      :title="'修改' + _baseName"
+      class="strix-model-primary"
+      size="huge"
+      @after-leave="initDataForm"
+    >
       <n-spin :show="editDataFormLoading">
-        <n-form ref="editDataFormRef" :model="editDataForm" :rules="editDataRules" label-placement="left"
-          label-width="auto" require-mark-placement="right-hanging">
+        <n-form
+          ref="editDataFormRef"
+          :model="editDataForm"
+          :rules="editDataRules"
+          label-placement="left"
+          label-width="auto"
+          require-mark-placement="right-hanging"
+        >
           <n-form-item label="文件组名称" path="name">
             <n-input v-model:value="editDataForm.name" placeholder="请输入文件组名称" clearable />
           </n-form-item>
@@ -100,35 +149,69 @@
             <n-input v-model:value="editDataForm.bucketDomain" placeholder="请输入Bucket自定义域名" clearable />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
-            <n-input v-model:value="editDataForm.baseDir" placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头" clearable />
+            <n-input
+              v-model:value="editDataForm.baseDir"
+              placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
+              clearable
+            />
           </n-form-item>
           <n-form-item label="允许的扩展名" path="allowExtension">
-            <n-dynamic-tags v-model:value="editDataForm.allowExtension" type="primary"
-              @create="handleAllowExtensionCreate($event, 2)" />
+            <n-dynamic-tags
+              v-model:value="editDataForm.allowExtension"
+              type="primary"
+              @create="handleAllowExtensionCreate($event, 2)"
+            />
           </n-form-item>
           <n-form-item label="查看权限类型" path="secretType">
-            <n-select v-model:value="editDataForm.secretType" :options="strixOssFileGroupSecretTypeRef"
-              placeholder="请选择查看权限类型" clearable />
+            <n-select
+              v-model:value="editDataForm.secretType"
+              :options="strixOssFileGroupSecretTypeRef"
+              placeholder="请选择查看权限类型"
+              clearable
+            />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
             <n-input-number v-model:value="editDataForm.secretLevel" placeholder="请输入查看权限等级" clearable />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
-            <n-input v-model:value="editDataForm.remark" placeholder="在此输入备注信息" type="textarea" :autosize="{
-              minRows: 3,
-              maxRows: 5
-            }" />
+            <n-input
+              v-model:value="editDataForm.remark"
+              placeholder="在此输入备注信息"
+              type="textarea"
+              :autosize="{
+                minRows: 3,
+                maxRows: 5
+              }"
+            />
           </n-form-item>
         </n-form>
       </n-spin>
       <template #footer>
         <n-space class="strix-form-modal-footer">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData">
-            确定
-          </n-button>
+          <n-button type="primary" @click="editData"> 确定 </n-button>
         </n-space>
       </template>
+    </n-modal>
+
+    <n-modal v-model:show="uploadModalShow" preset="card" title="上传文件" class="strix-model-primary" size="huge">
+      <n-upload
+        multiple
+        directory-dnd
+        :action="uploadUrl"
+        :headers="{ token: loginToken }"
+        :max="5"
+        :show-remove-button="false"
+      >
+        <n-upload-dragger>
+          <div style="margin-bottom: 12px">
+            <n-icon size="48" :depth="3">
+              <Icon icon="ion:archive-outline"></Icon>
+            </n-icon>
+          </div>
+          <n-text style="font-size: 16px"> 点击或者拖动文件到该区域来上传 </n-text>
+        </n-upload-dragger>
+      </n-upload>
     </n-modal>
   </div>
 </template>
@@ -138,14 +221,19 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { createPagination } from '@/plugins/pagination.js'
 import { useDictsStore } from '@/stores/dicts'
+import { useLoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { Icon } from '@iconify/vue'
 import { cloneDeep, pick } from 'lodash'
 import { NButton, NDataTable } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { getCurrentInstance, h, nextTick, onMounted, provide, ref } from 'vue'
 
 const { proxy } = getCurrentInstance()
 const dictsStore = useDictsStore()
+const loginInfoStore = useLoginInfoStore()
 
 // 本页面操作提示关键词
 const _baseName = '文件分组'
@@ -156,6 +244,8 @@ provide('StrixOssFileGroupSecretTypeDict', strixOssFileGroupSecretTypeRef)
 onMounted(() => {
   dictsStore.getDictData('StrixOssFileGroupSecretType', strixOssFileGroupSecretTypeRef)
 })
+
+const { loginToken } = storeToRefs(loginInfoStore)
 
 // 获取列表请求参数
 const initGetDataListParams = {
@@ -178,8 +268,15 @@ const dataColumns = [
   { key: 'baseDir', title: '基础路径', width: 120 },
   { key: 'allowExtension', title: '允许的拓展名', width: 150 },
   {
-    key: 'secretType', title: '文件权限类型', width: 100, render(row) {
-      return h(StrixTag, { value: row.secretType, dictName: 'StrixOssFileGroupSecretType', afterLabel: ' / ' + row.secretLevel })
+    key: 'secretType',
+    title: '文件权限类型',
+    width: 100,
+    render(row) {
+      return h(StrixTag, {
+        value: row.secretType,
+        dictName: 'StrixOssFileGroupSecretType',
+        afterLabel: ' / ' + row.secretLevel
+      })
     }
   },
   { key: 'remark', title: '备注', width: 150 },
@@ -188,6 +285,7 @@ const dataColumns = [
     width: 240,
     render(row) {
       return handleOperate([
+        { type: 'info', label: '上传文件', icon: 'ion:cloud-upload-outline', onClick: () => showUploadModal(row.key) },
         { type: 'warning', label: '编辑', icon: 'ion:create-outline', onClick: () => showEditDataModal(row.id) },
         {
           type: 'error',
@@ -202,18 +300,22 @@ const dataColumns = [
   }
 ]
 // 分页配置
-const dataPagination = createPagination(getDataListParams, () => { getDataList() })
+const dataPagination = createPagination(getDataListParams, () => {
+  getDataList()
+})
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  proxy.$http.get('system/oss/fileGroup', { params: getDataListParams.value, operate: `加载${_baseName}列表` }).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.fileGroups
-    dataPagination.itemCount = res.data.total
-  })
+  proxy.$http
+    .get('system/oss/fileGroup', { params: getDataListParams.value, operate: `加载${_baseName}列表` })
+    .then(({ data: res }) => {
+      dataLoading.value = false
+      dataRef.value = res.data.fileGroups
+      dataPagination.itemCount = res.data.total
+    })
 }
 onMounted(getDataList)
 const dataRowKey = (rowData) => rowData.id
@@ -232,14 +334,22 @@ const handleAllowExtensionCreate = (label, type) => {
   const l = label.startsWith('.') ? label : '.' + label
   if (type === 1 && addDataForm.value.allowExtension.includes(l)) {
     nextTick(() => {
-      addDataForm.value.allowExtension.splice(addDataForm.value.allowExtension.indexOf(l), 1);
+      addDataForm.value.allowExtension.splice(addDataForm.value.allowExtension.indexOf(l), 1)
     })
   } else if (type === 2 && editDataForm.value.allowExtension.includes(l)) {
     nextTick(() => {
-      editDataForm.value.allowExtension.splice(editDataForm.value.allowExtension.indexOf(l), 1);
+      editDataForm.value.allowExtension.splice(editDataForm.value.allowExtension.indexOf(l), 1)
     })
   }
-  return l;
+  return l
+}
+
+const uploadModalShow = ref(false)
+const uploadFileGroupKey = ref('default')
+const uploadUrl = computed(() => `/api/system/common/file/${uploadFileGroupKey.value}/upload`)
+const showUploadModal = (key) => {
+  uploadModalShow.value = true
+  uploadFileGroupKey.value = key
 }
 
 const initDataForm = () => {
@@ -270,9 +380,7 @@ const addDataRules = {
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
     { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
   ],
-  configKey: [
-    { required: true, message: '请选择存储配置', trigger: 'change' }
-  ],
+  configKey: [{ required: true, message: '请选择存储配置', trigger: 'change' }],
   name: [
     { required: true, message: '请输入配置名称', trigger: 'blur' },
     { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
@@ -281,30 +389,23 @@ const addDataRules = {
     { required: true, message: '请输入 Bucket 名称', trigger: 'blur' },
     { min: 1, max: 64, message: 'Bucket 名称长度需在 1 - 64 字之内', trigger: 'blur' }
   ],
-  bucketDomain: [
-    { max: 64, message: 'Bucket 域名长度需在 64 字之内', trigger: 'blur' }
-  ],
-  baseDir: [
-    { max: 64, message: '基础路径长度需在 64 字之内', trigger: 'blur' }
-  ],
+  bucketDomain: [{ max: 64, message: 'Bucket 域名长度需在 64 字之内', trigger: 'blur' }],
+  baseDir: [{ max: 64, message: '基础路径长度需在 64 字之内', trigger: 'blur' }],
   allowExtension: [
     {
-      trigger: 'change', validator(rule, value) {
-        if (value.length == 0) return new Error("请填入允许上传的文件拓展名");
-        return true;
+      trigger: 'change',
+      validator(rule, value) {
+        if (value.length == 0) return new Error('请填入允许上传的文件拓展名')
+        return true
       }
     }
   ],
-  secretType: [
-    { type: 'number', required: true, message: '请选择查看权限类型', trigger: 'change' }
-  ],
+  secretType: [{ type: 'number', required: true, message: '请选择查看权限类型', trigger: 'change' }],
   secretLevel: [
     { type: 'number', required: true, message: '请填写查看权限等级', trigger: 'blur' },
     { type: 'number', min: 0, max: 10, message: '请输入有效数值 (1-10)', trigger: 'change' }
   ],
-  remark: [
-    { max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }
-  ]
+  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
 const showAddDataModal = () => {
   addDataModalShow.value = true
@@ -346,9 +447,7 @@ const editDataRules = {
     { required: true, message: '请输入配置名称', trigger: 'blur' },
     { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
   ],
-  platform: [
-    { type: 'number', required: true, message: '请选择平台', trigger: 'change' }
-  ],
+  platform: [{ type: 'number', required: true, message: '请选择平台', trigger: 'change' }],
   publicEndpoint: [
     { required: true, message: '请输入公网节点', trigger: 'blur' },
     { min: 1, max: 128, message: '公网节点长度需在 1 - 128 字之内', trigger: 'blur' }
@@ -361,12 +460,8 @@ const editDataRules = {
     { required: true, message: '请输入 AccessKey', trigger: 'blur' },
     { max: 64, message: 'AccessKey 长度需在 64 字之内', trigger: 'blur' }
   ],
-  accessSecret: [
-    { max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }
-  ],
-  remark: [
-    { max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }
-  ]
+  accessSecret: [{ max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }],
+  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
 const showEditDataModal = (id) => {
   editDataModalShow.value = true
@@ -401,7 +496,6 @@ const deleteData = (id) => {
     getDataList()
   })
 }
-
 </script>
 <script>
 export default {
