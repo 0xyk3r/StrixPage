@@ -80,7 +80,7 @@ axios.interceptors.request.use((config) => {
       'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
       'background: #333333; color: #ffffff; padding: 2px 4px; border-radius: 2px;',
       '',
-      urlParams
+      config.data
     )
     if (config.data) {
       config.data = JSON.stringify(enc(config.data))
