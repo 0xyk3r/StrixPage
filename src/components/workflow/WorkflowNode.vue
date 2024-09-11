@@ -1,21 +1,7 @@
 <template>
   <div class="wf-node">
-    <!-- 渲染条件分支 -->
-    <n-card v-if="$slots.branches" class="branches-card" content-class="branches-card-content" hoverable>
-      <div style="display: flex; justify-content: center; margin-bottom: 20px">
-        <n-button-group>
-          <n-button strong secondary type="primary" @click="addNode('condition')"> 添加条件节点 </n-button>
-          <n-button strong secondary type="error" @click="removeNode"> 删除条件分支 </n-button>
-        </n-button-group>
-      </div>
-      <!-- 子分支插槽 -->
-      <n-flex justify="center" size="large" :wrap="false">
-        <slot name="branches" />
-      </n-flex>
-    </n-card>
     <!-- 节点渲染 (不含条件分支 & 空节点) -->
     <n-card
-      v-else
       v-show="$props.node.type !== 'empty'"
       class="wf-node-main"
       :header-class="'node-header node-' + $props.node.type"
@@ -26,7 +12,7 @@
       <template #header>
         <div class="node-header-content">
           <n-icon size="12"><Icon :icon="$props.icon" /></n-icon>
-          <div>{{ getTypeName($props.node.type) }}</div>
+          <div>{{ getTypeName($props.node.type) }} - {{ $props.node.name }}</div>
         </div>
       </template>
       <template #header-extra>
@@ -69,20 +55,20 @@
     <!-- 配置项抽屉 -->
     <n-drawer v-model:show="showDrawer" :width="512">
       <n-drawer-content :title="getTypeName($props.node.type)" :native-scrollbar="false" closable>
-        <component :is="choosePropsComponent" v-model="cacheProps" />
+        <component :is="propsComponent" v-model="$props.node.props" />
       </n-drawer-content>
     </n-drawer>
   </div>
 </template>
 <script setup>
-import { getTypeName, getOperationName } from '@/components/workflow/util/workflow.js'
+import { getOperationName, getTypeName } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import { NCard } from 'naive-ui'
 import { computed, ref } from 'vue'
 import ApprovalProps from './props/ApprovalProps.vue'
-import TaskProps from './props/TaskProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'
+import TaskProps from './props/TaskProps.vue'
 
 const $props = defineProps({
   node: {
@@ -107,7 +93,6 @@ const $emit = defineEmits(['addNode', 'removeNode'])
 
 const addNodePopoverRef = ref()
 const showDrawer = ref(false)
-const cacheProps = ref($props.node.props)
 
 // 添加节点
 const addNode = (type) => {
@@ -128,7 +113,7 @@ const openDrawer = () => {
   showDrawer.value = true
 }
 
-// 节点内容计算方法
+// 节点内容计算函数
 const showContent = computed(() => {
   const nodeType = $props.node.type
   if (nodeType === 'root') {
@@ -155,8 +140,8 @@ const showContent = computed(() => {
   return ''
 })
 
-// 配置项组件选择
-const choosePropsComponent = computed(() => {
+// 配置项组件计算函数
+const propsComponent = computed(() => {
   switch ($props.node.type) {
     case 'approval':
       return ApprovalProps

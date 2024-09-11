@@ -31,14 +31,14 @@
     <div class="canvas-container" @wheel="onWheel" @mousedown="startDrag" @mouseup="endDrag" @mousemove="onDrag">
       <div class="canvas" :style="canvasStyle">
         <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
-          <NodeTree />
+          <WorkflowBody />
         </n-el>
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import { renderNode } from '@/components/workflow/util/workflow.js'
+import { renderWorkflow } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import { NEl } from 'naive-ui'
 import { computed, defineComponent, getCurrentInstance, ref, watch } from 'vue'
@@ -91,23 +91,6 @@ const onWheel = (event) => {
     containerZoomOut()
   }
 }
-
-const flowData = ref({})
-watch(
-  () => $props.dataJson,
-  (val) => {
-    if (val) {
-      flowData.value = JSON.parse(val)
-    }
-  }
-)
-
-const NodeTree = defineComponent(() => {
-  return () => {
-    return renderNode(flowData.value)
-  }
-})
-
 const scale = ref(1)
 const containerZoomIn = () => {
   if (scale.value >= 2) {
@@ -121,15 +104,32 @@ const containerZoomOut = () => {
   }
   scale.value -= 0.1
 }
-// 响应鼠标滚轮事件
 
+const workflowData = ref({})
+watch(
+  () => $props.dataJson,
+  (val) => {
+    if (val) {
+      workflowData.value = JSON.parse(val)
+    }
+  }
+)
+
+// 渲染节点
+const WorkflowBody = defineComponent(() => {
+  return () => {
+    return renderWorkflow(workflowData.value)
+  }
+})
+
+// 保存数据
 const saveData = () => {
-  console.log($props.dataId, flowData.value)
+  console.log($props.dataId, workflowData.value)
 
   proxy.$http.post(
     `system/workflow/update/${$props.workflowId}/config`,
     {
-      content: JSON.stringify(flowData.value)
+      content: JSON.stringify(workflowData.value)
     },
     {
       operate: '保存流程数据'
@@ -194,9 +194,10 @@ const saveData = () => {
       }
 
       &.node-end {
-        width: 100px;
+        width: 140px;
         height: 30px;
         line-height: 30px;
+        margin: 10px 0;
         font-size: 14px;
         text-align: center;
         border-radius: 10px;
