@@ -15,7 +15,7 @@ export default defineConfig({
         enabled: true,
         type: 'module'
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'pwa/apple-touch-icon.png', 'pwa/mask-icon.svg'],
       manifest: {
         name: 'Strix',
         short_name: 'Strix',
@@ -23,26 +23,26 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'pwa/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'pwa/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
           }
         ],
         screenshots: [
           {
-            src: 'pwa-512x512.png',
+            src: 'pwa/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             form_factor: 'wide',
             label: 'Strix'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'pwa/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             form_factor: 'narrow',
