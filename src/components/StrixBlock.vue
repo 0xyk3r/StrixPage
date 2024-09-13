@@ -6,17 +6,17 @@
     @mouseenter="hovering = true"
     @mouseleave="hovering = false"
   >
-    <div class="source">
-      <slot name="show" />
+    <div class="strix-block-body">
+      <slot name="body" />
     </div>
-    <div v-show="showClearButton || $slots.default" ref="meta" class="meta">
-      <div v-if="$slots.default" class="description">
+    <div v-show="cleanable || $slots.default" ref="moreRef" class="strix-block-more">
+      <div v-if="$slots.default" class="strix-block-more-body">
         <slot />
       </div>
     </div>
     <div
-      v-show="showClearButton || $slots.default"
-      ref="control"
+      v-show="cleanable || $slots.default"
+      ref="controlRef"
       class="strix-block-control"
       :class="{ 'is-fixed': fixedControl }"
       @click="changeExpand"
@@ -28,13 +28,13 @@
       <!-- 左侧按钮 -->
       <div class="control-button-container control-button-container-left">
         <n-button
-          v-if="showClearButton"
+          v-if="cleanable"
           :tertiary="isSmallWindow"
           :quaternary="!isSmallWindow"
           type="error"
-          @click.stop="$emit('clear-search')"
+          @click.stop="$emit('clear')"
         >
-          <span>{{ isSmallWindow ? '清除' : '清除搜索条件' }}</span>
+          {{ isSmallWindow ? '清除' : '清除搜索条件' }}
         </n-button>
       </div>
       <!-- 右侧按钮 -->
@@ -42,54 +42,75 @@
     </div>
   </n-el>
 </template>
-<script setup>
+<script setup lang="ts">
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
-import { NButton } from 'naive-ui'
-import { computed, getCurrentInstance, h, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
-
-const { proxy } = getCurrentInstance()
-const globalSettingsStore = useStrixSettingsStore()
-const isSmallWindow = computed(() => globalSettingsStore.isSmallWindow)
+import { NEl } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import {
+  computed,
+  getCurrentInstance,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useSlots,
+  watch
+} from 'vue'
 
 defineProps({
-  showClearButton: { type: Boolean, default: false }
+  cleanable: { type: Boolean, default: false }
 })
-defineEmits(['clear-search'])
+defineEmits(['clear'])
+
+const { proxy } = getCurrentInstance() as any
+const globalSettingsStore = useStrixSettingsStore()
+const { isSmallWindow } = storeToRefs(globalSettingsStore)
+
+const moreRef = ref<any>(null)
+const controlRef = ref<any>(null)
 
 const hovering = ref(false)
 const isExpanded = ref(false)
 const fixedControl = ref(false)
-let scrollParent = null
+let scrollParent: HTMLElement | null = null
 
 const expandedIcon = computed(() =>
-  isExpanded.value ? h(Icon, { icon: 'ion:caret-up', inline: true }) : h(Icon, { icon: 'ion:caret-down', inline: true })
+  isExpanded.value
+    ? h(Icon, { icon: 'ion:caret-up', inline: true })
+    : h(Icon, { icon: 'ion:caret-down', inline: true })
 )
-const codeArea = computed(() => proxy.$el.getElementsByClassName('meta')[0])
+const codeArea = computed(() => proxy.$el.querySelector('.strix-block-more'))
 
 // 监听description高度变化以应对响应式栅格
 const descriptionHeight = ref(0)
-let erd = null
+const getMoreBodyElement = () => proxy.$el.querySelector('.strix-block-more-body')
+let erd: elementResizeDetectorMaker.Erd | null = null
 onMounted(() => {
   erd = elementResizeDetectorMaker({ strategy: 'scroll' })
-  if (proxy.$el.getElementsByClassName('description')[0]) {
-    erd.listenTo(proxy.$el.getElementsByClassName('description')[0], (element) => {
+  const moreBodyElement = getMoreBodyElement()
+  if (moreBodyElement) {
+    erd.listenTo(moreBodyElement, (element) => {
       descriptionHeight.value = element.offsetHeight
     })
   }
 })
 onBeforeUnmount(() => {
-  if (proxy.$el.getElementsByClassName('description')[0]) {
-    erd.uninstall(proxy.$el.getElementsByClassName('description')[0])
+  const moreBodyElement = getMoreBodyElement()
+  if (moreBodyElement) {
+    erd?.uninstall(moreBodyElement)
   }
+  removeScrollHandler()
 })
 
 watch([isExpanded, descriptionHeight], (val) => {
-  setCodeAreaHeight()
+  setMoreBodyHeight()
   if (!val) {
     fixedControl.value = false
-    proxy.$refs.control.style.left = '0'
+    if (controlRef.value) {
+      controlRef.value.style.left = '0'
+    }
     removeScrollHandler()
     return
   }
@@ -101,9 +122,6 @@ watch([isExpanded, descriptionHeight], (val) => {
     scrollHandler()
   }, 200)
 })
-onBeforeUnmount(() => {
-  removeScrollHandler
-})
 
 const $slots = useSlots()
 const changeExpand = () => {
@@ -111,25 +129,28 @@ const changeExpand = () => {
     isExpanded.value = !isExpanded.value
   }
 }
-const getCodeAreaHeight = () => {
-  if (proxy.$el.getElementsByClassName('description').length > 0) {
-    return proxy.$el.getElementsByClassName('description')[0].clientHeight + 20
-  }
-  return 0
+const getMoreBodyHeight = () => {
+  const moreBodyElement = getMoreBodyElement()
+  return moreBodyElement ? moreBodyElement.clientHeight + 20 : 0
 }
-const setCodeAreaHeight = () => {
-  codeArea.value.style.height = isExpanded.value ? `${getCodeAreaHeight() + 1}px` : '0'
+const setMoreBodyHeight = () => {
+  if (codeArea.value) {
+    codeArea.value.style.height = isExpanded.value ? `${getMoreBodyHeight() + 1}px` : '0'
+  }
 }
 const scrollHandler = () => {
-  const { top, bottom, left } = proxy.$refs.meta.getBoundingClientRect()
+  const { top, bottom, left } = moreRef.value?.getBoundingClientRect() || {}
   const controlBarHeight = 44
   fixedControl.value =
-    bottom + controlBarHeight > document.documentElement.clientHeight && top <= document.documentElement.clientHeight
-  proxy.$refs.control.style.left = fixedControl.value ? `${left}px` : '0'
+    bottom + controlBarHeight > document.documentElement.clientHeight &&
+    top <= document.documentElement.clientHeight
+  if (controlRef.value) {
+    controlRef.value.style.left = fixedControl.value ? `${left}px` : '0'
+  }
 }
 const removeScrollHandler = () => {
   if (scrollParent) {
-    scrollParent.removeEventListener('scroll', this.scrollHandler)
+    scrollParent.removeEventListener('scroll', scrollHandler)
   }
 }
 </script>
@@ -150,11 +171,11 @@ const removeScrollHandler = () => {
     }
   }
 
-  .source {
+  .strix-block-body {
     padding: 24px;
   }
 
-  .meta {
+  .strix-block-more {
     background-color: var(--card-color);
     border-top: solid 1px var(--border-color);
     overflow: hidden;
@@ -162,7 +183,7 @@ const removeScrollHandler = () => {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .description {
+  .strix-block-more-body {
     padding: 10px;
     box-sizing: border-box;
     font-size: 14px;

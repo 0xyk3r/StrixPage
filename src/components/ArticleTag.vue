@@ -1,7 +1,7 @@
 <template>
   <div v-if="!create" class="article-tag-container">
     <div class="article-tag" :style="tagStyle">
-      <span class="article-tag-text">{{ model.label }}</span>
+      <span class="article-tag-text">{{ model?.label }}</span>
     </div>
   </div>
   <div v-else class="article-tag-container">
@@ -10,16 +10,15 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import type { ArticleTagProps } from '@/@types/components/ArticleTag'
 import { computed } from 'vue'
 
-const $props = defineProps({
-  model: { type: Object, required: true },
-  create: { type: Boolean, default: false }
-})
+const { model, create = false } = defineProps<ArticleTagProps>()
 
 const tagStyle = computed(() => {
-  const colorObj = JSON.parse($props.model.colorParams)
+  if (create || !model) return ''
+  const colorObj = JSON.parse(model.colorParams)
   return `background-image: ${colorObj.colorType}(${colorObj.deg}deg, ${colorObj.startColor} 0%, ${colorObj.endColor} 100%);`
 })
 </script>

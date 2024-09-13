@@ -1,15 +1,15 @@
 <template>
   <div>
     <article-tag
-      v-for="(tag, index) in model"
-      :key="index"
+      v-for="tag in model"
+      :key="tag.key"
       :model="tag"
       class="article-tag-list-item"
-      :class="!selected.includes(tag.value) && mode === 'edit' ? 'article-tag-unselected' : ''"
-      @click="selectTag(tag)"
-      @contextmenu.prevent.stop="handleTabContextmenu($event, tag.value)"
+      :class="!selectedKeys.includes(tag.key) && mode === 'edit' ? 'article-tag-unselected' : ''"
+      @click="clickTag(tag)"
+      @contextmenu.prevent.stop="handleTabContextmenu($event, tag.key)"
     />
-    <article-tag v-if="mode === 'edit'" :model="{}" create @click="$emits('create')" />
+    <article-tag v-if="mode === 'edit'" create @click="createTag" />
 
     <n-dropdown
       v-if="mode === 'edit'"
@@ -24,34 +24,40 @@
     />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import type { ArticleTagModel } from '@/@types/components/ArticleTag'
+import type { ArticleTagListProps } from '@/@types/components/ArticleTagList'
 import ArticleTag from '@/components/ArticleTag.vue'
+import { EventBus } from '@/plugins/event-bus'
 import { Icon } from '@iconify/vue'
-import { useDialog } from 'naive-ui'
-import { getCurrentInstance, h, onMounted, ref } from 'vue'
+import { NDropdown, useDialog } from 'naive-ui'
+import { h, onMounted, ref } from 'vue'
 
-const { proxy } = getCurrentInstance()
+const model = defineModel<ArticleTagModel[]>()
+const { mode = 'show' } = defineProps<ArticleTagListProps>()
+const emit = defineEmits(['create', 'edit', 'select-changed'])
+
 const dialog = useDialog()
 
-defineProps({
-  model: { type: Array, required: true },
-  mode: { type: String, default: 'show' }
-})
-const $emits = defineEmits(['create', 'edit', 'delete', 'select-changed'])
+const selectedKeys = ref<string[]>([])
+const clickTag = (tag: ArticleTagModel) => {
+  selectedKeys.value = selectedKeys.value.includes(tag.key)
+    ? selectedKeys.value.filter((key) => key !== tag.key)
+    : [...selectedKeys.value, tag.key]
+  emit('select-changed', selectedKeys.value)
+}
 
-const selected = ref([])
-
-const selectTag = (tag) => {
-  if (selected.value.includes(tag.value)) {
-    selected.value.splice(selected.value.indexOf(tag.value), 1)
-  } else {
-    selected.value.push(tag.value)
-  }
-  $emits('select-changed', selected.value)
+const createTag = () => {
+  model.value?.push({
+    key: String(model.value?.length + 1),
+    label: '新标签',
+    colorParams:
+      '{"colorType":"linear-gradient","deg":109,"startColor":"#f093fb","endColor":"#f5576c"}'
+  })
 }
 
 const showRightMenu = ref()
-const contextmenuTagValue = ref('')
+const contextmenuTagKey = ref('')
 const contextmenuPosition = ref({ x: 0, y: 0 })
 const contextmenuList = [
   {
@@ -65,16 +71,16 @@ const contextmenuList = [
     icon: () => h(Icon, { icon: 'ion:close-outline' })
   }
 ]
-const handleTabContextmenu = (e, tagValue) => {
+const handleTabContextmenu = (e: MouseEvent, tagKey: string) => {
   showRightMenu.value = true
   contextmenuPosition.value.x = e.x
   contextmenuPosition.value.y = e.y
-  contextmenuTagValue.value = tagValue
+  contextmenuTagKey.value = tagKey
 }
-const handleContextmenuSelect = (key) => {
+const handleContextmenuSelect = (key: string) => {
   showRightMenu.value = false
   if (key === 'edit') {
-    $emits('edit', contextmenuTagValue.value)
+    emit('edit', contextmenuTagKey.value)
   } else if (key === 'delete') {
     dialog.error({
       title: '删除确认',
@@ -82,20 +88,20 @@ const handleContextmenuSelect = (key) => {
       positiveText: '确定删除',
       negativeText: '取消',
       onPositiveClick: () => {
-        $emits('delete', contextmenuTagValue.value)
+        model.value = model.value?.filter((tag) => tag.key !== contextmenuTagKey.value)
       }
     })
   }
 }
 onMounted(() => {
   // 点击任意地方隐藏右键菜单
-  proxy.$EventBus.on('click-container', () => {
+  EventBus.on('click-container', () => {
     showRightMenu.value = false
   })
 })
 
 const reset = () => {
-  selected.value = []
+  selectedKeys.value = []
 }
 defineExpose({ reset })
 </script>

@@ -1,10 +1,17 @@
 <template>
   <div class="wf-node">
     <!-- 渲染条件分支 -->
-    <n-card v-if="$slots.branches" class="branches-card" content-class="branches-card-content" hoverable>
+    <n-card
+      v-if="$slots.branches"
+      class="branches-card"
+      content-class="branches-card-content"
+      hoverable
+    >
       <div style="display: flex; justify-content: center; margin-bottom: 20px">
         <n-button-group>
-          <n-button strong secondary type="primary" @click="addNode('condition')"> 添加条件节点 </n-button>
+          <n-button strong secondary type="primary" @click="addNode('condition')">
+            添加条件节点
+          </n-button>
           <n-button strong secondary type="error" @click="removeNode"> 删除条件分支 </n-button>
         </n-button-group>
       </div>
@@ -17,7 +24,7 @@
     <div class="wf-node-footer">
       <n-popover ref="addNodePopoverRef" trigger="click" content-style="padding: 15px;">
         <template #trigger>
-          <n-button class="wf-node-btn" circle type="info" size="medium" @click="showPopover = !showPopover">
+          <n-button class="wf-node-btn" circle type="info" size="medium">
             <template #icon>
               <n-icon size="24"><Icon icon="ion:add-outline" /></n-icon>
             </template>
@@ -38,16 +45,16 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { NCard } from 'naive-ui'
+import { NButtonGroup, NCard, NFlex, NIcon, NPopover } from 'naive-ui'
 import { ref } from 'vue'
 
 const $emit = defineEmits(['addNode', 'removeNode'])
 
 // 添加条件
 const addNodePopoverRef = ref()
-const addNode = (type) => {
+const addNode = (type: string) => {
   $emit('addNode', type)
   addNodePopoverRef.value.setShow(false)
 }

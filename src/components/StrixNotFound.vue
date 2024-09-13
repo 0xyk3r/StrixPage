@@ -8,8 +8,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useTabsBarStore } from '@/stores/tabs-bar'
+import { NResult } from 'naive-ui'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -17,11 +18,18 @@ const $route = useRoute()
 const $router = useRouter()
 const tabsBarStore = useTabsBarStore()
 
-let timer = null
 const countDown = ref(5)
 
+let timer: number | null = null
+const clearTimer = () => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+
 const closeCurrentTab = () => {
-  if (timer) clearInterval(timer)
+  clearTimer()
   tabsBarStore.delVisitedRoute($route)
   $router.push({ path: '/' })
 }
@@ -30,14 +38,12 @@ onMounted(() => {
   timer = setInterval(() => {
     countDown.value--
     if (countDown.value === 0) {
-      clearInterval(timer)
       closeCurrentTab()
     }
   }, 1000)
 })
 
 onUnmounted(() => {
-  if (timer) clearInterval(timer)
+  clearTimer()
 })
-
 </script>

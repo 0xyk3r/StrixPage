@@ -11,18 +11,28 @@
   </n-config-provider>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useStrixSettingsStore } from '@/stores/strix-settings'
-import { darkTheme, dateZhCN, NConfigProvider, NGlobalStyle, useOsTheme, zhCN } from 'naive-ui'
-import { computed, getCurrentInstance, ref } from 'vue'
+import {
+  darkTheme,
+  dateZhCN,
+  NConfigProvider,
+  NDialogProvider,
+  NGlobalStyle,
+  NLoadingBarProvider,
+  NMessageProvider,
+  useOsTheme,
+  zhCN
+} from 'naive-ui'
+import { computed, ref } from 'vue'
+import { EventBus } from './plugins/event-bus'
 
-const { proxy } = getCurrentInstance()
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
 const themeSetting = ref(globalSettingsStore.theme)
 
 // 监听主题改变事件
-proxy?.$EventBus.on('changeTheme', () => {
+EventBus.on('changeTheme', () => {
   if (themeSetting.value === 'auto') {
     themeSetting.value = osTheme.value === 'dark' ? 'light' : 'dark'
   } else {

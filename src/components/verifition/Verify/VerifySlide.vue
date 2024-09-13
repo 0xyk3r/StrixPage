@@ -1,55 +1,107 @@
 <template>
-  <div style="position: relative;">
-    <div v-if="type === '2'" class="verify-img-out" :style="{ height: (parseInt(setSize.imgHeight) + vSpace) + 'px' }">
-      <div class="verify-img-panel" :style="{
-        width: setSize.imgWidth,
-        height: setSize.imgHeight,
-      }">
-        <img :src="'data:image/png;base64,' + backImgBase" alt="" style="width:100%;height:100%;display:block">
-        <div class="verify-refresh" @click="refresh" v-show="showRefresh"><i class="iconfont icon-refresh"></i>
+  <div style="position: relative">
+    <div
+      v-if="type === '2'"
+      class="verify-img-out"
+      :style="{ height: parseInt(setSize.imgHeight) + vSpace + 'px' }"
+    >
+      <div
+        class="verify-img-panel"
+        :style="{
+          width: setSize.imgWidth,
+          height: setSize.imgHeight
+        }"
+      >
+        <img
+          :src="'data:image/png;base64,' + backImgBase"
+          alt=""
+          style="width: 100%; height: 100%; display: block"
+        />
+        <div class="verify-refresh" @click="refresh" v-show="showRefresh">
+          <i class="iconfont icon-refresh"></i>
         </div>
         <transition name="tips">
-          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">{{ tipWords }}</span>
+          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">{{
+            tipWords
+          }}</span>
         </transition>
       </div>
     </div>
     <!-- 公共部分 -->
-    <div class="verify-bar-area" :style="{
-      width: setSize.imgWidth,
-      height: barSize.height,
-      'line-height': barSize.height
-    }">
+    <div
+      class="verify-bar-area"
+      :style="{
+        width: setSize.imgWidth,
+        height: barSize.height,
+        'line-height': barSize.height
+      }"
+    >
       <span class="verify-msg" v-text="text"></span>
-      <div class="verify-left-bar"
-        :style="{ width: (leftBarWidth !== undefined) ? leftBarWidth : barSize.height, height: barSize.height, 'border-color': leftBarBorderColor, transaction: transitionWidth }">
+      <div
+        class="verify-left-bar"
+        :style="{
+          width: leftBarWidth !== '' ? leftBarWidth : barSize.height,
+          height: barSize.height,
+          'border-color': leftBarBorderColor,
+          transition: transitionWidth
+        }"
+      >
         <span class="verify-msg" v-text="finishText"></span>
-        <div class="verify-move-block" @touchstart="start" @mousedown="start"
-          :style="{ width: barSize.height, height: barSize.height, 'background-color': moveBlockBackgroundColor, left: moveBlockLeft, transition: transitionLeft }">
+        <div
+          class="verify-move-block"
+          @touchstart="start"
+          @mousedown="start"
+          :style="{
+            width: barSize.height,
+            height: barSize.height,
+            'background-color': moveBlockBackgroundColor,
+            left: moveBlockLeft,
+            transition: transitionLeft
+          }"
+        >
           <i :class="['verify-icon iconfont', iconClass]" :style="{ color: iconColor }"></i>
-          <div v-if="type === '2'" class="verify-sub-block" :style="{
-            'width': Math.floor(parseInt(setSize.imgWidth) * 47 / 310) + 'px',
-            'height': setSize.imgHeight,
-            'top': '-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
-            'background-size': setSize.imgWidth + ' ' + setSize.imgHeight,
-          }">
-            <img :src="'data:image/png;base64,' + blockBackImgBase" alt=""
-              style="width:100%;height:100%;display:block;-webkit-user-drag:none;">
+          <div
+            v-if="type === '2'"
+            class="verify-sub-block"
+            :style="{
+              width: Math.floor((parseInt(setSize.imgWidth) * 47) / 310) + 'px',
+              height: setSize.imgHeight,
+              top: '-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
+              'background-size': setSize.imgWidth + ' ' + setSize.imgHeight
+            }"
+          >
+            <img
+              :src="'data:image/png;base64,' + blockBackImgBase"
+              alt=""
+              style="width: 100%; height: 100%; display: block; -webkit-user-drag: none"
+            />
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-<script>
-import { computed, getCurrentInstance, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue';
-import { aesEncrypt } from "./../utils/ase";
-import { resetSize } from './../utils/util';
+<script lang="ts">
+import { http } from '@/plugins/axios'
+import {
+  computed,
+  getCurrentInstance,
+  nextTick,
+  onMounted,
+  reactive,
+  ref,
+  toRefs,
+  watch,
+  type ComponentInternalInstance
+} from 'vue'
+import { aesEncrypt } from '../utils/ase'
+import { resetSize } from './../utils/util'
 //  "captchaType":"blockPuzzle",
 export default {
   name: 'VerifySlide',
   props: {
     captchaType: {
-      type: String,
+      type: String
     },
     type: {
       type: String,
@@ -98,84 +150,84 @@ export default {
   },
   setup(props) {
     const { mode, captchaType, type, blockSize, explain } = toRefs(props)
-    const { proxy } = getCurrentInstance();
-    let secretKey = ref(''),           //后端返回的ase加密秘钥
-      passFlag = ref(''),         //是否通过的标识
-      backImgBase = ref(''),      //验证码背景图片
+    const { proxy } = getCurrentInstance() as ComponentInternalInstance
+    let secretKey = ref(''), //后端返回的ase加密秘钥
+      passFlag = ref(false), //是否通过的标识
+      backImgBase = ref(''), //验证码背景图片
       blockBackImgBase = ref(''), //验证滑块的背景图片
-      backToken = ref(''),        //后端返回的唯一token值
-      startMoveTime = ref(''),    //移动开始的时间
-      endMovetime = ref(''),      //移动结束的时间
-      tipsBackColor = ref(''),    //提示词的背景颜色
+      backToken = ref(''), //后端返回的唯一token值
+      startMoveTime = ref(0), //移动开始的时间
+      endMovetime = ref(0), //移动结束的时间
+      tipsBackColor = ref(''), //提示词的背景颜色
       tipWords = ref(''),
       text = ref(''),
       finishText = ref(''),
       setSize = reactive({
-        imgHeight: 0,
-        imgWidth: 0,
-        barHeight: 0,
-        barWidth: 0
+        imgHeight: '0',
+        imgWidth: '0',
+        barHeight: '0',
+        barWidth: '0'
       }),
       top = ref(0),
       left = ref(0),
-      moveBlockLeft = ref(undefined),
-      leftBarWidth = ref(undefined),
+      moveBlockLeft = ref(''),
+      leftBarWidth = ref(''),
       // 移动中样式
-      moveBlockBackgroundColor = ref(undefined),
+      moveBlockBackgroundColor = ref(''),
       leftBarBorderColor = ref('#ddd'),
-      iconColor = ref(undefined),
+      iconColor = ref(''),
       iconClass = ref('icon-right'),
-      status = ref(false),	    //鼠标状态
-      isEnd = ref(false),		//是够验证完成
+      status = ref(false), //鼠标状态
+      isEnd = ref(false), //是够验证完成
       showRefresh = ref(true),
       transitionLeft = ref(''),
       transitionWidth = ref(''),
       startLeft = ref(0)
 
     const barArea = computed(() => {
-      return proxy.$el.querySelector('.verify-bar-area')
+      return proxy?.$el.querySelector('.verify-bar-area')
     })
     function init() {
       text.value = explain.value
-      getPictrue();
+      getPictrue()
       nextTick(() => {
         let { imgHeight, imgWidth, barHeight, barWidth } = resetSize(proxy)
         setSize.imgHeight = imgHeight
         setSize.imgWidth = imgWidth
         setSize.barHeight = barHeight
         setSize.barWidth = barWidth
-        proxy.$parent.$emit('ready', proxy)
+        proxy?.$parent?.$emit('ready', proxy)
       })
 
-      window.removeEventListener("touchmove", function (e) {
-        move(e);
-      });
-      window.removeEventListener("mousemove", function (e) {
-        move(e);
-      });
+      window.removeEventListener('touchmove', function (e) {
+        move(e)
+      })
+      window.removeEventListener('mousemove', function (e) {
+        move(e)
+      })
 
       //鼠标松开
-      window.removeEventListener("touchend", function () {
-        end();
-      });
-      window.removeEventListener("mouseup", function () {
-        end();
-      });
+      window.removeEventListener('touchend', function () {
+        end()
+      })
+      window.removeEventListener('mouseup', function () {
+        end()
+      })
 
-      window.addEventListener("touchmove", function (e) {
-        move(e);
-      });
-      window.addEventListener("mousemove", function (e) {
-        move(e);
-      });
+      window.addEventListener('touchmove', function (e) {
+        move(e)
+      })
+      window.addEventListener('mousemove', function (e) {
+        move(e)
+      })
 
       //鼠标松开
-      window.addEventListener("touchend", function () {
-        end();
-      });
-      window.addEventListener("mouseup", function () {
-        end();
-      });
+      window.addEventListener('touchend', function () {
+        end()
+      })
+      window.addEventListener('mouseup', function () {
+        end()
+      })
     }
     watch(type, () => {
       init()
@@ -183,107 +235,122 @@ export default {
     onMounted(() => {
       // 禁止拖拽
       init()
-      proxy.$el.onselectstart = function () {
-        return false
+      if (proxy) {
+        proxy.$el.onselectstart = function () {
+          return false
+        }
       }
     })
     // 鼠标按下
-    function start(e) {
+    function start(e: any) {
       e = e || window.event
-      let x;
-      if (!e.touches) {  //兼容PC端 
-        x = e.clientX;
-      } else {           //兼容移动端
-        x = e.touches[0].pageX;
+      let x
+      if (!e.touches) {
+        //兼容PC端
+        x = e.clientX
+      } else {
+        //兼容移动端
+        x = e.touches[0].pageX
       }
-      startLeft.value = Math.floor(x - barArea.value.getBoundingClientRect().left);
-      startMoveTime.value = +new Date();    //开始滑动的时间
+      startLeft.value = Math.floor(x - barArea.value.getBoundingClientRect().left)
+      startMoveTime.value = +new Date() //开始滑动的时间
       if (isEnd.value == false) {
         text.value = ''
         moveBlockBackgroundColor.value = '#337ab7'
         leftBarBorderColor.value = '#337AB7'
         iconColor.value = '#fff'
-        e.stopPropagation();
-        status.value = true;
+        e.stopPropagation()
+        status.value = true
       }
     }
     // 鼠标移动
-    function move(e) {
+    function move(e: any) {
       e = e || window.event
       if (status.value && isEnd.value == false) {
-        let x;
-        if (!e.touches) {  // 兼容PC端 
-          x = e.clientX;
-        } else {           // 兼容移动端
-          x = e.touches[0].pageX;
+        let x
+        if (!e.touches) {
+          // 兼容PC端
+          x = e.clientX
+        } else {
+          // 兼容移动端
+          x = e.touches[0].pageX
         }
-        const bar_area_left = barArea.value.getBoundingClientRect().left;
+        const bar_area_left = barArea.value.getBoundingClientRect().left
         let move_block_left = x - bar_area_left // 小方块相对于父元素的left值
-        if (move_block_left >= barArea.value.offsetWidth - parseInt(parseInt(blockSize.value.width) / 2) - 2) {
-          move_block_left = barArea.value.offsetWidth - parseInt(parseInt(blockSize.value.width) / 2) - 2;
+        if (move_block_left >= barArea.value.offsetWidth - (blockSize.value.width / 2 - 2)) {
+          move_block_left = barArea.value.offsetWidth - (blockSize.value.width / 2 - 2)
         }
         if (move_block_left <= 0) {
-          move_block_left = parseInt(parseInt(blockSize.value.width) / 2);
+          move_block_left = blockSize.value.width / 2
         }
         // 拖动后小方块的left值
-        moveBlockLeft.value = (move_block_left - startLeft.value) + "px"
-        leftBarWidth.value = (move_block_left - startLeft.value) + "px"
+        moveBlockLeft.value = move_block_left - startLeft.value + 'px'
+        leftBarWidth.value = move_block_left - startLeft.value + 'px'
       }
     }
 
     // 鼠标松开
     function end() {
-      endMovetime.value = +new Date();
+      endMovetime.value = +new Date()
       // 判断是否重合
       if (status.value && isEnd.value == false) {
-        let moveLeftDistance = parseInt((moveBlockLeft.value || '').replace('px', ''));
-        moveLeftDistance = moveLeftDistance * 310 / parseInt(setSize.imgWidth)
+        let moveLeftDistance = parseInt((moveBlockLeft.value || '').replace('px', ''))
+        moveLeftDistance = (moveLeftDistance * 310) / parseInt(setSize.imgWidth)
         let data = {
           captchaType: captchaType.value,
-          "pointJson": secretKey.value ? aesEncrypt(JSON.stringify({ x: moveLeftDistance, y: 5.0 }), secretKey.value) : JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
-          "token": backToken.value
+          pointJson: secretKey.value
+            ? aesEncrypt(JSON.stringify({ x: moveLeftDistance, y: 5.0 }), secretKey.value)
+            : JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
+          token: backToken.value
         }
 
-        proxy.$http.post('captcha/check', data, { operate: '验证码校验', notify: false }).then(({ data: res }) => {
-          if (res.data.repCode == "0000") {
-            moveBlockBackgroundColor.value = '#5cb85c'
-            leftBarBorderColor.value = '#5cb85c'
-            iconColor.value = '#fff'
-            iconClass.value = 'icon-check'
-            showRefresh.value = false
-            isEnd.value = true;
-            if (mode.value == 'pop') {
-              //   setTimeout(() => {
-              //     proxy.$parent.clickShow = false;
-              //     refresh();
-              //   }, 1500)
+        http
+          .post('captcha/check', data, { meta: { operate: '验证码校验', notify: false } })
+          .then(({ data: res }) => {
+            if (res.data.repCode == '0000') {
+              moveBlockBackgroundColor.value = '#5cb85c'
+              leftBarBorderColor.value = '#5cb85c'
+              iconColor.value = '#fff'
+              iconClass.value = 'icon-check'
+              showRefresh.value = false
+              isEnd.value = true
+              if (mode.value == 'pop') {
+                //   setTimeout(() => {
+                //     proxy.$parent.clickShow = false;
+                //     refresh();
+                //   }, 1500)
+              }
+              passFlag.value = true
+              tipWords.value = `${((endMovetime.value - startMoveTime.value) / 1000).toFixed(2)}s 验证成功`
+              const captchaVerification = secretKey.value
+                ? aesEncrypt(
+                    backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 }),
+                    secretKey.value
+                  )
+                : backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 })
+              // setTimeout(() => {
+              tipWords.value = ''
+              //proxy?.$parent?.closeBox()
+              proxy?.$parent?.$emit('success', { captchaVerification })
+              // }, 100)
+            } else {
+              moveBlockBackgroundColor.value = '#d9534f'
+              leftBarBorderColor.value = '#d9534f'
+              iconColor.value = '#fff'
+              iconClass.value = 'icon-close'
+              passFlag.value = false
+              setTimeout(function () {
+                refresh()
+              }, 1000)
+              proxy?.$parent?.$emit('error', proxy)
+              tipWords.value = '验证失败'
+              setTimeout(() => {
+                tipWords.value = ''
+              }, 1000)
             }
-            passFlag.value = true
-            tipWords.value = `${((endMovetime.value - startMoveTime.value) / 1000).toFixed(2)}s 验证成功`
-            const captchaVerification = secretKey.value ? aesEncrypt(backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 }), secretKey.value) : backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 })
-            // setTimeout(() => {
-            tipWords.value = ""
-            proxy.$parent.closeBox();
-            proxy.$parent.$emit('success', { captchaVerification })
-            // }, 100)
-          } else {
-            moveBlockBackgroundColor.value = '#d9534f'
-            leftBarBorderColor.value = '#d9534f'
-            iconColor.value = '#fff'
-            iconClass.value = 'icon-close'
-            passFlag.value = false
-            setTimeout(function () {
-              refresh();
-            }, 1000);
-            proxy.$parent.$emit('error', proxy)
-            tipWords.value = "验证失败"
-            setTimeout(() => {
-              tipWords.value = ""
-            }, 1000)
-          }
-        })
+          })
 
-        status.value = false;
+        status.value = false
       }
     }
 
@@ -292,9 +359,9 @@ export default {
       finishText.value = ''
 
       transitionLeft.value = 'left .3s'
-      moveBlockLeft.value = 0
+      moveBlockLeft.value = '0'
 
-      leftBarWidth.value = undefined
+      leftBarWidth.value = ''
       transitionWidth.value = 'width .3s'
 
       leftBarBorderColor.value = '#ddd'
@@ -317,30 +384,38 @@ export default {
         captchaType: captchaType.value
       }
 
-      proxy.$http.post('captcha/get', data, { operate: '验证码获取', notify: false }).then(({ data: res }) => {
-        if (res.data.repCode == "0000") {
-          backImgBase.value = res.data.repData.originalImageBase64
-          blockBackImgBase.value = res.data.repData.jigsawImageBase64
-          backToken.value = res.data.repData.token
-          secretKey.value = res.data.repData.secretKey
-        } else {
-          if (res.data.repCode == '6113') { tipWords.value = '行为验证系统未初始化，请稍后重试' }
-          else if (res.data.repCode == '6201') { tipWords.value = '请求次数过多，请稍后重试' }
-          else if (res.data.repCode == '6202') { tipWords.value = '错误次数过多，请稍后重试' }
-          else if (res.data.repCode == '6204') { tipWords.value = '验证次数过多，请稍后重试' }
-          else { tipWords.value = res.data.repMsg }
-        }
-      })
+      http
+        .post('captcha/get', data, { meta: { operate: '验证码获取', notify: false } })
+        .then(({ data: res }) => {
+          if (res.data.repCode == '0000') {
+            backImgBase.value = res.data.repData.originalImageBase64
+            blockBackImgBase.value = res.data.repData.jigsawImageBase64
+            backToken.value = res.data.repData.token
+            secretKey.value = res.data.repData.secretKey
+          } else {
+            if (res.data.repCode == '6113') {
+              tipWords.value = '行为验证系统未初始化，请稍后重试'
+            } else if (res.data.repCode == '6201') {
+              tipWords.value = '请求次数过多，请稍后重试'
+            } else if (res.data.repCode == '6202') {
+              tipWords.value = '错误次数过多，请稍后重试'
+            } else if (res.data.repCode == '6204') {
+              tipWords.value = '验证次数过多，请稍后重试'
+            } else {
+              tipWords.value = res.data.repMsg
+            }
+          }
+        })
     }
     return {
-      secretKey,           //后端返回的ase加密秘钥
-      passFlag,         //是否通过的标识
-      backImgBase,      //验证码背景图片
+      secretKey, //后端返回的ase加密秘钥
+      passFlag, //是否通过的标识
+      backImgBase, //验证码背景图片
       blockBackImgBase, //验证滑块的背景图片
-      backToken,        //后端返回的唯一token值
-      startMoveTime,    //移动开始的时间
-      endMovetime,      //移动结束的时间
-      tipsBackColor,    //提示词的背景颜色
+      backToken, //后端返回的唯一token值
+      startMoveTime, //移动开始的时间
+      endMovetime, //移动结束的时间
+      tipsBackColor, //提示词的背景颜色
       tipWords,
       text,
       finishText,
@@ -354,8 +429,8 @@ export default {
       leftBarBorderColor,
       iconColor,
       iconClass,
-      status,	    //鼠标状态
-      isEnd,		//是够验证完成
+      status, //鼠标状态
+      isEnd, //是够验证完成
       showRefresh,
       transitionLeft,
       transitionWidth,

@@ -2,17 +2,17 @@
   <div class="wf-node">
     <!-- 节点渲染 (不含条件分支 & 空节点) -->
     <n-card
-      v-show="$props.node.type !== 'empty'"
+      v-show="node.type !== 'empty'"
       class="wf-node-main"
-      :header-class="'node-header node-' + $props.node.type"
+      :header-class="'node-header node-' + node.type"
       content-class="node-content"
       hoverable
       @click="openDrawer"
     >
       <template #header>
         <div class="node-header-content">
-          <n-icon size="12"><Icon :icon="$props.icon" /></n-icon>
-          <div>{{ getTypeName($props.node.type) }} - {{ $props.node.name }}</div>
+          <n-icon size="12"><Icon :icon="icon" /></n-icon>
+          <div>{{ getTypeName(node.type) }} - {{ node.name }}</div>
         </div>
       </template>
       <template #header-extra>
@@ -25,14 +25,14 @@
       <!-- 节点body -->
       <div class="node-body-content">
         <div>{{ showContent }}</div>
-        <div v-if="$props.configable"><Icon icon="ion:chevron-forward-outline" /></div>
+        <div v-if="configable"><Icon icon="ion:chevron-forward-outline" /></div>
       </div>
     </n-card>
     <!-- 渲染节点Footer -->
-    <div v-show="$props.node.type !== 'conditions'" class="wf-node-footer">
+    <div v-show="node.type !== 'conditions'" class="wf-node-footer">
       <n-popover ref="addNodePopoverRef" trigger="click" content-style="padding: 15px;">
         <template #trigger>
-          <n-button class="wf-node-btn" circle type="info" size="medium" @click="showPopover = !showPopover">
+          <n-button class="wf-node-btn" circle type="info" size="medium">
             <template #icon>
               <n-icon size="24"><Icon icon="ion:add-outline" /></n-icon>
             </template>
@@ -54,40 +54,35 @@
 
     <!-- 配置项抽屉 -->
     <n-drawer v-model:show="showDrawer" :width="512">
-      <n-drawer-content :title="getTypeName($props.node.type)" :native-scrollbar="false" closable>
-        <component :is="propsComponent" v-model="$props.node.props" />
+      <n-drawer-content :title="getTypeName(node.type)" :native-scrollbar="false" closable>
+        <component :is="propsComponent" v-model="nodeProps" />
       </n-drawer-content>
     </n-drawer>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { getOperationName, getTypeName } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
-import { NCard } from 'naive-ui'
+import { NButtonGroup, NCard, NDrawer, NDrawerContent, NIcon, NPopover } from 'naive-ui'
 import { computed, ref } from 'vue'
 import ApprovalProps from './props/ApprovalProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'
 import TaskProps from './props/TaskProps.vue'
 
-const $props = defineProps({
-  node: {
-    type: Object,
-    required: true
-  },
-  icon: {
-    type: String,
-    default: 'ion:help-circle'
-  },
-  removable: {
-    type: Boolean,
-    default: true
-  },
-  configable: {
-    type: Boolean,
-    default: false
-  }
-})
+const {
+  node,
+  icon = 'ion:help-circle',
+  removable = true,
+  configable = false
+} = defineProps<{
+  node: any
+  icon: string
+  removable: boolean
+  configable: boolean
+}>()
+
+const nodeProps = computed(() => node.props || {})
 
 const $emit = defineEmits(['addNode', 'removeNode'])
 
@@ -95,7 +90,7 @@ const addNodePopoverRef = ref()
 const showDrawer = ref(false)
 
 // 添加节点
-const addNode = (type) => {
+const addNode = (type: string) => {
   $emit('addNode', type)
   addNodePopoverRef.value.setShow(false)
 }
@@ -107,7 +102,7 @@ const removeNode = () => {
 
 // 打开抽屉
 const openDrawer = () => {
-  if (!$props.configable) {
+  if (!configable) {
     return
   }
   showDrawer.value = true
@@ -115,15 +110,15 @@ const openDrawer = () => {
 
 // 节点内容计算函数
 const showContent = computed(() => {
-  const nodeType = $props.node.type
+  const nodeType = node.type
   if (nodeType === 'root') {
     return '发起人发起该流程'
   } else if (nodeType === 'approval' || nodeType === 'task' || nodeType === 'cc') {
     const operationName = getOperationName(nodeType)
-    const { assign: { type: assignType, id: assignIds } = {} } = $props.node.props || {}
+    const { assign: { type: assignType, id: assignIds } = { type: '', id: [] } } = node.props || {}
     if (assignType === 'USER' || assignType === 'ROLE') {
       if (assignIds && assignIds.length > 0) {
-        return '由 ' + assignIds.map((item) => item.name) + ' ' + operationName
+        return '由 ' + assignIds.map((item: any) => item.name) + ' ' + operationName
       } else {
         return `未指定${operationName}人`
       }
@@ -142,7 +137,7 @@ const showContent = computed(() => {
 
 // 配置项组件计算函数
 const propsComponent = computed(() => {
-  switch ($props.node.type) {
+  switch (node.type) {
     case 'approval':
       return ApprovalProps
     case 'task':

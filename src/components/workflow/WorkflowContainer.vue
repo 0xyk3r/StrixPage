@@ -28,7 +28,13 @@
       </n-card>
     </div>
 
-    <div class="canvas-container" @wheel="onWheel" @mousedown="startDrag" @mouseup="endDrag" @mousemove="onDrag">
+    <div
+      class="canvas-container"
+      @wheel="onWheel"
+      @mousedown="startDrag"
+      @mouseup="endDrag"
+      @mousemove="onDrag"
+    >
       <div class="canvas" :style="canvasStyle">
         <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
           <WorkflowBody />
@@ -37,13 +43,13 @@
     </div>
   </div>
 </template>
-<script setup>
-import { renderWorkflow } from '@/components/workflow/util/workflow.js'
+<script setup lang="ts">
+import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
+import { http } from '@/plugins/axios'
 import { Icon } from '@iconify/vue'
-import { NEl } from 'naive-ui'
-import { computed, defineComponent, getCurrentInstance, ref, watch } from 'vue'
+import { NButtonGroup, NCard, NEl, NIcon, NPopconfirm } from 'naive-ui'
+import { computed, defineComponent, ref, watch } from 'vue'
 
-const { proxy } = getCurrentInstance()
 const $props = defineProps({
   workflowId: {
     type: String,
@@ -66,14 +72,14 @@ const startMousePosition = ref({ x: 0, y: 0 })
 const canvasStyle = computed(() => ({
   transform: `translate(${canvasPosition.value.x}px, ${canvasPosition.value.y}px)`
 }))
-const startDrag = (event) => {
+const startDrag = (event: MouseEvent) => {
   isDragging.value = true
   startMousePosition.value = { x: event.clientX, y: event.clientY }
 }
 const endDrag = () => {
   isDragging.value = false
 }
-const onDrag = (event) => {
+const onDrag = (event: MouseEvent) => {
   if (isDragging.value) {
     const deltaX = event.clientX - startMousePosition.value.x
     const deltaY = event.clientY - startMousePosition.value.y
@@ -83,7 +89,7 @@ const onDrag = (event) => {
   }
 }
 // 根据滚轮的方向来调整缩放比例
-const onWheel = (event) => {
+const onWheel = (event: WheelEvent) => {
   event.preventDefault()
   if (event.deltaY < 0) {
     containerZoomIn()
@@ -105,7 +111,7 @@ const containerZoomOut = () => {
   scale.value -= 0.1
 }
 
-const workflowData = ref({})
+const workflowData = ref<WorkflowNode[]>([])
 watch(
   () => $props.dataJson,
   (val) => {
@@ -124,16 +130,10 @@ const WorkflowBody = defineComponent(() => {
 
 // 保存数据
 const saveData = () => {
-  console.log($props.dataId, workflowData.value)
-
-  proxy.$http.post(
+  http.post(
     `system/workflow/update/${$props.workflowId}/config`,
-    {
-      content: JSON.stringify(workflowData.value)
-    },
-    {
-      operate: '保存流程数据'
-    }
+    { content: JSON.stringify(workflowData.value) },
+    { meta: { operate: '保存流程数据' } }
   )
 }
 </script>

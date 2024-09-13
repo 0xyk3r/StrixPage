@@ -17,7 +17,12 @@
       />
     </n-tabs>
 
-    <n-dropdown trigger="hover" placement="bottom-start" :options="contextmenuList" @select="handleContextmenuSelect">
+    <n-dropdown
+      trigger="hover"
+      placement="bottom-start"
+      :options="contextmenuList"
+      @select="handleContextmenuSelect"
+    >
       <Icon icon="ion:grid" class="tabs-common-handler" :width="20" />
     </n-dropdown>
 
@@ -35,71 +40,72 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { EventBus } from '@/plugins/event-bus'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
-import { computed, getCurrentInstance, h, nextTick, onMounted, ref, watch } from 'vue'
+import { NDropdown, NTab, NTabs } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { h, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const { proxy } = getCurrentInstance()
 const $route = useRoute()
 const $router = useRouter()
 const tabsBarStore = useTabsBarStore()
 const quickMenuStore = useQuickMenuStore()
 
-const visitedRoutes = computed(() => tabsBarStore.visitedRoutes)
-// 监听路由变化
+const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
 
 // tabs的右击相关逻辑
 const showRightMenu = ref()
-let contextmenuRoutesIndex = ''
+let contextmenuRoutesIndex: number | null = null
 const contextmenuPosition = ref({ x: 0, y: 0 })
 const contextmenuList = [
   { key: 'reloadRouter', label: '刷新', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
-  { key: 'reloadAllRouter', label: '刷新全部', icon: () => h(Icon, { icon: 'ion:reload-circle-outline' }) },
+  {
+    key: 'reloadAllRouter',
+    label: '刷新全部',
+    icon: () => h(Icon, { icon: 'ion:reload-circle-outline' })
+  },
   { key: 'closeOtherTabs', label: '关闭其他', icon: () => h(Icon, { icon: 'ion:close-outline' }) },
-  { key: 'closeLeftTabs', label: '关闭左侧', icon: () => h(Icon, { icon: 'ion:arrow-undo-outline' }) },
-  { key: 'closeRightTabs', label: '关闭右侧', icon: () => h(Icon, { icon: 'ion:arrow-redo-outline' }) },
+  {
+    key: 'closeLeftTabs',
+    label: '关闭左侧',
+    icon: () => h(Icon, { icon: 'ion:arrow-undo-outline' })
+  },
+  {
+    key: 'closeRightTabs',
+    label: '关闭右侧',
+    icon: () => h(Icon, { icon: 'ion:arrow-redo-outline' })
+  },
   { key: 'closeAllTabs', label: '关闭全部', icon: () => h(Icon, { icon: 'ion:power-outline' }) }
 ]
-const handleTabContextmenu = (e, index) => {
+const handleTabContextmenu = (e: MouseEvent, index: number): void => {
   showRightMenu.value = true
   contextmenuRoutesIndex = index
-  contextmenuPosition.value.x = e.x
-  contextmenuPosition.value.y = e.y
+  contextmenuPosition.value = { x: e.x, y: e.y }
 }
-const handleContextmenuSelect = (key) => {
+const handleContextmenuSelect = (key: string) => {
   showRightMenu.value = false
-  switch (key) {
-    case 'reloadRouter':
-      reloadRouter()
-      break
-    case 'reloadAllRouter':
-      reloadAllRouter()
-      break
-    case 'closeOtherTabs':
-      closeOtherTabs()
-      break
-    case 'closeLeftTabs':
-      closeLeftTabs()
-      break
-    case 'closeRightTabs':
-      closeRightTabs()
-      break
-    case 'closeAllTabs':
-      closeAllTabs()
-      break
+  const actions: Record<string, () => void> = {
+    reloadRouter,
+    reloadAllRouter,
+    closeOtherTabs,
+    closeLeftTabs,
+    closeRightTabs,
+    closeAllTabs
   }
+  actions[key]?.()
   // 延迟50ms清除选择的tab记录
   setTimeout(() => {
-    contextmenuRoutesIndex = ''
+    contextmenuRoutesIndex = null
   }, 50)
 }
 onMounted(() => {
   // 点击任意地方隐藏右键菜单
-  proxy.$EventBus.on('click-container', () => {
+  EventBus.on('click-container', () => {
     showRightMenu.value = false
   })
 })
@@ -108,7 +114,7 @@ onMounted(() => {
 const initTabs = () => {
   // 添加 fixed 标签页
   const routes = $router.getRoutes()
-  routes.forEach((r) => {
+  routes.forEach((r: any) => {
     if (r.meta.fixed) {
       tabsBarStore.addVisitedRoute(r)
     }
@@ -120,46 +126,30 @@ const initTabs = () => {
   }
 }
 
-const handleTabClick = (tab) => {
-  const route = visitedRoutes.value.filter((item) => {
-    if (item.meta.title === tab) {
-      return item
-    }
-  })[0]
-  if ($router.currentRoute.value.fullPath !== route.path) {
-    $router.push({
-      path: route.path,
-      query: route.query,
-      fullPath: route.fullPath
-    })
-  } else {
-    return false
+const handleTabClick = (tab: string) => {
+  const route = visitedRoutes.value.find((item: any) => item.meta.title === tab)
+  if (route && $router.currentRoute.value.fullPath !== route.path) {
+    $router.push({ path: route.path, query: route.query })
   }
 }
-const handleTabRemove = async (tab) => {
-  let view
-  let currentIndex = 0
-  for (let i = 0; i < visitedRoutes.value.length; i++) {
-    const item = visitedRoutes.value[i]
-    if (tab === item.meta.title) {
-      view = item
-      currentIndex = i
-      break
-    }
-  }
-  if (view) {
+const handleTabRemove = async (tab: any) => {
+  const index = visitedRoutes.value.findIndex((item: any) => item.meta.title === tab)
+  if (index !== -1) {
+    const view = visitedRoutes.value[index]
     tabsBarStore.delVisitedRoute(view)
     if (isActive(view)) {
-      await $router.push(visitedRoutes.value[currentIndex - 1])
+      await $router.push(visitedRoutes.value[index - 1])
     }
   }
 }
 
 const reloadRouter = async () => {
-  const oldIndex = contextmenuRoutesIndex || visitedRoutes.value.findIndex((r) => tabActive.value === r.meta.title)
-  const view = visitedRoutes.value[oldIndex]
-  const currentPath = view.fullPath
+  const oldIndex =
+    contextmenuRoutesIndex ??
+    visitedRoutes.value.findIndex((r: any) => tabActive.value === r.meta.title)
+  const view: any = visitedRoutes.value[oldIndex]
   if (view) {
+    const currentPath = view.fullPath
     view.oldIndex = view.meta.fixed ? view.meta.fixedIndex : oldIndex
     tabsBarStore.addRefreshRoutes(view)
     tabsBarStore.delVisitedRoute(view)
@@ -168,63 +158,57 @@ const reloadRouter = async () => {
   }
 }
 const reloadAllRouter = () => {
-  proxy.$EventBus.emit('reload-router-view')
+  EventBus.emit('reload-router-view')
 }
 const closeOtherTabs = () => {
   const view = getContextmenuTagView()
   if (view) {
     tabsBarStore.delOthersVisitedRoute(view)
     nextTick(() => {
-      // 如果激活的tab被删除了，需要跳转到被操作的tab
-      if (visitedRoutes.value.findIndex((r) => tabActive.value === r.meta.title) === -1) {
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
         $router.push('/redirect' + view.fullPath)
       }
     })
   }
 }
+
 const closeLeftTabs = () => {
   const view = getContextmenuTagView()
   if (view) {
     tabsBarStore.delLeftVisitedRoute(view)
     nextTick(() => {
-      // 如果激活的tab被删除了，需要跳转到被操作的tab
-      if (visitedRoutes.value.findIndex((r) => tabActive.value === r.meta.title) === -1) {
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
         $router.push('/redirect' + view.fullPath)
       }
     })
   }
 }
+
 const closeRightTabs = () => {
   const view = getContextmenuTagView()
   if (view) {
     tabsBarStore.delRightVisitedRoute(view)
     nextTick(() => {
-      // 如果激活的tab被删除了，需要跳转到被操作的tab
-      if (visitedRoutes.value.findIndex((r) => tabActive.value === r.meta.title) === -1) {
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
         $router.push('/redirect' + view.fullPath)
       }
     })
   }
 }
+
 const closeAllTabs = async () => {
   tabsBarStore.delAllVisitedRoutes()
   const defaultView = visitedRoutes.value[0]
-  if (defaultView) {
-    await $router.push(defaultView)
-  } else {
-    await $router.push('/')
-  }
+  await $router.push(defaultView ?? '/')
 }
 
 // 一些通用处理函数
-const isActive = (route) => {
-  return route.path === $route.path
-}
-const isAffix = (tag) => {
-  return tag.meta && tag.meta.fixed
-}
+const isActive = (route: any) => route.path === $route.path
+const isAffix = (tag: any) => tag.meta && tag.meta.fixed
 const getContextmenuTagView = () => {
-  const index = contextmenuRoutesIndex || visitedRoutes.value.findIndex((r) => tabActive.value === r.meta.title)
+  const index =
+    contextmenuRoutesIndex ??
+    visitedRoutes.value.findIndex((r: any) => tabActive.value === r.meta.title)
   return visitedRoutes.value[index]
 }
 
@@ -233,17 +217,11 @@ watch(
   () => {
     initTabs()
     nextTick(() => {
-      tabActive.value = ''
-      visitedRoutes.value.forEach((item) => {
-        if (item.path === $route.path) {
-          tabActive.value = item.meta.title
-        }
-      })
+      tabActive.value =
+        visitedRoutes.value.find((item: any) => item.path === $route.path)?.meta.title || ''
     })
   },
-  {
-    immediate: true
-  }
+  { immediate: true }
 )
 </script>
 

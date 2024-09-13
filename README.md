@@ -12,11 +12,11 @@ pnpm install
 ### 以开发模式运行
 
 ```sh
-pnpm run dev
+pnpm dev
 ```
 
 ### 正式构建
 
 ```sh
-pnpm run build
+pnpm build
 ```

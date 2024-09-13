@@ -2,20 +2,19 @@
   <div>waiting to redirect.</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const $route = useRoute()
 const $router = useRouter()
 
-const replaceAll = (str, substr, replacement) => {
-  if (str == null) return str
-  return str.replace(new RegExp(substr, 'gm'), replacement)
+const replaceAll = (str: string, substr: string, replacement: string) => {
+  return str?.replace(new RegExp(substr, 'gm'), replacement) ?? str
 }
 
 onMounted(() => {
-  const { path } = $route
-  $router.replace(`${replaceAll(path, '/redirect', '')}`)
+  const newPath = replaceAll($route.path, '/redirect', '')
+  $router.replace(newPath)
 })
 </script>

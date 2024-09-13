@@ -3,8 +3,10 @@
     {{ beforeLabel }}{{ tag.label }}{{ afterLabel }}
   </n-tag>
 </template>
-<script setup>
-import { useDict } from '@/utils/strix-dict-util.js'
+<script setup lang="ts">
+import type { NTagType } from '@/@types/naive-ui'
+import { useDict } from '@/utils/strix-dict-util'
+import { NTag } from 'naive-ui'
 import { computed } from 'vue'
 
 const $props = defineProps({
@@ -15,21 +17,19 @@ const $props = defineProps({
   notFoundLabel: { type: String, default: '未知' }
 })
 
-const dict = useDict(`${$props.dictName}`)
+const dict = useDict($props.dictName)
 
-const loading = computed(() => {
-  return !dict || dict.value.length == 0
-})
+const loading = computed(() => !dict || dict.value.length === 0)
 
 const tag = computed(() => {
   if (!dict || dict.value.length === 0) {
-    return { label: '加载中...', type: '' }
+    return { label: '加载中...', type: 'default' as NTagType }
   }
 
-  const { label, style } = dict.value.find((item) => item.value === $props.value) || {}
+  const foundItem: any = dict.value.find((item: any) => item.value === $props.value)
   return {
-    label: label || $props.notFoundLabel,
-    type: style || ''
+    label: foundItem?.label || $props.notFoundLabel,
+    type: (foundItem?.style || 'default') as NTagType
   }
 })
 </script>

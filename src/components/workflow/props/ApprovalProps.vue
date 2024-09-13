@@ -9,11 +9,21 @@
         </n-space>
       </n-radio-group>
     </n-form-item>
-    <n-form-item v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'" label="审批对象选择">
-      <n-button v-if="cacheProps.assign.type === 'USER'" type="primary" @click="openSelectUser"> 选择人员 </n-button>
-      <n-button v-if="cacheProps.assign.type === 'ROLE'" type="primary" @click="openSelectRole"> 选择角色 </n-button>
+    <n-form-item
+      v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'"
+      label="审批对象选择"
+    >
+      <n-button v-if="cacheProps.assign.type === 'USER'" type="primary" @click="openSelectUser">
+        选择人员
+      </n-button>
+      <n-button v-if="cacheProps.assign.type === 'ROLE'" type="primary" @click="openSelectRole">
+        选择角色
+      </n-button>
     </n-form-item>
-    <n-form-item v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'" label="审批模式">
+    <n-form-item
+      v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'"
+      label="审批模式"
+    >
       <n-radio-group v-model:value="cacheProps.assign.mode">
         <n-space vertical>
           <n-radio v-for="item in assignModes" :key="item.value" :value="item.value">
@@ -24,8 +34,17 @@
     </n-form-item>
     <n-form-item v-if="cacheProps.assign.type !== 'AUTOREJECT'" label="审批期限 (0则不限时)">
       <n-input-group>
-        <n-input-number v-model:value="cacheProps.timeLimit.value" :min="0" :style="{ width: '75%' }" clearable />
-        <n-select v-model:value="cacheProps.timeLimit.unit" :style="{ width: '25%' }" :options="timeUnits" />
+        <n-input-number
+          v-model:value="cacheProps.timeLimit.value"
+          :min="0"
+          :style="{ width: '75%' }"
+          clearable
+        />
+        <n-select
+          v-model:value="cacheProps.timeLimit.unit"
+          :style="{ width: '25%' }"
+          :options="timeUnits"
+        />
       </n-input-group>
     </n-form-item>
     <n-form-item
@@ -54,7 +73,8 @@
     </n-form-item>
   </n-form>
 </template>
-<script setup>
+<script setup lang="ts">
+import { NRadio, NRadioGroup } from 'naive-ui'
 import { ref } from 'vue'
 
 const $props = defineProps({

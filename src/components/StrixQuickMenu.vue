@@ -8,10 +8,16 @@
     >
       <transition-group name="quick-menu-list">
         <li v-for="item in quickMenus" :key="item.id" :class="'color-' + item.color">
-          <n-tooltip class="item" trigger="hover" :delay="300" placement="left" style="max-width: 220px">
+          <n-tooltip
+            class="item"
+            trigger="hover"
+            :delay="300"
+            placement="left"
+            style="max-width: 220px"
+          >
             <template #trigger>
               <a @click="item.callback">
-                <Icon :icon="item.icon" :width="18" />
+                <Icon v-if="item.icon" :icon="item.icon" :width="18" />
                 <p>{{ item.name }}</p>
               </a>
             </template>
@@ -23,33 +29,35 @@
   </transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { Icon } from '@iconify/vue'
-import { computed, ref, watch } from 'vue'
+import { NEl, NTooltip } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { ref, watch } from 'vue'
 
 const quickMenuStore = useQuickMenuStore()
-const quickMenus = computed(() => quickMenuStore.quickMenus)
+const { quickMenus } = storeToRefs(quickMenuStore)
 
 const autoActive = ref(false)
-let autoActiveTimer = null
+let autoActiveTimer: number | null = null
+const clearAutoActiveTimer = () => {
+  if (autoActiveTimer !== null) {
+    clearTimeout(autoActiveTimer)
+    autoActiveTimer = null
+  }
+}
 
 watch(
-  () => quickMenus,
+  quickMenus,
   () => {
-    if (autoActiveTimer != null) {
-      clearTimeout(autoActiveTimer)
-      autoActiveTimer = null
-    }
+    clearAutoActiveTimer()
     autoActive.value = true
     autoActiveTimer = setTimeout(() => {
       autoActive.value = false
     }, 1000)
   },
-  {
-    immediate: true,
-    deep: true
-  }
+  { immediate: true }
 )
 </script>
 
