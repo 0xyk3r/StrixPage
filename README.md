@@ -1,5 +1,6 @@
 <h1 align="center">StrixPage</h1>
 <p align="center">ProjectAn Strix 的前端部分</p>
+<p align="center">Vue3 + Vite + TypeScript</p>
 
 ## 安装与使用
 
