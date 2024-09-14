@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-gradient-text type="info" :size="30"> ProjectAn Strix Index. </n-gradient-text>
+    <n-gradient-text type="info" :size="30"> Strix Index. </n-gradient-text>
   </div>
 </template>
 
