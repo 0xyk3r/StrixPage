@@ -7,7 +7,7 @@
 import { NButton, useNotification } from 'naive-ui'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
-const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
+const { needRefresh, updateServiceWorker } = useRegisterSW({
   onRegisteredSW(swUrl, r) {
     // 每小时检查一次更新
     r &&
@@ -30,26 +30,26 @@ const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
 })
 const notification = useNotification()
 
-watch(offlineReady, (newVal) => {
-  if (newVal) {
-    const offlineNotify = notification.warning({
-      title: 'Strix 提示',
-      content: '网络异常, Strix 目前处于离线模式.',
-      action: () =>
-        h(
-          NButton,
-          {
-            text: true,
-            type: 'warning',
-            onClick: () => {
-              offlineNotify.destroy()
-            }
-          },
-          { default: () => '确认' }
-        )
-    })
-  }
-})
+// watch(offlineReady, (newVal) => {
+//   if (newVal) {
+//     const offlineNotify = notification.warning({
+//       title: 'Strix 提示',
+//       content: 'Strix 已缓存完成, 离线状态下也可以访问.',
+//       action: () =>
+//         h(
+//           NButton,
+//           {
+//             text: true,
+//             type: 'warning',
+//             onClick: () => {
+//               offlineNotify.destroy()
+//             }
+//           },
+//           { default: () => '确认' }
+//         )
+//     })
+//   }
+// })
 
 watch(needRefresh, (newVal) => {
   if (newVal) {
