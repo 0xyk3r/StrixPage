@@ -32,11 +32,9 @@ export const useSW = () => {
 
   watch(offlineReady, (newVal) => {
     if (newVal) {
-      console.log('offlineReady')
       const offlineNotify = notification.warning({
         title: 'Strix 提示',
         content: '网络异常, Strix 目前处于离线模式.',
-        duration: 0,
         action: () => {
           h(
             NButton,
@@ -55,13 +53,11 @@ export const useSW = () => {
   })
 
   watch(needRefresh, (newVal) => {
-    console.log('needRefresh')
     if (newVal) {
       const updateNotify = notification.warning({
         title: 'Strix 提示',
         content: 'Strix 已更新, 点击确认切换为最新版本.',
         meta: '请注意保存您的内容',
-        duration: 0,
         action: () => {
           h(
             NButton,

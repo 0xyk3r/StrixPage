@@ -89,7 +89,6 @@ import StrixTabsBar from '@/components/StrixTabBar.vue'
 import StrixToolBar from '@/components/StrixToolBar.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
-import { useSW } from '@/plugins/sw'
 import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
@@ -122,8 +121,6 @@ const themeVars = useThemeVars()
 
 initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
-
-onMounted(useSW)
 
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()

@@ -4,6 +4,7 @@
       <n-notification-provider keep-alive-on-hover>
         <n-message-provider keep-alive-on-hover>
           <n-dialog-provider>
+            <SWPrompt />
             <router-view />
           </n-dialog-provider>
         </n-message-provider>
@@ -29,6 +30,7 @@ import {
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { EventBus } from './plugins/event-bus'
+import SWPrompt from './components/SWPrompt.vue'
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
