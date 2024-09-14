@@ -159,8 +159,6 @@ const login = () => {
 <style lang="less" scoped>
 .login-container {
   background: url(@/assets/img/background.webp) no-repeat center 0;
-  -webkit-background-size: cover;
-  -o-background-size: cover;
   background-size: cover;
   position: fixed;
   top: 0;

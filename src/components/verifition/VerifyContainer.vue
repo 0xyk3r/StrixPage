@@ -32,7 +32,6 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue'
-import VerifyPoints from './Verify/VerifyPoints.vue'
 import VerifySlide from './Verify/VerifySlide.vue'
 
 const $props = defineProps({
@@ -107,8 +106,6 @@ defineExpose({
 const verifyComponent = computed(() => {
   if (captchaType.value === 'blockPuzzle') {
     return VerifySlide
-  } else if (captchaType.value === 'clickWord') {
-    return VerifyPoints
   }
   return null
 })
