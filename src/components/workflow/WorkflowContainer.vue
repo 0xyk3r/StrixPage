@@ -47,8 +47,6 @@
 import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
 import { http } from '@/plugins/axios'
 import { Icon } from '@iconify/vue'
-import { NButtonGroup, NCard, NEl, NIcon, NPopconfirm } from 'naive-ui'
-import { computed, defineComponent, ref, watch } from 'vue'
 
 const $props = defineProps({
   workflowId: {

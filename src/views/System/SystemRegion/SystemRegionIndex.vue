@@ -2,13 +2,7 @@
   <div>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
-        <n-grid
-          :cols="6"
-          :x-gap="20"
-          :y-gap="5"
-          item-responsive
-          responsive="screen"
-        >
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -152,8 +146,7 @@ import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { NTag, NTreeSelect, type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统地区'
@@ -302,7 +295,7 @@ const getSystemRegionSelectList = () => {
     })
 }
 
-const addDataRules = {
+const addDataRules: FormRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
 }
 const showAddDataModal = (id?: string) => {
@@ -324,7 +317,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
 }
 const showEditDataModal = (id: string) => {

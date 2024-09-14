@@ -30,8 +30,6 @@ import type { ArticleTagListProps } from '@/@types/components/ArticleTagList'
 import ArticleTag from '@/components/ArticleTag.vue'
 import { EventBus } from '@/plugins/event-bus'
 import { Icon } from '@iconify/vue'
-import { NDropdown, useDialog } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
 
 const model = defineModel<ArticleTagModel[]>()
 const { mode = 'show' } = defineProps<ArticleTagListProps>()

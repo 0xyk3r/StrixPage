@@ -151,8 +151,6 @@
 </template>
 <script setup lang="ts">
 import { http } from '@/plugins/axios'
-import { NCard, NDescriptions, NDescriptionsItem } from 'naive-ui'
-import { onMounted, ref } from 'vue'
 
 const loading = ref(true)
 const serverInfo = ref<any>({})

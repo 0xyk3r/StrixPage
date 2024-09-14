@@ -1,5 +1,4 @@
 import { useDictsStore } from '@/stores/dicts'
-import { ref } from 'vue'
 
 const dictsStore = useDictsStore()
 

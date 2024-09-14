@@ -2,7 +2,6 @@ import WorkflowConditionsNode from '@/components/workflow/WorkflowConditionsNode
 import WorkflowNode from '@/components/workflow/WorkflowNode.vue'
 import { createStrixMessage } from '@/utils/strix-message'
 import { cloneDeep } from 'lodash'
-import { h } from 'vue'
 
 export type WorkflowNodeType =
   | 'root'

@@ -6,7 +6,6 @@
 <script setup lang="ts">
 import { NButton, useNotification } from 'naive-ui'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { h, watch } from 'vue'
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
   onRegisteredSW(swUrl, r) {

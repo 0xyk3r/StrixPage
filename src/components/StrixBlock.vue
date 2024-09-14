@@ -46,18 +46,7 @@
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
-import { NEl } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import {
-  computed,
-  getCurrentInstance,
-  h,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  useSlots,
-  watch
-} from 'vue'
 
 defineProps({
   cleanable: { type: Boolean, default: false }

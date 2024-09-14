@@ -185,8 +185,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { NPopover, type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '定时任务'
@@ -318,7 +317,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const addDataRules = {
+const addDataRules: FormRules = {
   name: [
     { required: true, message: '请输入任务名称', trigger: 'blur' },
     { min: 2, max: 64, message: '任务名称长度需在 2 - 64 字之内', trigger: 'blur' }
@@ -356,7 +355,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入任务名称', trigger: 'blur' },
     { min: 2, max: 64, message: '任务名称长度需在 2 - 64 字之内', trigger: 'blur' }

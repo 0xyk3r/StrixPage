@@ -1,6 +1,5 @@
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
 import type { RouteLocationNormalizedGeneric } from 'vue-router'
 
 export const useTabsBarStore = defineStore('tabsBar', () => {

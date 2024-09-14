@@ -10,7 +10,6 @@
 </template>
 <script setup lang="ts">
 import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
-import { NCard } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 
 const loginInfoStore = useLoginInfoStore()

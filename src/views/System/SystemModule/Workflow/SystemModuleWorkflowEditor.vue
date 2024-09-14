@@ -7,8 +7,6 @@
 <script setup lang="ts">
 import WorkflowContainer from '@/components/workflow/WorkflowContainer.vue'
 import { http } from '@/plugins/axios'
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

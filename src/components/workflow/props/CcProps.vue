@@ -32,9 +32,6 @@
   </n-form>
 </template>
 <script setup lang="ts">
-import { NRadio, NRadioGroup } from 'naive-ui'
-import { ref } from 'vue'
-
 const $props = defineProps({
   modelValue: {
     type: Object,

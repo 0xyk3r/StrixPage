@@ -31,7 +31,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, toRefs } from 'vue'
 import VerifySlide from './Verify/VerifySlide.vue'
 
 const $props = defineProps({

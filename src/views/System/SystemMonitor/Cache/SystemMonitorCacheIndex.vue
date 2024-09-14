@@ -62,8 +62,6 @@
 <script setup lang="ts">
 import { http } from '@/plugins/axios'
 import { useEcharts } from '@/plugins/echarts'
-import { NCard, NDescriptions, NDescriptionsItem } from 'naive-ui'
-import { onMounted, ref } from 'vue'
 
 const loading = ref(true)
 const cacheInfo = ref<any>({})

@@ -219,9 +219,9 @@ import {
   NSpin,
   NTag,
   NTreeSelect,
-  type DataTableColumns
+  type DataTableColumns,
+  type FormRules
 } from 'naive-ui'
-import { h, nextTick, onActivated, onDeactivated, onMounted, ref } from 'vue'
 
 const quickMenuStore = useQuickMenuStore()
 
@@ -456,7 +456,7 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
     })
 }
 
-const addDataRules = {
+const addDataRules: FormRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
     { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }
@@ -490,7 +490,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
     { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }

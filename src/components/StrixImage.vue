@@ -4,8 +4,6 @@
 <script setup lang="ts">
 import { http } from '@/plugins/axios'
 import { convertBlob } from '@/utils/strix-file-util'
-import { NImage } from 'naive-ui'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 const $props = defineProps({
   value: { type: [String, Number], required: true },

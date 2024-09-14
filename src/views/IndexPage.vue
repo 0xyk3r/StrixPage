@@ -4,8 +4,6 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { NGradientText } from 'naive-ui'
-</script>
+<script setup lang="ts"></script>
 
 <style lang="less" scoped></style>

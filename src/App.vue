@@ -28,7 +28,6 @@ import {
   useOsTheme,
   zhCN
 } from 'naive-ui'
-import { computed, ref } from 'vue'
 import { EventBus } from './plugins/event-bus'
 import SWPrompt from './components/SWPrompt.vue'
 

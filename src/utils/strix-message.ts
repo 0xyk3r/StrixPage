@@ -1,5 +1,4 @@
 import { NAlert, useMessage, type MessageType } from 'naive-ui'
-import { h } from 'vue'
 
 let message: any = null
 

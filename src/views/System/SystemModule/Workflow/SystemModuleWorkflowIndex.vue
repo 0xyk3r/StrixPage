@@ -142,18 +142,7 @@ import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash'
-import {
-  NCard,
-  NEllipsis,
-  NEmpty,
-  NFlex,
-  NLayout,
-  NLayoutSider,
-  NMenu,
-  type FormInst
-} from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { NEllipsis, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
 
 const router = useRouter()
 
@@ -237,7 +226,7 @@ const initAddDataForm = {
 }
 const addDataForm = ref(cloneDeep(initAddDataForm))
 const addDataFormRef = ref<FormInst | null>(null)
-const addDataRules = {
+const addDataRules: FormRules = {
   name: [
     { required: true, message: '请输入流程名称', trigger: 'blur' },
     { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
@@ -270,7 +259,7 @@ const initEditDataForm = {
 }
 const editDataForm = ref<any>(cloneDeep(initEditDataForm))
 const editDataFormRef = ref<FormInst | null>(null)
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入流程名称', trigger: 'blur' },
     { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
@@ -316,10 +305,11 @@ const deleteData = (id: string) => {
 
 const workflowConfigDataRef = ref([])
 // 流程版本展示列信息
-const workflowConfigDataColumns = [
+const workflowConfigDataColumns: DataTableColumns = [
   { key: 'version', title: '版本编号', width: 120 },
   { key: 'createTime', title: '创建时间', width: 160 },
   {
+    key: 'actions',
     title: '操作',
     width: 80,
     render(row: any) {

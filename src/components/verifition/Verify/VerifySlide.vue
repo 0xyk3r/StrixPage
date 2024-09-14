@@ -83,17 +83,7 @@
 </template>
 <script lang="ts">
 import { http } from '@/plugins/axios'
-import {
-  computed,
-  getCurrentInstance,
-  nextTick,
-  onMounted,
-  reactive,
-  ref,
-  toRefs,
-  watch,
-  type ComponentInternalInstance
-} from 'vue'
+import { type ComponentInternalInstance } from 'vue'
 import { aesEncrypt } from '../utils/ase'
 import { resetSize } from './../utils/util'
 //  "captchaType":"blockPuzzle",

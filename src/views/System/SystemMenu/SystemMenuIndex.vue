@@ -278,16 +278,7 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { Icon } from '@iconify/vue'
 import { cloneDeep, kebabCase, pick } from 'lodash'
-import {
-  NAlert,
-  NTreeSelect,
-  NTag,
-  NTabs,
-  NTabPane,
-  type DataTableColumns,
-  type FormInst
-} from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { NTag, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
@@ -413,7 +404,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 const addDataModalType = ref('menu')
-const addDataRules = {
+const addDataRules: FormRules = {
   name: [
     { required: true, message: '请输入菜单名称', trigger: 'blur' },
     { min: 2, max: 10, message: '菜单名称需为 2-10 字符', trigger: 'blur' }
@@ -475,7 +466,7 @@ const addData = () => {
 }
 
 const editDataModalType = ref('menu')
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入菜单名称', trigger: 'blur' },
     { min: 2, max: 10, message: '菜单名称需为 2-10 字符', trigger: 'blur' }

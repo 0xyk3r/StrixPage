@@ -99,8 +99,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -194,7 +193,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const editDataRules = {
+const editDataRules: FormRules = {
   nickname: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }]
 }
 const showEditDataModal = (id: string) => {

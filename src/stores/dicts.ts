@@ -1,7 +1,7 @@
 import { http } from '@/plugins/axios'
 import { throttle } from 'lodash'
 import { defineStore } from 'pinia'
-import { isRef, ref, type Ref } from 'vue'
+import { type Ref } from 'vue'
 
 export const useDictsStore = defineStore(
   'dicts',

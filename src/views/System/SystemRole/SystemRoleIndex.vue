@@ -155,11 +155,10 @@ import {
   NTabPane,
   NTabs,
   NTag,
-  NTree,
   type DataTableColumns,
+  type FormRules,
   type TreeInst
 } from 'naive-ui'
-import { computed, h, onMounted, ref } from 'vue'
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
@@ -373,7 +372,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addDataRules = {
+const addDataRules: FormRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
     { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
@@ -396,7 +395,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
     { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }

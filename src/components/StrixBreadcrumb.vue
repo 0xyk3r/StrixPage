@@ -20,11 +20,8 @@
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { Icon } from '@iconify/vue'
-import { NBreadcrumb, NBreadcrumbItem, NIcon } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { nextTick, ref, watch } from 'vue'
 import type { RouteLocationMatched } from 'vue-router'
-import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()

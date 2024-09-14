@@ -32,9 +32,7 @@
 <script setup lang="ts">
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { Icon } from '@iconify/vue'
-import { NEl, NTooltip } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { ref, watch } from 'vue'
 
 const quickMenuStore = useQuickMenuStore()
 const { quickMenus } = storeToRefs(quickMenuStore)

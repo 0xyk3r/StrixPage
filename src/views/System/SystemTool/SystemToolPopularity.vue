@@ -186,18 +186,7 @@ import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash'
-import {
-  NInputNumber,
-  NCard,
-  NLayout,
-  NTooltip,
-  NEmpty,
-  NLayoutSider,
-  NMenu,
-  type DataTableColumns,
-  type FormInst
-} from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { NInputNumber, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
 
 const _baseName = '热度工具配置'
 const _baseApiPrefix = 'system/tool/popularity'
@@ -278,7 +267,7 @@ const initEditDataForm = {
 }
 const editDataForm = ref<any>(cloneDeep(initEditDataForm))
 const editDataFormRef = ref<FormInst | null>(null)
-const editDataRules = {
+const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入配置名称', trigger: 'blur' },
     { min: 1, max: 32, message: '配置名称长度需在 1 - 32 字之内', trigger: 'blur' }

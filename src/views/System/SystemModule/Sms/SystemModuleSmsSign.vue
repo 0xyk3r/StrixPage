@@ -62,7 +62,6 @@ import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
 
 // 本页面操作提示关键词
 const _baseName = '短信签名'

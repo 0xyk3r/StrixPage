@@ -259,17 +259,8 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { Icon } from '@iconify/vue'
 import { cloneDeep, pick } from 'lodash'
-import {
-  NAlert,
-  NDynamicTags,
-  NIcon,
-  NUpload,
-  NUploadDragger,
-  type DataTableColumns,
-  type FormRules
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { computed, h, onMounted, ref, watch } from 'vue'
 
 const loginInfoStore = useLoginInfoStore()
 
@@ -483,7 +474,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   key: [
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
     { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }

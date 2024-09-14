@@ -9,17 +9,7 @@
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { storeToRefs } from 'pinia'
-import {
-  defineComponent,
-  h,
-  nextTick,
-  onActivated,
-  onMounted,
-  ref,
-  shallowRef,
-  type Component
-} from 'vue'
-import { useRoute } from 'vue-router'
+import { type Component } from 'vue'
 
 const route = useRoute()
 const tabsBarStore = useTabsBarStore()

@@ -1,6 +1,5 @@
 import type { Canceler } from 'axios'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export interface CancelableRequest {
   requestId?: string

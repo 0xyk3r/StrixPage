@@ -50,10 +50,7 @@ import { EventBus } from '@/plugins/event-bus'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
-import { NDropdown, NTab, NTabs } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { computed, h, nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()

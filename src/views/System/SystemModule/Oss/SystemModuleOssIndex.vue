@@ -203,9 +203,9 @@ import {
   NTabPane,
   NTabs,
   NTag,
-  type DataTableColumns
+  type DataTableColumns,
+  type FormRules
 } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
 
 // 本页面操作提示关键词
 const _baseName = '存储服务'
@@ -438,7 +438,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addDataRules = {
+const addDataRules: FormRules = {
   key: [
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
     { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
@@ -479,7 +479,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   key: [
     { required: true, message: '请输入配置 Key', trigger: 'blur' },
     { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }

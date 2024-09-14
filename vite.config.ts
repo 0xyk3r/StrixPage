@@ -1,6 +1,9 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import vue from '@vitejs/plugin-vue'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -8,6 +11,20 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     vue(),
+    AutoImport({
+      dts: 'src/@types/auto-imports.d.ts',
+      imports: [
+        'vue',
+        'vue-router',
+        {
+          'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
+        }
+      ]
+    }),
+    Components({
+      dts: 'src/@types/components.d.ts',
+      resolvers: [NaiveUiResolver()]
+    }),
     VitePWA({
       // registerType: 'autoUpdate',
       // devOptions: {
@@ -63,12 +80,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          axios: ['axios'],
-          lodash: ['lodash'],
-          echarts: ['echarts'],
-          cryptoes: ['crypto-es'],
-          jsencrypt: ['jsencrypt']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('axios')) return 'axios'
+            if (id.includes('lodash')) return 'lodash'
+            if (id.includes('echarts')) return 'echarts'
+            if (id.includes('jsencrypt')) return 'jsencrypt'
+          }
         }
       }
     },

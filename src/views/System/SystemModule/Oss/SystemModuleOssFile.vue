@@ -62,7 +62,6 @@ import { usePage } from '@/utils/common-page-util'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'
-import { onMounted, ref } from 'vue'
 
 // 本页面操作提示关键词
 const _baseName = '存储文件'

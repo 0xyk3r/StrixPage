@@ -6,8 +6,6 @@
 <script setup lang="ts">
 import type { NTagType } from '@/@types/naive-ui'
 import { useDict } from '@/utils/strix-dict-util'
-import { NTag } from 'naive-ui'
-import { computed } from 'vue'
 
 const $props = defineProps({
   value: { type: [String, Number], required: true },

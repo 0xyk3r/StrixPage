@@ -10,9 +10,6 @@
 
 <script setup lang="ts">
 import { useTabsBarStore } from '@/stores/tabs-bar'
-import { NResult } from 'naive-ui'
-import { onMounted, onUnmounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()

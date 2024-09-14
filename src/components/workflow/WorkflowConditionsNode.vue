@@ -47,8 +47,6 @@
 </template>
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { NButtonGroup, NCard, NFlex, NIcon, NPopover } from 'naive-ui'
-import { ref } from 'vue'
 
 const $emit = defineEmits(['addNode', 'removeNode'])
 

@@ -63,8 +63,6 @@
 <script setup lang="ts">
 import { getOperationName, getTypeName } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
-import { NButtonGroup, NCard, NDrawer, NDrawerContent, NIcon, NPopover } from 'naive-ui'
-import { computed, ref } from 'vue'
 import ApprovalProps from './props/ApprovalProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'

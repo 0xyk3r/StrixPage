@@ -31,9 +31,6 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { NDropdown } from 'naive-ui'
 
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()

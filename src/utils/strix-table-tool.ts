@@ -1,6 +1,5 @@
 import { Icon } from '@iconify/vue'
 import { NButton, NPopover, NPopconfirm } from 'naive-ui'
-import { h } from 'vue'
 
 /**
  * 阻止事件冒泡

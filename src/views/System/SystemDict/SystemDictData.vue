@@ -186,9 +186,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { NTag, type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
 
 const route = useRoute()
 
@@ -312,7 +310,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const addDataRules = {
+const addDataRules: FormRules = {
   key: [
     { required: true, message: '请输入字典标识', trigger: 'blur' },
     { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }
@@ -349,7 +347,7 @@ const addData = () => {
   })
 }
 
-const editDataRules = {
+const editDataRules: FormRules = {
   key: [
     { required: true, message: '请输入字典标识', trigger: 'blur' },
     { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }

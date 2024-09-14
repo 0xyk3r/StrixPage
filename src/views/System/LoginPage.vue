@@ -68,9 +68,7 @@ import { useLoginInfoStore } from '@/stores/login-info'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
-import { NCard, useLoadingBar, type FormInst } from 'naive-ui'
-import { nextTick, ref, type Ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { type FormInst } from 'naive-ui'
 
 const route = useRoute()
 const router = useRouter()

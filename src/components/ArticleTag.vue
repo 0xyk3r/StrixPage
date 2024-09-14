@@ -12,7 +12,6 @@
 </template>
 <script setup lang="ts">
 import type { ArticleTagProps } from '@/@types/components/ArticleTag'
-import { computed } from 'vue'
 
 const { model, create = false } = defineProps<ArticleTagProps>()
 

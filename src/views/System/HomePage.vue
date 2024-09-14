@@ -98,22 +98,9 @@ import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
 import { kebabCase } from 'lodash'
-import {
-  NLayout,
-  NLayoutContent,
-  NLayoutHeader,
-  NLayoutSider,
-  NMenu,
-  NWatermark,
-  useLoadingBar,
-  useOsTheme,
-  useThemeVars,
-  type MenuInst,
-  type MenuOption
-} from 'naive-ui'
+import { useOsTheme, useThemeVars, type MenuInst, type MenuOption } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 const route = useRoute()
 const osTheme = useOsTheme()

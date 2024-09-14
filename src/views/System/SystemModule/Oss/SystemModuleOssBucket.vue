@@ -99,8 +99,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
-import { NTag, type DataTableColumns } from 'naive-ui'
-import { h, onMounted, ref } from 'vue'
+import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储空间'
@@ -187,7 +186,7 @@ const storageClassOptions: { value: string; label: string; type: NTagType }[] = 
   { value: 'default', label: '未知', type: 'default' }
 ]
 
-const addDataRules = {
+const addDataRules: FormRules = {
   configKey: [{ required: true, message: '请选择存储配置 Key', trigger: 'change' }],
   name: [
     { required: true, message: '请输入 Bucket 名称', trigger: 'blur' },
