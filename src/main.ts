@@ -60,7 +60,7 @@ import installDirectives from './directives'
 
 // Service Worker
 import { useRegisterSW } from 'virtual:pwa-register/vue'
-const updateSW = useRegisterSW({
+useRegisterSW({
   onNeedRefresh() {
     alert('有新内容可用，请刷新页面')
   },
