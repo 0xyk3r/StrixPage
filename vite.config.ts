@@ -10,10 +10,10 @@ export default defineConfig({
     vue(),
     VitePWA({
       // registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true,
-        type: 'module'
-      },
+      // devOptions: {
+      //   enabled: true,
+      //   type: 'module'
+      // },
       includeAssets: ['favicon.ico', 'pwa/apple-touch-icon.png', 'pwa/mask-icon.svg'],
       manifest: {
         name: 'Strix',
@@ -61,6 +61,18 @@ export default defineConfig({
     port: 19889
   },
   build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          axios: ['axios'],
+          lodash: ['lodash'],
+          echarts: ['echarts'],
+          cryptoes: ['crypto-es'],
+          jsencrypt: ['jsencrypt']
+        }
+      }
+    },
+    cssMinify: 'lightningcss',
     minify: 'terser',
     terserOptions: {
       compress: {

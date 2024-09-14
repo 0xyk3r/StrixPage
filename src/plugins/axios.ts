@@ -4,11 +4,15 @@ import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'
-import CryptoES from 'crypto-es'
+import { AES } from 'crypto-es/lib/aes'
+import { CBC, Pkcs7 } from 'crypto-es/lib/cipher-core'
+import { Utf8 } from 'crypto-es/lib/core'
+import { HexFormatter } from 'crypto-es/lib/format-hex'
+import { MD5 } from 'crypto-es/lib/md5'
 import JSEncrypt from 'jsencrypt'
 import { merge, omit } from 'lodash'
 import { storeToRefs } from 'pinia'
-import qs from 'qs'
+import { parse as qsParse, stringify as qsStringify } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
 import { type Ref } from 'vue'
 
@@ -32,6 +36,10 @@ axios.defaults.baseURL = '/api/'
 const iv = import.meta.env.VITE_APP_IV
 const serverPubKey = import.meta.env.VITE_APP_SERVER_PUBLIC_KEY
 const clientPriKey = import.meta.env.VITE_APP_CLIENT_PRIVATE_KEY
+const encJsEncrypt = new JSEncrypt()
+encJsEncrypt.setPublicKey(serverPubKey)
+const decJsEncrypt = new JSEncrypt()
+decJsEncrypt.setPrivateKey(clientPriKey)
 
 // 请求拦截器
 axios.interceptors.request.use((config) => {
@@ -56,8 +64,8 @@ axios.interceptors.request.use((config) => {
   // 请求预处理 & 加密 & 签名
   if (config.method === 'get') {
     const params = config.params
-    const queryString = qs.stringify(params)
-    const urlParams = qs.parse(queryString)
+    const queryString = qsStringify(params)
+    const urlParams = qsParse(queryString)
     console.log(
       '%cStrix%cGET%c ' + config.meta?.operate,
       'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
@@ -139,16 +147,12 @@ function enc(data: any) {
     key += library.substring(randomPoz, randomPoz + 1)
   }
   const parsedData = JSON.stringify(data)
-  const aes = CryptoES.AES.encrypt(parsedData, CryptoES.enc.Utf8.parse(key), {
-    iv: CryptoES.enc.Utf8.parse(iv),
-    mode: CryptoES.mode.CBC,
-    padding: CryptoES.pad.Pkcs7
+  const aes = AES.encrypt(parsedData, Utf8.parse(key), {
+    iv: Utf8.parse(iv),
+    mode: CBC,
+    padding: Pkcs7
   })
-
-  const jsEncrypt = new JSEncrypt()
-  jsEncrypt.setPublicKey(serverPubKey)
-  const rsa = jsEncrypt.encrypt(key)
-
+  const rsa = encJsEncrypt.encrypt(key)
   return {
     data: aes.ciphertext?.toString(),
     sign: rsa
@@ -170,24 +174,18 @@ function dec(response: any) {
   }
 
   if (data && sign) {
-    const jsEncrypt = new JSEncrypt()
-    jsEncrypt.setPrivateKey(clientPriKey)
-    const aesKey = jsEncrypt.decrypt(sign)
+    const aesKey = decJsEncrypt.decrypt(sign)
 
     if (!aesKey) {
       return {}
     }
 
-    const dec = CryptoES.AES.decrypt(
-      CryptoES.format.Hex.parse(data),
-      CryptoES.enc.Utf8.parse(aesKey),
-      {
-        iv: CryptoES.enc.Utf8.parse(iv),
-        mode: CryptoES.mode.CBC,
-        padding: CryptoES.pad.Pkcs7
-      }
-    )
-    return JSON.parse(CryptoES.enc.Utf8.stringify(dec))
+    const dec = AES.decrypt(HexFormatter.parse(data), Utf8.parse(aesKey), {
+      iv: Utf8.parse(iv),
+      mode: CBC,
+      padding: Pkcs7
+    })
+    return JSON.parse(Utf8.stringify(dec))
   }
   return {}
 }
@@ -235,7 +233,7 @@ function paramsSign(url: string, params: any, timestamp: any) {
   const sortEncryptObj = sortAsc(encryptObj)
   const sortParamsJson = JSON.stringify(sortEncryptObj)
   // console.log("待签名数据", sortParamsJson);
-  return CryptoES.MD5(sortParamsJson).toString()
+  return MD5(sortParamsJson).toString()
 }
 
 /**
