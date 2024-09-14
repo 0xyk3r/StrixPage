@@ -2,7 +2,7 @@ import { useLoginInfoStore } from '@/stores/login-info'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { storeToRefs } from 'pinia'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const Redirect = () => import('@/components/StrixRedirect.vue')
 const NotFound = () => import('@/components/StrixNotFound.vue')
@@ -22,7 +22,7 @@ if (import.meta.env.MODE === 'development') {
   })
 }
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'LoginPage',
@@ -34,7 +34,8 @@ const routes = [
     component: () => import('@/views/System/HomePage.vue'),
     redirect: '/index',
     meta: {
-      title: 'Strix管理系统'
+      icon: 'ion:home-outline',
+      title: ''
     },
     children: [
       {
@@ -53,7 +54,7 @@ const routes = [
         name: 'StrixRedirect',
         component: Redirect,
         meta: {
-          ignore: true,
+          empty: true,
           isRedirect: true
         },
         children: [
@@ -118,11 +119,10 @@ const routes = [
         name: 'DynamicWrapper',
         component: DynamicWrapper,
         meta: {
-          title: '字典数据管理',
+          title: '字典数据',
           titleTemplate: ' 字典数据 - {dictKey}',
-          parentRoute: 'SystemDictIndex',
+          parentRouteName: 'SystemDictIndex',
           isDynamicWrapper: true,
-          dynamicParamKeys: ['dictKey'],
           dynamicComponent: () => import('@/views/System/SystemDict/SystemDictData.vue'),
           dynamieComponentNameTemplate: 'SystemDictData-{dictKey}'
         }
@@ -168,6 +168,7 @@ const routes = [
       },
       {
         path: 'system/tool',
+        name: 'SystemTool',
         meta: {
           title: '系统工具管理'
         },
@@ -377,7 +378,7 @@ router.beforeEach((to, form, next) => {
 
 // 后置路由导航守卫
 router.afterEach((to, from, failure) => {
-  if (failure) {
+  if (failure && failure.type !== 16) {
     return controlStrixLoadingBar('error')
   }
   controlStrixLoadingBar('finish')

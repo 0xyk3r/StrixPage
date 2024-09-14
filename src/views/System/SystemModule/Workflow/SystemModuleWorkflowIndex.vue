@@ -1,11 +1,7 @@
 <template>
   <div>
-    <n-h3 class="mb-0" prefix="bar" align-text type="success">
-      <n-text type="success">{{ _baseName }}管理</n-text>
-    </n-h3>
     <n-layout has-sider>
       <n-layout-sider
-        class="clear-bg-color"
         content-style="height: 100%; padding: 10px;"
         :native-scrollbar="false"
         bordered
@@ -28,7 +24,7 @@
           </n-spin>
         </n-card>
       </n-layout-sider>
-      <n-layout content-style="padding: 10px;" :native-scrollbar="false">
+      <n-layout content-style="padding: 10px" :native-scrollbar="false">
         <n-grid x-gap="12" y-gap="12" :cols="5">
           <n-gi span="2">
             <n-card class="full-h">
@@ -159,7 +155,7 @@ import {
 import { h, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const $router = useRouter()
+const router = useRouter()
 
 const _baseName = '流程引擎'
 const _baseApiPrefix = 'system/workflow'
@@ -351,7 +347,7 @@ const workflowConfigDataColumns = [
 ]
 
 const openWorkflowEditor = (configId: string) => {
-  $router.push(`editor/${selectDataId.value}/${configId}`)
+  router.push(`editor/${selectDataId.value}/${configId}`)
 }
 
 // 加载列表

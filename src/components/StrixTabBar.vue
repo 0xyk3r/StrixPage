@@ -6,7 +6,7 @@
       class="tabs-content"
       animated
       @update:value="handleTabClick"
-      @close="handleTabRemove"
+      @close="closeTab"
     >
       <n-tab
         v-for="(item, index) in visitedRoutes"
@@ -17,14 +17,18 @@
       />
     </n-tabs>
 
-    <n-dropdown
-      trigger="hover"
-      placement="bottom-start"
-      :options="contextmenuList"
-      @select="handleContextmenuSelect"
-    >
-      <Icon icon="ion:grid" class="tabs-common-handler" :width="20" />
-    </n-dropdown>
+    <div class="tabs-bar-bottom-bar"></div>
+
+    <Teleport defer to="#strix-tool-bar-item">
+      <n-dropdown
+        trigger="hover"
+        placement="bottom-start"
+        :options="contextmenuList"
+        @select="handleContextmenuSelect"
+      >
+        <Icon icon="ion:grid" class="tabs-common-handler" :width="18" />
+      </n-dropdown>
+    </Teleport>
 
     <teleport to=".n-config-provider">
       <n-dropdown
@@ -35,6 +39,7 @@
         :options="contextmenuList"
         :show="showRightMenu"
         @select="handleContextmenuSelect"
+        @clickoutside="clearContextmenuSelect"
       />
     </teleport>
   </div>
@@ -47,11 +52,11 @@ import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
 import { NDropdown, NTab, NTabs } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { h, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, h, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const $route = useRoute()
-const $router = useRouter()
+const route = useRoute()
+const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 const quickMenuStore = useQuickMenuStore()
 
@@ -59,17 +64,26 @@ const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
 
 // tabs的右击相关逻辑
-const showRightMenu = ref()
+const showRightMenu = ref(false)
 let contextmenuRoutesIndex: number | null = null
 const contextmenuPosition = ref({ x: 0, y: 0 })
 const contextmenuList = [
-  { key: 'reloadRouter', label: '刷新', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
+  { key: 'reloadRouter', label: '刷新当前', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
   {
     key: 'reloadAllRouter',
     label: '刷新全部',
     icon: () => h(Icon, { icon: 'ion:reload-circle-outline' })
   },
-  { key: 'closeOtherTabs', label: '关闭其他', icon: () => h(Icon, { icon: 'ion:close-outline' }) },
+  {
+    key: 'closeCurrTabs',
+    label: '关闭当前',
+    icon: () => h(Icon, { icon: 'ion:close-outline' })
+  },
+  {
+    key: 'closeOtherTabs',
+    label: '关闭其他',
+    icon: () => h(Icon, { icon: 'ion:close-circle-outline' })
+  },
   {
     key: 'closeLeftTabs',
     label: '关闭左侧',
@@ -87,59 +101,83 @@ const handleTabContextmenu = (e: MouseEvent, index: number): void => {
   contextmenuRoutesIndex = index
   contextmenuPosition.value = { x: e.x, y: e.y }
 }
-const handleContextmenuSelect = (key: string) => {
+const clearContextmenuSelect = () => {
   showRightMenu.value = false
+  setTimeout(() => {
+    contextmenuRoutesIndex = null
+  }, 50)
+}
+const handleContextmenuSelect = (key: string) => {
   const actions: Record<string, () => void> = {
     reloadRouter,
     reloadAllRouter,
+    closeCurrTabs,
     closeOtherTabs,
     closeLeftTabs,
     closeRightTabs,
     closeAllTabs
   }
   actions[key]?.()
-  // 延迟50ms清除选择的tab记录
-  setTimeout(() => {
-    contextmenuRoutesIndex = null
-  }, 50)
+  clearContextmenuSelect()
 }
-onMounted(() => {
-  // 点击任意地方隐藏右键菜单
-  EventBus.on('click-container', () => {
-    showRightMenu.value = false
-  })
-})
+
+// 添加 fixed 标签页
+const fixedTabs = computed(() =>
+  router
+    .getRoutes()
+    .filter((r) => r.meta.fixed)
+    .sort((a, b) => (a.meta.fixedIndex ?? 0) - (b.meta.fixedIndex ?? 0))
+)
+watch(
+  fixedTabs,
+  (fixedTabs) => {
+    fixedTabs.forEach((fixedTab: any) => {
+      tabsBarStore.addVisitedRoute(fixedTab)
+    })
+  },
+  { immediate: true }
+)
 
 // 初始化标签页
-const initTabs = () => {
-  // 添加 fixed 标签页
-  const routes = $router.getRoutes()
-  routes.forEach((r: any) => {
-    if (r.meta.fixed) {
-      tabsBarStore.addVisitedRoute(r)
-    }
-  })
+const setupTabs = () => {
   // 添加 当前路由 标签页
-  const { name, meta } = $route
+  const { name, meta } = route
   if (name && meta.title && !meta.empty) {
-    tabsBarStore.addVisitedRoute($route)
+    tabsBarStore.addVisitedRoute(route)
+  }
+  // 设置当前激活的标签页
+  nextTick(() => {
+    tabActive.value = visitedRoutes.value.find((item) => item.path === route.path)?.meta.title || ''
+  })
+}
+watch(() => route.path, setupTabs, { immediate: true })
+
+// 点击标签页
+const handleTabClick = (tab: string) => {
+  const r = visitedRoutes.value.find((item) => item.meta.title === tab)
+  if (r?.path !== route.path) {
+    router.push({ path: r.path, query: r.query })
   }
 }
 
-const handleTabClick = (tab: string) => {
-  const route = visitedRoutes.value.find((item: any) => item.meta.title === tab)
-  if (route && $router.currentRoute.value.fullPath !== route.path) {
-    $router.push({ path: route.path, query: route.query })
-  }
-}
-const handleTabRemove = async (tab: any) => {
-  const index = visitedRoutes.value.findIndex((item: any) => item.meta.title === tab)
+// 关闭标签页
+const closeTab = async (tab: string) => {
+  const index = visitedRoutes.value.findIndex((item) => item.meta.title === tab)
   if (index !== -1) {
     const view = visitedRoutes.value[index]
-    tabsBarStore.delVisitedRoute(view)
+    // 如果关闭的是当前标签页 则跳转
     if (isActive(view)) {
-      await $router.push(visitedRoutes.value[index - 1])
+      if (index - 1 < 0) {
+        if (visitedRoutes.value.length > 1) {
+          await router.push(visitedRoutes.value[index + 1])
+        } else {
+          await router.push('/')
+        }
+      } else {
+        await router.push(visitedRoutes.value[index - 1])
+      }
     }
+    tabsBarStore.delVisitedRoute(view)
   }
 }
 
@@ -154,19 +192,27 @@ const reloadRouter = async () => {
     tabsBarStore.addRefreshRoutes(view)
     tabsBarStore.delVisitedRoute(view)
     quickMenuStore.delAllQuickMenu()
-    await $router.push('/redirect' + currentPath)
+    await router.push('/redirect' + currentPath)
   }
 }
 const reloadAllRouter = () => {
   EventBus.emit('reload-router-view')
 }
+
+const closeCurrTabs = () => {
+  const view = getContextmenuTagView()
+  if (view) {
+    closeTab(view.meta.title)
+  }
+}
+
 const closeOtherTabs = () => {
   const view = getContextmenuTagView()
   if (view) {
     tabsBarStore.delOthersVisitedRoute(view)
     nextTick(() => {
       if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        $router.push('/redirect' + view.fullPath)
+        router.push('/redirect' + view.fullPath)
       }
     })
   }
@@ -178,7 +224,7 @@ const closeLeftTabs = () => {
     tabsBarStore.delLeftVisitedRoute(view)
     nextTick(() => {
       if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        $router.push('/redirect' + view.fullPath)
+        router.push('/redirect' + view.fullPath)
       }
     })
   }
@@ -190,7 +236,7 @@ const closeRightTabs = () => {
     tabsBarStore.delRightVisitedRoute(view)
     nextTick(() => {
       if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        $router.push('/redirect' + view.fullPath)
+        router.push('/redirect' + view.fullPath)
       }
     })
   }
@@ -199,137 +245,138 @@ const closeRightTabs = () => {
 const closeAllTabs = async () => {
   tabsBarStore.delAllVisitedRoutes()
   const defaultView = visitedRoutes.value[0]
-  await $router.push(defaultView ?? '/')
+  await router.push(defaultView ?? '/')
 }
 
 // 一些通用处理函数
-const isActive = (route: any) => route.path === $route.path
-const isAffix = (tag: any) => tag.meta && tag.meta.fixed
+const isActive = (r: any) => route.path === r.path
+const isAffix = (r: any) => r.meta?.fixed
 const getContextmenuTagView = () => {
   const index =
     contextmenuRoutesIndex ??
     visitedRoutes.value.findIndex((r: any) => tabActive.value === r.meta.title)
   return visitedRoutes.value[index]
 }
-
-watch(
-  () => $router.currentRoute.value.path,
-  () => {
-    initTabs()
-    nextTick(() => {
-      tabActive.value =
-        visitedRoutes.value.find((item: any) => item.path === $route.path)?.meta.title || ''
-    })
-  },
-  { immediate: true }
-)
 </script>
 
 <style lang="scss" scoped>
 .tabs-bar-container {
   position: relative;
-  box-sizing: border-box;
   display: flex;
   align-content: center;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 50px;
-  padding: 0 20px;
-  user-select: none;
-  border-top: 1px solid var(--n-border-color);
-  box-shadow: 0 2px 4px 0 rgba(36, 38, 47, 0.2) !important;
+  height: 100%;
+  margin: 0 20px;
   z-index: 499;
+  user-select: none;
+  box-sizing: border-box;
   transition: border 0.3s var(--n-bezier);
 
   .tabs-content {
-    width: calc(100% - 90px);
     height: 34px;
+  }
+
+  .tabs-bar-bottom-bar {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--n-border-color);
+    transition: background-color 0.3s var(--n-bezier);
   }
 }
 
 ::v-deep(.tabs-content) {
-  .n-tabs-wrapper {
-    .n-tabs-tab-wrapper {
-      .n-tabs-tab {
-        box-sizing: border-box;
-        height: 34px;
-        line-height: 34px;
-        transition:
-          all 0.3s var(--n-bezier),
-          width 0.6s !important;
-        padding-right: 20px;
-
-        .n-base-close {
-          width: 0;
-          margin-left: 0;
-          overflow: hidden;
-          transform-origin: 100% 50%;
-          transition: all 0.3s var(--n-bezier);
-
-          .n-base-icon {
-            overflow: hidden;
-          }
-        }
-
-        &:after {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 2px;
-          content: '';
-          background-color: var(--n-tab-text-color-active);
+  .n-tabs-nav-scroll-content {
+    justify-content: center;
+    .n-tabs-wrapper {
+      .n-tabs-tab-wrapper {
+        .n-tabs-tab {
+          box-sizing: border-box;
+          height: 34px;
+          line-height: 34px;
           transition:
             all 0.3s var(--n-bezier),
-            border 0s,
-            color 0.1s,
-            font-size 0s;
-        }
+            width 0.6s !important;
+          padding-right: 20px;
 
-        &:hover {
-          border: 1px solid var(--n-tab-text-color-hover);
+          .n-base-close {
+            width: 0;
+            margin-left: 0;
+            overflow: hidden;
+            transform-origin: 100% 50%;
+            transition: all 0.3s var(--n-bezier);
 
-          &.n-tabs-tab--closable {
-            padding-right: 10px;
-
-            .n-base-close {
-              width: 18px;
-              margin-left: 6px;
+            .n-base-icon {
+              overflow: hidden;
             }
           }
 
           &:after {
-            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            content: '';
+            background-color: var(--n-tab-text-color-active);
+            transition:
+              all 0.3s var(--n-bezier),
+              border 0s,
+              color 0.1s,
+              font-size 0s;
+          }
+
+          &:hover {
+            border: 1px solid var(--n-tab-text-color-hover);
+
+            &.n-tabs-tab--closable {
+              padding-right: 10px;
+
+              .n-base-close {
+                width: 18px;
+                margin-left: 6px;
+              }
+            }
+
+            &:after {
+              width: 100%;
+            }
           }
         }
-      }
 
-      .n-tabs-tab--active {
-        &:after {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 2px;
-          content: '';
-          background-color: var(--n-tab-text-color-active);
-          transition:
-            all 0.3s var(--n-bezier),
-            border 0s,
-            color 0.1s,
-            font-size 0s;
+        .n-tabs-tab--active {
+          &:after {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            content: '';
+            background-color: var(--n-tab-text-color-active);
+            transition:
+              all 0.3s var(--n-bezier),
+              border 0s,
+              color 0.1s,
+              font-size 0s;
+          }
+        }
+
+        .n-tabs-tab-pad {
+          width: 6px;
+          border: none;
         }
       }
-
-      .n-tabs-tab-pad {
-        width: 6px;
-      }
     }
-  }
 
-  .n-tabs-pad {
-    border: none !important;
+    .n-tabs-pad {
+      flex-grow: 0 !important;
+      border: none !important;
+    }
   }
 }
 

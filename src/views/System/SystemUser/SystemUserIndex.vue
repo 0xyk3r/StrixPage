@@ -1,18 +1,8 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">{{ _baseName }}管理</n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
-        <n-grid
-          :cols="6"
-          :x-gap="20"
-          :y-gap="5"
-          item-responsive
-          responsive="screen"
-          style="margin-bottom: 15px"
-        >
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -109,7 +99,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { type DataTableColumns, type FormInst } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import { h, onMounted, ref } from 'vue'
 
 // 本页面操作提示关键词

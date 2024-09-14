@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success"> {{ _baseName }}管理 </n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">

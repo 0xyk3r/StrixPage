@@ -1,9 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">Debug</n-text>
-    </n-h3>
-
     <n-card>
       <div v-hasPerm="['system:user:update']">修改用户</div>
       <div v-hasPerm="['system:user:remove']">删除用户</div>

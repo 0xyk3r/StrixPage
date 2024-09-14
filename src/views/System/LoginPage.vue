@@ -72,8 +72,8 @@ import { NCard, useLoadingBar, type FormInst } from 'naive-ui'
 import { nextTick, ref, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const $route = useRoute()
-const $router = useRouter()
+const route = useRoute()
+const router = useRouter()
 const tabBarStore = useTabsBarStore()
 const loginInfoStore = useLoginInfoStore()
 
@@ -81,7 +81,7 @@ initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
 
 // 获取地址栏的to参数
-const loggedJumpPath = $route.query.to || '/'
+const loggedJumpPath = route.query.to || '/'
 
 const isLogging = ref(false)
 const loginFormRef = ref<FormInst | null>(null)
@@ -144,7 +144,7 @@ const login = () => {
           `${loginManagerType === 1 ? '超级管理员' : '当前用户'}：` + res.data.info.nickname
         )
         const pushPath = (loggedJumpPath != '/login' ? loggedJumpPath : '/') as string
-        $router.push(pushPath)
+        router.push(pushPath)
       })
       .catch(() => {
         loginForm.value.loginPassword = ''

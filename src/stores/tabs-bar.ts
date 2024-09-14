@@ -1,7 +1,7 @@
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 
 export const useTabsBarStore = defineStore('tabsBar', () => {
   const visitedRoutes = ref<any[]>([])
@@ -16,7 +16,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 添加路由
    * @param route 路由
    */
-  function addVisitedRoute(route: RouteLocationNormalizedLoadedGeneric) {
+  function addVisitedRoute(route: RouteLocationNormalizedGeneric) {
     const target = visitedRoutes.value.find((item) => item.path === route.path)
     if (target) {
       if (route.fullPath !== target.fullPath) Object.assign(target, route)
@@ -28,7 +28,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
       const rr = refreshRoutes.value[refreshIndex]
       visitedRoutes.value.splice(rr.oldIndex, 0, rr)
       refreshRoutes.value.splice(refreshIndex, 1)
-    } else if (!route.meta.ignore) {
+    } else if (!route.meta.empty) {
       visitedRoutes.value.push({ ...route })
     }
   }
@@ -37,7 +37,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 删除指定路由
    * @param route 路由
    */
-  function delVisitedRoute(route: RouteLocationNormalizedLoadedGeneric) {
+  function delVisitedRoute(route: RouteLocationNormalizedGeneric) {
     visitedRoutes.value = visitedRoutes.value.filter((item) => item.path !== route.path)
   }
 
@@ -45,7 +45,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 删除其他路由
    * @param route 路由
    */
-  function delOthersVisitedRoute(route: RouteLocationNormalizedLoadedGeneric) {
+  function delOthersVisitedRoute(route: RouteLocationNormalizedGeneric) {
     visitedRoutes.value = visitedRoutes.value.filter(
       (item) => item.path === route.path || item.meta.fixed
     )
@@ -55,7 +55,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 删除左侧路由
    * @param route 路由
    */
-  function delLeftVisitedRoute(route: RouteLocationNormalizedLoadedGeneric) {
+  function delLeftVisitedRoute(route: RouteLocationNormalizedGeneric) {
     const index = visitedRoutes.value.findIndex((item) => item.path === route.path)
     if (index !== -1) {
       visitedRoutes.value = visitedRoutes.value.filter((item, i) => i >= index || item.meta.fixed)
@@ -66,7 +66,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 删除右侧路由
    * @param route 路由
    */
-  function delRightVisitedRoute(route: RouteLocationNormalizedLoadedGeneric) {
+  function delRightVisitedRoute(route: RouteLocationNormalizedGeneric) {
     const index = visitedRoutes.value.findIndex((item) => item.path === route.path)
     if (index !== -1) {
       visitedRoutes.value = visitedRoutes.value.filter((item, i) => i <= index || item.meta.fixed)
@@ -84,7 +84,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 添加刷新路由
    * @param route 路由
    */
-  function addRefreshRoutes(route: RouteLocationNormalizedLoadedGeneric) {
+  function addRefreshRoutes(route: RouteLocationNormalizedGeneric) {
     const target = refreshRoutes.value.find((item) => item.path === route.path)
     if (target) {
       if (route.fullPath !== target.fullPath) {

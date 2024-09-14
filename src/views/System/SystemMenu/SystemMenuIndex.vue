@@ -1,21 +1,17 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success"> {{ _baseName }}管理 </n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px">
       <template #body>
-        <n-grid :cols="6" style="margin-bottom: 15px">
+        <n-grid :cols="6">
           <n-gi :span="1">
-            <n-button type="primary" @click="() => showAddDataModal({ id: '', key: '' })"
-              >添加{{ _baseName }}</n-button
-            >
+            <n-button type="primary" @click="() => showAddDataModal({ id: '', key: '' })">
+              添加{{ _baseName }}
+            </n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="提醒" type="warning"
-          >Strix 理论支持无限级别菜单，但考虑到 UI 展示和性能问题，仍不建议配置超过 3
-          级菜单。</n-alert
-        >
+        <n-alert title="提醒" type="warning" style="margin-top: 15px">
+          Strix 理论支持无限级别菜单，但考虑到 UI 展示和性能问题，仍不建议配置超过 3 级菜单。
+        </n-alert>
       </template>
     </strix-block>
 
@@ -298,8 +294,6 @@ const _baseName = '系统菜单'
 
 const {
   getDataListParams,
-  clearSearch,
-  dataPagination,
   dataRowKey,
   addDataModalShow,
   addDataForm,

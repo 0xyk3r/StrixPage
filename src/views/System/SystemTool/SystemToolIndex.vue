@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">{{ _baseName }}管理</n-text>
-    </n-h3>
     <n-grid cols="1 400:2 800:4">
       <n-grid-item v-for="(item, index) in tools" :key="index">
         <n-card hoverable>
@@ -32,9 +29,8 @@ import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { NCard } from 'naive-ui'
 
-const $router = useRouter()
+const router = useRouter()
 
-const _baseName = '系统工具'
 const tools = [
   {
     name: '热度工具',
@@ -44,7 +40,7 @@ const tools = [
   }
 ]
 const openTool = (url: string) => {
-  $router.push({ path: url })
+  router.push({ path: url })
 }
 </script>
 

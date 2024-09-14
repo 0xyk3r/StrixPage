@@ -77,12 +77,14 @@ watch(
   box-shadow: var(--box-shadow-1);
   box-sizing: border-box;
   width: 78px;
+  opacity: 0.5;
   transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .strix-quick-menu:hover,
 .strix-quick-menu.auto-active {
   right: 0;
+  opacity: 1;
 }
 
 .strix-quick-menu > li {

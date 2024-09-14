@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 class="mb-0" prefix="bar" align-text type="success">
-      <n-text type="success">热度工具</n-text>
-    </n-h3>
     <n-layout has-sider>
       <n-layout-sider
         class="clear-bg-color"

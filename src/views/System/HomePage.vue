@@ -2,19 +2,19 @@
   <n-layout class="home-layout" has-sider @click="clickContainer">
     <n-layout-sider
       v-model:collapsed="siderCollapsed"
-      :width="240"
-      :collapsed-width="70"
-      :native-scrollbar="false"
       collapse-mode="width"
       show-trigger="bar"
       class="home-sider"
-      bordered
+      :width="240"
+      :collapsed-width="70"
+      :native-scrollbar="false"
+      :style="'--n-color: ' + themeVars.bodyColor"
     >
       <!-- Logo -->
       <div class="home-logo-container">
         <img class="home-logo" :class="theme" src="@/assets/img/logo-w.webp" />
       </div>
-      <!-- 侧边菜单区域 -->
+      <!-- 菜单 -->
       <n-spin :show="menuLoading">
         <n-menu
           ref="menuRef"
@@ -22,66 +22,40 @@
           key-field="id"
           label-field="name"
           children-field="children"
-          :collapsed-width="70"
-          :root-indent="32"
-          :indent="16"
-          :render-label="renderMenuLabel"
           :options="menuList"
+          :indent="16"
+          :root-indent="32"
+          :collapsed-width="70"
+          :render-label="renderMenuLabel"
         />
       </n-spin>
     </n-layout-sider>
     <n-layout>
-      <n-layout-header class="home-header">
+      <n-layout-header class="home-header" :style="'--n-color: ' + themeVars.bodyColor">
+        <!-- 顶部栏 -->
         <n-grid class="home-header-top">
-          <n-gi :span="12">
-            <div class="home-header-top-left">
-              <!-- 面包屑导航 -->
-              <strix-breadcrumb />
-            </div>
-          </n-gi>
-          <n-gi :span="12">
-            <div class="home-header-top-right">
-              <n-space v-if="!isSmallWindow">
-                <Icon icon="ion:contrast" :width="18" @click="changeTheme" />
-                <Icon icon="ion:expand" :width="18" @click="switchFullscreen" />
-                <Icon icon="ion:refresh" :width="18" @click="reloadAll" />
-              </n-space>
-              <n-dropdown
-                trigger="hover"
-                placement="bottom-start"
-                :options="avatarDropdownOptions"
-                @select="handleAvatarDropdownSelect"
-              >
-                <span class="avatar-dropdown">
-                  <img
-                    v-if="!isSmallWindow"
-                    class="user-avatar"
-                    src="@/assets/img/avatar.webp"
-                    alt=""
-                  />
-                  <span class="user-name">
-                    {{ loginInfo.nickname || '未知' }}
-                  </span>
-                </span>
-              </n-dropdown>
-            </div>
-          </n-gi>
+          <n-gi :span="5"><strix-breadcrumb /> </n-gi>
+          <n-gi :span="14"><strix-tabs-bar /> </n-gi>
+          <n-gi :span="5"><strix-tool-bar /> </n-gi>
         </n-grid>
-        <!-- 标签栏 -->
-        <strix-tabs-bar />
       </n-layout-header>
       <n-layout-content
         class="home-content"
         content-style="padding: 24px;"
         :native-scrollbar="false"
         :scrollbar-props="{ xScrollable: true }"
+        :style="'--n-color: ' + themeVars.actionColor"
         embedded
       >
+        <!-- 路由名称显示 -->
+        <n-h3 prefix="bar" align-text type="success">
+          <n-text type="success">{{ route.meta._title || route.meta.title }}</n-text>
+        </n-h3>
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
           <router-view v-slot="{ Component, route }">
             <transition name="strix-zoom-in-top">
-              <!-- 根据 fullPath 缓存组件 解决动态路由缓存问题 -->
+              <!-- 根据 fullPath 缓存组件 解决组件复用问题 -->
               <keep-alive :include="tabsBarStore.cachedRouteNames">
                 <component :is="Component" :key="route.fullPath" />
               </keep-alive>
@@ -89,9 +63,8 @@
           </router-view>
         </div>
       </n-layout-content>
-      <!-- <n-layout-footer class="home-footer">footer</n-layout-footer> -->
     </n-layout>
-
+    <!-- 快捷工具栏 -->
     <strix-quick-menu />
     <!-- 水印 -->
     <n-watermark
@@ -113,19 +86,19 @@
 import StrixBreadcrumb from '@/components/StrixBreadcrumb.vue'
 import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/StrixTabBar.vue'
+import StrixToolBar from '@/components/StrixToolBar.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
-import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
+import { initStrixMessage } from '@/utils/strix-message'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import elementResizeDetectorMaker from 'element-resize-detector'
 import { kebabCase } from 'lodash'
 import {
-  NDropdown,
   NLayout,
   NLayoutContent,
   NLayoutHeader,
@@ -134,16 +107,17 @@ import {
   NWatermark,
   useLoadingBar,
   useOsTheme,
+  useThemeVars,
   type MenuInst,
   type MenuOption
 } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import ScreenFull from 'screenfull'
 import { computed, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 
-const $router = useRouter()
+const route = useRoute()
 const osTheme = useOsTheme()
+const themeVars = useThemeVars()
 
 initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
@@ -156,7 +130,6 @@ const theme = computed(() =>
   globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme
 )
 const { loginInfo, loginTokenExpire } = storeToRefs(loginInfoStore) as LoginInfoStore
-const { isSmallWindow } = storeToRefs(globalSettingsStore)
 
 // 左侧菜单栏折叠
 const siderCollapsed = ref(globalSettingsStore.siderCollapsed)
@@ -164,13 +137,6 @@ watch(siderCollapsed, (value) => {
   globalSettingsStore.setSiderCollapsed(value)
 })
 
-// 登出
-const logout = () => {
-  http.post('system/logout', null, { meta: { operate: '登出 ', notify: false } }).finally(() => {
-    loginInfoStore.clearLoginInfo()
-    $router.push('/login')
-  })
-}
 // Token续期
 const renewToken = () => {
   // 如果token过期时间小于30天，则续期  (yyyy-MM-dd格式的字符串)
@@ -192,19 +158,6 @@ onMounted(renewToken)
 const clickContainer = () => {
   EventBus.emit('click-container')
 }
-
-// 切换全屏状态
-const switchFullscreen = () => {
-  if (!ScreenFull.isEnabled) {
-    return createStrixMessage(
-      'warning',
-      '进入全屏失败',
-      '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏'
-    )
-  }
-  ScreenFull.toggle()
-}
-
 // 强制刷新所有组件
 const routerViewShow = ref(true)
 const reloadAll = () => {
@@ -213,15 +166,9 @@ const reloadAll = () => {
     routerViewShow.value = true
   })
 }
-// 监听mitt通知并刷新所有组件
 onMounted(() => {
-  EventBus.on('reload-router-view', reloadAll)
+  EventBus.on('reload-all', reloadAll)
 })
-
-// 切换主题
-const changeTheme = () => {
-  EventBus.emit('changeTheme')
-}
 
 // 加载系统主菜单
 const menuRef = ref<MenuInst | null>(null)
@@ -248,14 +195,14 @@ onMounted(() => {
 const menuSelected = ref('')
 const syncCurrentSelectMenu = () => {
   if (menuList.value && menuList.value.length > 0) {
-    const currentMenu = deepSearch(menuList.value, $router.currentRoute.value.path, 'url')
+    const currentMenu = deepSearch(menuList.value, route.path, 'url')
     if (currentMenu) {
       menuSelected.value = currentMenu.id
       nextTick(() => menuRef.value?.showOption())
     }
   }
 }
-watch(() => $router.currentRoute.value.path, syncCurrentSelectMenu, {
+watch(() => route.path, syncCurrentSelectMenu, {
   immediate: true
 })
 
@@ -293,22 +240,6 @@ const renderMenuLabel = (option: MenuOption): any => {
     )
   }
   return option.name
-}
-
-// 右上角头像下拉菜单
-const avatarDropdownOptions = [
-  { key: 'setting', label: '个人设置' },
-  { key: 'logout', label: '退出登录' }
-]
-const handleAvatarDropdownSelect = (key: string) => {
-  switch (key) {
-    case 'setting':
-      createStrixMessage('warning', '操作失败', '该功能暂未开放，敬请期待')
-      break
-    case 'logout':
-      logout()
-      break
-  }
 }
 
 const windowWidth = ref(0)
@@ -361,68 +292,22 @@ onBeforeUnmount(() => {
   }
 
   .home-header {
-    height: 110px;
+    height: 60px;
 
     .home-header-top {
       height: 60px;
       margin: 0 20px;
       align-content: center;
-
-      .home-header-top-left {
-        display: flex;
-        align-items: center;
-      }
-
-      .home-header-top-right {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        height: 60px;
-        margin-right: 50px;
-
-        .n-space {
-          margin-top: 8px;
-        }
-
-        .n-space .iconify:hover {
-          color: #63e2b7;
-        }
-
-        .avatar-dropdown {
-          display: flex;
-          align-content: center;
-          align-items: center;
-          justify-content: center;
-          justify-items: center;
-          height: 60px;
-          padding-left: 10px;
-
-          .user-avatar {
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            border-radius: 50%;
-          }
-
-          .user-name {
-            position: relative;
-            margin-left: 5px;
-            cursor: pointer;
-
-            &:hover {
-              color: #63e2b7;
-            }
-          }
-        }
-      }
     }
   }
 
   .home-content {
-    height: calc(100vh - 110px);
+    height: calc(100vh - 60px - 12px);
+    border-radius: 16px;
+    margin: 0 12px 12px 0;
+    box-sizing: border-box;
   }
 
-  //
   //.home-footer {
   //  height: 100px;
   //}

@@ -14,8 +14,8 @@ import { NResult } from 'naive-ui'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const $route = useRoute()
-const $router = useRouter()
+const route = useRoute()
+const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 
 const countDown = ref(5)
@@ -30,8 +30,8 @@ const clearTimer = () => {
 
 const closeCurrentTab = () => {
   clearTimer()
-  tabsBarStore.delVisitedRoute($route)
-  $router.push({ path: '/' })
+  tabsBarStore.delVisitedRoute(route)
+  router.push({ path: '/' })
 }
 
 onMounted(() => {

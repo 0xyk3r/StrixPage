@@ -1,18 +1,8 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success"> {{ _baseName }}管理 - {{ dictKey }} </n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
-        <n-grid
-          :cols="6"
-          :x-gap="20"
-          :y-gap="5"
-          item-responsive
-          responsive="screen"
-          style="margin-bottom: 15px"
-        >
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -200,13 +190,13 @@ import { NTag, type DataTableColumns } from 'naive-ui'
 import { h, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-const $route = useRoute()
+const route = useRoute()
 
 // 本页面操作提示关键词
 const _baseName = '系统字典数据'
 
 // 路由参数
-const dictKey = $route.params.dictKey
+const dictKey = route.params.dictKey
 
 // 加载字典
 const dictDataStyleRef = useDict('DictDataStyle')

@@ -10,14 +10,14 @@ import { http } from '@/plugins/axios'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-const $route = useRoute()
+const route = useRoute()
 
 const _baseName = '流程绘制工具'
 const _baseApiPrefix = 'system/workflow/config'
 
 // 路由参数
-const workflowId = $route.params.workflowId as string
-const configId = $route.params.configId as string
+const workflowId = route.params.workflowId as string
+const configId = route.params.configId as string
 const dataJson = ref('')
 
 const loadConfigData = () => {

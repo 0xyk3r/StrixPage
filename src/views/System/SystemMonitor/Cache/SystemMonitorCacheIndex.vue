@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">系统缓存信息</n-text>
-    </n-h3>
     <n-card title="Redis Info">
       <n-spin :show="!cacheInfo">
         <n-descriptions label-placement="left" :column="4" bordered>

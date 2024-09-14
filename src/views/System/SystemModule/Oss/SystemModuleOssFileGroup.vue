@@ -1,18 +1,8 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success"> {{ _baseName }}管理 </n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
-        <n-grid
-          :cols="6"
-          :x-gap="20"
-          :y-gap="5"
-          item-responsive
-          responsive="screen"
-          style="margin-bottom: 15px"
-        >
+        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -27,7 +17,7 @@
             <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }} </n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="提醒" type="warning">
+        <n-alert title="提醒" type="warning" style="margin-top: 15px">
           文件分组与文件属于强绑定模式，所以文件组创建后不建议进行修改或删除操作，删除会导致该文件组下所有文件无法获取。
         </n-alert>
       </template>

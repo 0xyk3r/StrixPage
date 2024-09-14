@@ -1,8 +1,5 @@
 <template>
   <div>
-    <n-h3 prefix="bar" align-text type="success">
-      <n-text type="success">{{ _baseName }}管理</n-text>
-    </n-h3>
     <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
       <template #body>
         <n-grid
@@ -11,7 +8,6 @@
           :y-gap="5"
           item-responsive
           responsive="screen"
-          style="margin-bottom: 15px"
         >
           <n-gi span="6 s:3 m:2">
             <n-input-group>

@@ -21,17 +21,17 @@ import {
 } from 'vue'
 import { useRoute } from 'vue-router'
 
-const $route = useRoute()
+const route = useRoute()
 const tabsBarStore = useTabsBarStore()
 const { cacheDynamicComponents } = storeToRefs(tabsBarStore)
 
 const isDestroyed = ref(false)
-const dynamicComponent = $route.meta.dynamicComponent as (() => Promise<Component>) | null
+const dynamicComponent = route.meta.dynamicComponent as (() => Promise<Component>) | null
 const proxyComponent = shallowRef<Component | null>(null)
 
 const dynamicComponentName = replaceDynamicName(
-  $route.meta.dynamieComponentNameTemplate as string,
-  $route.params
+  route.meta.dynamieComponentNameTemplate as string,
+  route.params
 )
 
 /**
