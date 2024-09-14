@@ -61,7 +61,7 @@
 </template>
 <script setup lang="ts">
 import { http } from '@/plugins/axios'
-import echarts from '@/plugins/echarts'
+import { useEcharts } from '@/plugins/echarts'
 import { NCard, NDescriptions, NDescriptionsItem } from 'naive-ui'
 import { onMounted, ref } from 'vue'
 
@@ -69,8 +69,8 @@ const loading = ref(true)
 const cacheInfo = ref<any>({})
 
 const getData = () => {
-  const commandstats = echarts.init(document.getElementById('commandstats'))
-  const usedmemory = echarts.init(document.getElementById('usedmemory'))
+  const commandstats = useEcharts(document.getElementById('commandstats'))
+  const usedmemory = useEcharts(document.getElementById('usedmemory'))
 
   loading.value = true
   http

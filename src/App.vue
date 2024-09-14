@@ -1,10 +1,9 @@
 <template>
   <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
     <n-loading-bar-provider>
-      <n-notification-provider>
-        <n-message-provider :keep-alive-on-hover="true">
+      <n-notification-provider keep-alive-on-hover>
+        <n-message-provider keep-alive-on-hover>
           <n-dialog-provider>
-            <ReloadPrompt />
             <router-view />
           </n-dialog-provider>
         </n-message-provider>
@@ -23,14 +22,13 @@ import {
   NDialogProvider,
   NGlobalStyle,
   NLoadingBarProvider,
-  NNotificationProvider,
   NMessageProvider,
+  NNotificationProvider,
   useOsTheme,
   zhCN
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { EventBus } from './plugins/event-bus'
-import ReloadPrompt from './components/ReloadPrompt.vue'
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
