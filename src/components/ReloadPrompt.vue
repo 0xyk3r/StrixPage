@@ -1,23 +1,56 @@
-<template>
-  <div v-if="offlineReady || needRefresh" class="pwa-toast" role="alert">
-    <div class="message">
-      <span v-if="offlineReady"> App ready to work offline </span>
-      <span v-else> New content available, click on reload button to update. </span>
-    </div>
-    <button v-if="needRefresh" @click="updateServiceWorker()">Reload</button>
-    <button @click="close">Close</button>
-  </div>
-</template>
-
 <script setup lang="ts">
+import { NButton, useNotification } from 'naive-ui'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
+import { h, watch } from 'vue'
 
 const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW()
+const notification = useNotification()
 
-async function close() {
-  offlineReady.value = false
-  needRefresh.value = false
-}
+watch(offlineReady, (newVal) => {
+  if (newVal) {
+    const offlineNotify = notification.warning({
+      title: 'Strix 提示',
+      content: '网络异常, Strix 目前处于离线模式.',
+      duration: 0,
+      action: () =>
+        h(
+          NButton,
+          {
+            text: true,
+            type: 'primary',
+            onClick: () => {
+              offlineNotify.destroy()
+            }
+          },
+          { default: () => '知道了' }
+        )
+    })
+  }
+})
+
+watch(needRefresh, (newVal) => {
+  if (newVal) {
+    const updateNotify = notification.warning({
+      title: 'Strix 提示',
+      content: 'Strix 已更新, 点击确认切换为最新版本.',
+      duration: 0,
+      meta: '请注意保存您的内容',
+      action: () =>
+        h(
+          NButton,
+          {
+            text: true,
+            type: 'primary',
+            onClick: () => {
+              updateServiceWorker()
+              updateNotify.destroy()
+            }
+          },
+          { default: () => '确认' }
+        )
+    })
+  }
+})
 </script>
 
 <style>

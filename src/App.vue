@@ -1,14 +1,15 @@
 <template>
   <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
     <n-loading-bar-provider>
-      <n-message-provider :keep-alive-on-hover="true">
-        <n-dialog-provider>
-          <router-view />
-        </n-dialog-provider>
-      </n-message-provider>
+      <n-notification-provider>
+        <n-message-provider :keep-alive-on-hover="true">
+          <n-dialog-provider>
+            <ReloadPrompt />
+            <router-view />
+          </n-dialog-provider>
+        </n-message-provider>
+      </n-notification-provider>
     </n-loading-bar-provider>
-
-    <ReloadPrompt></ReloadPrompt>
     <n-global-style />
   </n-config-provider>
 </template>
@@ -22,6 +23,7 @@ import {
   NDialogProvider,
   NGlobalStyle,
   NLoadingBarProvider,
+  NNotificationProvider,
   NMessageProvider,
   useOsTheme,
   zhCN
