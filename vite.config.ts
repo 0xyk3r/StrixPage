@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // registerType: 'autoUpdate',
       devOptions: {
         enabled: true,
         type: 'module'
