@@ -39,12 +39,12 @@ watch(offlineReady, (newVal) => {
           NButton,
           {
             text: true,
-            type: 'primary',
+            type: 'warning',
             onClick: () => {
               offlineNotify.destroy()
             }
           },
-          { default: () => '知道了' }
+          { default: () => '确认' }
         )
     })
   }
@@ -61,7 +61,7 @@ watch(needRefresh, (newVal) => {
           NButton,
           {
             text: true,
-            type: 'primary',
+            type: 'warning',
             onClick: () => {
               updateServiceWorker()
               updateNotify.destroy()
