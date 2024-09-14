@@ -1,13 +1,6 @@
-import {
-  createDiscreteApi,
-  darkTheme,
-  lightTheme,
-  NButton,
-  useNotification,
-  type ConfigProviderProps
-} from 'naive-ui'
+import { NButton, useNotification } from 'naive-ui'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { computed, h, ref, watch, type Ref } from 'vue'
+import { h, watch } from 'vue'
 
 export const useSW = () => {
   const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
