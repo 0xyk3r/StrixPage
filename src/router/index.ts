@@ -35,7 +35,7 @@ const routes: RouteRecordRaw[] = [
     redirect: '/index',
     meta: {
       icon: 'ion:home-outline',
-      title: 'Strix'
+      title: ''
     },
     children: [
       {
