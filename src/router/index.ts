@@ -44,7 +44,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/IndexPage.vue'),
         meta: {
           title: '首页',
-          icon: 'fa fa-home',
           fixed: true,
           fixedIndex: 0
         }

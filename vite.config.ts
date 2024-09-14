@@ -10,7 +10,6 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'auto',
       devOptions: {
         enabled: true,
         type: 'module'

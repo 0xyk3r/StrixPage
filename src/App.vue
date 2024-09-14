@@ -7,6 +7,8 @@
         </n-dialog-provider>
       </n-message-provider>
     </n-loading-bar-provider>
+
+    <ReloadPrompt></ReloadPrompt>
     <n-global-style />
   </n-config-provider>
 </template>
@@ -26,6 +28,7 @@ import {
 } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { EventBus } from './plugins/event-bus'
+import ReloadPrompt from './components/ReloadPrompt.vue'
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()

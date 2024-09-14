@@ -58,6 +58,17 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 // 自定义指令
 import installDirectives from './directives'
 
+// Service Worker
+import { useRegisterSW } from 'virtual:pwa-register/vue'
+const updateSW = useRegisterSW({
+  onNeedRefresh() {
+    alert('有新内容可用，请刷新页面')
+  },
+  onOfflineReady() {
+    alert('App is offline-ready')
+  }
+})
+
 const app = createApp(App)
 
 const pinia = createPinia()
