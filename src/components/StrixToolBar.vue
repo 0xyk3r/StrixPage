@@ -1,11 +1,39 @@
 <template>
-  <div ref="toolbarContainerRef" class="toolbar-container">
-    <n-space v-if="!isSmallWindow">
+  <div v-show="!isSmallWindow" ref="toolbarContainerRef" class="toolbar-container">
+    <n-flex :size="10" :wrap="false">
       <span id="strix-tool-bar-item"></span>
-      <Icon icon="ion:contrast" :width="18" @click="changeTheme" />
-      <Icon icon="ion:expand" :width="18" @click="switchFullscreen" />
-      <Icon icon="ion:refresh" :width="18" @click="reloadAll" />
-    </n-space>
+
+      <!-- 更改主题 -->
+      <n-icon-wrapper
+        :size="32"
+        :border-radius="5"
+        :color="themeVars.actionColor"
+        :icon-color="themeVars.textColorBase"
+      >
+        <n-icon :size="18"><Icon icon="ion:contrast" @click="changeTheme" /></n-icon>
+      </n-icon-wrapper>
+
+      <!-- 切换全屏 -->
+      <n-icon-wrapper
+        :size="32"
+        :border-radius="5"
+        :color="themeVars.actionColor"
+        :icon-color="themeVars.textColorBase"
+      >
+        <n-icon :size="18"><Icon icon="ion:expand" @click="switchFullscreen" /></n-icon>
+      </n-icon-wrapper>
+
+      <!-- 刷新全部 -->
+      <n-icon-wrapper
+        :size="32"
+        :border-radius="5"
+        :color="themeVars.actionColor"
+        :icon-color="themeVars.textColorBase"
+      >
+        <n-icon :size="18"><Icon icon="ion:refresh" @click="reloadAll" /></n-icon>
+      </n-icon-wrapper>
+    </n-flex>
+
     <n-dropdown
       trigger="hover"
       placement="bottom-start"
@@ -13,7 +41,6 @@
       @select="handleAvatarDropdownSelect"
     >
       <span class="avatar-dropdown">
-        <img v-if="!isSmallWindow" class="user-avatar" src="@/assets/img/avatar.webp" alt="" />
         <span class="user-name">
           {{ loginInfo.nickname || '未知' }}
         </span>
@@ -29,12 +56,14 @@ import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
+import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
 
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()
 const globalSettingsStore = useStrixSettingsStore()
+const themeVars = useThemeVars()
 
 const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
 const { isSmallWindow } = storeToRefs(globalSettingsStore)
@@ -99,11 +128,7 @@ const logout = () => {
   height: 60px;
   margin-right: 50px;
 
-  .n-space {
-    margin-top: 8px;
-  }
-
-  .n-space .iconify:hover {
+  .n-icon .iconify:hover {
     color: #63e2b7;
   }
 
@@ -127,6 +152,7 @@ const logout = () => {
       position: relative;
       margin-left: 5px;
       cursor: pointer;
+      white-space: nowrap;
 
       &:hover {
         color: #63e2b7;

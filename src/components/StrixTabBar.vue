@@ -26,7 +26,14 @@
         :options="contextmenuList"
         @select="handleContextmenuSelect"
       >
-        <Icon icon="ion:grid" class="tabs-common-handler" :width="18" />
+        <n-icon-wrapper
+          :size="32"
+          :border-radius="5"
+          :color="themeVars.actionColor"
+          :icon-color="themeVars.textColorBase"
+        >
+          <n-icon :size="18"><Icon icon="ion:grid" class="tabs-common-handler" /></n-icon>
+        </n-icon-wrapper>
       </n-dropdown>
     </Teleport>
 
@@ -50,12 +57,14 @@ import { EventBus } from '@/plugins/event-bus'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { Icon } from '@iconify/vue'
+import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 const quickMenuStore = useQuickMenuStore()
+const themeVars = useThemeVars()
 
 const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
@@ -379,7 +388,6 @@ const getContextmenuTagView = () => {
 
 .tabs-common-handler {
   color: var(--n-tab-text-color);
-  font-size: 20px;
   outline: none;
   cursor: pointer;
   transition: transform 1s;

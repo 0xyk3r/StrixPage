@@ -33,10 +33,10 @@
     <n-layout>
       <n-layout-header class="home-header" :style="'--n-color: ' + themeVars.bodyColor">
         <!-- 顶部栏 -->
-        <n-grid class="home-header-top">
-          <n-gi :span="5"><strix-breadcrumb /> </n-gi>
-          <n-gi :span="14"><strix-tabs-bar /> </n-gi>
-          <n-gi :span="5"><strix-tool-bar /> </n-gi>
+        <n-grid class="home-header-top" cols="24" item-responsive responsive="screen">
+          <n-gi span="0 m:0 l:6"><strix-breadcrumb /> </n-gi>
+          <n-gi span="0 m:0 l:12"><strix-tabs-bar /> </n-gi>
+          <n-gi span="24 m:24 l:6"><strix-tool-bar /> </n-gi>
         </n-grid>
       </n-layout-header>
       <n-layout-content
@@ -48,9 +48,9 @@
         embedded
       >
         <!-- 路由名称显示 -->
-        <n-h3 prefix="bar" align-text type="success">
+        <!-- <n-h3 prefix="bar" align-text type="success">
           <n-text type="success">{{ route.meta._title || route.meta.title }}</n-text>
-        </n-h3>
+        </n-h3> -->
         <!-- 动态路由区域 -->
         <div v-if="routerViewShow" class="app-main-height">
           <router-view v-slot="{ Component, route }">
@@ -285,6 +285,10 @@ onBeforeUnmount(() => {
       height: 60px;
       margin: 0 20px;
       align-content: center;
+
+      & > div {
+        height: 60px;
+      }
     }
   }
 
