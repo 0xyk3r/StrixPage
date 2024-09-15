@@ -1,8 +1,5 @@
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition: color 0.5s, background-color 0.5s;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -20,5 +17,7 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-transition-delay: 99999s !important;
-  -webkit-transition: color 99999s ease-out, background-color 99999s ease-out !important;
+  -webkit-transition:
+    color 99999s ease-out,
+    background-color 99999s ease-out !important;
 }

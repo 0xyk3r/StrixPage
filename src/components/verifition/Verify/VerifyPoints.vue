@@ -11,7 +11,7 @@
         }"
       >
         <div class="verify-refresh" style="z-index: 3" @click="refresh" v-show="showRefresh">
-          <i class="iconfont icon-refresh"></i>
+          <Icon icon="ion-refresh" color="#000" :width="24" />
         </div>
         <img
           :src="'data:image/png;base64,' + pointBackImgBase"
@@ -60,8 +60,13 @@ import { http } from '@/plugins/axios'
 import { type ComponentInternalInstance } from 'vue'
 import { aesEncrypt } from '../utils/ase'
 import { resetSize } from '../utils/util'
+import { Icon } from '@iconify/vue'
+
 export default {
   name: 'VerifyPoints',
+  components: {
+    Icon
+  },
   props: {
     // 弹出式pop，固定fixed
     mode: {
@@ -281,3 +286,6 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+@import '@/assets/style/components/verify.scss';
+</style>

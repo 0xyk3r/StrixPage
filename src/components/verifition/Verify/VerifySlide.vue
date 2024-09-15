@@ -5,25 +5,19 @@
       class="verify-img-out"
       :style="{ height: parseInt(setSize.imgHeight) + vSpace + 'px' }"
     >
-      <div
-        class="verify-img-panel"
-        :style="{
-          width: setSize.imgWidth,
-          height: setSize.imgHeight
-        }"
-      >
+      <div class="verify-img-panel" :style="{ width: setSize.imgWidth, height: setSize.imgHeight }">
         <img
           :src="'data:image/png;base64,' + backImgBase"
           alt=""
           style="width: 100%; height: 100%; display: block"
         />
         <div class="verify-refresh" @click="refresh" v-show="showRefresh">
-          <i class="iconfont icon-refresh"></i>
+          <Icon icon="ion-refresh" color="#000" :width="28" />
         </div>
         <transition name="tips">
-          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">{{
-            tipWords
-          }}</span>
+          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">
+            {{ tipWords }}
+          </span>
         </transition>
       </div>
     </div>
@@ -33,7 +27,7 @@
       :style="{
         width: setSize.imgWidth,
         height: barSize.height,
-        'line-height': barSize.height
+        lineHeight: barSize.height
       }"
     >
       <span class="verify-msg" v-text="text"></span>
@@ -42,7 +36,7 @@
         :style="{
           width: leftBarWidth !== '' ? leftBarWidth : barSize.height,
           height: barSize.height,
-          'border-color': leftBarBorderColor,
+          borderColor: leftBarBorderColor,
           transition: transitionWidth
         }"
       >
@@ -54,12 +48,12 @@
           :style="{
             width: barSize.height,
             height: barSize.height,
-            'background-color': moveBlockBackgroundColor,
+            backgroundColor: moveBlockBackgroundColor,
             left: moveBlockLeft,
             transition: transitionLeft
           }"
         >
-          <i :class="['verify-icon iconfont', iconClass]" :style="{ color: iconColor }"></i>
+          <Icon :icon="iconClass" color="#000" :width="40" />
           <div
             v-if="type === '2'"
             class="verify-sub-block"
@@ -67,7 +61,7 @@
               width: Math.floor((parseInt(setSize.imgWidth) * 47) / 310) + 'px',
               height: setSize.imgHeight,
               top: '-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
-              'background-size': setSize.imgWidth + ' ' + setSize.imgHeight
+              backgroundSize: setSize.imgWidth + ' ' + setSize.imgHeight
             }"
           >
             <img
@@ -86,9 +80,13 @@ import { http } from '@/plugins/axios'
 import { type ComponentInternalInstance } from 'vue'
 import { aesEncrypt } from '../utils/ase'
 import { resetSize } from './../utils/util'
-//  "captchaType":"blockPuzzle",
+import { Icon } from '@iconify/vue'
+
 export default {
   name: 'VerifySlide',
+  components: {
+    Icon
+  },
   props: {
     captchaType: {
       type: String
@@ -166,7 +164,7 @@ export default {
       moveBlockBackgroundColor = ref(''),
       leftBarBorderColor = ref('#ddd'),
       iconColor = ref(''),
-      iconClass = ref('icon-right'),
+      iconClass = ref('ion:arrow-forward-outline'),
       status = ref(false), //鼠标状态
       isEnd = ref(false), //是够验证完成
       showRefresh = ref(true),
@@ -301,7 +299,7 @@ export default {
               moveBlockBackgroundColor.value = '#5cb85c'
               leftBarBorderColor.value = '#5cb85c'
               iconColor.value = '#fff'
-              iconClass.value = 'icon-check'
+              iconClass.value = 'ion:checkmark-outline'
               showRefresh.value = false
               isEnd.value = true
               if (mode.value == 'pop') {
@@ -327,7 +325,7 @@ export default {
               moveBlockBackgroundColor.value = '#d9534f'
               leftBarBorderColor.value = '#d9534f'
               iconColor.value = '#fff'
-              iconClass.value = 'icon-close'
+              iconClass.value = 'ion:close-outline'
               passFlag.value = false
               setTimeout(function () {
                 refresh()
@@ -357,7 +355,7 @@ export default {
       leftBarBorderColor.value = '#ddd'
       moveBlockBackgroundColor.value = '#fff'
       iconColor.value = '#000'
-      iconClass.value = 'icon-right'
+      iconClass.value = 'ion:arrow-forward-outline'
       isEnd.value = false
 
       getPictrue()
@@ -431,3 +429,6 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+@import '@/assets/style/components/verify.scss';
+</style>

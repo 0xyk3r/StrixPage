@@ -54,9 +54,4 @@ const currentTheme = computed(() => {
 })
 </script>
 
-<style>
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-</style>
+<style lang="scss" scoped></style>

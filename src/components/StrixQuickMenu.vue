@@ -59,7 +59,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .strix-quick-menu {
   position: fixed;
   top: 33%;

@@ -89,6 +89,7 @@ import StrixTabsBar from '@/components/StrixTabBar.vue'
 import StrixToolBar from '@/components/StrixToolBar.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
+import { useResizeDetector } from '@/plugins/resize-detector'
 import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
@@ -96,7 +97,6 @@ import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { initStrixMessage } from '@/utils/strix-message'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
-import elementResizeDetectorMaker from 'element-resize-detector'
 import { kebabCase } from 'lodash'
 import { useOsTheme, useThemeVars, type MenuInst, type MenuOption } from 'naive-ui'
 import { storeToRefs } from 'pinia'
@@ -229,26 +229,16 @@ const renderMenuLabel = (option: MenuOption): any => {
   return option.name
 }
 
-const windowWidth = ref(0)
-watch(windowWidth, (value) => {
-  globalSettingsStore.setIsSmallWindow(value < 640)
-  if (value < 640) {
+// 监听窗口大小变化
+useResizeDetector(document.getElementById('app'), (element) => {
+  globalSettingsStore.setIsSmallWindow(element.offsetWidth < 640)
+  if (element.offsetWidth < 640) {
     siderCollapsed.value = true
   }
 })
-let erd: elementResizeDetectorMaker.Erd | null = null
-onMounted(() => {
-  erd = elementResizeDetectorMaker({ strategy: 'scroll' })
-  erd.listenTo(document.getElementById('app') as HTMLElement, (element) => {
-    windowWidth.value = element.offsetWidth
-  })
-})
-onBeforeUnmount(() => {
-  erd?.uninstall(document.getElementById('app') as HTMLElement)
-})
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .home-layout {
   height: 100vh;
 
@@ -297,10 +287,31 @@ onBeforeUnmount(() => {
     border-radius: 16px;
     margin: 0 12px 12px 0;
     box-sizing: border-box;
+
+    .app-main-height {
+      user-select: text;
+
+      .strix-zoom-in-top-enter-active,
+      .strix-zoom-in-top-leave-active {
+        filter: none;
+        transition:
+          filter 0.4s ease,
+          transform 0.4s ease;
+      }
+
+      .strix-zoom-in-top-enter-from,
+      .strix-zoom-in-top-leave-from {
+        filter: blur(20px);
+      }
+
+      .strix-zoom-in-top-leave-active {
+        display: none;
+      }
+    }
   }
 
-  //.home-footer {
-  //  height: 100px;
-  //}
+  /* .home-footer {
+    height: 100px;
+  } */
 }
 </style>

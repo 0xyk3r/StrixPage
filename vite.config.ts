@@ -82,10 +82,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('axios')) return 'axios'
-            if (id.includes('lodash')) return 'lodash'
             if (id.includes('echarts')) return 'echarts'
-            if (id.includes('jsencrypt')) return 'jsencrypt'
           }
         }
       }

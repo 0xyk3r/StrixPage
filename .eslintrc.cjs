@@ -9,6 +9,9 @@ module.exports = {
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-prettier/skip-formatting'
   ],
+  parserOptions: {
+    ecmaVersion: 'latest'
+  }
   // rules: {
   //   'vue/max-attributes-per-line': [
   //     'warn',
@@ -26,7 +29,4 @@ module.exports = {
   //   'vue/html-closing-bracket-newline': ['off'],
   //   'vue/singleline-html-element-content-newline': ['off']
   // },
-  parserOptions: {
-    ecmaVersion: 'latest'
-  }
 }

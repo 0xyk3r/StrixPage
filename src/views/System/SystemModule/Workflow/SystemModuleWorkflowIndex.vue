@@ -80,7 +80,7 @@
       v-model:show="addDataModalShow"
       preset="card"
       :title="'添加' + _baseName"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -108,7 +108,7 @@
       v-model:show="editDataModalShow"
       preset="card"
       :title="'修改' + _baseName"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -376,4 +376,4 @@ const deletePopularitData = (id: string) => {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="scss" scoped></style>

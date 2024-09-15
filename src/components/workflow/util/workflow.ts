@@ -1,3 +1,4 @@
+import '@/assets/style/components/workflow.scss'
 import WorkflowConditionsNode from '@/components/workflow/WorkflowConditionsNode.vue'
 import WorkflowNode from '@/components/workflow/WorkflowNode.vue'
 import { createStrixMessage } from '@/utils/strix-message'

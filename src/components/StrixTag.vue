@@ -7,7 +7,7 @@
 import type { NTagType } from '@/@types/naive-ui'
 import { useDict } from '@/utils/strix-dict-util'
 
-const $props = defineProps({
+const { value, dictName, notFoundLabel } = defineProps({
   value: { type: [String, Number], required: true },
   dictName: { type: String, required: true },
   beforeLabel: { type: String, default: '' },
@@ -15,7 +15,7 @@ const $props = defineProps({
   notFoundLabel: { type: String, default: '未知' }
 })
 
-const dict = useDict($props.dictName)
+const dict = useDict(dictName)
 
 const loading = computed(() => !dict || dict.value.length === 0)
 
@@ -24,9 +24,9 @@ const tag = computed(() => {
     return { label: '加载中...', type: 'default' as NTagType }
   }
 
-  const foundItem: any = dict.value.find((item: any) => item.value === $props.value)
+  const foundItem: any = dict.value.find((item: any) => item.value === value)
   return {
-    label: foundItem?.label || $props.notFoundLabel,
+    label: foundItem?.label || notFoundLabel,
     type: (foundItem?.style || 'default') as NTagType
   }
 })

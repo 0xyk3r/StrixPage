@@ -42,7 +42,7 @@ const openTool = (url: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .tool-header {
   display: flex;
   align-items: center;

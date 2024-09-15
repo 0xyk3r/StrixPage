@@ -40,7 +40,7 @@
       :options="avatarDropdownOptions"
       @select="handleAvatarDropdownSelect"
     >
-      <span class="avatar-dropdown">
+      <span class="user-dropdown">
         <span class="user-name">
           {{ loginInfo.nickname || '未知' }}
         </span>
@@ -53,7 +53,6 @@
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
-import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
 import { useThemeVars } from 'naive-ui'
@@ -62,11 +61,9 @@ import screenfull from 'screenfull'
 
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()
-const globalSettingsStore = useStrixSettingsStore()
 const themeVars = useThemeVars()
 
 const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
-const { isSmallWindow } = storeToRefs(globalSettingsStore)
 
 // 切换全屏状态
 const switchFullscreen = () => {
@@ -132,7 +129,7 @@ const logout = () => {
     color: #63e2b7;
   }
 
-  .avatar-dropdown {
+  .user-dropdown {
     display: flex;
     align-content: center;
     align-items: center;
@@ -140,13 +137,6 @@ const logout = () => {
     justify-items: center;
     height: 60px;
     padding-left: 10px;
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      border-radius: 50%;
-    }
 
     .user-name {
       position: relative;

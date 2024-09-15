@@ -1,0 +1,57 @@
+/* strix-model */
+.strix-form-modal {
+  width: 65vw;
+  max-width: 800px;
+
+  .strix-form-modal-footer {
+    justify-content: flex-end !important;
+  }
+}
+
+/* strix-model 在移动设备上占满屏幕宽度 */
+@media only screen and (max-width: 768px) {
+  .strix-form-modal {
+    width: calc(100vw - 20px);
+    max-width: none;
+  }
+}
+
+.strix-button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+  > * + * {
+    margin-left: 10px;
+  }
+}
+
+.full-h {
+  height: 100%;
+}
+
+.clear-bg-color {
+  background-color: unset !important;
+}
+
+// n-table 数据载入动画
+@for $n from 0 through 100 {
+  .n-data-table-tbody {
+    .n-data-table-tr:nth-child(#{$n}) {
+      opacity: 0;
+      animation: animation-table-tr 360ms $n * 30ms forwards ease-out;
+    }
+  }
+}
+
+@keyframes animation-table-tr {
+  0% {
+    transform: translateX(-30px);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

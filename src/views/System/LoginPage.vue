@@ -1,64 +1,78 @@
 <template>
-  <div class="login-container">
-    <n-card class="login-form-panel" content-style="padding: 0; height: 100%;">
-      <n-grid style="height: 100%" cols="24" item-responsive>
-        <n-grid-item span="0:0 800:16">
-          <div class="login-left" />
-        </n-grid-item>
-        <n-grid-item span="0:24 800:8">
-          <div class="login-right">
-            <div class="login-title">Strix 控制中心</div>
-            <n-form
-              ref="loginFormRef"
-              :model="loginForm"
-              :rules="loginFormRules"
-              label-width="60px"
-              class="login-form"
-              @submit.prevent
-            >
-              <n-form-item label="登录用户" path="loginName">
-                <n-input
-                  v-model:value="loginForm.loginName"
-                  placeholder="请输入登录账号"
-                  class="login-input"
-                  clearable
-                />
-              </n-form-item>
-              <n-form-item label="登录密码" path="loginPassword">
-                <n-input
-                  v-model:value="loginForm.loginPassword"
-                  type="password"
-                  placeholder="请输入登录密码"
-                  class="login-input"
-                  show-password-on="mousedown"
-                  clearable
-                />
-              </n-form-item>
-              <n-button
-                type="primary"
-                :loading="isLogging"
-                class="login-btn"
-                @click="showLoginVerify"
+  <n-el tag="div" class="login-container">
+    <n-grid cols="4" item-responsive responsive="screen">
+      <n-grid-item span="0 m:0 l:2">
+        <div class="login-panel-left">
+          <div class="login-img-1"></div>
+          <div class="login-img-2"></div>
+        </div>
+      </n-grid-item>
+      <n-grid-item span="4 m:4 l:2">
+        <div class="login-panel-right">
+          <div class="login-panel-right-content">
+            <div tag="div" class="login-panel-right-content-header">
+              <div class="login-panel-right-content-header-title">Strix 控制中心</div>
+              <div class="login-panel-right-content-header-subtitle">Welcome Back</div>
+            </div>
+            <div class="login-panel-right-content-body">
+              <n-form
+                ref="loginFormRef"
+                :model="loginForm"
+                :rules="loginFormRules"
+                label-width="100px"
+                label-placement="top"
+                @submit.prevent
               >
-                {{ isLogging ? '登录中...' : '登录' }}
-              </n-button>
-            </n-form>
+                <n-form-item label="登录账号" path="loginName">
+                  <n-input
+                    v-model:value="loginForm.loginName"
+                    size="large"
+                    placeholder="请输入登录账号"
+                    clearable
+                  />
+                </n-form-item>
+                <n-form-item label="登录密码" path="loginPassword">
+                  <n-input
+                    v-model:value="loginForm.loginPassword"
+                    type="password"
+                    size="large"
+                    placeholder="请输入登录密码"
+                    clearable
+                  />
+                </n-form-item>
+                <n-form-item>
+                  <n-button
+                    type="primary"
+                    size="large"
+                    class="btn-login"
+                    strong
+                    secondary
+                    @click="showLoginVerify"
+                    :loading="isLogging"
+                  >
+                    {{ isLogging ? '登录中...' : '登录' }}
+                  </n-button>
+                </n-form-item>
+              </n-form>
+
+              <VerifyContainer
+                v-if="loginVerifyShowStatus"
+                ref="verifyRef"
+                mode="pop"
+                captcha-type="blockPuzzle"
+                :img-size="{ width: '400px', height: '200px' }"
+                @success="verifySuccess"
+              />
+              <div class="copyright">
+                Copyright &copy; 2024 ProjectAn Strix |
+                <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
+              </div>
+            </div>
           </div>
-        </n-grid-item>
-      </n-grid>
-    </n-card>
-    <VerifyContainer
-      v-if="loginVerifyShowStatus"
-      ref="verifyRef"
-      mode="pop"
-      captcha-type="blockPuzzle"
-      :img-size="{ width: '400px', height: '200px' }"
-      @success="verifySuccess"
-    />
-    <div class="beian">
-      <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
-    </div>
-  </div>
+        </div>
+      </n-grid-item>
+    </n-grid>
+  </n-el>
 </template>
 
 <script setup lang="ts">
@@ -154,95 +168,121 @@ const login = () => {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .login-container {
-  background: url(@/assets/img/background.webp) no-repeat center 0;
-  background-size: cover;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--base-color);
   display: flex;
   align-items: center;
   justify-content: center;
 
-  .beian {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    font-size: 12px;
-
-    a {
-      color: #aaa;
-      text-decoration: none;
-    }
-  }
-}
-
-.login-form-panel {
-  border-radius: 4px;
-  width: 60vw;
-  min-width: 300px;
-  max-width: 950px;
-  height: 500px;
-  border: 0;
-
   .n-grid {
-    div {
-      transition:
-        all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1),
-        border 0s,
-        color 0.1s,
-        font-size 0s;
-    }
+    height: 100%;
   }
 
-  .login-left {
-    width: 100%;
+  .login-panel-left {
+    flex: 1;
     height: 100%;
-    color: transparent;
-    background: url(@/assets/img/login-image.webp) no-repeat;
-    background-size: 100% 100%;
-  }
-
-  .login-right {
-    width: 100%;
-    height: 100%;
-    padding: 25px;
+    position: relative;
+    border-radius: 3rem;
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    background-color: var(--action-color);
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 
-    .login-title {
-      margin-top: 40px;
-      font-size: 26px;
-      font-weight: 400;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .login-img-1 {
+      width: 360px;
+      height: 300px;
+      position: absolute;
+      top: 20%;
+      left: 25%;
+      background: url(@/assets/img/login/1.svg) no-repeat center 0;
+      animation: login-img-anim 8s linear 0ms infinite normal backwards;
+    }
+
+    .login-img-2 {
+      width: 550px;
+      height: 420px;
+      position: absolute;
+      top: 30%;
+      left: 28%;
+      background: url(@/assets/img/login/2.svg) no-repeat center 0;
+      animation: login-img-anim 6s linear 0ms infinite normal backwards;
     }
   }
 
-  .login-form {
-    margin-top: 35px;
+  .login-panel-right {
+    background-color: var(--base-color);
+    flex: 1;
+    height: 100%;
+    position: relative;
+    display: flex;
+
+    .login-panel-right-content {
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+      box-sizing: border-box;
+      margin: auto auto;
+
+      .login-panel-right-content-header {
+        text-align: left;
+        margin-bottom: 3rem;
+
+        .login-panel-right-content-header-title {
+          font-size: 2.5rem;
+          font-weight: 600;
+          color: var(--text-color);
+        }
+
+        .login-panel-right-content-header-subtitle {
+          font-size: 1.5rem;
+          color: var(--text-color-light);
+        }
+      }
+
+      .login-panel-right-content-body {
+        .n-form-item {
+          margin-bottom: 1rem;
+        }
+
+        .copyright {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 30px;
+          line-height: 30px;
+          text-align: center;
+          font-size: 12px;
+          color: var(--placeholder-color);
+
+          a {
+            color: var(--placeholder-color);
+            text-decoration: none;
+          }
+        }
+      }
+
+      .btn-login {
+        width: 100%;
+      }
+    }
   }
 }
 
-.login-btn {
-  width: 100%;
-  height: 40px;
-  margin-top: 30px;
-  border: 0;
-  background-image: linear-gradient(45deg, #8a39dc, #511fa7);
-  color: #ffffff;
+@keyframes login-img-anim {
+  0% {
+    transform: translateZ(0);
+  }
 
-  &:hover {
-    opacity: 0.9;
+  50% {
+    transform: translate3d(0, 20px, 0);
+  }
+
+  to {
+    transform: translateZ(0);
   }
 }
 </style>

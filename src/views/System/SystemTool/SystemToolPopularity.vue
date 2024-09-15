@@ -417,7 +417,7 @@ const calcResult = (value: number) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .popularity-calc {
   display: flex;
   align-items: center;

@@ -5,7 +5,7 @@
 import { http } from '@/plugins/axios'
 import { convertBlob } from '@/utils/strix-file-util'
 
-const $props = defineProps({
+const { value } = defineProps({
   value: { type: [String, Number], required: true },
   width: { type: Number, required: true }
 })
@@ -14,9 +14,9 @@ const imageSrc = ref('')
 
 // 加载图像并创建 blob Url
 const loadObject = () => {
-  if ($props.value) {
+  if (value) {
     http
-      .get(`system/common/file/${$props.value}`, {
+      .get(`system/common/file/${value}`, {
         responseType: 'blob',
         meta: { operate: '加载图像' }
       })
@@ -37,7 +37,7 @@ const revokeObject = () => {
 onUnmounted(revokeObject)
 
 watch(
-  () => $props.value,
+  () => value,
   () => {
     revokeObject()
     loadObject()

@@ -33,7 +33,7 @@
       v-model:show="addDataModalShow"
       preset="card"
       :title="'添加' + _baseName"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -69,7 +69,7 @@
       v-model:show="editDataModalShow"
       preset="card"
       :title="'修改' + _baseName"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -107,7 +107,7 @@
       v-model:show="editRoleMenusModalShow"
       preset="card"
       :title="'修改' + _baseName + '菜单权限'"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initModifyForm"
     >

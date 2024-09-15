@@ -46,7 +46,7 @@
       v-model:show="editDataModalShow"
       preset="card"
       :title="'修改' + _baseName"
-      class="strix-model-primary"
+      class="strix-form-modal"
       size="huge"
       @after-leave="initDataForm"
     >
