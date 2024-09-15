@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!isSmallWindow" ref="toolbarContainerRef" class="toolbar-container">
+  <div ref="toolbarContainerRef" class="toolbar-container">
     <n-flex :size="10" :wrap="false">
       <span id="strix-tool-bar-item"></span>
 
