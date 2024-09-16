@@ -24,7 +24,7 @@
           </n-spin>
         </n-card>
       </n-layout-sider>
-      <n-layout content-style="padding: 10px" :native-scrollbar="false">
+      <n-layout content-style="padding: 10px" :native-scrollbar="false" class="s-bg-color">
         <n-grid x-gap="12" y-gap="12" :cols="5">
           <n-gi span="2">
             <n-card class="full-h">
@@ -45,6 +45,7 @@
                 :columns="workflowConfigDataColumns"
                 :data="workflowConfigDataRef"
                 :row-key="popularityDataRowKey"
+                table-layout="fixed"
               >
                 <template #empty>
                   <n-empty size="large" :description="selectDataId ? '无数据' : '请选择配置'" />
@@ -65,6 +66,7 @@
                 :pagination="popularityDataPagination"
                 :row-key="popularityDataRowKey"
                 :min-height="500"
+                table-layout="fixed"
               >
                 <template #empty>
                   <n-empty size="large" :description="selectDataId ? '无数据' : '请选择配置'" />

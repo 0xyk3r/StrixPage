@@ -26,6 +26,7 @@
       :data="dataRef"
       :row-key="dataRowKey"
       :pagination="dataPagination"
+      table-layout="fixed"
     />
 
     <n-modal

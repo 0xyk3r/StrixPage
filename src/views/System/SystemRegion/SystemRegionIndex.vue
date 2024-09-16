@@ -29,6 +29,7 @@
       :row-key="dataRowKey"
       :cascade="false"
       :allow-checking-not-loaded="true"
+      table-layout="fixed"
       @load="onDataChildrenLoad"
     />
 

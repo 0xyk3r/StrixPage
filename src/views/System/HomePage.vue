@@ -52,7 +52,11 @@
           <n-text type="success">{{ route.meta._title || route.meta.title }}</n-text>
         </n-h3> -->
         <!-- 动态路由区域 -->
-        <div v-if="routerViewShow" class="app-main-height">
+        <div
+          v-if="routerViewShow"
+          class="home-content-view"
+          :style="'--s-bg-color: ' + themeVars.cardColor"
+        >
           <router-view v-slot="{ Component, route }">
             <transition name="strix-zoom-in-top">
               <!-- 根据 fullPath 缓存组件 解决组件复用问题 -->
@@ -288,7 +292,8 @@ useResizeDetector(document.getElementById('app'), (element) => {
     margin: 0 12px 12px 0;
     box-sizing: border-box;
 
-    .app-main-height {
+    .home-content-view {
+      min-width: 1024px;
       user-select: text;
 
       .strix-zoom-in-top-enter-active,

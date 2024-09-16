@@ -27,6 +27,7 @@
       :row-key="dataRowKey"
       :pagination="dataPagination"
       :expanded-row-keys="dataExpandedRowKeys"
+      table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
 

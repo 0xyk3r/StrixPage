@@ -26,6 +26,7 @@
       :data="filterDataList"
       :row-key="dataRowKey"
       :expanded-row-keys="dataExpandedRowKeys"
+      table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
 

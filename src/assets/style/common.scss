@@ -34,6 +34,10 @@
   background-color: unset !important;
 }
 
+.s-bg-color {
+  background-color: var(--s-bg-color);
+}
+
 // n-table 数据载入动画
 @for $n from 0 through 100 {
   .n-data-table-tbody {

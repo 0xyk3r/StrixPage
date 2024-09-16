@@ -60,6 +60,7 @@
       :data="dataRef"
       :pagination="dataPagination"
       :row-key="dataRowKey"
+      table-layout="fixed"
     />
   </div>
 </template>

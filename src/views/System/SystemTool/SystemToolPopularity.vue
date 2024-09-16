@@ -2,7 +2,7 @@
   <div>
     <n-layout has-sider>
       <n-layout-sider
-        class="clear-bg-color"
+        class="s-bg-color"
         content-style="height: 100%; padding: 10px;"
         :native-scrollbar="false"
         bordered
@@ -24,7 +24,7 @@
           </n-spin>
         </n-card>
       </n-layout-sider>
-      <n-layout content-style="padding: 10px;" :native-scrollbar="false">
+      <n-layout content-style="padding: 10px;" :native-scrollbar="false" class="s-bg-color">
         <n-grid x-gap="12" y-gap="12" :cols="5">
           <n-gi span="2">
             <n-card class="full-h">
@@ -102,6 +102,7 @@
                 :row-key="popularityDataRowKey"
                 :min-height="290"
                 :max-height="290"
+                table-layout="fixed"
               >
                 <template #empty>
                   <n-empty size="large" :description="editDataId ? '无数据' : '请选择配置'" />
