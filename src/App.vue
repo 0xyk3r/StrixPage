@@ -1,8 +1,8 @@
 <template>
   <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
     <n-loading-bar-provider>
-      <n-notification-provider keep-alive-on-hover>
-        <n-message-provider keep-alive-on-hover>
+      <n-notification-provider>
+        <n-message-provider>
           <n-dialog-provider>
             <SWPrompt />
             <router-view />
@@ -28,8 +28,8 @@ import {
   useOsTheme,
   zhCN
 } from 'naive-ui'
-import { EventBus } from './plugins/event-bus'
 import SWPrompt from './components/SWPrompt.vue'
+import { EventBus } from './plugins/event-bus'
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()

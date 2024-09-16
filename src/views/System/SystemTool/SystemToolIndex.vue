@@ -1,8 +1,8 @@
 <template>
   <div>
-    <n-grid cols="1 400:2 800:4">
-      <n-grid-item v-for="(item, index) in tools" :key="index">
-        <n-card hoverable>
+    <n-grid cols="1 l:2 xl:4" x-gap="12" y-gap="24" responsive="screen" item-responsive>
+      <n-gi v-for="(item, index) in tools" :key="index">
+        <n-card class="tool-card" hoverable>
           <template #header>
             <div class="tool-header">
               <Icon :icon="item.icon" :width="32" />
@@ -19,7 +19,7 @@
             </n-button>
           </template>
         </n-card>
-      </n-grid-item>
+      </n-gi>
     </n-grid>
   </div>
 </template>
@@ -43,16 +43,18 @@ const openTool = (url: string) => {
 </script>
 
 <style lang="scss" scoped>
-.tool-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 600;
-  height: 50px;
+.tool-card {
+  .tool-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 600;
+    height: 50px;
 
-  .iconify {
-    margin-right: 10px;
+    .iconify {
+      margin-right: 10px;
+    }
   }
 }
 </style>

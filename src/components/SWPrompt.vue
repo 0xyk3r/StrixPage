@@ -1,5 +1,5 @@
 <template>
-  <!-- 不渲染任何内容 -->
+  <!-- Server Worker Prompt -->
   <div v-if="false"></div>
 </template>
 

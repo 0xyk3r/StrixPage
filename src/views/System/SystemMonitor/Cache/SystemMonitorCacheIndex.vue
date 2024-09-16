@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="min-w-1024">
     <n-card title="Redis Info">
       <n-spin :show="!cacheInfo">
         <n-descriptions label-placement="left" :column="4" bordered>

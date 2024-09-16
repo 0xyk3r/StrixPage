@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-layout has-sider>
+    <n-layout class="min-w-1024" has-sider>
       <n-layout-sider
         content-style="height: 100%; padding: 10px;"
         :native-scrollbar="false"

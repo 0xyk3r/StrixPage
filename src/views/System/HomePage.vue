@@ -293,7 +293,6 @@ useResizeDetector(document.getElementById('app'), (element) => {
     box-sizing: border-box;
 
     .home-content-view {
-      min-width: 1024px;
       user-select: text;
 
       .strix-zoom-in-top-enter-active,
