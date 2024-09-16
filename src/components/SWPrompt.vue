@@ -33,8 +33,9 @@ const notification = useNotification()
 // watch(offlineReady, (newVal) => {
 //   if (newVal) {
 //     const offlineNotify = notification.warning({
-//       title: 'Strix 提示',
+//       title: '系统提示',
 //       content: 'Strix 已缓存完成, 离线状态下也可以访问.',
+//       duration: 2500,
 //       action: () =>
 //         h(
 //           NButton,
@@ -54,9 +55,9 @@ const notification = useNotification()
 watch(needRefresh, (newVal) => {
   if (newVal) {
     const updateNotify = notification.warning({
-      title: 'Strix 提示',
-      content: 'Strix 已更新, 点击确认切换为最新版本.',
-      meta: '请注意保存您的内容',
+      title: '系统提示',
+      content: 'Strix 已更新, 旧版本可能无法正常使用, 点击确认切换至最新版本.',
+      meta: '切换前请注意保存您的内容',
       action: () =>
         h(
           NButton,
