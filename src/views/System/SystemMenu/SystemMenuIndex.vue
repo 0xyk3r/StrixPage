@@ -1,6 +1,6 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px">
+    <strix-block>
       <template #body>
         <n-grid :cols="6">
           <n-gi :span="1">
@@ -131,10 +131,10 @@
       </n-tabs>
 
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -261,10 +261,10 @@
       </n-spin>
 
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData">确定</n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -331,34 +331,35 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'name', title: '菜单名称', width: 200 },
+  { key: 'name', title: '菜单名称', width: 240 },
   {
     key: 'icon',
     title: '类型',
     align: 'center',
-    width: 100,
+    width: 120,
     render(row) {
       return h(NTag, { type: row.type === 'menu' ? 'success' : 'info', bordered: false }, () =>
         row.type === 'menu' ? '菜单' : '按钮'
       )
     }
   },
-  { key: 'key', title: '权限标识', width: 200 },
+  { key: 'key', title: '权限标识', width: 240 },
   { key: 'url', title: '菜单路由', width: 320 },
   {
     key: 'icon',
     title: '菜单图标',
     align: 'center',
-    width: 90,
+    width: 120,
     render(row: any) {
       return h(Icon, { icon: kebabCase(row.icon), width: 24 })
     }
   },
-  { key: 'sortValue', title: '菜单排序', width: 90 },
+  { key: 'sortValue', title: '菜单排序', width: 120, align: 'center' },
   {
     key: 'actions',
     title: '操作',
-    width: 200,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

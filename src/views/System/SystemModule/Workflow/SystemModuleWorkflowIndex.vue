@@ -6,11 +6,11 @@
         :native-scrollbar="false"
         bordered
       >
-        <n-card class="full-h" content-style="padding: 5px">
-          <div class="strix-button-group">
+        <n-card class="full-h" content-style="padding: 15px 5px">
+          <n-flex justify="center">
             <n-button type="primary" size="small" @click="showAddDataModal"> 添加流程 </n-button>
             <n-button type="info" size="small" @click="getDataList"> 刷新列表 </n-button>
-          </div>
+          </n-flex>
           <n-spin :show="dataLoading">
             <n-menu
               v-model:value="selectDataId"
@@ -99,10 +99,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -129,10 +129,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -308,12 +308,13 @@ const deleteData = (id: string) => {
 const workflowConfigDataRef = ref([])
 // 流程版本展示列信息
 const workflowConfigDataColumns: DataTableColumns = [
-  { key: 'version', title: '版本编号', width: 120 },
-  { key: 'createTime', title: '创建时间', width: 160 },
+  { key: 'version', title: '版本编号', width: 100 },
+  { key: 'createTime', title: '创建时间', width: 180 },
   {
     key: 'actions',
     title: '操作',
-    width: 80,
+    width: 130,
+    align: 'center',
     render(row: any) {
       return handleOperate(
         [

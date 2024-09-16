@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -68,7 +68,6 @@ import { type DataTableColumns } from 'naive-ui'
 const _baseName = '短信日志'
 
 // 加载字典
-const strixSmsPlatformRef = useDict('StrixSmsPlatform')
 const strixSmsLogStatusRef = useDict('StrixSmsLogStatus')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
@@ -88,30 +87,32 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'configKey', title: '短信配置 Key', width: 120 },
-  { key: 'phoneNumber', title: '手机号码', width: 150 },
+  { key: 'configKey', title: '短信配置 Key', width: 140 },
+  { key: 'phoneNumber', title: '手机号码', width: 160 },
   {
     key: 'platform',
     title: '短信平台',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.platform, dictName: 'StrixSmsPlatform' })
     }
   },
-  { key: 'signName', title: '签名', width: 150 },
-  { key: 'templateCode', title: '模板 Code', width: 150 },
-  { key: 'templateParam', title: '模板参数', width: 250 },
-  { key: 'requesterIp', title: 'IP 地址', width: 100 },
+  { key: 'signName', title: '签名', width: 160 },
+  { key: 'templateCode', title: '模板 Code', width: 160 },
+  { key: 'templateParam', title: '模板参数', width: 260 },
+  { key: 'requesterIp', title: 'IP 地址', width: 120 },
   {
     key: 'status',
     title: '状态',
     width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'StrixSmsLogStatus' })
     }
   },
-  { key: 'platformResponse', title: '平台响应', width: 250 },
-  { key: 'createTime', title: '时间', width: 160 }
+  { key: 'platformResponse', title: '平台响应', width: 240 },
+  { key: 'createTime', title: '时间', width: 180 }
 ]
 // 加载列表
 const dataRef = ref()

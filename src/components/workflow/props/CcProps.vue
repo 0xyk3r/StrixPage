@@ -2,11 +2,11 @@
   <n-form :model="cacheProps">
     <n-form-item label="抄送对象类型">
       <n-radio-group v-model:value="cacheProps.assign.type">
-        <n-space>
+        <n-flex>
           <n-radio v-for="item in assignTypes" :key="item.value" :value="item.value">
             {{ item.label }}
           </n-radio>
-        </n-space>
+        </n-flex>
       </n-radio-group>
     </n-form-item>
     <n-form-item
@@ -22,11 +22,11 @@
     </n-form-item>
     <n-form-item label="允许发起人添加抄送对象">
       <n-radio-group v-model:value="cacheProps.allowAdd">
-        <n-space>
+        <n-flex>
           <n-radio v-for="(item, index) in ccAllowAddItems" :key="index" :value="item.value">
             {{ item.label }}
           </n-radio>
-        </n-space>
+        </n-flex>
       </n-radio-group>
     </n-form-item>
   </n-form>

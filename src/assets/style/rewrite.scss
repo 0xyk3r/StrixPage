@@ -1,4 +1,26 @@
-/* n-alert */
+// n-alert 去除 margin
 .n-alert .n-alert-body p {
   margin: 0;
+}
+
+// n-table 数据载入动画
+@for $n from 0 through 100 {
+  .n-data-table-tbody {
+    .n-data-table-tr:nth-child(#{$n}) {
+      opacity: 0;
+      animation: animation-table-tr 360ms $n * 30ms forwards ease-out;
+    }
+  }
+}
+
+@keyframes animation-table-tr {
+  0% {
+    transform: translateX(-30px);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

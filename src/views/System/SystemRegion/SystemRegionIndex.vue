@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -77,10 +77,10 @@
       </n-form>
 
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData">确定</n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -130,10 +130,10 @@
       </n-spin>
 
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData">确定</n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -191,12 +191,13 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'name', title: '地区名称', width: 200 },
-  { key: 'fullName', title: '完整地区名称', width: 320 },
+  { key: 'name', title: '地区名称', width: 240 },
+  { key: 'fullName', title: '完整地区名称', width: 360 },
   {
     key: 'level',
     title: '地区层级',
-    width: 100,
+    width: 140,
+    align: 'center',
     render(row: any) {
       const tagTypes = ['default', 'success', 'info', 'warning', 'error', 'default']
       const tagType: NTagType = (tagTypes[row.level] as NTagType) || 'default'
@@ -213,11 +214,12 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'remarks', title: '备注信息', width: 200 },
+  { key: 'remarks', title: '备注信息', width: 240 },
   {
     key: 'actions',
     title: '操作',
-    width: 200,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

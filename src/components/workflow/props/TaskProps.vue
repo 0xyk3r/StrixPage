@@ -2,11 +2,11 @@
   <n-form :model="cacheProps">
     <n-form-item label="办理对象类型">
       <n-radio-group v-model:value="cacheProps.assign.type">
-        <n-space>
+        <n-flex>
           <n-radio v-for="item in assignTypes" :key="item.value" :value="item.value">
             {{ item.label }}
           </n-radio>
-        </n-space>
+        </n-flex>
       </n-radio-group>
     </n-form-item>
     <n-form-item
@@ -25,11 +25,11 @@
       label="办理模式"
     >
       <n-radio-group v-model:value="cacheProps.assign.mode">
-        <n-space vertical>
+        <n-flex vertical>
           <n-radio v-for="item in assignModes" :key="item.value" :value="item.value">
             {{ item.label }}
           </n-radio>
-        </n-space>
+        </n-flex>
       </n-radio-group>
     </n-form-item>
     <n-form-item v-if="cacheProps.assign.type !== 'AUTOREJECT'" label="办理期限 (0则不限时)">
@@ -52,11 +52,11 @@
       label="办理超时自动操作"
     >
       <n-radio-group v-model:value="cacheProps.timeLimit.handler">
-        <n-space vertical>
+        <n-flex vertical>
           <n-radio v-for="item in timeLimitHandler" :key="item.value" :value="item.value">
             {{ item.label }}
           </n-radio>
-        </n-space>
+        </n-flex>
       </n-radio-group>
     </n-form-item>
   </n-form>

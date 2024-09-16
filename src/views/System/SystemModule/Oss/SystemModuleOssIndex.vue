@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -98,10 +98,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -178,10 +178,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -360,25 +360,27 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'key', width: 120, title: '配置 Key' },
-  { key: 'name', width: 120, title: '配置名称' },
+  { key: 'key', width: 140, title: '配置 Key' },
+  { key: 'name', width: 160, title: '配置名称' },
   {
     key: 'platform',
-    width: 100,
+    width: 120,
     title: '平台',
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.platform, dictName: 'StrixOssPlatform' })
     }
   },
-  { key: 'publicEndpoint', width: 150, title: '公网节点' },
-  { key: 'privateEndpoint', width: 150, title: '内网节点' },
-  { key: 'accessKey', width: 150, title: 'AccessKey' },
-  { key: 'remark', width: 150, title: '备注' },
-  { key: 'createTime', width: 150, title: '创建时间' },
+  { key: 'publicEndpoint', width: 180, title: '公网节点' },
+  { key: 'privateEndpoint', width: 180, title: '内网节点' },
+  { key: 'accessKey', width: 160, title: 'AccessKey' },
+  { key: 'remark', width: 180, title: '备注' },
+  { key: 'createTime', width: 180, title: '创建时间' },
   {
     key: 'actions',
     title: '操作',
-    width: 240,
+    align: 'center',
+    width: 180,
     render(row: any) {
       return handleOperate([
         {

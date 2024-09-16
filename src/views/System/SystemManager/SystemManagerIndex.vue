@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -116,10 +116,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -191,10 +191,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -214,8 +214,8 @@ import { differenceWith, find, isEqual, pick } from 'lodash'
 import {
   NCheckbox,
   NCheckboxGroup,
+  NFlex,
   NH6,
-  NSpace,
   NSpin,
   NTag,
   NTreeSelect,
@@ -315,17 +315,18 @@ const dataColumns: DataTableColumns = [
             value: row.roleIdArray,
             'onUpdate:value': (value) => changeSystemManagerRoles(row.id, value)
           },
-          () => h(NSpace, { itemStyle: 'display: flex;' }, () => rolesCheckboxRender)
+          () => h(NFlex, {}, () => rolesCheckboxRender)
         )
       ])
     }
   },
-  { key: 'nickname', title: '昵称', width: 120 },
-  { key: 'loginName', title: '登录名', width: 120 },
+  { key: 'nickname', title: '昵称', width: 160 },
+  { key: 'loginName', title: '登录名', width: 160 },
   {
     key: 'status',
     title: '账户状态',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'SystemManagerStatus' })
     }
@@ -333,7 +334,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'type',
     title: '账户类型',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.type, dictName: 'SystemManagerType' })
     }
@@ -341,7 +343,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'regionId',
     title: '所属地区',
-    width: 140,
+    width: 180,
+    align: 'center',
     render(row: any) {
       const tagText = row.type === 1 ? '所有地区' : managerRegionName(row.regionId)
       return h(
@@ -353,11 +356,12 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'createTime', title: '创建时间', width: 160 },
+  { key: 'createTime', title: '创建时间', width: 180 },
   {
     key: 'actions',
     title: '操作',
-    width: 160,
+    width: 130,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

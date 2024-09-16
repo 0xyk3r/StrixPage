@@ -11,7 +11,7 @@
         <template #unchecked> 或 </template>
       </n-switch>
     </n-form-item>
-    <n-space vertical>
+    <n-flex vertical>
       <n-button @click="addConditionGroup">添加条件组</n-button>
       <n-card
         v-for="(item, index) in cacheProps.groups"
@@ -19,7 +19,7 @@
         :title="'条件组 - ' + (index + 1)"
       >
         <template #header-extra>
-          <n-space :size="5">
+          <n-flex :size="5">
             <n-switch
               v-model:value="item.type"
               :round="false"
@@ -33,9 +33,9 @@
             <n-button type="error" size="tiny" @click="cacheProps.groups.splice(index, 1)"
               >删除条件组</n-button
             >
-          </n-space>
+          </n-flex>
         </template>
-        <n-space vertical>
+        <n-flex vertical>
           <n-input-group v-for="(cItem, cIndex) in item.conditions" :key="cIndex">
             <n-input v-model:value="cItem.field" :style="{ width: '33%' }" placeholder="字段" />
             <n-select
@@ -45,9 +45,9 @@
             />
             <n-input v-model:value="cItem.value" :style="{ width: '33%' }" placeholder="值" />
           </n-input-group>
-        </n-space>
+        </n-flex>
       </n-card>
-    </n-space>
+    </n-flex>
   </n-form>
 </template>
 <script setup lang="ts">

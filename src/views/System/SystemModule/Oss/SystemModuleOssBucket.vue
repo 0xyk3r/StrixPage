@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -85,10 +85,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -134,11 +134,12 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { title: '存储空间名称', key: 'name', width: 250 },
+  { title: '存储空间名称', key: 'name', width: 260 },
   {
     title: '存储类型',
     key: 'storageClass',
-    width: 100,
+    width: 120,
+    align: 'center',
     render: (row: any) => {
       const { label, type } = storageClassOptions.find(
         (item) => item.value === row.storageClass
@@ -147,7 +148,7 @@ const dataColumns: DataTableColumns = [
     }
   },
   { title: '地域', key: 'region', width: 160 },
-  { title: '创建时间', key: 'createTime', width: 160 }
+  { title: '创建时间', key: 'createTime', width: 180 }
 ]
 // 加载列表
 const dataRef = ref()

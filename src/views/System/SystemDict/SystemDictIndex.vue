@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -108,10 +108,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -168,10 +168,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -242,13 +242,14 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'key', title: '字典标识', width: 150 },
-  { key: 'name', title: '字典名称', width: 150 },
-  { key: 'version', title: '字典版本', width: 100 },
+  { key: 'key', title: '字典标识', width: 240 },
+  { key: 'name', title: '字典名称', width: 320 },
+  { key: 'version', title: '字典版本', width: 120, align: 'center' },
   {
     key: 'status',
     title: '字典状态',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'DictStatus' })
     }
@@ -256,7 +257,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'dataType',
     title: '字典数据类型',
-    width: 150,
+    width: 160,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
     }
@@ -264,16 +266,18 @@ const dataColumns: DataTableColumns = [
   {
     key: 'provided',
     title: '是否内置',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.provided, dictName: 'DictProvided' })
     }
   },
-  { key: 'remark', title: '备注', width: 250 },
+  { key: 'remark', title: '备注', width: 240 },
   {
     key: 'actions',
     title: '操作',
-    width: 240,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

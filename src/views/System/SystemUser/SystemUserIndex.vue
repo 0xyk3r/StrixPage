@@ -1,6 +1,6 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
@@ -82,10 +82,10 @@
       </n-spin>
 
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData">确定</n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -140,12 +140,13 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'nickname', title: '用户昵称', width: 160 },
-  { key: 'phoneNumber', title: '手机号码', width: 220 },
+  { key: 'nickname', title: '用户昵称', width: 200 },
+  { key: 'phoneNumber', title: '手机号码', width: 200 },
   {
     key: 'status',
     title: '用户状态',
-    width: 120,
+    width: 140,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'SystemUserStatus' })
     }
@@ -153,7 +154,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'actions',
     title: '操作',
-    width: 200,
+    width: 130,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

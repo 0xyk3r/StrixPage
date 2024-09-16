@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -84,16 +84,17 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'path', title: '文件路径', width: 300 },
+  { key: 'path', title: '文件路径', width: 360 },
   { key: 'configKey', title: '存储配置 Key', width: 140 },
-  { key: 'groupKey', title: '文件组配置 Key', width: 140 },
+  { key: 'groupKey', title: '文件组配置 Key', width: 160 },
   { key: 'size', title: '文件大小', width: 120, render: (row: any) => formatFileSize(row.size) },
   { key: 'ext', title: '文件拓展名', width: 100 },
-  { key: 'createTime', title: '上传时间', width: 160 },
+  { key: 'createTime', title: '上传时间', width: 180 },
   {
     key: 'actions',
     title: '操作',
-    width: 100,
+    width: 130,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

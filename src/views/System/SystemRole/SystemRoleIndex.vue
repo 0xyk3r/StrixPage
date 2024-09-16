@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -59,10 +59,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -97,10 +97,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -126,10 +126,10 @@
         />
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editRoleMenusModalShow = false">取消</n-button>
           <n-button type="primary" @click="editRoleMenus"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -271,16 +271,12 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  {
-    key: 'name',
-    minWidth: 100,
-    width: 500,
-    title: '角色名称'
-  },
+  { key: 'name', width: 360, title: '角色名称' },
   {
     key: 'regionPermissionType',
     title: '地区权限类型',
-    width: 140,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, {
         value: row.regionPermissionType,
@@ -291,7 +287,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'actions',
     title: '操作',
-    width: 240,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

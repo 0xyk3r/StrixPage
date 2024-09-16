@@ -7,16 +7,17 @@
         :native-scrollbar="false"
         bordered
       >
-        <n-card class="full-h">
-          <div class="strix-button-group">
+        <n-card class="full-h" content-style="padding: 15px 5px">
+          <n-flex justify="center">
             <n-button type="primary" size="small" @click="initDataForm"> 添加配置 </n-button>
             <n-button type="info" size="small" @click="getDataList"> 刷新列表 </n-button>
-          </div>
+          </n-flex>
           <n-spin :show="dataLoading">
             <n-menu
               v-model:value="editDataId"
               key-field="id"
               label-field="name"
+              :indent="16"
               :options="dataRef"
               :render-extra="renderDataMenuExtra"
               @update:value="handleSelectDataChanged"
@@ -82,10 +83,10 @@
                   </n-form-item>
                 </n-form>
               </n-spin>
-              <div class="strix-button-group">
+              <n-flex justify="center">
                 <n-button type="primary" @click="editData"> 保存 </n-button>
                 <n-button type="warning"> 重置 </n-button>
-              </div>
+              </n-flex>
             </n-card>
           </n-gi>
           <n-gi span="3">
@@ -229,7 +230,9 @@ const renderDataMenuExtra = (row: any) => {
     'div',
     {
       style: {
-        float: 'right'
+        position: 'absolute',
+        top: '10px',
+        right: '1px'
       }
     },
     handleOperate(
@@ -322,8 +325,7 @@ const popularityDataColumns: DataTableColumns = [
   {
     key: 'originalValue',
     title: '原始数值',
-    minWidth: 150,
-    width: 150,
+    width: 180,
     render(row: any) {
       return h(NInputNumber, {
         value: row.originalValue,
@@ -342,7 +344,7 @@ const popularityDataColumns: DataTableColumns = [
   {
     key: 'showValue',
     title: '显示数值',
-    width: 100,
+    width: 180,
     render(row: any) {
       return calcResult(row.originalValue)
     }
@@ -351,6 +353,7 @@ const popularityDataColumns: DataTableColumns = [
     key: 'actions',
     title: '操作',
     width: 80,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

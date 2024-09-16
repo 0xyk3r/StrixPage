@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -137,10 +137,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -214,10 +214,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -322,17 +322,18 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'key', title: '文件组 Key', width: 120 },
-  { key: 'name', title: '文件组名称', width: 120 },
-  { key: 'configKey', title: '存储服务 Key', width: 120 },
-  { key: 'bucketName', title: '所属 Bucket', width: 120 },
-  { key: 'bucketDomain', title: '自定义域名', width: 150 },
-  { key: 'baseDir', title: '基础路径', width: 120 },
-  { key: 'allowExtension', title: '允许的拓展名', width: 150 },
+  { key: 'key', title: '文件组 Key', width: 140 },
+  { key: 'name', title: '文件组名称', width: 160 },
+  { key: 'configKey', title: '存储服务 Key', width: 140 },
+  { key: 'bucketName', title: '所属 Bucket', width: 140 },
+  { key: 'bucketDomain', title: '自定义域名', width: 240 },
+  { key: 'baseDir', title: '基础路径', width: 160 },
+  { key: 'allowExtension', title: '允许的拓展名', width: 240 },
   {
     key: 'secretType',
     title: '文件权限类型',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, {
         value: row.secretType,
@@ -341,11 +342,12 @@ const dataColumns: DataTableColumns = [
       })
     }
   },
-  { key: 'remark', title: '备注', width: 150 },
+  { key: 'remark', title: '备注', width: 180 },
   {
     key: 'actions',
     title: '操作',
-    width: 240,
+    width: 180,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

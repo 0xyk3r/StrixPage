@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -102,10 +102,10 @@
         </n-form-item>
       </n-form>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
 
@@ -169,10 +169,10 @@
         </n-form>
       </n-spin>
       <template #footer>
-        <n-space class="strix-form-modal-footer">
+        <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
           <n-button type="primary" @click="editData"> 确定 </n-button>
-        </n-space>
+        </n-flex>
       </template>
     </n-modal>
   </div>
@@ -248,13 +248,14 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'value', title: '字典值', width: 150 },
-  { key: 'label', title: '字典标签', width: 150 },
-  { key: 'sort', title: '字典排序', width: 100 },
+  { key: 'value', title: '字典值', width: 240 },
+  { key: 'label', title: '字典标签', width: 240 },
+  { key: 'sort', title: '字典排序', width: 120, align: 'center' },
   {
     key: 'style',
     title: '字典样式预览',
-    width: 100,
+    width: 240,
+    align: 'center',
     render(row: any) {
       return h(NTag, { type: row.style, bordered: false }, { default: () => row.label })
     }
@@ -262,16 +263,18 @@ const dataColumns: DataTableColumns = [
   {
     key: 'status',
     title: '字典状态',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'DictDataStatus' })
     }
   },
-  { key: 'remark', title: '备注', width: 250 },
+  { key: 'remark', title: '备注', width: 240 },
   {
     key: 'actions',
     title: '操作',
-    width: 240,
+    width: 130,
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {

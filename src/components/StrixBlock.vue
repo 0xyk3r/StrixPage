@@ -76,6 +76,7 @@ watch(isExpanded, (val) => {
 </script>
 <style lang="scss" scoped>
 .strix-block {
+  margin-bottom: 20px;
   background-color: var(--card-color);
   border: solid 1px var(--border-color);
   border-radius: var(--border-radius);
@@ -90,7 +91,7 @@ watch(isExpanded, (val) => {
   }
 
   .strix-block-body {
-    padding: 20px;
+    padding: 15px;
   }
 
   .strix-block-more {

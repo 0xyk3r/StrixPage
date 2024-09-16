@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -86,12 +86,13 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 )
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'name', title: '签名', width: 160 },
-  { key: 'configKey', title: '短信配置 Key', width: 150 },
+  { key: 'configKey', title: '短信配置 Key', width: 180 },
+  { key: 'name', title: '签名', width: 240 },
   {
     key: 'status',
     title: '状态',
     width: 120,
+    align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'StrixSmsSignStatus' })
     }

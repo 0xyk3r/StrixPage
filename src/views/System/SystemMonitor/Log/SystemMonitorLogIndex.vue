@@ -1,8 +1,8 @@
 <template>
   <div>
-    <strix-block style="margin-bottom: 20px" cleanable @clear="clearSearch">
+    <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
@@ -86,12 +86,12 @@ const clearSearch = () => {
 }
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'operationGroup', title: '操作分组', width: 100 },
-  { key: 'operationName', title: '操作名称', width: 130 },
+  { key: 'operationGroup', title: '操作分组', width: 120 },
+  { key: 'operationName', title: '操作名称', width: 240 },
   {
     key: 'operationSpend',
     title: '响应时间',
-    width: 80,
+    width: 120,
     render(row: any) {
       const type: NTagType =
         row.operationSpend < 100
@@ -113,7 +113,8 @@ const dataColumns: DataTableColumns = [
   {
     key: 'operationMethod',
     title: '请求方式',
-    width: 80,
+    width: 120,
+    align: 'center',
     render(row: any) {
       return h(
         NTag,
@@ -124,16 +125,17 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'operationUrl', title: '请求地址', width: 200 },
-  { key: 'operationParam', title: '操作参数', width: 300 },
-  { key: 'clientUsername', title: '操作用户', width: 100 },
-  { key: 'clientIp', title: '操作IP', width: 80 },
+  { key: 'operationUrl', title: '请求地址', width: 240 },
+  { key: 'operationParam', title: '操作参数', width: 360 },
+  { key: 'clientUsername', title: '操作用户', width: 120 },
+  { key: 'clientIp', title: '操作IP', width: 120 },
   { key: 'clientLocation', title: '操作位置', width: 120 },
   { key: 'clientDevice', title: '操作设备', width: 120 },
   {
     key: 'responseCode',
     title: '响应状态',
-    width: 100,
+    width: 120,
+    align: 'center',
     render(row: any) {
       let type: NTagType = 'warning'
       if (row.responseCode === 200) {
@@ -150,7 +152,7 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'operationTime', title: '创建时间', width: 160 }
+  { key: 'operationTime', title: '创建时间', width: 180 }
 ]
 // 分页配置
 const dataPagination = createPagination(getDataListParams, () => {
