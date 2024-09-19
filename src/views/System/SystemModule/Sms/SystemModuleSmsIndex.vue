@@ -7,35 +7,35 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索条件（配置Key、名称）"
                 clearable
+                placeholder="请输入搜索条件（配置Key、名称）"
               />
-              <n-button type="primary" ghost @click="getDataList"> 搜索 </n-button>
+              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
     </strix-block>
 
     <n-data-table
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
-      :row-key="dataRowKey"
-      :pagination="dataPagination"
       :expanded-row-keys="dataExpandedRowKeys"
+      :loading="dataLoading"
+      :pagination="dataPagination"
+      :row-key="dataRowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -48,57 +48,57 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="配置 Key" path="key">
-          <n-input v-model:value="addDataForm.key" placeholder="请输入配置 Key" clearable />
+          <n-input v-model:value="addDataForm.key" clearable placeholder="请输入配置 Key" />
         </n-form-item>
         <n-form-item label="配置名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
         <n-form-item label="短信平台" path="platform">
           <n-select
             v-model:value="addDataForm.platform"
             :options="strixSmsPlatformRef"
-            placeholder="请选择短信平台"
             clearable
+            placeholder="请选择短信平台"
           />
         </n-form-item>
         <n-form-item label="所属地域" path="regionId">
-          <n-input v-model:value="addDataForm.regionId" placeholder="请输入所属地域" clearable />
+          <n-input v-model:value="addDataForm.regionId" clearable placeholder="请输入所属地域" />
         </n-form-item>
         <n-form-item label="AccessKey" path="accessKey">
-          <n-input v-model:value="addDataForm.accessKey" placeholder="请输入AccessKey" clearable />
+          <n-input v-model:value="addDataForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
           <n-input
             v-model:value="addDataForm.accessSecret"
-            placeholder="请输入AccessSecret"
             clearable
+            placeholder="请输入AccessSecret"
           />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addDataForm.remark"
-            placeholder="在此输入备注信息"
-            type="textarea"
             :autosize="{
               minRows: 3,
               maxRows: 5
             }"
+            placeholder="在此输入备注信息"
+            type="textarea"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -112,45 +112,45 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="配置 Key" path="key">
-            <n-input v-model:value="editDataForm.key" placeholder="请输入配置 Key" clearable />
+            <n-input v-model:value="editDataForm.key" clearable placeholder="请输入配置 Key" />
           </n-form-item>
           <n-form-item label="配置名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
           </n-form-item>
           <n-form-item label="短信平台" path="platform">
             <n-select
               v-model:value="editDataForm.platform"
               :options="strixSmsPlatformRef"
-              placeholder="请选择短信平台"
               clearable
+              placeholder="请选择短信平台"
             />
           </n-form-item>
           <n-form-item label="所属地域" path="regionId">
-            <n-input v-model:value="editDataForm.regionId" placeholder="请输入所属地域" clearable />
+            <n-input v-model:value="editDataForm.regionId" clearable placeholder="请输入所属地域" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
             <n-input
               v-model:value="editDataForm.accessKey"
-              placeholder="请输入AccessKey"
               clearable
+              placeholder="请输入AccessKey"
             />
           </n-form-item>
           <n-form-item label="AccessSecret" path="accessSecret">
             <n-input
               v-model:value="editDataForm.accessSecret"
-              placeholder="请输入新的AccessSecret (不输入则不改变)"
               clearable
+              placeholder="请输入新的AccessSecret (不输入则不改变)"
             />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
               v-model:value="editDataForm.remark"
-              placeholder="在此输入备注信息"
-              type="textarea"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
               }"
+              placeholder="在此输入备注信息"
+              type="textarea"
             />
           </n-form-item>
         </n-form>
@@ -158,14 +158,14 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'

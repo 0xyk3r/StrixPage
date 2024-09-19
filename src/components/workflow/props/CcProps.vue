@@ -31,7 +31,7 @@
     </n-form-item>
   </n-form>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 const $props = defineProps({
   modelValue: {
     type: Object,

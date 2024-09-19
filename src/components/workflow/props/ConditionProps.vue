@@ -7,8 +7,8 @@
         checked-value="AND"
         unchecked-value="OR"
       >
-        <template #checked> 且 </template>
-        <template #unchecked> 或 </template>
+        <template #checked> 且</template>
+        <template #unchecked> 或</template>
       </n-switch>
     </n-form-item>
     <n-flex vertical>
@@ -26,13 +26,13 @@
               checked-value="AND"
               unchecked-value="OR"
             >
-              <template #checked> 且 </template>
-              <template #unchecked> 或 </template>
+              <template #checked> 且</template>
+              <template #unchecked> 或</template>
             </n-switch>
-            <n-button type="info" size="tiny" @click="addCondition(item)">添加条件</n-button>
-            <n-button type="error" size="tiny" @click="cacheProps.groups.splice(index, 1)"
-              >删除条件组</n-button
-            >
+            <n-button size="tiny" type="info" @click="addCondition(item)">添加条件</n-button>
+            <n-button size="tiny" type="error" @click="cacheProps.groups.splice(index, 1)"
+              >删除条件组
+            </n-button>
           </n-flex>
         </template>
         <n-flex vertical>
@@ -50,7 +50,7 @@
     </n-flex>
   </n-form>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 const $props = defineProps({
   modelValue: {
     type: Object,

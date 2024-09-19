@@ -1,6 +1,6 @@
 <template>
   <div v-if="!create" class="article-tag-container">
-    <div class="article-tag" :style="tagStyle">
+    <div :style="tagStyle" class="article-tag">
       <span class="article-tag-text">{{ model?.label }}</span>
     </div>
   </div>
@@ -10,7 +10,7 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { ArticleTagProps } from '@/@types/components/ArticleTag'
 
 const { model, create = false } = defineProps<ArticleTagProps>()

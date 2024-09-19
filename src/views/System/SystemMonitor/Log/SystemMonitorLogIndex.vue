@@ -7,27 +7,27 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="按操作名称搜索"
                 clearable
+                placeholder="按操作名称搜索"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="操作类型" path="operationType">
+          <n-form-item-gi label="操作类型" path="operationType" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.operationType"
               :options="sysLogOperTypeRef"
-              placeholder="请选择操作类型"
               clearable
+              placeholder="请选择操作类型"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -44,18 +44,18 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'

@@ -16,7 +16,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { Icon } from '@iconify/vue'

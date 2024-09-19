@@ -1,10 +1,10 @@
 <template>
   <div>
-    <WorkflowContainer :workflow-id="workflowId" :config-id="configId" :data-json="dataJson" />
+    <WorkflowContainer :config-id="configId" :data-json="dataJson" :workflow-id="workflowId" />
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import WorkflowContainer from '@/components/workflow/WorkflowContainer.vue'
 import { http } from '@/plugins/axios'
 

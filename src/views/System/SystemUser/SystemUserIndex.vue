@@ -7,47 +7,47 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索条件（昵称、手机号码）"
                 clearable
+                placeholder="请输入搜索条件（昵称、手机号码）"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="用户状态" path="status">
+          <n-form-item-gi label="用户状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
               :options="systemUserStatusRef"
-              placeholder="请选择用户状态"
               clearable
+              placeholder="请选择用户状态"
             />
           </n-form-item-gi>
         </n-grid>
       </n-form>
     </strix-block>
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -61,21 +61,21 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="用户昵称" path="nickname">
-            <n-input v-model:value="editDataForm.nickname" placeholder="请输入用户昵称" clearable />
+            <n-input v-model:value="editDataForm.nickname" clearable placeholder="请输入用户昵称" />
           </n-form-item>
           <n-form-item label="手机号码" path="phoneNumber">
             <n-input
               v-model:value="editDataForm.phoneNumber"
-              placeholder="请输入手机号码"
               clearable
+              placeholder="请输入手机号码"
             />
           </n-form-item>
           <n-form-item label="用户状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
               :options="systemUserStatusRef"
-              placeholder="请选择用户状态"
               clearable
+              placeholder="请选择用户状态"
             />
           </n-form-item>
         </n-form>
@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

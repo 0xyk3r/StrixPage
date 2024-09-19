@@ -2,43 +2,43 @@
   <div>
     <n-layout class="min-w-1024 b-r-10" has-sider>
       <n-layout-sider
-        content-style="height: 100%; padding: 10px;"
         :native-scrollbar="false"
         bordered
+        content-style="height: 100%; padding: 10px;"
       >
         <n-card class="full-h" content-style="padding: 15px 5px">
           <n-flex justify="center">
-            <n-button type="primary" size="small" @click="showAddDataModal"> 添加流程 </n-button>
-            <n-button type="info" size="small" @click="getDataList"> 刷新列表 </n-button>
+            <n-button size="small" type="primary" @click="showAddDataModal"> 添加流程</n-button>
+            <n-button size="small" type="info" @click="getDataList"> 刷新列表</n-button>
           </n-flex>
           <n-spin :show="dataLoading">
             <n-menu
               v-model:value="selectDataId"
-              key-field="id"
-              label-field="name"
               :indent="16"
               :options="dataRef"
               :render-extra="renderDataMenuExtra"
+              key-field="id"
+              label-field="name"
               @update:value="handleSelectDataChanged"
             />
           </n-spin>
         </n-card>
       </n-layout-sider>
-      <n-layout content-style="padding: 10px" :native-scrollbar="false" class="s-bg-color">
-        <n-grid x-gap="12" y-gap="12" :cols="5">
+      <n-layout :native-scrollbar="false" class="s-bg-color" content-style="padding: 10px">
+        <n-grid :cols="5" x-gap="12" y-gap="12">
           <n-gi span="2">
             <n-card class="full-h">
               <n-flex justify="space-between">
-                <n-h3 prefix="bar" align-text type="info">
+                <n-h3 align-text prefix="bar" type="info">
                   <n-text type="info">流程配置列表</n-text>
                 </n-h3>
                 <n-button
-                  type="primary"
-                  size="small"
                   :disabled="!selectDataId"
+                  size="small"
+                  type="primary"
                   @click="openWorkflowEditor('new')"
-                  >添加配置</n-button
-                >
+                  >添加配置
+                </n-button>
               </n-flex>
 
               <n-data-table
@@ -48,28 +48,28 @@
                 table-layout="fixed"
               >
                 <template #empty>
-                  <n-empty size="large" :description="selectDataId ? '无数据' : '请选择配置'" />
+                  <n-empty :description="selectDataId ? '无数据' : '请选择配置'" size="large" />
                 </template>
               </n-data-table>
             </n-card>
           </n-gi>
           <n-gi span="3">
             <n-card class="full-h">
-              <n-h3 prefix="bar" align-text type="info">
+              <n-h3 align-text prefix="bar" type="info">
                 <n-text type="info">流程实例列表</n-text>
               </n-h3>
               <n-data-table
-                :remote="true"
-                :loading="popularityDataLoading"
                 :columns="workflowConfigDataColumns"
                 :data="popularityDataRef"
-                :pagination="popularityDataPagination"
-                :row-key="popularityDataRowKey"
+                :loading="popularityDataLoading"
                 :min-height="500"
+                :pagination="popularityDataPagination"
+                :remote="true"
+                :row-key="popularityDataRowKey"
                 table-layout="fixed"
               >
                 <template #empty>
-                  <n-empty size="large" :description="selectDataId ? '无数据' : '请选择配置'" />
+                  <n-empty :description="selectDataId ? '无数据' : '请选择配置'" size="large" />
                 </template>
               </n-data-table>
             </n-card>
@@ -80,9 +80,9 @@
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -95,22 +95,22 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="配置名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入配置名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -124,21 +124,21 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="配置名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入配置名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
           </n-form-item>
         </n-form>
       </n-spin>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'

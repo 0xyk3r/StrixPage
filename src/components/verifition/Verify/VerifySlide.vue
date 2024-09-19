@@ -2,20 +2,20 @@
   <div style="position: relative">
     <div
       v-if="type === '2'"
-      class="verify-img-out"
       :style="{ height: parseInt(setSize.imgHeight) + vSpace + 'px' }"
+      class="verify-img-out"
     >
-      <div class="verify-img-panel" :style="{ width: setSize.imgWidth, height: setSize.imgHeight }">
+      <div :style="{ width: setSize.imgWidth, height: setSize.imgHeight }" class="verify-img-panel">
         <img
           :src="'data:image/png;base64,' + backImgBase"
           alt=""
           style="width: 100%; height: 100%; display: block"
         />
-        <div class="verify-refresh" @click="refresh" v-show="showRefresh">
-          <Icon icon="ion-refresh" color="#000" :width="28" />
+        <div v-show="showRefresh" class="verify-refresh" @click="refresh">
+          <Icon :width="28" color="#000" icon="ion-refresh" />
         </div>
         <transition name="tips">
-          <span class="verify-tips" v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'">
+          <span v-if="tipWords" :class="passFlag ? 'suc-bg' : 'err-bg'" class="verify-tips">
             {{ tipWords }}
           </span>
         </transition>
@@ -23,28 +23,25 @@
     </div>
     <!-- 公共部分 -->
     <div
-      class="verify-bar-area"
       :style="{
         width: setSize.imgWidth,
         height: barSize.height,
         lineHeight: barSize.height
       }"
+      class="verify-bar-area"
     >
       <span class="verify-msg" v-text="text"></span>
       <div
-        class="verify-left-bar"
         :style="{
           width: leftBarWidth !== '' ? leftBarWidth : barSize.height,
           height: barSize.height,
           borderColor: leftBarBorderColor,
           transition: transitionWidth
         }"
+        class="verify-left-bar"
       >
         <span class="verify-msg" v-text="finishText"></span>
         <div
-          class="verify-move-block"
-          @touchstart="start"
-          @mousedown="start"
           :style="{
             width: barSize.height,
             height: barSize.height,
@@ -52,17 +49,20 @@
             left: moveBlockLeft,
             transition: transitionLeft
           }"
+          class="verify-move-block"
+          @mousedown="start"
+          @touchstart="start"
         >
-          <Icon :icon="iconClass" color="#000" :width="40" />
+          <Icon :icon="iconClass" :width="40" color="#000" />
           <div
             v-if="type === '2'"
-            class="verify-sub-block"
             :style="{
               width: Math.floor((parseInt(setSize.imgWidth) * 47) / 310) + 'px',
               height: setSize.imgHeight,
               top: '-' + (parseInt(setSize.imgHeight) + vSpace) + 'px',
               backgroundSize: setSize.imgWidth + ' ' + setSize.imgHeight
             }"
+            class="verify-sub-block"
           >
             <img
               :src="'data:image/png;base64,' + blockBackImgBase"
@@ -175,6 +175,7 @@ export default {
     const barArea = computed(() => {
       return proxy?.$el.querySelector('.verify-bar-area')
     })
+
     function init() {
       text.value = explain.value
       getPictrue()
@@ -217,6 +218,7 @@ export default {
         end()
       })
     }
+
     watch(type, () => {
       init()
     })
@@ -229,6 +231,7 @@ export default {
         }
       }
     })
+
     // 鼠标按下
     function start(e: any) {
       e = e || window.event
@@ -251,6 +254,7 @@ export default {
         status.value = true
       }
     }
+
     // 鼠标移动
     function move(e: any) {
       e = e || window.event
@@ -395,6 +399,7 @@ export default {
           }
         })
     }
+
     return {
       secretKey, //后端返回的ase加密秘钥
       passFlag, //是否通过的标识

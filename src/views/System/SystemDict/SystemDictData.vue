@@ -7,30 +7,30 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="按名称搜索"
                 clearable
+                placeholder="按名称搜索"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="字典状态" path="status">
+          <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
               :options="dictDataStatusRef"
-              placeholder="请选择字典数据状态"
               clearable
+              placeholder="请选择字典数据状态"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -39,20 +39,20 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -65,55 +65,55 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="字典值" path="value">
-          <n-input v-model:value="addDataForm.value" placeholder="请输入字典值" clearable />
+          <n-input v-model:value="addDataForm.value" clearable placeholder="请输入字典值" />
         </n-form-item>
         <n-form-item label="字典标签" path="label">
-          <n-input v-model:value="addDataForm.label" placeholder="请输入字典标签" clearable />
+          <n-input v-model:value="addDataForm.label" clearable placeholder="请输入字典标签" />
         </n-form-item>
         <n-form-item label="字典排序" path="sort">
-          <n-input-number v-model:value="addDataForm.sort" placeholder="请输入字典排序" clearable />
+          <n-input-number v-model:value="addDataForm.sort" clearable placeholder="请输入字典排序" />
         </n-form-item>
         <n-form-item label="字典样式" path="style">
           <n-select
             v-model:value="addDataForm.style"
             :options="dictDataStyleRef"
-            placeholder="请选择字典样式"
             clearable
+            placeholder="请选择字典样式"
           />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
           <n-select
             v-model:value="addDataForm.status"
             :options="dictDataStatusRef"
-            placeholder="请选择字典状态"
             clearable
+            placeholder="请选择字典状态"
           />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addDataForm.remark"
-            placeholder="在此输入备注信息"
-            type="textarea"
             :autosize="{
               minRows: 3,
               maxRows: 5
             }"
+            placeholder="在此输入备注信息"
+            type="textarea"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -127,43 +127,43 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="字典值" path="value">
-            <n-input v-model:value="editDataForm.value" placeholder="请输入字典值" clearable />
+            <n-input v-model:value="editDataForm.value" clearable placeholder="请输入字典值" />
           </n-form-item>
           <n-form-item label="字典标签" path="label">
-            <n-input v-model:value="editDataForm.label" placeholder="请输入字典标签" clearable />
+            <n-input v-model:value="editDataForm.label" clearable placeholder="请输入字典标签" />
           </n-form-item>
           <n-form-item label="字典排序" path="sort">
             <n-input-number
               v-model:value="editDataForm.sort"
-              placeholder="请输入字典排序"
               clearable
+              placeholder="请输入字典排序"
             />
           </n-form-item>
           <n-form-item label="字典样式" path="style">
             <n-select
               v-model:value="editDataForm.style"
               :options="dictDataStyleRef"
-              placeholder="请选择字典样式"
               clearable
+              placeholder="请选择字典样式"
             />
           </n-form-item>
           <n-form-item label="字典状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
               :options="dictDataStatusRef"
-              placeholder="请选择字典状态"
               clearable
+              placeholder="请选择字典状态"
             />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
               v-model:value="editDataForm.remark"
-              placeholder="在此输入备注信息"
-              type="textarea"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
               }"
+              placeholder="在此输入备注信息"
+              type="textarea"
             />
           </n-form-item>
         </n-form>
@@ -171,14 +171,14 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

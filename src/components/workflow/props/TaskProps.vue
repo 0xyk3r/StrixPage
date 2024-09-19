@@ -42,8 +42,8 @@
         />
         <n-select
           v-model:value="cacheProps.timeLimit.unit"
-          :style="{ width: '25%' }"
           :options="timeUnits"
+          :style="{ width: '25%' }"
         />
       </n-input-group>
     </n-form-item>
@@ -61,7 +61,7 @@
     </n-form-item>
   </n-form>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 const $props = defineProps({
   modelValue: {
     type: Object,

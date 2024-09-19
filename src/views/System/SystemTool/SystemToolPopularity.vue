@@ -2,34 +2,34 @@
   <div>
     <n-layout class="min-w-1024 b-r-10" has-sider>
       <n-layout-sider
-        class="s-bg-color"
-        content-style="height: 100%; padding: 10px;"
         :native-scrollbar="false"
         bordered
+        class="s-bg-color"
+        content-style="height: 100%; padding: 10px;"
       >
         <n-card class="full-h" content-style="padding: 15px 5px">
           <n-flex justify="center">
-            <n-button type="primary" size="small" @click="initDataForm"> 添加配置 </n-button>
-            <n-button type="info" size="small" @click="getDataList"> 刷新列表 </n-button>
+            <n-button size="small" type="primary" @click="initDataForm"> 添加配置</n-button>
+            <n-button size="small" type="info" @click="getDataList"> 刷新列表</n-button>
           </n-flex>
           <n-spin :show="dataLoading">
             <n-menu
               v-model:value="editDataId"
-              key-field="id"
-              label-field="name"
               :indent="16"
               :options="dataRef"
               :render-extra="renderDataMenuExtra"
+              key-field="id"
+              label-field="name"
               @update:value="handleSelectDataChanged"
             />
           </n-spin>
         </n-card>
       </n-layout-sider>
-      <n-layout content-style="padding: 10px;" :native-scrollbar="false" class="s-bg-color">
-        <n-grid x-gap="12" y-gap="12" :cols="5">
+      <n-layout :native-scrollbar="false" class="s-bg-color" content-style="padding: 10px;">
+        <n-grid :cols="5" x-gap="12" y-gap="12">
           <n-gi span="2">
             <n-card class="full-h">
-              <n-h3 prefix="bar" align-text type="info">
+              <n-h3 align-text prefix="bar" type="info">
                 <n-text type="info">配置详情 - {{ editDataId ? '编辑' : '创建' }}</n-text>
               </n-h3>
               <n-spin :show="editDataFormLoading">
@@ -41,79 +41,79 @@
                   label-width="auto"
                   require-mark-placement="right-hanging"
                 >
-                  <n-form-item span="2 s:1" label="配置Key" path="configKey">
+                  <n-form-item label="配置Key" path="configKey" span="2 s:1">
                     <n-input
                       v-model:value="editDataForm.configKey"
-                      placeholder="请输入配置Key"
                       :disabled="editDataId != null"
                       clearable
+                      placeholder="请输入配置Key"
                     />
                   </n-form-item>
-                  <n-form-item span="2 s:1" label="配置名称" path="name">
+                  <n-form-item label="配置名称" path="name" span="2 s:1">
                     <n-input
                       v-model:value="editDataForm.name"
-                      placeholder="请输入配置名称"
                       clearable
+                      placeholder="请输入配置名称"
                     />
                   </n-form-item>
-                  <n-form-item span="2 s:1" label="初始值" path="initialValue">
+                  <n-form-item label="初始值" path="initialValue" span="2 s:1">
                     <n-input-number
                       v-model:value="editDataForm.initialValue"
+                      clearable
                       placeholder="初始值（参与乘算）"
                       style="width: 100%"
-                      clearable
                     />
                   </n-form-item>
-                  <n-form-item span="2 s:1" label="倍率" path="magValue">
+                  <n-form-item label="倍率" path="magValue" span="2 s:1">
                     <n-input-number
                       v-model:value="editDataForm.magValue"
                       :precision="2"
+                      clearable
                       placeholder="乘算倍率"
                       style="width: 100%"
-                      clearable
                     />
                   </n-form-item>
-                  <n-form-item span="2 s:1" label="附加值" path="extraValue">
+                  <n-form-item label="附加值" path="extraValue" span="2 s:1">
                     <n-input-number
                       v-model:value="editDataForm.extraValue"
+                      clearable
                       placeholder="附加值（不参与乘算）"
                       style="width: 100%"
-                      clearable
                     />
                   </n-form-item>
                 </n-form>
               </n-spin>
               <n-flex justify="center">
-                <n-button type="primary" @click="editData"> 保存 </n-button>
-                <n-button type="warning"> 重置 </n-button>
+                <n-button type="primary" @click="editData"> 保存</n-button>
+                <n-button type="warning"> 重置</n-button>
               </n-flex>
             </n-card>
           </n-gi>
           <n-gi span="3">
             <n-card class="full-h">
-              <n-h3 prefix="bar" align-text type="info">
+              <n-h3 align-text prefix="bar" type="info">
                 <n-text type="info">数据列表</n-text>
               </n-h3>
               <n-data-table
-                :remote="true"
-                :loading="popularityDataLoading"
                 :columns="popularityDataColumns"
                 :data="popularityDataRef"
-                :pagination="popularityDataPagination"
-                :row-key="popularityDataRowKey"
-                :min-height="290"
+                :loading="popularityDataLoading"
                 :max-height="290"
+                :min-height="290"
+                :pagination="popularityDataPagination"
+                :remote="true"
+                :row-key="popularityDataRowKey"
                 table-layout="fixed"
               >
                 <template #empty>
-                  <n-empty size="large" :description="editDataId ? '无数据' : '请选择配置'" />
+                  <n-empty :description="editDataId ? '无数据' : '请选择配置'" size="large" />
                 </template>
               </n-data-table>
             </n-card>
           </n-gi>
           <n-gi span="5">
             <n-card class="full-h">
-              <n-h3 prefix="bar" align-text type="info">
+              <n-h3 align-text prefix="bar" type="info">
                 <n-text type="info">数据计算器</n-text>
               </n-h3>
               <div v-if="editDataId != null" class="popularity-calc">
@@ -173,7 +173,7 @@
                   </n-tooltip>
                 </div>
               </div>
-              <n-empty v-else size="large" description="选择一个配置" />
+              <n-empty v-else description="选择一个配置" size="large" />
             </n-card>
           </n-gi>
         </n-grid>
@@ -182,7 +182,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -429,6 +429,7 @@ const calcResult = (value: number) => {
   font-size: 20px;
   font-weight: 600;
   height: 78px;
+
   > * {
     margin: 0 5px;
   }

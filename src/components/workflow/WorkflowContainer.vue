@@ -7,7 +7,9 @@
             <template #trigger>
               <n-button>
                 <template #icon>
-                  <n-icon> <Icon icon="ion:save-outline" /></n-icon>
+                  <n-icon>
+                    <Icon icon="ion:save-outline" />
+                  </n-icon>
                 </template>
                 保存
               </n-button>
@@ -16,12 +18,16 @@
           </n-popconfirm>
           <n-button @click="containerZoomIn">
             <template #icon>
-              <n-icon> <Icon icon="ion:add-outline" /></n-icon>
+              <n-icon>
+                <Icon icon="ion:add-outline" />
+              </n-icon>
             </template>
           </n-button>
           <n-button @click="containerZoomOut">
             <template #icon>
-              <n-icon> <Icon icon="ion:remove-outline" /></n-icon>
+              <n-icon>
+                <Icon icon="ion:remove-outline" />
+              </n-icon>
             </template>
           </n-button>
         </n-button-group>
@@ -30,20 +36,20 @@
 
     <div
       class="wf-canvas-container"
-      @wheel="onWheel"
       @mousedown="startDrag"
-      @mouseup="endDrag"
       @mousemove="onDrag"
+      @mouseup="endDrag"
+      @wheel="onWheel"
     >
-      <div class="wf-canvas" :style="canvasStyle">
-        <n-el tag="div" class="wf-container" :style="'transform: scale(' + scale + ')'">
+      <div :style="canvasStyle" class="wf-canvas">
+        <n-el :style="'transform: scale(' + scale + ')'" class="wf-container" tag="div">
           <WorkflowBody />
         </n-el>
       </div>
     </div>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
 import { http } from '@/plugins/axios'
 import { Icon } from '@iconify/vue'

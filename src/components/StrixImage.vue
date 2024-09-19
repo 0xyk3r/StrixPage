@@ -1,7 +1,7 @@
 <template>
-  <n-image :width="width" :src="imageSrc" lazy />
+  <n-image :src="imageSrc" :width="width" lazy />
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import { convertBlob } from '@/utils/strix-file-util'
 

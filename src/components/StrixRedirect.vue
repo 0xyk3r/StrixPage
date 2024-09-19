@@ -2,7 +2,7 @@
   <div>waiting to redirect.</div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 const route = useRoute()
 const router = useRouter()
 

@@ -7,33 +7,33 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="按名称搜索"
                 clearable
+                placeholder="按名称搜索"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="提醒" type="warning" style="margin-top: 15px">
+        <n-alert style="margin-top: 15px" title="提醒" type="warning">
           文件分组与文件属于强绑定模式，所以文件组创建后不建议进行修改或删除操作，删除会导致该文件组下所有文件无法获取。
         </n-alert>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
+          <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.configKey"
               :options="ossConfigSelectList"
-              placeholder="请选择存储配置 Key"
               clearable
+              placeholder="请选择存储配置 Key"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -42,20 +42,20 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -68,38 +68,38 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="文件组配置 Key" path="key">
-          <n-input v-model:value="addDataForm.key" placeholder="请输入文件组配置 Key" clearable />
+          <n-input v-model:value="addDataForm.key" clearable placeholder="请输入文件组配置 Key" />
         </n-form-item>
         <n-form-item label="存储配置 Key" path="configKey">
           <n-select
             v-model:value="addDataForm.configKey"
             :options="ossConfigSelectList"
-            placeholder="请选择存储配置 Key"
             clearable
+            placeholder="请选择存储配置 Key"
           />
         </n-form-item>
         <n-form-item label="文件组名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入文件组名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入文件组名称" />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="bucketName">
           <n-input
             v-model:value="addDataForm.bucketName"
-            placeholder="请输入存储空间 (Bucket) 名称"
             clearable
+            placeholder="请输入存储空间 (Bucket) 名称"
           />
         </n-form-item>
         <n-form-item label="Bucket 域名" path="bucketDomain">
           <n-input
             v-model:value="addDataForm.bucketDomain"
-            placeholder="请输入Bucket自定义域名"
             clearable
+            placeholder="请输入Bucket自定义域名"
           />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
           <n-input
             v-model:value="addDataForm.baseDir"
-            placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
             clearable
+            placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
           />
         </n-form-item>
         <n-form-item label="允许的扩展名" path="allowExtension">
@@ -113,42 +113,42 @@
           <n-select
             v-model:value="addDataForm.secretType"
             :options="strixOssFileGroupSecretTypeRef"
-            placeholder="请选择查看权限类型"
             clearable
+            placeholder="请选择查看权限类型"
           />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
           <n-input-number
             v-model:value="addDataForm.secretLevel"
-            placeholder="请输入查看权限等级"
             clearable
+            placeholder="请输入查看权限等级"
           />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addDataForm.remark"
-            placeholder="在此输入备注信息"
-            type="textarea"
             :autosize="{
               minRows: 3,
               maxRows: 5
             }"
+            placeholder="在此输入备注信息"
+            type="textarea"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -162,20 +162,20 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="文件组名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入文件组名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入文件组名称" />
           </n-form-item>
           <n-form-item label="Bucket 域名" path="bucketDomain">
             <n-input
               v-model:value="editDataForm.bucketDomain"
-              placeholder="请输入Bucket自定义域名"
               clearable
+              placeholder="请输入Bucket自定义域名"
             />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
             <n-input
               v-model:value="editDataForm.baseDir"
-              placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
               clearable
+              placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
             />
           </n-form-item>
           <n-form-item label="允许的扩展名" path="allowExtension">
@@ -189,26 +189,26 @@
             <n-select
               v-model:value="editDataForm.secretType"
               :options="strixOssFileGroupSecretTypeRef"
-              placeholder="请选择查看权限类型"
               clearable
+              placeholder="请选择查看权限类型"
             />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
             <n-input-number
               v-model:value="editDataForm.secretLevel"
-              placeholder="请输入查看权限等级"
               clearable
+              placeholder="请输入查看权限等级"
             />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
               v-model:value="editDataForm.remark"
-              placeholder="在此输入备注信息"
-              type="textarea"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
               }"
+              placeholder="在此输入备注信息"
+              type="textarea"
             />
           </n-form-item>
         </n-form>
@@ -216,40 +216,40 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="uploadModalShow"
-      preset="card"
-      title="上传文件"
       class="strix-form-modal"
+      preset="card"
       size="huge"
+      title="上传文件"
     >
       <n-upload
-        multiple
-        directory-dnd
         :action="uploadUrl"
         :headers="{ token: loginToken }"
         :max="5"
         :show-remove-button="false"
+        directory-dnd
+        multiple
       >
         <n-upload-dragger>
           <div style="margin-bottom: 12px">
-            <n-icon size="48" :depth="3">
+            <n-icon :depth="3" size="48">
               <Icon icon="ion:archive-outline"></Icon>
             </n-icon>
           </div>
-          <n-text style="font-size: 16px"> 点击或者拖动文件到该区域来上传 </n-text>
+          <n-text style="font-size: 16px"> 点击或者拖动文件到该区域来上传</n-text>
         </n-upload-dragger>
       </n-upload>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

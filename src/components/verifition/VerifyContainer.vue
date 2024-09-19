@@ -1,36 +1,36 @@
 <template>
-  <div :class="mode == 'pop' ? 'mask' : ''" v-show="showBox">
+  <div v-show="showBox" :class="mode == 'pop' ? 'mask' : ''">
     <div
       :class="mode == 'pop' ? 'verifybox' : ''"
       :style="{ 'max-width': parseInt(imgSize.width) + 30 + 'px' }"
     >
-      <div class="verifybox-top" v-if="mode == 'pop'">
+      <div v-if="mode == 'pop'" class="verifybox-top">
         请完成安全验证
         <span class="verifybox-close" @click="close">
-          <Icon icon="ion-close" color="#000" :width="28" />
+          <Icon :width="28" color="#000" icon="ion-close" />
         </span>
       </div>
-      <div class="verifybox-bottom" :style="{ padding: mode == 'pop' ? '15px' : '0' }">
+      <div :style="{ padding: mode == 'pop' ? '15px' : '0' }" class="verifybox-bottom">
         <!-- 验证码容器 -->
         <component
           :is="verifyComponent"
-          :captchaType="captchaType"
-          :type="verifyType"
-          :figure="figure"
-          :arith="arith"
-          :mode="mode"
-          :vSpace="vSpace"
-          :explain="explain"
-          :imgSize="imgSize"
-          :blockSize="blockSize"
-          :barSize="barSize"
           ref="instance"
+          :arith="arith"
+          :barSize="barSize"
+          :blockSize="blockSize"
+          :captchaType="captchaType"
+          :explain="explain"
+          :figure="figure"
+          :imgSize="imgSize"
+          :mode="mode"
+          :type="verifyType"
+          :vSpace="vSpace"
         ></component>
       </div>
     </div>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import VerifySlide from './Verify/VerifySlide.vue'
 import { Icon } from '@iconify/vue'
 

@@ -3,9 +3,9 @@
     <article-tag
       v-for="tag in model"
       :key="tag.key"
+      :class="!selectedKeys.includes(tag.key) && mode === 'edit' ? 'article-tag-unselected' : ''"
       :model="tag"
       class="article-tag-list-item"
-      :class="!selectedKeys.includes(tag.key) && mode === 'edit' ? 'article-tag-unselected' : ''"
       @click="clickTag(tag)"
       @contextmenu.prevent.stop="handleTabContextmenu($event, tag.key)"
     />
@@ -13,18 +13,18 @@
 
     <n-dropdown
       v-if="mode === 'edit'"
-      placement="bottom-start"
-      trigger="manual"
-      :x="contextmenuPosition.x"
-      :y="contextmenuPosition.y"
       :options="contextmenuList"
       :show="showRightMenu"
+      :x="contextmenuPosition.x"
+      :y="contextmenuPosition.y"
+      placement="bottom-start"
+      trigger="manual"
       @select="handleContextmenuSelect"
       @contextmenu.prevent.stop
     />
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { ArticleTagModel } from '@/@types/components/ArticleTag'
 import type { ArticleTagListProps } from '@/@types/components/ArticleTagList'
 import ArticleTag from '@/components/ArticleTag.vue'

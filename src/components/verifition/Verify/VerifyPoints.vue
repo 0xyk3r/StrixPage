@@ -2,20 +2,20 @@
   <div style="position: relative">
     <div class="verify-img-out">
       <div
-        class="verify-img-panel"
         :style="{
           width: setSize.imgWidth,
           height: setSize.imgHeight,
           'background-size': setSize.imgWidth + ' ' + setSize.imgHeight,
           'margin-bottom': vSpace + 'px'
         }"
+        class="verify-img-panel"
       >
-        <div class="verify-refresh" style="z-index: 3" @click="refresh" v-show="showRefresh">
-          <Icon icon="ion-refresh" color="#000" :width="24" />
+        <div v-show="showRefresh" class="verify-refresh" style="z-index: 3" @click="refresh">
+          <Icon :width="24" color="#000" icon="ion-refresh" />
         </div>
         <img
-          :src="'data:image/png;base64,' + pointBackImgBase"
           ref="canvas"
+          :src="'data:image/png;base64,' + pointBackImgBase"
           alt=""
           style="width: 100%; height: 100%; display: block"
           @click="bindingClick ? canvasClick($event) : undefined"
@@ -23,7 +23,6 @@
         <div
           v-for="(tempPoint, index) in tempPoints"
           :key="index"
-          class="point-area"
           :style="{
             'background-color': '#1abd6c',
             color: '#fff',
@@ -37,19 +36,20 @@
             top: tempPoint.y - 10 + 'px',
             left: tempPoint.x - 10 + 'px'
           }"
+          class="point-area"
         >
           {{ index + 1 }}
         </div>
       </div>
     </div>
     <div
-      class="verify-bar-area"
       :style="{
         width: setSize.imgWidth,
         color: barAreaColor,
         'border-color': barAreaBorderColor,
         'line-height': barSize.height
       }"
+      class="verify-bar-area"
     >
       <span class="verify-msg">{{ text }}</span>
     </div>
@@ -249,6 +249,7 @@ export default {
           }
         })
     }
+
     //坐标转换函数
     const pointTransfrom = function (pointArr: any, imgSize: any) {
       const newPointArr = pointArr.map((p: { x: number; y: number }) => {

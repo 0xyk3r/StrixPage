@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-grid cols="1 l:2 xl:4" x-gap="12" y-gap="24" responsive="screen" item-responsive>
+    <n-grid cols="1 l:2 xl:4" item-responsive responsive="screen" x-gap="12" y-gap="24">
       <n-gi v-for="(item, index) in tools" :key="index">
         <n-card class="tool-card" hoverable>
           <template #header>
@@ -11,7 +11,7 @@
           </template>
           {{ item.description }}
           <template #action>
-            <n-button strong secondary type="primary" @click="openTool(item.url)">
+            <n-button secondary strong type="primary" @click="openTool(item.url)">
               <template #icon>
                 <Icon icon="ion:open-outline" />
               </template>
@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Icon } from '@iconify/vue'
 
 const router = useRouter()

@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :theme="currentTheme" :locale="zhCN" :date-locale="dateZhCN">
+  <n-config-provider :date-locale="dateZhCN" :locale="zhCN" :theme="currentTheme">
     <n-loading-bar-provider>
       <n-notification-provider>
         <n-message-provider>
@@ -14,7 +14,7 @@
   </n-config-provider>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import {
   darkTheme,

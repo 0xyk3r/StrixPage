@@ -7,36 +7,36 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="按文件名搜索"
                 clearable
+                placeholder="按文件名搜索"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
+          <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.configKey"
               :options="ossConfigSelectList"
-              placeholder="请选择存储配置 Key"
               clearable
+              placeholder="请选择存储配置 Key"
               @update:value="getOssFileGroupSelectList($event)"
             />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="文件组 Key" path="groupKey">
+          <n-form-item-gi label="文件组 Key" path="groupKey" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.groupKey"
               :options="ossFileGroupSelectList"
-              placeholder="请选择文件组 Key"
               clearable
+              placeholder="请选择文件组 Key"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -45,18 +45,18 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'

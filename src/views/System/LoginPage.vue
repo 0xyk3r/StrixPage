@@ -1,5 +1,5 @@
 <template>
-  <n-el tag="div" class="login-container">
+  <n-el class="login-container" tag="div">
     <n-grid cols="4" item-responsive responsive="screen">
       <n-grid-item span="0 m:0 l:2">
         <div class="login-panel-left">
@@ -10,7 +10,7 @@
       <n-grid-item span="4 m:4 l:2">
         <div class="login-panel-right">
           <div class="login-panel-right-content">
-            <div tag="div" class="login-panel-right-content-header">
+            <div class="login-panel-right-content-header" tag="div">
               <div class="login-panel-right-content-header-title">Strix 控制中心</div>
               <div class="login-panel-right-content-header-subtitle">Welcome Back</div>
             </div>
@@ -19,36 +19,36 @@
                 ref="loginFormRef"
                 :model="loginForm"
                 :rules="loginFormRules"
-                label-width="100px"
                 label-placement="top"
+                label-width="100px"
                 @submit.prevent
               >
                 <n-form-item label="登录账号" path="loginName">
                   <n-input
                     v-model:value="loginForm.loginName"
-                    size="large"
-                    placeholder="请输入登录账号"
                     clearable
+                    placeholder="请输入登录账号"
+                    size="large"
                   />
                 </n-form-item>
                 <n-form-item label="登录密码" path="loginPassword">
                   <n-input
                     v-model:value="loginForm.loginPassword"
-                    type="password"
-                    size="large"
-                    placeholder="请输入登录密码"
                     clearable
+                    placeholder="请输入登录密码"
+                    size="large"
+                    type="password"
                   />
                 </n-form-item>
                 <n-form-item>
                   <n-button
-                    type="primary"
-                    size="large"
-                    class="btn-login"
-                    strong
-                    secondary
-                    @click="showLoginVerify"
                     :loading="isLogging"
+                    class="btn-login"
+                    secondary
+                    size="large"
+                    strong
+                    type="primary"
+                    @click="showLoginVerify"
                   >
                     {{ isLogging ? '登录中...' : '登录' }}
                   </n-button>
@@ -58,9 +58,9 @@
               <VerifyContainer
                 v-if="loginVerifyShowStatus"
                 ref="verifyRef"
-                mode="pop"
-                captcha-type="blockPuzzle"
                 :img-size="{ width: '400px', height: '200px' }"
+                captcha-type="blockPuzzle"
+                mode="pop"
                 @success="verifySuccess"
               />
               <div class="copyright">
@@ -75,7 +75,7 @@
   </n-el>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import VerifyContainer from '@/components/verifition/VerifyContainer.vue'
 import { http } from '@/plugins/axios'
 import { useLoginInfoStore } from '@/stores/login-info'

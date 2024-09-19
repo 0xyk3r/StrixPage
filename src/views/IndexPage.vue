@@ -1,9 +1,9 @@
 <template>
   <div>
-    <n-gradient-text type="info" :size="30"> Strix Index. </n-gradient-text>
+    <n-gradient-text :size="30" type="info"> Strix Index.</n-gradient-text>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script lang="ts" setup></script>
 
 <style lang="scss" scoped></style>

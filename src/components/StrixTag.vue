@@ -1,9 +1,9 @@
 <template>
-  <n-tag :type="tag.type" :bordered="false" :disabled="loading">
+  <n-tag :bordered="false" :disabled="loading" :type="tag.type">
     {{ beforeLabel }}{{ tag.label }}{{ afterLabel }}
   </n-tag>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import { useDict } from '@/utils/strix-dict-util'
 

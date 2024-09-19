@@ -6,39 +6,45 @@
 
       <!-- 更改主题 -->
       <n-icon-wrapper
-        :size="32"
         :border-radius="5"
         :color="themeVars.actionColor"
         :icon-color="themeVars.textColorBase"
+        :size="32"
       >
-        <n-icon :size="18"><Icon icon="ion:contrast" @click="changeTheme" /></n-icon>
+        <n-icon :size="18">
+          <Icon icon="ion:contrast" @click="changeTheme" />
+        </n-icon>
       </n-icon-wrapper>
 
       <!-- 切换全屏 -->
       <n-icon-wrapper
-        :size="32"
         :border-radius="5"
         :color="themeVars.actionColor"
         :icon-color="themeVars.textColorBase"
+        :size="32"
       >
-        <n-icon :size="18"><Icon icon="ion:expand" @click="switchFullscreen" /></n-icon>
+        <n-icon :size="18">
+          <Icon icon="ion:expand" @click="switchFullscreen" />
+        </n-icon>
       </n-icon-wrapper>
 
       <!-- 刷新全部 -->
       <n-icon-wrapper
-        :size="32"
         :border-radius="5"
         :color="themeVars.actionColor"
         :icon-color="themeVars.textColorBase"
+        :size="32"
       >
-        <n-icon :size="18"><Icon icon="ion:refresh" @click="reloadAll" /></n-icon>
+        <n-icon :size="18">
+          <Icon icon="ion:refresh" @click="reloadAll" />
+        </n-icon>
       </n-icon-wrapper>
     </n-flex>
 
     <n-dropdown
-      trigger="hover"
-      placement="bottom-start"
       :options="avatarDropdownOptions"
+      placement="bottom-start"
+      trigger="hover"
       @select="handleAvatarDropdownSelect"
     >
       <span class="user-dropdown">
@@ -50,7 +56,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'

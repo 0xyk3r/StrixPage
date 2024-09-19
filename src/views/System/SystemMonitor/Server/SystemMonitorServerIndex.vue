@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-grid x-gap="12" :cols="2">
+    <n-grid :cols="2" x-gap="12">
       <n-gi>
         <n-card title="CPU Info">
           <n-spin :show="!serverInfo.cpu">
@@ -72,9 +72,9 @@
       </n-gi>
     </n-grid>
 
-    <n-card title="Server Info" style="margin-top: 15px">
+    <n-card style="margin-top: 15px" title="Server Info">
       <n-spin :show="!serverInfo.sys">
-        <n-descriptions label-placement="left" :column="2" bordered>
+        <n-descriptions :column="2" bordered label-placement="left">
           <n-descriptions-item label="服务器名称">
             {{ serverInfo.sys?.computerName }}
           </n-descriptions-item>
@@ -91,9 +91,9 @@
       </n-spin>
     </n-card>
 
-    <n-card title="JVM Info" style="margin-top: 15px">
+    <n-card style="margin-top: 15px" title="JVM Info">
       <n-spin :show="!serverInfo.jvm">
-        <n-descriptions label-placement="left" :column="2" bordered>
+        <n-descriptions :column="2" bordered label-placement="left">
           <n-descriptions-item label="Java名称">
             {{ serverInfo.jvm?.name }}
           </n-descriptions-item>
@@ -106,20 +106,20 @@
           <n-descriptions-item label="运行时长">
             {{ serverInfo.jvm?.runTime }}
           </n-descriptions-item>
-          <n-descriptions-item label="安装路径" :span="2">
+          <n-descriptions-item :span="2" label="安装路径">
             {{ serverInfo.jvm?.home }}
           </n-descriptions-item>
-          <n-descriptions-item label="项目路径" :span="2">
+          <n-descriptions-item :span="2" label="项目路径">
             {{ serverInfo.sys?.userDir }}
           </n-descriptions-item>
-          <n-descriptions-item label="运行参数" :span="2">
+          <n-descriptions-item :span="2" label="运行参数">
             {{ serverInfo.jvm?.inputArgs }}
           </n-descriptions-item>
         </n-descriptions>
       </n-spin>
     </n-card>
 
-    <n-card title="Disk Info" style="margin-top: 15px">
+    <n-card style="margin-top: 15px" title="Disk Info">
       <n-spin :show="!serverInfo.sysFiles">
         <n-table :single-line="false">
           <thead>
@@ -149,7 +149,7 @@
     </n-card>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 
 const loading = ref(true)

@@ -7,32 +7,32 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索条件（昵称、账号）"
                 clearable
+                placeholder="请输入搜索条件（昵称、账号）"
               />
-              <n-button type="primary" ghost @click="getDataList"> 搜索 </n-button>
+              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="管理人员状态" path="status">
+          <n-form-item-gi label="管理人员状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
               :options="systemManagerStatusRef"
               placeholder="请选择管理人员状态"
             />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="管理人员类型" path="type">
+          <n-form-item-gi label="管理人员类型" path="type" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.type"
               :options="systemManagerTypeRef"
@@ -44,21 +44,21 @@
     </strix-block>
 
     <n-data-table
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :expanded-row-keys="dataExpandedRowKeys"
+      :loading="dataLoading"
       :pagination="dataPagination"
       :row-key="dataRowKey"
-      :expanded-row-keys="dataExpandedRowKeys"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -73,61 +73,61 @@
         <n-form-item label="管理人员昵称" path="nickname">
           <n-input
             v-model:value="addDataForm.nickname"
-            placeholder="请输入管理人员昵称"
             clearable
+            placeholder="请输入管理人员昵称"
           />
         </n-form-item>
         <n-form-item label="登录账号" path="loginName">
-          <n-input v-model:value="addDataForm.loginName" placeholder="请输入登录账号" clearable />
+          <n-input v-model:value="addDataForm.loginName" clearable placeholder="请输入登录账号" />
         </n-form-item>
         <n-form-item label="登录密码" path="loginPassword">
           <n-input
             v-model:value="addDataForm.loginPassword"
-            placeholder="请输入登录密码"
             clearable
+            placeholder="请输入登录密码"
           />
         </n-form-item>
         <n-form-item label="管理人员状态" path="status">
           <n-select
             v-model:value="addDataForm.status"
             :options="systemManagerStatusRef"
-            placeholder="请选择管理人员状态"
             clearable
+            placeholder="请选择管理人员状态"
           />
         </n-form-item>
         <n-form-item label="管理人员类型" path="type">
           <n-select
             v-model:value="addDataForm.type"
             :options="systemManagerTypeRef"
-            placeholder="请选择管理人员类型"
             clearable
+            placeholder="请选择管理人员类型"
           />
         </n-form-item>
         <n-form-item v-if="addDataForm.type == 2" label="平台地区权限" path="regionId">
           <n-tree-select
             v-model:value="addDataForm.regionId"
             :options="systemRegionCascaderOptions"
-            placeholder="请选择平台地区权限"
             cascade
             clearable
             filterable
             key-field="value"
+            placeholder="请选择平台地区权限"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -143,49 +143,49 @@
           <n-form-item label="管理人员昵称" path="nickname">
             <n-input
               v-model:value="editDataForm.nickname"
-              placeholder="请输入管理人员昵称"
               clearable
+              placeholder="请输入管理人员昵称"
             />
           </n-form-item>
           <n-form-item label="登录账号" path="loginName">
             <n-input
               v-model:value="editDataForm.loginName"
-              placeholder="请输入登录账号"
               clearable
+              placeholder="请输入登录账号"
             />
           </n-form-item>
           <n-form-item label="登录密码" path="loginPassword">
             <n-input
               v-model:value="editDataForm.loginPassword"
-              placeholder="请输入登录密码"
               clearable
+              placeholder="请输入登录密码"
             />
           </n-form-item>
           <n-form-item label="管理人员状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
               :options="systemManagerStatusRef"
-              placeholder="请选择管理人员状态"
               clearable
+              placeholder="请选择管理人员状态"
             />
           </n-form-item>
           <n-form-item label="管理人员类型" path="type">
             <n-select
               v-model:value="editDataForm.type"
               :options="systemManagerTypeRef"
-              placeholder="请选择管理人员类型"
               clearable
+              placeholder="请选择管理人员类型"
             />
           </n-form-item>
           <n-form-item v-if="editDataForm.type == 2" label="平台地区权限" path="regionId">
             <n-tree-select
               v-model:value="editDataForm.regionId"
               :options="systemRegionCascaderOptions"
-              placeholder="请选择平台地区权限"
               cascade
               clearable
               filterable
               key-field="value"
+              placeholder="请选择平台地区权限"
             />
           </n-form-item>
         </n-form>
@@ -193,14 +193,14 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

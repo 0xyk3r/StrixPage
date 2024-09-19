@@ -1,4 +1,5 @@
 import type { LoadingBarApiInjection } from 'naive-ui/es/loading-bar/src/LoadingBarProvider'
+
 export type LoadingBarState = 'start' | 'finish' | 'error'
 
 let loadingBar: LoadingBarApiInjection | null = null

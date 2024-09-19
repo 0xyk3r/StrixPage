@@ -3,7 +3,7 @@
   <div v-if="false"></div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { NButton, useNotification } from 'naive-ui'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 

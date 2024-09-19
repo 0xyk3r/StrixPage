@@ -19,6 +19,7 @@ import { type Ref } from 'vue'
 let loginInfoStore: ReturnType<typeof useLoginInfoStore> | null = null
 let httpCancelerStore: ReturnType<typeof useHttpCancelerStore> | null = null
 let token: Ref<any> | null = null
+
 function initStore() {
   if (!loginInfoStore) {
     loginInfoStore = useLoginInfoStore()

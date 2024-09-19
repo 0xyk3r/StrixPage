@@ -5,7 +5,7 @@
     </keep-alive>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { storeToRefs } from 'pinia'

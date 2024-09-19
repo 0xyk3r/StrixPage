@@ -7,30 +7,30 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="按名称搜索"
                 clearable
+                placeholder="按名称搜索"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="存储配置 Key" path="configKey">
+          <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.configKey"
               :options="ossConfigSelectList"
-              placeholder="请选择存储配置 Key"
               clearable
+              placeholder="请选择存储配置 Key"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -39,20 +39,20 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -68,33 +68,33 @@
           <n-select
             v-model:value="addDataForm.configKey"
             :options="ossConfigSelectList"
-            placeholder="请选择存储配置 Key"
             clearable
+            placeholder="请选择存储配置 Key"
           />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入 Bucket 名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入 Bucket 名称" />
         </n-form-item>
         <n-form-item label="存储类型" path="storageClass">
           <n-select
             v-model:value="addDataForm.storageClass"
             :options="storageClassOptions"
-            placeholder="请选择存储类型"
             clearable
+            placeholder="请选择存储类型"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'

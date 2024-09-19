@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-result status="404" title="404 资源不存在" description="生活总归带点荒谬" size="huge">
+    <n-result description="生活总归带点荒谬" size="huge" status="404" title="404 资源不存在">
       <template #footer>
         <n-button @click="closeCurrentTab">{{ countDown }} 秒后返回首页</n-button>
       </template>
@@ -8,7 +8,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useTabsBarStore } from '@/stores/tabs-bar'
 
 const route = useRoute()

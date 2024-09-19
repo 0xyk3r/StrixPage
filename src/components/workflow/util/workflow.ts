@@ -12,6 +12,7 @@ export type WorkflowNodeType =
   | 'condition'
   | 'cc'
   | 'empty'
+
 export interface WorkflowNode {
   id: string
   name: string

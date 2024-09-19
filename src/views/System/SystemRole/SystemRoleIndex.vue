@@ -7,34 +7,34 @@
             <n-input-group>
               <n-input
                 v-model:value="filterDataListParams.keyword"
-                placeholder="请输入搜索条件（角色名称）"
                 clearable
+                placeholder="请输入搜索条件（角色名称）"
               />
-              <n-button type="primary" ghost @click="getDataList"> 搜索 </n-button>
+              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
     </strix-block>
 
     <n-data-table
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="filterDataList"
-      :row-key="dataRowKey"
       :expanded-row-keys="dataExpandedRowKeys"
+      :loading="dataLoading"
+      :row-key="dataRowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -47,30 +47,30 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="角色名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入角色名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入角色名称" />
         </n-form-item>
         <n-form-item label="地区权限类型" path="regionPermissionType">
           <n-select
             v-model:value="addDataForm.regionPermissionType"
             :options="systemRoleRegionPermissionTypeRef"
-            placeholder="请选择地区权限类型"
             clearable
+            placeholder="请选择地区权限类型"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -84,14 +84,14 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="角色名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入角色名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入角色名称" />
           </n-form-item>
           <n-form-item label="地区权限类型" path="regionPermissionType">
             <n-select
               v-model:value="editDataForm.regionPermissionType"
               :options="systemRoleRegionPermissionTypeRef"
-              placeholder="请选择地区权限类型"
               clearable
+              placeholder="请选择地区权限类型"
             />
           </n-form-item>
         </n-form>
@@ -99,16 +99,16 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editRoleMenusModalShow"
-      preset="card"
       :title="'修改' + _baseName + '菜单权限'"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initModifyForm"
     >
@@ -116,11 +116,11 @@
         <n-tree
           ref="editRoleMenusTreeRef"
           v-model:checked-keys="editRoleMenusCheckedKeys"
+          :data="systemMenuTreeData"
+          :render-prefix="editRoleMenusRenderPrefix"
           block-line
           checkable
           default-expand-all
-          :data="systemMenuTreeData"
-          :render-prefix="editRoleMenusRenderPrefix"
           key-field="id"
           label-field="name"
         />
@@ -128,14 +128,14 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editRoleMenusModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editRoleMenus"> 确定 </n-button>
+          <n-button type="primary" @click="editRoleMenus"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'

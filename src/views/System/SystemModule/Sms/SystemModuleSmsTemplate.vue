@@ -7,45 +7,45 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索关键字（模板Code、名称）"
                 clearable
+                placeholder="请输入搜索关键字（模板Code、名称）"
               />
-              <n-button type="primary" ghost @click="getDataList"> 搜索 </n-button>
+              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
       <n-form
         :model="getDataListParams"
+        :show-feedback="false"
         label-placement="left"
         label-width="auto"
-        :show-feedback="false"
       >
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi span="6 s:3 m:2" label="配置 Key" path="configKey">
+          <n-form-item-gi label="配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.configKey"
               :options="smsConfigSelectList"
-              placeholder="请选择短信配置 Key"
               clearable
+              placeholder="请选择短信配置 Key"
               @update:value="getDataList"
             />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="状态" path="status">
+          <n-form-item-gi label="状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
               :options="strixSmsTemplateStatusRef"
-              placeholder="请选择状态"
               clearable
+              placeholder="请选择状态"
               @update:value="getDataList"
             />
           </n-form-item-gi>
-          <n-form-item-gi span="6 s:3 m:2" label="类型" path="type">
+          <n-form-item-gi label="类型" path="type" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.type"
               :options="strixSmsTemplateTypeRef"
-              placeholder="请选择类型"
               clearable
+              placeholder="请选择类型"
               @update:value="getDataList"
             />
           </n-form-item-gi>
@@ -54,18 +54,18 @@
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
     />
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

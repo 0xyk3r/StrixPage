@@ -2,18 +2,18 @@
   <transition name="quick-menus-show">
     <n-el
       v-if="quickMenus && quickMenus.length > 0"
-      tag="ul"
-      class="strix-quick-menu"
       :class="autoActive ? 'auto-active' : ''"
+      class="strix-quick-menu"
+      tag="ul"
     >
       <transition-group name="quick-menu-list">
         <li v-for="item in quickMenus" :key="item.id" :class="'color-' + item.color">
           <n-tooltip
-            class="item"
-            trigger="hover"
             :delay="300"
+            class="item"
             placement="left"
             style="max-width: 220px"
+            trigger="hover"
           >
             <template #trigger>
               <a @click="item.callback">
@@ -29,7 +29,7 @@
   </transition>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'

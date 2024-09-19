@@ -2,17 +2,17 @@
   <div id="tabs-bar-container" class="tabs-bar-container">
     <n-tabs
       :value="tabActive"
-      type="card"
-      class="tabs-content"
       animated
-      @update:value="handleTabClick"
+      class="tabs-content"
+      type="card"
       @close="closeTab"
+      @update:value="handleTabClick"
     >
       <n-tab
         v-for="(item, index) in visitedRoutes"
         :key="item.name"
-        :name="item.meta.title"
         :closable="!isAffix(item)"
+        :name="item.meta.title"
         @contextmenu.prevent.stop="handleTabContextmenu($event, index)"
       />
     </n-tabs>
@@ -21,38 +21,40 @@
 
     <Teleport defer to="#strix-tool-bar-item">
       <n-dropdown
-        trigger="hover"
-        placement="bottom-start"
         :options="contextmenuList"
+        placement="bottom-start"
+        trigger="hover"
         @select="handleContextmenuSelect"
       >
         <n-icon-wrapper
-          :size="32"
           :border-radius="5"
           :color="themeVars.actionColor"
           :icon-color="themeVars.textColorBase"
+          :size="32"
         >
-          <n-icon :size="18"><Icon icon="ion:grid" class="tabs-common-handler" /></n-icon>
+          <n-icon :size="18">
+            <Icon class="tabs-common-handler" icon="ion:grid" />
+          </n-icon>
         </n-icon-wrapper>
       </n-dropdown>
     </Teleport>
 
     <teleport to=".n-config-provider">
       <n-dropdown
-        placement="bottom-start"
-        trigger="manual"
-        :x="contextmenuPosition.x"
-        :y="contextmenuPosition.y"
         :options="contextmenuList"
         :show="showRightMenu"
-        @select="handleContextmenuSelect"
+        :x="contextmenuPosition.x"
+        :y="contextmenuPosition.y"
+        placement="bottom-start"
+        trigger="manual"
         @clickoutside="clearContextmenuSelect"
+        @select="handleContextmenuSelect"
       />
     </teleport>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { EventBus } from '@/plugins/event-bus'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
@@ -304,6 +306,7 @@ const getContextmenuTagView = () => {
 ::v-deep(.tabs-content) {
   .n-tabs-nav-scroll-content {
     justify-content: center;
+
     .n-tabs-wrapper {
       .n-tabs-tab-wrapper {
         .n-tabs-tab {

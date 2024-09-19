@@ -7,33 +7,33 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索条件（任务名称）"
                 clearable
+                placeholder="请输入搜索条件（任务名称）"
               />
-              <n-button type="primary" ghost @click="getDataList"> 搜索 </n-button>
+              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
     </strix-block>
 
     <n-data-table
-      :loading="dataLoading"
       :columns="dataColumns"
       :data="dataRef"
-      :row-key="dataRowKey"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :row-key="dataRowKey"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -46,15 +46,15 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="任务名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入任务名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入任务名称" />
         </n-form-item>
         <n-form-item label="调用目标" path="invokeTarget">
-          <n-popover trigger="focus" placement="bottom-start">
+          <n-popover placement="bottom-start" trigger="focus">
             <template #trigger>
               <n-input
                 v-model:value="addDataForm.invokeTarget"
-                placeholder="请输入调用目标"
                 clearable
+                placeholder="请输入调用目标"
               />
             </template>
             <p>请输入 组件名称.方法名称() 或 组件名称.方法名称(...参数列表)</p>
@@ -70,48 +70,48 @@
         <n-form-item label="Cron 表达式" path="cronExpression">
           <n-input
             v-model:value="addDataForm.cronExpression"
-            placeholder="请输入 Cron 表达式"
             clearable
+            placeholder="请输入 Cron 表达式"
           />
         </n-form-item>
         <n-form-item label="计划错误策略" path="misfirePolicy">
           <n-select
             v-model:value="addDataForm.misfirePolicy"
             :options="jobMisfireRef"
-            placeholder="请选择计划错误策略"
             clearable
+            placeholder="请选择计划错误策略"
           />
         </n-form-item>
         <n-form-item label="是否并发执行" path="concurrent">
           <n-select
             v-model:value="addDataForm.concurrent"
             :options="commonSwitchRef"
-            placeholder="请选择是否并发执行"
             clearable
+            placeholder="请选择是否并发执行"
           />
         </n-form-item>
         <n-form-item label="任务状态" path="status">
           <n-select
             v-model:value="addDataForm.status"
             :options="jobStatusRef"
-            placeholder="请选择任务状态"
             clearable
+            placeholder="请选择任务状态"
           />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -125,44 +125,44 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="任务名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入任务名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入任务名称" />
           </n-form-item>
           <n-form-item label="调用目标" path="invokeTarget">
             <n-input
               v-model:value="editDataForm.invokeTarget"
-              placeholder="请输入调用目标"
               clearable
+              placeholder="请输入调用目标"
             />
           </n-form-item>
           <n-form-item label="Cron 表达式" path="cronExpression">
             <n-input
               v-model:value="editDataForm.cronExpression"
-              placeholder="请输入 Cron 表达式"
               clearable
+              placeholder="请输入 Cron 表达式"
             />
           </n-form-item>
           <n-form-item label="计划错误策略" path="misfirePolicy">
             <n-select
               v-model:value="editDataForm.misfirePolicy"
               :options="jobMisfireRef"
-              placeholder="请选择计划错误策略"
               clearable
+              placeholder="请选择计划错误策略"
             />
           </n-form-item>
           <n-form-item label="是否并发执行" path="concurrent">
             <n-select
               v-model:value="editDataForm.concurrent"
               :options="commonSwitchRef"
-              placeholder="请选择是否并发执行"
               clearable
+              placeholder="请选择是否并发执行"
             />
           </n-form-item>
           <n-form-item label="任务状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
               :options="jobStatusRef"
-              placeholder="请选择任务状态"
               clearable
+              placeholder="请选择任务状态"
             />
           </n-form-item>
         </n-form>
@@ -170,14 +170,14 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定 </n-button>
+          <n-button type="primary" @click="editData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'

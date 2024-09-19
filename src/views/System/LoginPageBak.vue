@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <n-card class="login-form-panel" content-style="padding: 0; height: 100%;">
-      <n-grid style="height: 100%" cols="24" item-responsive>
+      <n-grid cols="24" item-responsive style="height: 100%">
         <n-grid-item span="0:0 800:16">
           <div class="login-left" />
         </n-grid-item>
@@ -12,32 +12,32 @@
               ref="loginFormRef"
               :model="loginForm"
               :rules="loginFormRules"
-              label-width="60px"
               class="login-form"
+              label-width="60px"
               @submit.prevent
             >
               <n-form-item label="登录用户" path="loginName">
                 <n-input
                   v-model:value="loginForm.loginName"
-                  placeholder="请输入登录账号"
                   class="login-input"
                   clearable
+                  placeholder="请输入登录账号"
                 />
               </n-form-item>
               <n-form-item label="登录密码" path="loginPassword">
                 <n-input
                   v-model:value="loginForm.loginPassword"
-                  type="password"
-                  placeholder="请输入登录密码"
                   class="login-input"
-                  show-password-on="mousedown"
                   clearable
+                  placeholder="请输入登录密码"
+                  show-password-on="mousedown"
+                  type="password"
                 />
               </n-form-item>
               <n-button
-                type="primary"
                 :loading="isLogging"
                 class="login-btn"
+                type="primary"
                 @click="showLoginVerify"
               >
                 {{ isLogging ? '登录中...' : '登录' }}
@@ -50,9 +50,9 @@
     <VerifyContainer
       v-if="loginVerifyShowStatus"
       ref="verifyRef"
-      mode="pop"
-      captcha-type="blockPuzzle"
       :img-size="{ width: '400px', height: '200px' }"
+      captcha-type="blockPuzzle"
+      mode="pop"
       @success="verifySuccess"
     />
     <div class="beian">
@@ -61,7 +61,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import VerifyContainer from '@/components/verifition/VerifyContainer.vue'
 import { http } from '@/plugins/axios'
 import { useLoginInfoStore } from '@/stores/login-info'

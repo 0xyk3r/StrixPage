@@ -8,7 +8,7 @@
     </n-card>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { storeToRefs } from 'pinia'
 

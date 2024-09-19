@@ -7,37 +7,37 @@
             <n-input-group>
               <n-input
                 v-model:value="getDataListParams.keyword"
-                placeholder="请输入搜索条件（名称）"
                 clearable
+                placeholder="请输入搜索条件（名称）"
               />
-              <n-button type="primary" ghost @click="getDataList">搜索</n-button>
+              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }} </n-button>
+            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
     </strix-block>
     <n-data-table
       v-model:expanded-row-keys="dataExpandedRowKeys"
-      :remote="true"
-      :loading="dataLoading"
+      :allow-checking-not-loaded="true"
+      :cascade="false"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
       :pagination="dataPagination"
+      :remote="true"
       :row-key="dataRowKey"
-      :cascade="false"
-      :allow-checking-not-loaded="true"
       table-layout="fixed"
       @load="onDataChildrenLoad"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -50,28 +50,28 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="地区名称" path="name">
-          <n-input v-model:value="addDataForm.name" placeholder="请输入地区名称" clearable />
+          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入地区名称" />
         </n-form-item>
         <n-form-item label="父级地区" path="parentId">
           <n-tree-select
             v-model:value="addDataForm.parentId"
             :options="systemRegionCascaderOptions"
-            placeholder="选择父级地区"
             cascade
             clearable
             filterable
             key-field="value"
+            placeholder="选择父级地区"
           />
         </n-form-item>
         <n-form-item label="备注信息" path="remarks">
           <n-input
             v-model:value="addDataForm.remarks"
-            placeholder="在此输入备注信息"
-            type="textarea"
             :autosize="{
               minRows: 3,
               maxRows: 5
             }"
+            placeholder="在此输入备注信息"
+            type="textarea"
           />
         </n-form-item>
       </n-form>
@@ -86,9 +86,9 @@
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
@@ -102,28 +102,28 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="地区名称" path="name">
-            <n-input v-model:value="editDataForm.name" placeholder="请输入地区名称" clearable />
+            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入地区名称" />
           </n-form-item>
           <n-form-item label="父级地区" path="parentId">
             <n-tree-select
               v-model:value="editDataForm.parentId"
               :options="systemRegionCascaderOptions"
-              placeholder="选择父级地区"
               cascade
               clearable
               filterable
               key-field="value"
+              placeholder="选择父级地区"
             />
           </n-form-item>
           <n-form-item label="备注信息" path="remarks">
             <n-input
               v-model:value="editDataForm.remarks"
-              placeholder="在此输入备注信息"
-              type="textarea"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
               }"
+              placeholder="在此输入备注信息"
+              type="textarea"
             />
           </n-form-item>
         </n-form>
@@ -139,7 +139,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'

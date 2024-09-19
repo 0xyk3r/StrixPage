@@ -3,47 +3,55 @@
     <!-- 节点渲染 (不含条件分支 & 空节点) -->
     <n-card
       v-show="node.type !== 'empty'"
-      class="wf-node-main"
       :header-class="'node-header node-' + node.type"
+      class="wf-node-main"
       content-class="node-content"
       hoverable
       @click="openDrawer"
     >
       <template #header>
         <div class="node-header-content">
-          <n-icon size="12"><Icon :icon="icon" /></n-icon>
+          <n-icon size="12">
+            <Icon :icon="icon" />
+          </n-icon>
           <div>{{ getTypeName(node.type) }} - {{ node.name }}</div>
         </div>
       </template>
       <template #header-extra>
-        <n-button v-if="removable" size="tiny" quaternary circle @click.stop="removeNode">
+        <n-button v-if="removable" circle quaternary size="tiny" @click.stop="removeNode">
           <template #icon>
-            <n-icon size="14"><Icon icon="ion:close-outline" /></n-icon>
+            <n-icon size="14">
+              <Icon icon="ion:close-outline" />
+            </n-icon>
           </template>
         </n-button>
       </template>
       <!-- 节点body -->
       <div class="node-body-content">
         <div>{{ showContent }}</div>
-        <div v-if="configable"><Icon icon="ion:chevron-forward-outline" /></div>
+        <div v-if="configable">
+          <Icon icon="ion:chevron-forward-outline" />
+        </div>
       </div>
     </n-card>
     <!-- 渲染节点Footer -->
     <div v-show="node.type !== 'conditions'" class="wf-node-footer">
-      <n-popover ref="addNodePopoverRef" trigger="click" content-style="padding: 15px;">
+      <n-popover ref="addNodePopoverRef" content-style="padding: 15px;" trigger="click">
         <template #trigger>
-          <n-button class="wf-node-btn" circle type="info" size="medium">
+          <n-button circle class="wf-node-btn" size="medium" type="info">
             <template #icon>
-              <n-icon size="24"><Icon icon="ion:add-outline" /></n-icon>
+              <n-icon size="24">
+                <Icon icon="ion:add-outline" />
+              </n-icon>
             </template>
           </n-button>
         </template>
         <n-button-group>
-          <n-button secondary round type="primary" @click="addNode('approval')"> 审批人 </n-button>
-          <n-button secondary round type="warning" @click="addNode('task')"> 办理人 </n-button>
-          <n-button secondary round @click="addNode('conditions')"> 条件分支 </n-button>
+          <n-button round secondary type="primary" @click="addNode('approval')"> 审批人</n-button>
+          <n-button round secondary type="warning" @click="addNode('task')"> 办理人</n-button>
+          <n-button round secondary @click="addNode('conditions')"> 条件分支</n-button>
           <!-- <n-button secondary round type="error" @click="addNode('timer')"> 延迟等待 </n-button> -->
-          <n-button secondary round type="info" @click="addNode('cc')"> 抄送人 </n-button>
+          <n-button round secondary type="info" @click="addNode('cc')"> 抄送人</n-button>
         </n-button-group>
       </n-popover>
     </div>
@@ -54,13 +62,13 @@
 
     <!-- 配置项抽屉 -->
     <n-drawer v-model:show="showDrawer" :width="512">
-      <n-drawer-content :title="getTypeName(node.type)" :native-scrollbar="false" closable>
+      <n-drawer-content :native-scrollbar="false" :title="getTypeName(node.type)" closable>
         <component :is="propsComponent" v-model="nodeProps" />
       </n-drawer-content>
     </n-drawer>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { getOperationName, getTypeName } from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import ApprovalProps from './props/ApprovalProps.vue'

@@ -1,8 +1,8 @@
 <template>
   <n-el
-    tag="div"
-    class="strix-block"
     :class="[{ hover: hovering }]"
+    class="strix-block"
+    tag="div"
     @mouseenter="hovering = true"
     @mouseleave="hovering = false"
   >
@@ -16,8 +16,8 @@
     </div>
     <div
       v-show="cleanable || $slots.default"
-      class="strix-block-control"
       :class="{ 'is-fixed': fixedControl }"
+      class="strix-block-control"
       @click="switchExpand"
     >
       <Icon v-if="$slots.default" :icon="isExpanded ? 'ion:caret-up' : 'ion:caret-down'" inline />
@@ -28,8 +28,8 @@
       <div class="control-button-container left">
         <n-button
           v-if="cleanable"
-          :tertiary="isSmallWindow"
           :quaternary="!isSmallWindow"
+          :tertiary="isSmallWindow"
           type="error"
           @click.stop="$emit('clear')"
         >
@@ -41,7 +41,7 @@
     </div>
   </n-el>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'

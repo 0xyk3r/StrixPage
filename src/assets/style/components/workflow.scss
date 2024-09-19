@@ -113,10 +113,12 @@
       }
     }
   }
+
   .wf-node-footer {
     width: 34px;
     margin: 0 auto;
     position: relative;
+
     &::before {
       content: '';
       position: absolute;

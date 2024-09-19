@@ -2,36 +2,36 @@
   <n-layout class="home-layout" has-sider @click="clickContainer">
     <n-layout-sider
       v-model:collapsed="siderCollapsed"
-      collapse-mode="width"
-      show-trigger="bar"
-      class="home-sider"
-      :width="240"
       :collapsed-width="70"
       :native-scrollbar="false"
       :style="'--n-color: ' + themeVars.bodyColor"
+      :width="240"
+      class="home-sider"
+      collapse-mode="width"
+      show-trigger="bar"
     >
       <!-- Logo -->
       <div class="home-logo-container">
-        <img class="home-logo" :class="theme" src="@/assets/img/logo-w.webp" />
+        <img :class="theme" class="home-logo" src="@/assets/img/logo-w.webp" />
       </div>
       <!-- 菜单 -->
       <n-spin :show="menuLoading">
         <n-menu
           ref="menuRef"
           v-model:value="menuSelected"
+          :collapsed-width="70"
+          :indent="16"
+          :options="menuList"
+          :render-label="renderMenuLabel"
+          :root-indent="32"
+          children-field="children"
           key-field="id"
           label-field="name"
-          children-field="children"
-          :options="menuList"
-          :indent="16"
-          :root-indent="32"
-          :collapsed-width="70"
-          :render-label="renderMenuLabel"
         />
       </n-spin>
     </n-layout-sider>
     <n-layout>
-      <n-layout-header class="home-header" :style="'--n-color: ' + themeVars.bodyColor">
+      <n-layout-header :style="'--n-color: ' + themeVars.bodyColor" class="home-header">
         <!-- 顶部栏 -->
         <n-grid class="home-header-top" cols="24" item-responsive responsive="screen">
           <n-gi span="1 m:1 l:6">
@@ -46,11 +46,11 @@
         </n-grid>
       </n-layout-header>
       <n-layout-content
-        class="home-content"
-        content-style="padding: 24px;"
         :native-scrollbar="false"
         :scrollbar-props="{ xScrollable: true }"
         :style="'--n-color: ' + themeVars.actionColor"
+        class="home-content"
+        content-style="padding: 24px;"
         embedded
       >
         <!-- 路由名称显示 -->
@@ -60,8 +60,8 @@
         <!-- 动态路由区域 -->
         <div
           v-if="routerViewShow"
-          class="home-content-view"
           :style="'--s-bg-color: ' + themeVars.cardColor"
+          class="home-content-view"
         >
           <router-view v-slot="{ Component, route }">
             <transition name="strix-zoom-in-top">
@@ -78,21 +78,21 @@
     <strix-quick-menu />
     <!-- 水印 -->
     <n-watermark
-      content="Powered By ProjectAn Strix"
-      cross
-      fullscreen
       :font-size="16"
-      :line-height="16"
-      :width="384"
       :height="384"
+      :line-height="16"
+      :rotate="-15"
+      :width="384"
       :x-offset="12"
       :y-offset="60"
-      :rotate="-15"
+      content="Powered By ProjectAn Strix"
+      cross
       font-color="rgba(128, 128, 128, .05)"
+      fullscreen
     />
   </n-layout>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBreadcrumb from '@/components/StrixBreadcrumb.vue'
 import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/StrixTabBar.vue'

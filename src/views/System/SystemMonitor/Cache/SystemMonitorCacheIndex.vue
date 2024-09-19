@@ -2,7 +2,7 @@
   <div class="min-w-1024">
     <n-card title="缓存服务详情">
       <n-spin :show="loading">
-        <n-descriptions label-placement="left" :column="4" bordered>
+        <n-descriptions :column="4" bordered label-placement="left">
           <n-descriptions-item label="服务版本">
             {{ cacheInfo.info?.redis_version }}
           </n-descriptions-item>
@@ -45,25 +45,25 @@
       </n-spin>
     </n-card>
 
-    <n-grid x-gap="12" :cols="2">
+    <n-grid :cols="2" x-gap="12">
       <n-gi>
-        <n-card title="命令统计" style="min-height: 420px; margin-top: 15px">
+        <n-card style="min-height: 420px; margin-top: 15px" title="命令统计">
           <n-spin :show="loading">
-            <v-chart class="strix-charts" :option="commandStatsOptions" autoresize />
+            <v-chart :option="commandStatsOptions" autoresize class="strix-charts" />
           </n-spin>
         </n-card>
       </n-gi>
       <n-gi>
-        <n-card title="内存信息" style="min-height: 420px; margin-top: 15px">
+        <n-card style="min-height: 420px; margin-top: 15px" title="内存信息">
           <n-spin :show="loading">
-            <v-chart class="strix-charts" :option="usedMemoryOptions" autoresize />
+            <v-chart :option="usedMemoryOptions" autoresize class="strix-charts" />
           </n-spin>
         </n-card>
       </n-gi>
     </n-grid>
   </div>
 </template>
-<script setup lang="ts">
+<script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import type { GaugeSeriesOption, PieSeriesOption } from 'echarts/charts'
 import { GaugeChart, PieChart } from 'echarts/charts'

@@ -9,32 +9,32 @@
             </n-button>
           </n-gi>
         </n-grid>
-        <n-alert title="提醒" type="warning" style="margin-top: 15px">
+        <n-alert style="margin-top: 15px" title="提醒" type="warning">
           Strix 理论支持无限级别菜单，但考虑到 UI 展示和性能问题，仍不建议配置超过 3 级菜单。
         </n-alert>
       </template>
     </strix-block>
 
     <n-data-table
-      :remote="true"
-      :loading="dataLoading"
+      :allow-checking-not-loaded="true"
+      :cascade="false"
       :columns="dataColumns"
       :data="dataRef"
+      :loading="dataLoading"
+      :remote="true"
       :row-key="dataRowKey"
-      :cascade="false"
-      :allow-checking-not-loaded="true"
       table-layout="fixed"
     />
 
     <n-modal
       v-model:show="addDataModalShow"
-      preset="card"
       :title="'添加' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
-      <n-tabs v-model:value="addDataModalType" type="segment" :animated="true">
+      <n-tabs v-model:value="addDataModalType" :animated="true" type="segment">
         <n-tab-pane name="menu" tab="菜单">
           <n-form
             ref="addDataFormRef"
@@ -45,34 +45,34 @@
             require-mark-placement="right-hanging"
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-              <n-form-item-gi span="2 s:1" label="菜单名称" path="name">
-                <n-input v-model:value="addDataForm.name" placeholder="请输入菜单名称" clearable />
+              <n-form-item-gi label="菜单名称" path="name" span="2 s:1">
+                <n-input v-model:value="addDataForm.name" clearable placeholder="请输入菜单名称" />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:1" label="父级菜单" path="parentId">
+              <n-form-item-gi label="父级菜单" path="parentId" span="2 s:1">
                 <n-tree-select
                   v-model:value="addDataForm.parentId"
                   :options="menuTreeRef"
-                  placeholder="选择父级菜单"
                   cascade
                   clearable
                   filterable
                   key-field="value"
+                  placeholder="选择父级菜单"
                 />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:2" label="权限标识" path="key">
-                <n-input v-model:value="addDataForm.key" placeholder="请输入权限标识" clearable />
+              <n-form-item-gi label="权限标识" path="key" span="2 s:2">
+                <n-input v-model:value="addDataForm.key" clearable placeholder="请输入权限标识" />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:2" label="菜单路由" path="url">
-                <n-input v-model:value="addDataForm.url" placeholder="请输入菜单路由" clearable />
+              <n-form-item-gi label="菜单路由" path="url" span="2 s:2">
+                <n-input v-model:value="addDataForm.url" clearable placeholder="请输入菜单路由" />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:1" label="菜单图标" path="icon">
-                <n-input v-model:value="addDataForm.icon" placeholder="请输入菜单图标" clearable />
+              <n-form-item-gi label="菜单图标" path="icon" span="2 s:1">
+                <n-input v-model:value="addDataForm.icon" clearable placeholder="请输入菜单图标" />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:1" label="菜单排序" path="sortValue">
+              <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
                 <n-input-number
                   v-model:value="addDataForm.sortValue"
-                  placeholder="请输入菜单排序"
                   clearable
+                  placeholder="请输入菜单排序"
                 />
               </n-form-item-gi>
             </n-grid>
@@ -88,41 +88,41 @@
             require-mark-placement="right-hanging"
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-              <n-form-item-gi span="2 s:1" label="权限名称" path="name">
+              <n-form-item-gi label="权限名称" path="name" span="2 s:1">
                 <n-input
                   v-model:value="addPermissionForm.name"
-                  placeholder="请输入权限名称"
                   clearable
+                  placeholder="请输入权限名称"
                 />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:1" label="父级菜单" path="menuId">
+              <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                 <n-tree-select
                   v-model:value="addPermissionForm.menuId"
                   :options="menuTreeRef"
-                  placeholder="选择父级菜单"
                   cascade
                   clearable
                   filterable
                   key-field="value"
+                  placeholder="选择父级菜单"
                 />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:2" label="权限标识" path="key">
+              <n-form-item-gi label="权限标识" path="key" span="2 s:2">
                 <n-input
                   v-model:value="addPermissionForm.key"
-                  placeholder="请输入权限标识"
                   clearable
+                  placeholder="请输入权限标识"
                 />
               </n-form-item-gi>
-              <n-form-item-gi span="2 s:2" label="权限介绍" path="description">
+              <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                 <n-input
                   v-model:value="addPermissionForm.description"
-                  placeholder="请输入权限介绍"
-                  type="textarea"
-                  clearable
                   :autosize="{
                     minRows: 1,
                     maxRows: 5
                   }"
+                  clearable
+                  placeholder="请输入权限介绍"
+                  type="textarea"
                 />
               </n-form-item-gi>
             </n-grid>
@@ -133,22 +133,22 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定 </n-button>
+          <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
       v-model:show="editDataModalShow"
-      preset="card"
       :title="'修改' + _baseName"
       class="strix-form-modal"
+      preset="card"
       size="huge"
       @after-leave="initDataForm"
     >
       <n-spin :show="editDataFormLoading">
-        <n-tabs v-model:value="editDataModalType" type="segment" :animated="true">
-          <n-tab-pane name="menu" tab="菜单" disabled>
+        <n-tabs v-model:value="editDataModalType" :animated="true" type="segment">
+          <n-tab-pane disabled name="menu" tab="菜单">
             <n-form
               ref="editDataFormRef"
               :model="editDataForm"
@@ -158,56 +158,56 @@
               require-mark-placement="right-hanging"
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-                <n-form-item-gi span="2 s:1" label="菜单名称" path="name">
+                <n-form-item-gi label="菜单名称" path="name" span="2 s:1">
                   <n-input
                     v-model:value="editDataForm.name"
-                    placeholder="请输入菜单名称"
                     clearable
+                    placeholder="请输入菜单名称"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:1" label="父级菜单" path="parentId">
+                <n-form-item-gi label="父级菜单" path="parentId" span="2 s:1">
                   <n-tree-select
                     v-model:value="editDataForm.parentId"
                     :options="menuTreeRef"
-                    placeholder="选择父级菜单"
                     cascade
                     clearable
                     filterable
                     key-field="value"
+                    placeholder="选择父级菜单"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:2" label="权限标识" path="key">
+                <n-form-item-gi label="权限标识" path="key" span="2 s:2">
                   <n-input
                     v-model:value="editDataForm.key"
-                    placeholder="请输入权限标识"
                     clearable
+                    placeholder="请输入权限标识"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:2" label="菜单路由" path="url">
+                <n-form-item-gi label="菜单路由" path="url" span="2 s:2">
                   <n-input
                     v-model:value="editDataForm.url"
-                    placeholder="请输入菜单路由"
                     clearable
+                    placeholder="请输入菜单路由"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:1" label="菜单图标" path="icon">
+                <n-form-item-gi label="菜单图标" path="icon" span="2 s:1">
                   <n-input
                     v-model:value="editDataForm.icon"
-                    placeholder="请输入菜单图标"
                     clearable
+                    placeholder="请输入菜单图标"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:1" label="菜单排序" path="sortValue">
+                <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
                   <n-input-number
                     v-model:value="editDataForm.sortValue"
-                    placeholder="请输入菜单排序"
                     clearable
+                    placeholder="请输入菜单排序"
                   />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
           </n-tab-pane>
-          <n-tab-pane name="permission" tab="按钮 / 功能" disabled>
+          <n-tab-pane disabled name="permission" tab="按钮 / 功能">
             <n-form
               ref="editPermissionFormRef"
               :model="editPermissionForm"
@@ -217,41 +217,41 @@
               require-mark-placement="right-hanging"
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-                <n-form-item-gi span="2 s:1" label="权限名称" path="name">
+                <n-form-item-gi label="权限名称" path="name" span="2 s:1">
                   <n-input
                     v-model:value="editPermissionForm.name"
-                    placeholder="请输入权限名称"
                     clearable
+                    placeholder="请输入权限名称"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:1" label="父级菜单" path="menuId">
+                <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                   <n-tree-select
                     v-model:value="editPermissionForm.menuId"
                     :options="menuTreeRef"
-                    placeholder="选择父级菜单"
                     cascade
                     clearable
                     filterable
                     key-field="value"
+                    placeholder="选择父级菜单"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:2" label="权限标识" path="key">
+                <n-form-item-gi label="权限标识" path="key" span="2 s:2">
                   <n-input
                     v-model:value="editPermissionForm.key"
-                    placeholder="请输入权限标识"
                     clearable
+                    placeholder="请输入权限标识"
                   />
                 </n-form-item-gi>
-                <n-form-item-gi span="2 s:2" label="权限介绍" path="description">
+                <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                   <n-input
                     v-model:value="editPermissionForm.description"
-                    placeholder="请输入权限介绍"
-                    type="textarea"
-                    clearable
                     :autosize="{
                       minRows: 1,
                       maxRows: 5
                     }"
+                    clearable
+                    placeholder="请输入权限介绍"
+                    type="textarea"
                   />
                 </n-form-item-gi>
               </n-grid>
@@ -270,7 +270,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'

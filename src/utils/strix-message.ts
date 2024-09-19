@@ -1,4 +1,4 @@
-import { NAlert, useMessage, type MessageType } from 'naive-ui'
+import { type MessageType, NAlert, useMessage } from 'naive-ui'
 
 let message: any = null
 
