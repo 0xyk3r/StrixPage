@@ -201,6 +201,7 @@ const reloadRouter = async () => {
     await router.push('/redirect' + currentPath)
   }
 }
+
 const reloadAllRouter = () => {
   EventBus.emit('reload-router-view')
 }
@@ -269,18 +270,17 @@ const getContextmenuTagView = () => {
 .tabs-bar-container {
   position: relative;
   display: flex;
-  align-content: center;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  margin: 0 20px;
+  margin: 0 15px;
   z-index: 499;
   user-select: none;
   box-sizing: border-box;
   transition: border 0.3s var(--n-bezier);
 
-  // 屏幕小于 640px 时不显示
+  // 屏幕小于 1280px 时不显示
   @media (max-width: 1280px) {
     display: none;
   }

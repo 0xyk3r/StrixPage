@@ -108,7 +108,7 @@ watch(
     display: none;
   }
 
-  // 屏幕小于 640px 时不显示
+  // 屏幕小于 1280px 时不显示
   @media (max-width: 1280px) {
     display: none;
   }

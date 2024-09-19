@@ -6,6 +6,10 @@
   min-width: 1024px;
 }
 
+.b-r-10 {
+  border-radius: 10px;
+}
+
 .s-bg-color {
   background-color: var(--s-bg-color);
 }
@@ -14,6 +18,10 @@
 .strix-form-modal {
   width: 65vw;
   max-width: 800px;
+}
+
+.strix-charts {
+  height: 480px;
 }
 
 // 数据编辑表单模态框 在移动设备上占满屏幕宽度

@@ -78,15 +78,15 @@ export default defineConfig({
     port: 19889
   },
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('echarts')) return 'echarts'
-          }
-        }
-      }
-    },
+    // rollupOptions: {
+    //   output: {
+    //     manualChunks(id) {
+    //       if (id.includes('node_modules')) {
+    //         if (id.includes('echarts')) return 'echarts'
+    //       }
+    //     }
+    //   }
+    // },
     cssMinify: 'lightningcss',
     minify: 'terser',
     terserOptions: {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-layout class="min-w-1024" has-sider>
+    <n-layout class="min-w-1024 b-r-10" has-sider>
       <n-layout-sider
         class="s-bg-color"
         content-style="height: 100%; padding: 10px;"

@@ -53,6 +53,9 @@ importers:
       vue-draggable-resizable:
         specifier: ^3.0.0
         version: 3.0.0(vue@3.5.4(typescript@5.6.2))
+      vue-echarts:
+        specifier: ^7.0.3
+        version: 7.0.3(@vue/runtime-core@3.5.4)(echarts@5.5.1)(vue@3.5.4(typescript@5.6.2))
       vue-router:
         specifier: ^4.4.4
         version: 4.4.4(vue@3.5.4(typescript@5.6.2))
@@ -3656,6 +3659,17 @@ packages:
   vscode-uri@3.0.8:
     resolution: {integrity: sha512-AyFQ0EVmsOZOlAnxoFOGOq1SQDWAB7C6aqMGS23svWAllfOaxbuFvcT8D1i8z3Gyn8fraVeZNNmN6e9bxxXkKw==}
 
+  vue-demi@0.13.11:
+    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-demi@0.14.10:
     resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
     engines: {node: '>=12'}
@@ -3671,6 +3685,16 @@ packages:
     resolution: {integrity: sha512-kABSggcXPoDB8dOTVE09ZkccxiMdNDUaLl7STTeghsFE3o+mk653iumrkmjKLfIBA/w5ZXWJmarBqoqsmWLzEg==}
     peerDependencies:
       vue: ^3.2.25
+
+  vue-echarts@7.0.3:
+    resolution: {integrity: sha512-/jSxNwOsw5+dYAUcwSfkLwKPuzTQ0Cepz1LxCOpj2QcHrrmUa/Ql0eQqMmc1rTPQVrh2JQ29n2dhq75ZcHvRDw==}
+    peerDependencies:
+      '@vue/runtime-core': ^3.0.0
+      echarts: ^5.5.1
+      vue: ^2.7.0 || ^3.1.1
+    peerDependenciesMeta:
+      '@vue/runtime-core':
+        optional: true
 
   vue-eslint-parser@9.4.3:
     resolution: {integrity: sha512-2rYRLWlIpaiN8xbPiDyXZXRgLGOtWxERV7ND5fFAv5qo1D2N9Fu9MNajBNc6o13lZ+24DAWCkQCvj4klgmcITg==}
@@ -7730,6 +7754,10 @@ snapshots:
 
   vscode-uri@3.0.8: {}
 
+  vue-demi@0.13.11(vue@3.5.4(typescript@5.6.2)):
+    dependencies:
+      vue: 3.5.4(typescript@5.6.2)
+
   vue-demi@0.14.10(vue@3.5.4(typescript@5.6.2)):
     dependencies:
       vue: 3.5.4(typescript@5.6.2)
@@ -7737,6 +7765,16 @@ snapshots:
   vue-draggable-resizable@3.0.0(vue@3.5.4(typescript@5.6.2)):
     dependencies:
       vue: 3.5.4(typescript@5.6.2)
+
+  vue-echarts@7.0.3(@vue/runtime-core@3.5.4)(echarts@5.5.1)(vue@3.5.4(typescript@5.6.2)):
+    dependencies:
+      echarts: 5.5.1
+      vue: 3.5.4(typescript@5.6.2)
+      vue-demi: 0.13.11(vue@3.5.4(typescript@5.6.2))
+    optionalDependencies:
+      '@vue/runtime-core': 3.5.4
+    transitivePeerDependencies:
+      - '@vue/composition-api'
 
   vue-eslint-parser@9.4.3(eslint@8.57.0):
     dependencies:

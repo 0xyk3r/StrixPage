@@ -1,6 +1,7 @@
 <template>
   <div ref="toolbarContainerRef" class="toolbar-container">
     <n-flex :size="10" :wrap="false">
+      <!-- Teleport 插入位置 -->
       <span id="strix-tool-bar-item"></span>
 
       <!-- 更改主题 -->
@@ -119,28 +120,23 @@ const logout = () => {
 
 <style lang="scss" scoped>
 .toolbar-container {
+  height: 100%;
+  margin-right: 50px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  height: 60px;
-  margin-right: 50px;
 
   .n-icon .iconify:hover {
     color: #63e2b7;
   }
 
   .user-dropdown {
+    height: 100%;
+    margin-left: 10px;
     display: flex;
-    align-content: center;
     align-items: center;
-    justify-content: center;
-    justify-items: center;
-    height: 60px;
-    padding-left: 10px;
 
     .user-name {
-      position: relative;
-      margin-left: 5px;
       cursor: pointer;
       white-space: nowrap;
 
