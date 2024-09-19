@@ -107,5 +107,10 @@ watch(
   &::-webkit-scrollbar {
     display: none;
   }
+
+  // 屏幕小于 640px 时不显示
+  @media (max-width: 1280px) {
+    display: none;
+  }
 }
 </style>

@@ -34,9 +34,15 @@
       <n-layout-header class="home-header" :style="'--n-color: ' + themeVars.bodyColor">
         <!-- 顶部栏 -->
         <n-grid class="home-header-top" cols="24" item-responsive responsive="screen">
-          <n-gi span="0 m:0 l:6"><strix-breadcrumb /> </n-gi>
-          <n-gi span="0 m:0 l:12"><strix-tabs-bar /> </n-gi>
-          <n-gi span="24 m:24 l:6"><strix-tool-bar /> </n-gi>
+          <n-gi span="1 m:1 l:6">
+            <strix-breadcrumb />
+          </n-gi>
+          <n-gi span="1 m:1 l:12">
+            <strix-tabs-bar />
+          </n-gi>
+          <n-gi span="22 m:22 l:6">
+            <strix-tool-bar />
+          </n-gi>
         </n-grid>
       </n-layout-header>
       <n-layout-content
@@ -94,7 +100,7 @@ import StrixToolBar from '@/components/StrixToolBar.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { useResizeDetector } from '@/plugins/resize-detector'
-import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
@@ -102,7 +108,7 @@ import { initStrixMessage } from '@/utils/strix-message'
 import { deepSearch } from '@/utils/strix-tools'
 import { Icon } from '@iconify/vue'
 import { kebabCase } from 'lodash'
-import { useOsTheme, useThemeVars, type MenuInst, type MenuOption } from 'naive-ui'
+import { type MenuInst, type MenuOption, useOsTheme, useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 
@@ -222,13 +228,7 @@ const handleMenuIconField = (list: any[]) => {
 
 const renderMenuLabel = (option: MenuOption): any => {
   if (!option.children) {
-    return h(
-      RouterLink,
-      {
-        to: option.url as string
-      },
-      { default: () => option.name }
-    )
+    return h(RouterLink, { to: option.url as string }, { default: () => option.name })
   }
   return option.name
 }

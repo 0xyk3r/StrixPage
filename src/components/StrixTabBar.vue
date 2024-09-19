@@ -74,16 +74,16 @@ const showRightMenu = ref(false)
 let contextmenuRoutesIndex: number | null = null
 const contextmenuPosition = ref({ x: 0, y: 0 })
 const contextmenuList = [
-  { key: 'reloadRouter', label: '刷新当前', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
+  { key: 'reloadRouter', label: '刷新', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
+  {
+    key: 'closeCurrTabs',
+    label: '关闭',
+    icon: () => h(Icon, { icon: 'ion:close-outline' })
+  },
   {
     key: 'reloadAllRouter',
     label: '刷新全部',
     icon: () => h(Icon, { icon: 'ion:reload-circle-outline' })
-  },
-  {
-    key: 'closeCurrTabs',
-    label: '关闭当前',
-    icon: () => h(Icon, { icon: 'ion:close-outline' })
   },
   {
     key: 'closeOtherTabs',
@@ -279,6 +279,11 @@ const getContextmenuTagView = () => {
   user-select: none;
   box-sizing: border-box;
   transition: border 0.3s var(--n-bezier);
+
+  // 屏幕小于 640px 时不显示
+  @media (max-width: 1280px) {
+    display: none;
+  }
 
   .tabs-content {
     height: 34px;
