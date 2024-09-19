@@ -100,7 +100,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
-import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储空间'

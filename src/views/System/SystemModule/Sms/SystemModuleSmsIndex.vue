@@ -176,14 +176,14 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash'
 import {
+  type DataTableColumns,
+  type FormRules,
   NDataTable,
   NScrollbar,
   NSpin,
   NTabPane,
   NTabs,
-  NTag,
-  type DataTableColumns,
-  type FormRules
+  NTag
 } from 'naive-ui'
 
 // 本页面操作提示关键词

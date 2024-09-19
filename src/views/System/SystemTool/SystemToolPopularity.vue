@@ -188,7 +188,7 @@ import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash'
-import { NInputNumber, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
 
 const _baseName = '热度工具配置'
 const _baseApiPrefix = 'system/tool/popularity'

@@ -9,7 +9,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { storeToRefs } from 'pinia'
 
 const loginInfoStore = useLoginInfoStore()

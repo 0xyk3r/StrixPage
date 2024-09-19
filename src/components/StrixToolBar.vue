@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
-import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
 import { Icon } from '@iconify/vue'
 import { useThemeVars } from 'naive-ui'

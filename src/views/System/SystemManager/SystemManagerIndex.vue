@@ -212,15 +212,15 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual, pick } from 'lodash'
 import {
+  type DataTableColumns,
+  type FormRules,
   NCheckbox,
   NCheckboxGroup,
   NFlex,
   NH6,
   NSpin,
   NTag,
-  NTreeSelect,
-  type DataTableColumns,
-  type FormRules
+  NTreeSelect
 } from 'naive-ui'
 
 const quickMenuStore = useQuickMenuStore()

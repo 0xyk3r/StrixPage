@@ -187,7 +187,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
 const route = useRoute()
 

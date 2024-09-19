@@ -1,6 +1,6 @@
 import type { CancelableRequest } from '@/stores/http-canceler'
 import { useHttpCancelerStore } from '@/stores/http-canceler'
-import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'

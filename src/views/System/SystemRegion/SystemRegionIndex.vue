@@ -147,7 +147,7 @@ import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash'
-import { NTag, type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统地区'

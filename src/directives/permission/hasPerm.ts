@@ -1,4 +1,4 @@
-import { useLoginInfoStore, type LoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { storeToRefs } from 'pinia'
 import { type DirectiveBinding, type Ref } from 'vue'
 

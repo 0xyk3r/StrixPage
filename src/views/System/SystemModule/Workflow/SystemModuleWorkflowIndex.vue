@@ -144,7 +144,7 @@ import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash'
-import { NEllipsis, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormInst, type FormRules, NEllipsis } from 'naive-ui'
 
 const router = useRouter()
 

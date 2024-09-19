@@ -279,7 +279,7 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { Icon } from '@iconify/vue'
 import { cloneDeep, kebabCase, pick } from 'lodash'
-import { NTag, type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
+import { type DataTableColumns, type FormInst, type FormRules, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统菜单'

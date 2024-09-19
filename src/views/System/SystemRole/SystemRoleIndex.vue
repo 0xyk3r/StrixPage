@@ -148,6 +148,8 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual, pick } from 'lodash'
 import {
+  type DataTableColumns,
+  type FormRules,
   NEmpty,
   NGi,
   NGrid,
@@ -156,8 +158,6 @@ import {
   NTabPane,
   NTabs,
   NTag,
-  type DataTableColumns,
-  type FormRules,
   type TreeInst
 } from 'naive-ui'
 
