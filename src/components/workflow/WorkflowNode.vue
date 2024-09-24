@@ -2,8 +2,8 @@
   <div class="wf-node">
     <!-- 节点渲染 (不含条件分支 & 空节点) -->
     <n-card
-      v-show="node.type !== 'empty'"
-      :header-class="'node-header node-' + node.type"
+      v-show="model.type !== 'empty'"
+      :header-class="'node-header node-' + model.type"
       class="wf-node-main"
       content-class="node-content"
       hoverable
@@ -14,11 +14,11 @@
           <n-icon size="12">
             <Icon :icon="icon" />
           </n-icon>
-          <div>{{ getTypeName(node.type) }} - {{ node.name }}</div>
+          <div>{{ getTypeName(model.type) }} - {{ model.name }}</div>
         </div>
       </template>
       <template #header-extra>
-        <n-button v-if="removable" circle quaternary size="tiny" @click.stop="removeNode">
+        <n-button v-if="removable" circle quaternary size="tiny" @click.stop="$emit('removeNode')">
           <template #icon>
             <n-icon size="14">
               <Icon icon="ion:close-outline" />
@@ -29,13 +29,13 @@
       <!-- 节点body -->
       <div class="node-body-content">
         <div>{{ showContent }}</div>
-        <div v-if="configable">
+        <div v-if="configurable">
           <Icon icon="ion:chevron-forward-outline" />
         </div>
       </div>
     </n-card>
     <!-- 渲染节点Footer -->
-    <div v-show="node.type !== 'conditions'" class="wf-node-footer">
+    <div v-show="model.type !== 'conditions'" class="wf-node-footer">
       <n-popover ref="addNodePopoverRef" content-style="padding: 15px;" trigger="click">
         <template #trigger>
           <n-button circle class="wf-node-btn" size="medium" type="info">
@@ -62,66 +62,69 @@
 
     <!-- 配置项抽屉 -->
     <n-drawer v-model:show="showDrawer" :width="512">
-      <n-drawer-content :native-scrollbar="false" :title="getTypeName(node.type)" closable>
-        <component :is="propsComponent" v-model="nodeProps" />
+      <n-drawer-content :native-scrollbar="false" closable>
+        <template #header>
+          <div class="node-drawer-header">
+            <span v-if="!editNodeName">{{ model.name }}</span>
+            <n-input v-else v-model:value="model.name" :maxlength="16" placeholder="节点名称" />
+            <Icon
+              class="node-drawer-edit-btn"
+              icon="ion:create-outline"
+              @click="editNodeName = !editNodeName"
+            />
+          </div>
+        </template>
+        <component :is="propsComponent" v-model="model.props" />
       </n-drawer-content>
     </n-drawer>
   </div>
 </template>
 <script lang="ts" setup>
-import { getOperationName, getTypeName } from '@/components/workflow/util/workflow.js'
+import {
+  getOperationName,
+  getTypeName,
+  nodeTypeMap,
+  type WorkflowNode
+} from '@/components/workflow/util/workflow.js'
 import { Icon } from '@iconify/vue'
 import ApprovalProps from './props/ApprovalProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'
 import TaskProps from './props/TaskProps.vue'
 
-const {
-  node,
-  icon = 'ion:help-circle',
-  removable = true,
-  configable = false
-} = defineProps<{
-  node: any
-  icon: string
-  removable: boolean
-  configable: boolean
-}>()
+const model = defineModel<WorkflowNode>({ required: true })
+const emit = defineEmits(['addNode', 'removeNode'])
 
-const nodeProps = computed(() => node.props || {})
+const icon = computed(() => nodeTypeMap[model.value.type]?.icon || 'ion:help-circle')
+const removable = computed(() => nodeTypeMap[model.value.type]?.removable || false)
+const configurable = computed(() => nodeTypeMap[model.value.type]?.configurable || false)
 
-const $emit = defineEmits(['addNode', 'removeNode'])
-
-const addNodePopoverRef = ref()
-const showDrawer = ref(false)
+// 编辑节点名称
+const editNodeName = ref(false)
 
 // 添加节点
+const addNodePopoverRef = ref()
 const addNode = (type: string) => {
-  $emit('addNode', type)
+  emit('addNode', type)
   addNodePopoverRef.value.setShow(false)
 }
 
-// 删除节点
-const removeNode = () => {
-  $emit('removeNode')
-}
-
 // 打开抽屉
+const showDrawer = ref(false)
 const openDrawer = () => {
-  if (!configable) {
-    return
-  }
+  if (!configurable.value) return
   showDrawer.value = true
 }
 
 // 节点内容计算函数
 const showContent = computed(() => {
-  const nodeType = node.type
+  const nodeType = model.value.type
   if (nodeType === 'root') {
     return '发起人发起该流程'
   } else if (nodeType === 'approval' || nodeType === 'task' || nodeType === 'cc') {
     const operationName = getOperationName(nodeType)
-    const { assign: { type: assignType, id: assignIds } = { type: '', id: [] } } = node.props || {}
+    const { assign: { type: assignType, id: assignIds } = { type: '', id: [] } } =
+      model.value.props || {}
     if (assignType === 'USER' || assignType === 'ROLE') {
       if (assignIds && assignIds.length > 0) {
         return '由 ' + assignIds.map((item: any) => item.name) + ' ' + operationName
@@ -143,7 +146,7 @@ const showContent = computed(() => {
 
 // 配置项组件计算函数
 const propsComponent = computed(() => {
-  switch (node.type) {
+  switch (model.value.type) {
     case 'approval':
       return ApprovalProps
     case 'task':
@@ -158,4 +161,13 @@ const propsComponent = computed(() => {
 </script>
 <style lang="scss" scoped>
 @import '@/assets/style/components/workflow.scss';
+
+.node-drawer-header {
+  display: flex;
+  align-items: center;
+
+  .node-drawer-edit-btn {
+    cursor: pointer;
+  }
+}
 </style>

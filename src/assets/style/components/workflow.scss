@@ -1,44 +1,3 @@
-.wf-tool-bar-container {
-  .wf-tool-bar {
-    z-index: 100;
-    position: absolute;
-    right: 30px;
-    top: 30px;
-    width: auto;
-  }
-}
-
-.wf-canvas-container {
-  width: 100%;
-  height: calc(100vh - 120px);
-  overflow: hidden;
-  position: relative;
-  cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
-
-  .wf-canvas {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-
-.wf-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-wrap: wrap;
-  width: auto;
-  padding: 20px;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
 .wf-node {
   display: flex;
   flex-direction: column;
@@ -58,7 +17,7 @@
       width: 140px;
       height: 30px;
       line-height: 30px;
-      margin: 10px 0;
+      margin-bottom: 15px;
       font-size: 14px;
       text-align: center;
       border-radius: 10px;
@@ -138,50 +97,5 @@
       z-index: 1;
       margin: 20px auto;
     }
-  }
-}
-
-.wf-node-branch {
-  position: relative;
-
-  .wf-node-footer {
-    // 覆盖wf-node下的footer样式
-    &::before {
-      opacity: 0;
-    }
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-    margin: auto;
-    width: 2px;
-    height: 100%;
-    background-color: var(--n-text-color);
-    opacity: 0.1;
-  }
-}
-
-.wf-node-condition {
-  overflow-x: auto;
-
-  .wf-node-condition-main {
-    width: 300px;
-    margin: 10px 0;
-  }
-}
-
-.branches-card {
-  &:hover {
-    border-color: var(--n-primary-color);
-  }
-
-  .branches-card-content {
-    padding: 20px 36px 0 36px;
   }
 }

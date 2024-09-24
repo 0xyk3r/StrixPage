@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="wf-tool-bar-container">
+    <div>
       <n-card class="wf-tool-bar" content-style="padding: 15px" hoverable>
         <n-button-group>
-          <n-popconfirm :positive-button-props="{ type: 'warning' }" @positive-click="saveData">
+          <n-popconfirm :positive-button-props="{ type: 'warning' }" @positive-click="emitSave">
             <template #trigger>
               <n-button>
                 <template #icon>
@@ -51,23 +51,10 @@
 </template>
 <script lang="ts" setup>
 import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
-import { http } from '@/plugins/axios'
 import { Icon } from '@iconify/vue'
 
-const $props = defineProps({
-  workflowId: {
-    type: String,
-    required: true
-  },
-  configId: {
-    type: String,
-    required: true
-  },
-  dataJson: {
-    type: String,
-    required: true
-  }
-})
+const { dataJson } = defineProps<{ dataJson: string }>()
+const emit = defineEmits(['save'])
 
 // 画布拖拽功能
 const canvasPosition = ref({ x: 0, y: 0 })
@@ -117,7 +104,7 @@ const containerZoomOut = () => {
 
 const workflowData = ref<WorkflowNode[]>([])
 watch(
-  () => $props.dataJson,
+  () => dataJson,
   (val) => {
     if (val) {
       workflowData.value = JSON.parse(val)
@@ -132,15 +119,49 @@ const WorkflowBody = defineComponent(() => {
   }
 })
 
-// 保存数据
-const saveData = () => {
-  http.post(
-    `system/workflow/update/${$props.workflowId}/config`,
-    { content: JSON.stringify(workflowData.value) },
-    { meta: { operate: '保存流程数据' } }
-  )
+const emitSave = () => {
+  emit('save', workflowData.value)
 }
 </script>
 <style lang="scss" scoped>
 @import '@/assets/style/components/workflow.scss';
+
+.wf-tool-bar {
+  z-index: 100;
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  width: auto;
+}
+
+.wf-canvas-container {
+  width: 100%;
+  height: calc(100vh - 120px);
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .wf-canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.wf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
+  padding: 20px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
 </style>

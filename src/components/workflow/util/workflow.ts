@@ -21,24 +21,25 @@ export interface WorkflowNode {
   props: any
   parentId: string
   parentType: string
+  conditionsId: string | null
   branches: WorkflowNode[]
 }
 
 /**
  * 节点类型映射
  */
-const typeMap: { [key: string]: any } = {
+export const nodeTypeMap: { [key: string]: any } = {
   root: {
     name: '发起人',
     removable: false,
-    configable: false,
+    configurable: false,
     icon: 'ion:person-sharp'
   },
   approval: {
     name: '审批人',
     operationName: '审批',
     removable: true,
-    configable: true,
+    configurable: true,
     icon: 'ion:checkmark-done-circle',
     defaultProps: {
       assign: {
@@ -61,7 +62,7 @@ const typeMap: { [key: string]: any } = {
     name: '办理人',
     operationName: '办理',
     removable: true,
-    configable: true,
+    configurable: true,
     icon: 'ion:checkbox',
     defaultProps: {
       assign: {
@@ -80,7 +81,7 @@ const typeMap: { [key: string]: any } = {
     name: '条件节点',
     operationName: '条件',
     removable: true,
-    configable: true,
+    configurable: true,
     icon: 'ion:git-branch-outline',
     defaultProps: {
       type: 'AND',
@@ -96,7 +97,7 @@ const typeMap: { [key: string]: any } = {
     name: '抄送人',
     operationName: '抄送',
     removable: true,
-    configable: true,
+    configurable: true,
     icon: 'ion:paper-plane',
     defaultProps: {
       assign: {
@@ -110,7 +111,7 @@ const typeMap: { [key: string]: any } = {
   empty: {
     name: '空节点',
     removable: false,
-    configable: false,
+    configurable: false,
     icon: 'ion:square'
   }
 }
@@ -168,12 +169,12 @@ const getNodeById = (nodes: WorkflowNode[], nodeId: string) => {
 
 /**
  * 获取条件节点使用的节点ID
- * @param {Array} nodes 节点数组
- * @param {Object} node 节点
- * @returns {Array} 使用的节点ID数组
+ * @param {*} nodes 节点数组
+ * @param {*} node 节点
+ * @returns 使用的节点ID数组
  */
-const getConditionUsedNode = (nodes: WorkflowNode[], node: WorkflowNode) => {
-  const usedNodeIds = new Set()
+const getConditionUsedNode = (nodes: WorkflowNode[], node: WorkflowNode): string[] => {
+  const usedNodeIds = new Set<string>()
   const branchStartIds = node.branches.map((branch) => branch.id)
 
   branchStartIds.forEach((nodeId) => {
@@ -199,11 +200,10 @@ const renderNode = (nodes: WorkflowNode[], node: WorkflowNode) => {
   return h(
     isConditionsNode ? WorkflowConditionsNode : WorkflowNode,
     {
-      node: node,
-      icon: typeMap[node.type]?.icon || 'ion:help-circle',
-      removable: typeMap[node.type]?.removable || false,
-      configable: typeMap[node.type]?.configable || false,
-      className: 'wf-node wf-node-branch',
+      modelValue: node,
+      onUpdateModelValue: (value: WorkflowNode) => {
+        node = value
+      },
       onAddNode: (type) => {
         handleAddChildren(nodes, node, type)
       },
@@ -241,7 +241,10 @@ const handleAddChildren = (
   const oldChildren = getChildrenNode(nodes, parentNode.id)
   const newNodeId = generateRandomId()
   // 深拷贝默认属性, 避免修改默认属性
-  const defaultProps = cloneDeep(typeMap[type]?.defaultProps || {})
+  const defaultProps = cloneDeep(nodeTypeMap[type]?.defaultProps || {})
+
+  // 记录条件分支的主节点ID
+  const conditionsId = type === 'condition' ? parentNode.id : parentNode.conditionsId || null
 
   const newNode: WorkflowNode = {
     id: newNodeId,
@@ -251,6 +254,7 @@ const handleAddChildren = (
     props: defaultProps,
     parentId: parentNode.id,
     parentType: parentNode.type,
+    conditionsId,
     branches: []
   }
 
@@ -272,7 +276,7 @@ const handleAddChildren = (
 
 /**
  * 删除子节点
- * @param {*} parent  父节点
+ * @param {*} nodes 节点集
  * @param {*} node  要删除的节点
  */
 const handleRemoveChildren = (nodes: WorkflowNode[], node: WorkflowNode) => {
@@ -311,19 +315,19 @@ const handleRemoveChildren = (nodes: WorkflowNode[], node: WorkflowNode) => {
  * @returns  节点类型名称
  */
 export const getTypeName = (type: WorkflowNodeType) => {
-  return typeMap[type]?.name || type
+  return nodeTypeMap[type]?.name || type
 }
 
 /**
  * 获取节点操作名称
  */
 export const getOperationName = (type: WorkflowNodeType) => {
-  return typeMap[type]?.operationName || type
+  return nodeTypeMap[type]?.operationName || type
 }
 
 /**
  * 渲染工作流
- * @param {*} node  节点数据
+ * @param {*} nodes  节点集
  * @returns  渲染后的节点
  */
 export const renderWorkflow = (nodes: WorkflowNode[]) => {

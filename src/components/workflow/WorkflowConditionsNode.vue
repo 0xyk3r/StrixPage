@@ -12,7 +12,9 @@
           <n-button secondary strong type="primary" @click="addNode('condition')">
             添加条件节点
           </n-button>
-          <n-button secondary strong type="error" @click="removeNode"> 删除条件分支</n-button>
+          <n-button secondary strong type="error" @click="$emit('removeNode')">
+            删除条件分支
+          </n-button>
         </n-button-group>
       </div>
       <!-- 子分支插槽 -->
@@ -50,20 +52,25 @@
 <script lang="ts" setup>
 import { Icon } from '@iconify/vue'
 
-const $emit = defineEmits(['addNode', 'removeNode'])
+const emit = defineEmits(['addNode', 'removeNode'])
 
 // 添加条件
 const addNodePopoverRef = ref()
 const addNode = (type: string) => {
-  $emit('addNode', type)
+  emit('addNode', type)
   addNodePopoverRef.value.setShow(false)
-}
-
-// 删除条件
-const removeNode = () => {
-  $emit('removeNode')
 }
 </script>
 <style lang="scss" scoped>
 @import '@/assets/style/components/workflow.scss';
+
+.branches-card {
+  &:hover {
+    border-color: var(--n-primary-color);
+  }
+
+  .branches-card-content {
+    padding: 20px 36px 0 36px;
+  }
+}
 </style>
