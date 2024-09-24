@@ -334,6 +334,7 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                   title: '流程绘制工具',
                   empty: false,
+                  parentRouteName: 'SystemModuleWorkflowIndex',
                   titleTemplate: '流程绘制工具 - {configId}'
                 }
               }
