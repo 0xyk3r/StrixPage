@@ -26,11 +26,6 @@ export default defineConfig({
       resolvers: [NaiveUiResolver()]
     }),
     VitePWA({
-      // registerType: 'autoUpdate',
-      // devOptions: {
-      //   enabled: true,
-      //   type: 'module'
-      // },
       includeAssets: ['favicon.ico', 'pwa/apple-touch-icon.png', 'pwa/mask-icon.svg'],
       manifest: {
         name: 'Strix',
@@ -73,9 +68,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server: {
-    host: '127.0.0.1',
-    port: 19889
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler'
+      }
+    }
   },
   build: {
     // rollupOptions: {
@@ -94,5 +92,9 @@ export default defineConfig({
         drop_console: true
       }
     }
+  },
+  server: {
+    host: '127.0.0.1',
+    port: 19889
   }
 })
