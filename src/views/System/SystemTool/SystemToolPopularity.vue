@@ -232,7 +232,7 @@ const renderDataMenuExtra = (row: any) => {
       style: {
         position: 'absolute',
         top: '10px',
-        right: '1px'
+        right: '15px'
       }
     },
     handleOperate(
