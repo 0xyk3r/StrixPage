@@ -88,9 +88,6 @@ export default {
     Icon
   },
   props: {
-    captchaType: {
-      type: String
-    },
     type: {
       type: String,
       default: '1'
@@ -137,7 +134,8 @@ export default {
     }
   },
   setup(props) {
-    const { mode, captchaType, type, blockSize, explain } = toRefs(props)
+    const captchaType = ref('blockPuzzle')
+    const { mode, type, blockSize, explain } = toRefs(props)
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
     let secretKey = ref(''), //后端返回的ase加密秘钥
       passFlag = ref(false), //是否通过的标识
@@ -306,12 +304,6 @@ export default {
               iconClass.value = 'ion:checkmark-outline'
               showRefresh.value = false
               isEnd.value = true
-              if (mode.value == 'pop') {
-                //   setTimeout(() => {
-                //     proxy.$parent.clickShow = false;
-                //     refresh();
-                //   }, 1500)
-              }
               passFlag.value = true
               tipWords.value = `${((endMovetime.value - startMoveTime.value) / 1000).toFixed(2)}s 验证成功`
               const captchaVerification = secretKey.value
@@ -320,11 +312,8 @@ export default {
                     secretKey.value
                   )
                 : backToken.value + '---' + JSON.stringify({ x: moveLeftDistance, y: 5.0 })
-              // setTimeout(() => {
               tipWords.value = ''
-              //proxy?.$parent?.closeBox()
-              proxy?.$parent?.$emit('success', { captchaVerification })
-              // }, 100)
+              proxy?.$emit('success', { captchaVerification })
             } else {
               moveBlockBackgroundColor.value = '#d9534f'
               leftBarBorderColor.value = '#d9534f'
@@ -356,8 +345,8 @@ export default {
       leftBarWidth.value = ''
       transitionWidth.value = 'width .3s'
 
-      leftBarBorderColor.value = '#ddd'
-      moveBlockBackgroundColor.value = '#fff'
+      leftBarBorderColor.value = ''
+      moveBlockBackgroundColor.value = ''
       iconColor.value = '#000'
       iconClass.value = 'ion:arrow-forward-outline'
       isEnd.value = false

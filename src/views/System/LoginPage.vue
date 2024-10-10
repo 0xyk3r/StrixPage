@@ -59,13 +59,12 @@
                 v-if="loginVerifyShowStatus"
                 ref="verifyRef"
                 :img-size="{ width: '400px', height: '200px' }"
-                captcha-type="blockPuzzle"
                 mode="pop"
                 @success="verifySuccess"
               />
               <div class="copyright">
                 Copyright &copy; 2024 ProjectAn Strix |
-                <a href="http://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
+                <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
               </div>
             </div>
           </div>
