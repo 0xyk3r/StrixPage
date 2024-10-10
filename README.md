@@ -1,6 +1,6 @@
 <h1 align="center">StrixPage</h1>
-<p align="center">ProjectAn Strix 的前端部分</p>
-<p align="center">Vue3 + Vite + TypeScript</p>
+<p align="center">ProjectAn Strix 业务中台的前端部分</p>
+<p align="center">Vue 3 + Vite + TypeScript</p>
 
 ## 安装与使用
 
@@ -16,7 +16,7 @@ pnpm install
 pnpm dev
 ```
 
-### 正式构建
+### 构建
 
 ```sh
 pnpm build
