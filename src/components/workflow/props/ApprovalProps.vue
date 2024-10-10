@@ -32,7 +32,7 @@
         </n-flex>
       </n-radio-group>
     </n-form-item>
-    <n-form-item v-if="cacheProps.assign.type !== 'AUTOREJECT'" label="审批期限 (0则不限时)">
+    <n-form-item v-if="cacheProps.assign.type !== 'AUTO_REJECT'" label="审批期限 (0则不限时)">
       <n-input-group>
         <n-input-number
           v-model:value="cacheProps.timeLimit.value"
@@ -48,7 +48,7 @@
       </n-input-group>
     </n-form-item>
     <n-form-item
-      v-if="cacheProps.assign.type !== 'AUTOREJECT' && cacheProps.timeLimit.value > 0"
+      v-if="cacheProps.assign.type !== 'AUTO_REJECT' && cacheProps.timeLimit.value > 0"
       label="审批超时自动操作"
     >
       <n-radio-group v-model:value="cacheProps.timeLimit.handler">
@@ -90,7 +90,7 @@ const assignTypes = [
   { label: '指定角色', value: 'ROLE' },
   { label: '发起人自选', value: 'SELECT' },
   { label: '发起人自己', value: 'SELF' },
-  { label: '系统自动拒绝', value: 'AUTOREJECT' }
+  { label: '系统自动拒绝', value: 'AUTO_REJECT' }
 ]
 const assignModes = [
   { label: '或签 (任意一人同意即可)', value: 'ANY' },
@@ -104,8 +104,8 @@ const timeUnits = [
 ]
 const timeLimitHandler = [
   { label: '发送通知', value: 'NOTIFY' },
-  { label: '自动通过', value: 'AUTOPASS' },
-  { label: '自动驳回', value: 'AUTOREJECT' }
+  { label: '自动通过', value: 'AUTO_PASS' },
+  { label: '自动驳回', value: 'AUTO_REJECT' }
 ]
 const rejectTypes = [
   { label: '结束流程', value: 'END' },

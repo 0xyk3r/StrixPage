@@ -32,7 +32,7 @@
         </n-flex>
       </n-radio-group>
     </n-form-item>
-    <n-form-item v-if="cacheProps.assign.type !== 'AUTOREJECT'" label="办理期限 (0则不限时)">
+    <n-form-item v-if="cacheProps.assign.type !== 'AUTO_REJECT'" label="办理期限 (0则不限时)">
       <n-input-group>
         <n-input-number
           v-model:value="cacheProps.timeLimit.value"
@@ -48,7 +48,7 @@
       </n-input-group>
     </n-form-item>
     <n-form-item
-      v-if="cacheProps.assign.type !== 'AUTOREJECT' && cacheProps.timeLimit.value > 0"
+      v-if="cacheProps.assign.type !== 'AUTO_REJECT' && cacheProps.timeLimit.value > 0"
       label="办理超时自动操作"
     >
       <n-radio-group v-model:value="cacheProps.timeLimit.handler">
@@ -91,7 +91,7 @@ const timeUnits = [
 ]
 const timeLimitHandler = [
   { label: '发送通知', value: 'NOTIFY' },
-  { label: '自动办理', value: 'AUTOPASS' }
+  { label: '自动办理', value: 'AUTO_PASS' }
 ]
 const openSelectUser = () => {
   console.log('openSelectUser')

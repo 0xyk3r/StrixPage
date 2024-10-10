@@ -66,12 +66,19 @@
         <template #header>
           <div class="node-drawer-header">
             <span v-if="!editNodeName">{{ model.name }}</span>
-            <n-input v-else v-model:value="model.name" :maxlength="16" placeholder="节点名称" />
+            <n-input
+              v-else
+              v-model:value="model.name"
+              :maxlength="16"
+              class="edit-input"
+              placeholder="节点名称"
+            />
             <Icon
-              class="node-drawer-edit-btn"
+              class="edit-btn"
               icon="ion:create-outline"
               @click="editNodeName = !editNodeName"
             />
+            <span class="node-id-text">{{ model.id }}</span>
           </div>
         </template>
         <component :is="propsComponent" v-model="model.props" />
@@ -135,7 +142,7 @@ const showContent = computed(() => {
       return `发起人自行选择${operationName}人`
     } else if (assignType === 'SELF') {
       return `发起人自己进行${operationName}`
-    } else if (assignType === 'AUTOREJECT') {
+    } else if (assignType === 'AUTO_REJECT') {
       return '系统自动拒绝该审批'
     }
   } else if (nodeType === 'condition') {
@@ -166,8 +173,19 @@ const propsComponent = computed(() => {
   display: flex;
   align-items: center;
 
-  .node-drawer-edit-btn {
+  .edit-input {
+    margin-left: 5px;
+    width: 50%;
+  }
+
+  .edit-btn {
     cursor: pointer;
+  }
+
+  .node-id-text {
+    margin-left: auto;
+    font-size: 12px;
+    opacity: 0.3;
   }
 }
 </style>
