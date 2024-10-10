@@ -5,6 +5,7 @@
       :style="{ 'max-width': parseInt(imgSize.width) + 80 + 'px' }"
       closable
       title="请完成安全验证"
+      @close="close"
     >
       <div :style="{ padding: mode == 'pop' ? '15px' : '0' }" class="verifybox-bottom">
         <VerifySlide
