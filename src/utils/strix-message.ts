@@ -32,7 +32,14 @@ export const createStrixMessage = (
             width: '480px'
           }
         },
-        { default: () => content }
+        {
+          default: () => {
+            const lines = content.split('\n')
+            return lines.map((line: string, index: number) => {
+              return h('p', { key: index }, line)
+            })
+          }
+        }
       )
     }
   })
