@@ -203,7 +203,7 @@ function handleError(response: AxiosResponse) {
     // 登录失效 清除登录信息并跳转到登录页
     if (response.data.code === 401) {
       loginInfoStore?.clearLoginInfo()
-      location.href = '/login?to=' + location.pathname
+      location.href = '/login?r=e&to=' + location.pathname
     }
   }
   createStrixMessage('error', errTitle, errMsg)

@@ -93,6 +93,15 @@ initStrixMessage()
 
 // 获取地址栏的to参数
 const loggedJumpPath = route.query.to || '/'
+onMounted(() => {
+  if (route.query.r === 'e') {
+    createStrixMessage(
+      'error',
+      '登录状态失效',
+      '由于在其他设备上登录或凭据超时，当前登录状态已失效，请重新登录'
+    )
+  }
+})
 
 const isLogging = ref(false)
 const loginFormRef = ref<FormInst | null>(null)
