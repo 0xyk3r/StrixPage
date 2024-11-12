@@ -1,6 +1,6 @@
 <template>
   <div>
-    <n-result description="生活总归带点荒谬" size="huge" status="404" title="404 资源不存在">
+    <n-result description="一定是搞错了什么..." size="huge" status="404" title="404 资源不存在">
       <template #footer>
         <n-button @click="closeCurrentTab">{{ countDown }} 秒后返回首页</n-button>
       </template>
