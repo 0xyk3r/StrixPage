@@ -43,12 +43,12 @@
           <n-tab-pane name="instance" tab="流程实例列表">
             <n-data-table
               :columns="workflowConfigDataColumns"
-              :data="popularityDataRef"
-              :loading="popularityDataLoading"
+              :data="workflowInstanceDataRef"
+              :loading="workflowInstanceDataLoading"
               :min-height="500"
-              :pagination="popularityDataPagination"
+              :pagination="workflowInstanceDataPagination"
               :remote="true"
-              :row-key="popularityDataRowKey"
+              :row-key="workflowInstanceDataRowKey"
               table-layout="fixed"
             >
               <template #empty>
@@ -131,7 +131,7 @@ import { type DataTableColumns, type FormRules, NFlex, NSpin } from 'naive-ui'
 const router = useRouter()
 
 const _baseName = '流程引擎'
-const _baseApiPrefix = 'system/workflow'
+const _baseApiPrefix = 'system/workflow/config'
 
 const {
   getDataListParams,
@@ -325,7 +325,7 @@ const workflowConfigDataColumns: DataTableColumns = [
             type: 'error',
             label: '删除',
             icon: 'ion:trash-outline',
-            onClick: () => deletePopularitData(row.id),
+            onClick: () => deleteWorkflowInstanceData(row.id),
             popconfirm: true,
             popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
           }
@@ -348,37 +348,40 @@ const openWorkflowEditor = (wfId: string, configId: string) => {
 }
 
 // 加载列表
-const getPopularitDataListParams = ref({
+const getWorkflowInstanceDataListParams = ref({
   page: 1,
   pageSize: 10
 })
-const popularityDataRef = ref()
-const popularityDataLoading = ref(false)
-const getPopularitDataList = () => {
+const workflowInstanceDataRef = ref()
+const workflowInstanceDataLoading = ref(false)
+const getWorkflowInstanceDataList = () => {
   if (!selectDataId.value) return createStrixMessage('warning', '请先选择配置', '请先选择配置')
-  popularityDataLoading.value = true
+  workflowInstanceDataLoading.value = true
   http
     .get(`${_baseApiPrefix}/${selectDataId.value}/data`, {
-      params: getPopularitDataListParams.value,
+      params: getWorkflowInstanceDataListParams.value,
       meta: { operate: `加载引擎版本数据列表` }
     })
     .then(({ data: res }) => {
-      popularityDataLoading.value = false
-      popularityDataRef.value = res.data.items
-      popularityDataPagination.itemCount = res.data.total
+      workflowInstanceDataLoading.value = false
+      workflowInstanceDataRef.value = res.data.items
+      workflowInstanceDataPagination.itemCount = res.data.total
     })
 }
-const popularityDataRowKey = (row: any) => row.id
-const popularityDataPagination = createPagination(getPopularitDataListParams, getPopularitDataList)
+const workflowInstanceDataRowKey = (row: any) => row.id
+const workflowInstanceDataPagination = createPagination(
+  getWorkflowInstanceDataListParams,
+  getWorkflowInstanceDataList
+)
 
 // 删除数据
-const deletePopularitData = (id: string) => {
+const deleteWorkflowInstanceData = (id: string) => {
   http
     .post(`${_baseApiPrefix}/${editDataId.value}/data/remove/${id}`, null, {
       meta: { operate: '删除引擎版本数据' }
     })
     .then(() => {
-      getPopularitDataList()
+      getWorkflowInstanceDataList()
     })
 }
 </script>

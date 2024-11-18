@@ -20,7 +20,7 @@ const dataJson = ref('')
 
 const loadConfigData = () => {
   http
-    .get(`${_baseApiPrefix}/${configId}`, { meta: { operate: `加载${_baseName}信息` } })
+    .get(`${_baseApiPrefix}/config/${configId}`, { meta: { operate: `加载${_baseName}信息` } })
     .then(({ data: res }) => {
       dataJson.value = res.data.content
     })

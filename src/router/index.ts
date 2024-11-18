@@ -210,6 +210,7 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/SystemModule/Job/SystemModuleJobIndex.vue'),
             meta: {
               title: '定时任务日志',
+              parentRouteName: 'SystemModuleJobIndex',
               empty: false
             }
           },
@@ -307,38 +308,92 @@ const routes: RouteRecordRaw[] = [
                 }
               }
             ]
+          }
+        ]
+      },
+      {
+        path: 'system/workflow',
+        name: 'SystemWorkflow',
+        meta: {
+          title: '工作流程管理',
+          empty: true
+        },
+        children: [
+          {
+            path: 'config',
+            name: 'SystemWorkflowConfigIndex',
+            component: () => import('@/views/System/Workflow/Config/SystemWorkflowConfigIndex.vue'),
+            meta: {
+              title: '流程引擎列表',
+              empty: false
+            }
           },
           {
-            path: 'workflow',
-            name: 'SystemModuleWorkflow',
+            path: 'editor/:workflowId/:configId',
+            name: 'SystemWorkflowConfigEditor',
+            component: () =>
+              import('@/views/System/Workflow/Config/SystemWorkflowConfigEditor.vue'),
             meta: {
-              title: '流程引擎配置',
-              empty: true
-            },
-            children: [
-              {
-                path: 'config',
-                name: 'SystemModuleWorkflowIndex',
-                component: () =>
-                  import('@/views/System/SystemModule/Workflow/SystemModuleWorkflowIndex.vue'),
-                meta: {
-                  title: '流程引擎列表',
-                  empty: false
-                }
-              },
-              {
-                path: 'editor/:workflowId/:configId',
-                name: 'SystemModuleWorkflowEditor',
-                component: () =>
-                  import('@/views/System/SystemModule/Workflow/SystemModuleWorkflowEditor.vue'),
-                meta: {
-                  title: '流程绘制工具',
-                  empty: false,
-                  parentRouteName: 'SystemModuleWorkflowIndex',
-                  titleTemplate: '流程绘制工具 - {configId}'
-                }
-              }
-            ]
+              title: '流程绘制工具',
+              empty: false,
+              parentRouteName: 'SystemModuleWorkflowIndex',
+              titleTemplate: '流程绘制工具 - {configId}'
+            }
+          },
+          {
+            path: 'submit',
+            name: 'SystemWorkflowSubmitList',
+            component: () => import('@/views/System/Workflow/SystemWorkflowSubmitList.vue'),
+            meta: {
+              title: '发起审批',
+              empty: false
+            }
+          },
+          {
+            path: 'submit/:workflowId',
+            name: 'SystemWorkflowSubmit',
+            component: () => import('@/views/System/Workflow/SystemWorkflowSubmit.vue'),
+            meta: {
+              title: '发起审批表单',
+              empty: false
+            }
+          },
+          {
+            path: 'unfinished',
+            name: 'SystemWorkflowTaskUnfinished',
+            component: () =>
+              import('@/views/System/Workflow/List/SystemWorkflowTaskUnfinished.vue'),
+            meta: {
+              title: '待我处理',
+              empty: false
+            }
+          },
+          {
+            path: 'finished',
+            name: 'SystemWorkflowTaskFinished',
+            component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskFinished.vue'),
+            meta: {
+              title: '已处理的',
+              empty: false
+            }
+          },
+          {
+            path: 'initiated',
+            name: 'SystemWorkflowTaskInitiated',
+            component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskInitiated.vue'),
+            meta: {
+              title: '我发起的',
+              empty: false
+            }
+          },
+          {
+            path: 'cc',
+            name: 'SystemWorkflowTaskCC',
+            component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskCC.vue'),
+            meta: {
+              title: '抄送我的',
+              empty: false
+            }
           }
         ]
       },
