@@ -32,6 +32,7 @@
 import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { type DataTableColumns, NTag } from 'naive-ui'
+import StrixNameFetcher from '@/components/StrixNameFetcher.vue'
 
 // 本页面操作提示关键词
 const _baseName = '工作流程列表'
@@ -56,7 +57,14 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 // 展示列信息
 const dataColumns: DataTableColumns = [
   { key: 'workflowId', title: '审批类型', width: 140 },
-  { key: 'instanceCreateBy', title: '提交人', width: 180 },
+  {
+    key: 'instanceCreateBy',
+    title: '提交人',
+    width: 180,
+    render(row: any) {
+      return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreateBy })
+    }
+  },
   { key: 'instanceCreateTime', title: '提交时间', width: 180 },
   { key: 'nodeType', title: '当前节点', width: 140 },
   { key: 'startTime', title: '任务到达时间', width: 180 },
