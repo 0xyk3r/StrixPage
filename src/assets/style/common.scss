@@ -18,6 +18,11 @@
   margin-bottom: 10px;
 }
 
+// 使元素内容可以被选择
+.selectable {
+  user-select: text;
+}
+
 // 数据编辑表单模态框
 .strix-form-modal {
   width: 65vw;

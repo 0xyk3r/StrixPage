@@ -1,7 +1,14 @@
 <template>
   <div>
     <n-spin :show="loading" size="small">
-      <span>{{ dataName }}</span>
+      <n-popover trigger="hover">
+        <template #trigger>
+          <n-badge :offset="[11, 11]" color="grey" dot>
+            <span>{{ dataName }}</span>
+          </n-badge>
+        </template>
+        <span class="selectable">{{ 'ID: ' + dataId }}</span>
+      </n-popover>
     </n-spin>
   </div>
 </template>
@@ -37,7 +44,7 @@ onMounted(() => {
       dataName.value = name
     })
     .catch(() => {
-      dataName.value = `未知 (${dataId})`
+      dataName.value = '未知'
     })
     .finally(() => {
       loading.value = false
