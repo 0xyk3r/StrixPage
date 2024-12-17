@@ -167,7 +167,7 @@ const propsComponent = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/components/workflow.scss';
+@use '@/assets/style/components/workflow.scss';
 
 .node-drawer-header {
   display: flex;

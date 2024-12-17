@@ -62,7 +62,7 @@ const addNode = (type: string) => {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/components/workflow.scss';
+@use '@/assets/style/components/workflow.scss';
 
 .branches-card {
   &:hover {

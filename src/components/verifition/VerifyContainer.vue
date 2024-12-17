@@ -72,5 +72,5 @@ defineExpose({
 })
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/components/verify.scss';
+@use '@/assets/style/components/verify.scss';
 </style>

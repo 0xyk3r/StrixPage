@@ -114,7 +114,7 @@ const dataColumns: DataTableColumns = [
           type: 'info',
           label: '审批',
           icon: 'ion:create-outline',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => console.log('审批', row)
         }
       ])
     }

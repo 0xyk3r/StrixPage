@@ -124,7 +124,7 @@ const emitSave = () => {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/components/workflow.scss';
+@use '@/assets/style/components/workflow.scss';
 
 .wf-tool-bar {
   z-index: 100;
