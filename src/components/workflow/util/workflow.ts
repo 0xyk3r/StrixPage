@@ -309,6 +309,10 @@ const handleRemoveChildren = (nodes: WorkflowNode[], node: WorkflowNode) => {
   }
 }
 
+export const getTypeNameByKey = (key: string) => {
+  return nodeTypeMap[key]?.name || key
+}
+
 /**
  * 获取节点类型名称
  * @param {*} type  节点类型

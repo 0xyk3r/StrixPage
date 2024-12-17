@@ -33,13 +33,15 @@ import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { type DataTableColumns, NTag } from 'naive-ui'
 import StrixNameFetcher from '@/components/StrixNameFetcher.vue'
+import { handleOperate } from '@/utils/strix-table-tool'
+import StrixTag from '@/components/StrixTag.vue'
 
 // 本页面操作提示关键词
-const _baseName = '工作流程列表'
+const _baseName = '待我处理工作流程列表'
 const _baseApiPrefix = 'system/workflow'
 
 // 加载字典
-// const systemUserStatusRef = useDict('SystemUserStatus')
+// const WorkflowNodeTypeRef = useDict('WorkflowNodeType')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -56,25 +58,65 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'workflowId', title: '审批类型', width: 140 },
+  { key: 'instanceName', title: '标题', width: 180 },
+  {
+    key: 'workflowId',
+    title: '流程模型',
+    width: 180,
+    render(row: any) {
+      return h(StrixNameFetcher, { dataType: 'workflow', dataId: row.workflowId })
+    }
+  },
   {
     key: 'instanceCreateBy',
     title: '提交人',
-    width: 180,
+    width: 140,
     render(row: any) {
       return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreateBy })
     }
   },
-  { key: 'instanceCreateTime', title: '提交时间', width: 180 },
-  { key: 'nodeType', title: '当前节点', width: 140 },
-  { key: 'startTime', title: '任务到达时间', width: 180 },
+  { key: 'instanceCreateTime', title: '提交时间', width: 160 },
+  {
+    key: 'nodeType',
+    title: '当前节点',
+    width: 140,
+    render(row: any) {
+      return h(StrixTag, {
+        value: row.nodeType,
+        dictName: 'WorkflowNodeType'
+      })
+    }
+  },
   {
     key: 'status',
     title: '审批状态',
     width: 140,
     align: 'center',
-    render() {
-      return h(NTag, { type: 'info' }, () => '待处理')
+    render(row: any) {
+      if (!row.status) {
+        return h(NTag, { type: 'warning' }, { default: () => '待处理' })
+      }
+      return h(StrixTag, {
+        value: row.status,
+        dictName: 'WorkflowOperationType'
+      })
+    }
+  },
+  { key: 'startTime', title: '任务到达时间', width: 180 },
+  {
+    key: 'actions',
+    title: '操作',
+    width: 180,
+    align: 'center',
+    render(row: any) {
+      return handleOperate([
+        {
+          type: 'info',
+          label: '审批',
+          icon: 'ion:create-outline',
+          onClick: () => showEditDataModal(row.id)
+        }
+      ])
     }
   }
 ]
