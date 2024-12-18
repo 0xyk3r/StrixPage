@@ -29,17 +29,19 @@
 </template>
 
 <script lang="ts" setup>
-import StrixTag from '@/components/StrixTag.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
-import { type DataTableColumns } from 'naive-ui'
+import { type DataTableColumns, NTag } from 'naive-ui'
+import StrixNameFetcher from '@/components/StrixNameFetcher.vue'
+import { handleOperate } from '@/utils/strix-table-tool'
+import StrixTag from '@/components/StrixTag.vue'
 
 // 本页面操作提示关键词
-const _baseName = '工作流程列表'
+const _baseName = '我处理的工作列表'
 const _baseApiPrefix = 'system/workflow'
 
 // 加载字典
-// const systemUserStatusRef = useDict('SystemUserStatus')
+// const WorkflowNodeTypeRef = useDict('WorkflowNodeType')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -56,15 +58,66 @@ const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'nickname', title: '用户昵称', width: 200 },
-  { key: 'phoneNumber', title: '手机号码', width: 200 },
+  { key: 'instanceName', title: '标题', width: 180 },
   {
-    key: 'status',
-    title: '用户状态',
+    key: 'workflowId',
+    title: '流程模型',
+    width: 180,
+    render(row: any) {
+      return h(StrixNameFetcher, { dataType: 'workflow', dataId: row.workflowId })
+    }
+  },
+  {
+    key: 'instanceCreateBy',
+    title: '发起人',
+    width: 140,
+    render(row: any) {
+      return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreateBy })
+    }
+  },
+  { key: 'instanceCreateTime', title: '提交时间', width: 160 },
+  {
+    key: 'nodeType',
+    title: '操作节点',
+    width: 140,
+    render(row: any) {
+      return h(StrixTag, {
+        value: row.nodeType,
+        dictName: 'WorkflowNodeType'
+      })
+    }
+  },
+  {
+    key: 'operationType',
+    title: '状态',
     width: 140,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'SystemUserStatus' })
+      if (!row.operationType) {
+        return h(NTag, { type: 'warning' }, { default: () => '待处理' })
+      }
+      return h(StrixTag, {
+        value: row.operationType,
+        dictName: 'WorkflowOperationType'
+      })
+    }
+  },
+  { key: 'taskAssignStartTime', title: '任务到达时间', width: 180 },
+  { key: 'taskAssignEndTime', title: '任务到达时间', width: 180 },
+  {
+    key: 'actions',
+    title: '操作',
+    width: 180,
+    align: 'center',
+    render(row: any) {
+      return handleOperate([
+        {
+          type: 'info',
+          label: '查看',
+          icon: 'ion:eye-outline',
+          onClick: () => console.log('查看', row)
+        }
+      ])
     }
   }
 ]
@@ -82,7 +135,7 @@ const getDataList = () => {
     })
     .then(({ data: res }) => {
       dataLoading.value = false
-      dataRef.value = res.data.systemUserList
+      dataRef.value = res.data.items
       dataPagination.itemCount = res.data.total
     })
 }

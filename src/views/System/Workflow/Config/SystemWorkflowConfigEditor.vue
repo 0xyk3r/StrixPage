@@ -36,7 +36,7 @@ onMounted(() => {
 
 const saveData = (data: any) => {
   http.post(
-    `system/workflow/update/${workflowId}/config`,
+    `${_baseApiPrefix}/update/${workflowId}/config`,
     { content: JSON.stringify(data) },
     { meta: { operate: '保存流程数据' } }
   )

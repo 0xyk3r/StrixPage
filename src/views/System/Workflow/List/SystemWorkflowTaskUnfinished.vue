@@ -37,7 +37,7 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import StrixTag from '@/components/StrixTag.vue'
 
 // 本页面操作提示关键词
-const _baseName = '待我处理工作流程列表'
+const _baseName = '待我处理工作列表'
 const _baseApiPrefix = 'system/workflow'
 
 // 加载字典
@@ -69,7 +69,7 @@ const dataColumns: DataTableColumns = [
   },
   {
     key: 'instanceCreateBy',
-    title: '提交人',
+    title: '发起人',
     width: 140,
     render(row: any) {
       return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreateBy })
@@ -88,21 +88,21 @@ const dataColumns: DataTableColumns = [
     }
   },
   {
-    key: 'status',
-    title: '审批状态',
+    key: 'operationType',
+    title: '状态',
     width: 140,
     align: 'center',
     render(row: any) {
-      if (!row.status) {
+      if (!row.operationType) {
         return h(NTag, { type: 'warning' }, { default: () => '待处理' })
       }
       return h(StrixTag, {
-        value: row.status,
+        value: row.operationType,
         dictName: 'WorkflowOperationType'
       })
     }
   },
-  { key: 'startTime', title: '任务到达时间', width: 180 },
+  { key: 'taskAssignStartTime', title: '任务到达时间', width: 180 },
   {
     key: 'actions',
     title: '操作',
