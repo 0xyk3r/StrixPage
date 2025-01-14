@@ -501,20 +501,20 @@ const editRoleMenus = () => {
   const menuIds: string[] = []
   const permissionIds: string[] = []
 
-  const checkedIds = [
-    editRoleMenusTreeRef.value?.getCheckedData().keys,
-    editRoleMenusTreeRef.value?.getIndeterminateData().keys
+  const checkedIds: any[] = [
+    ...(editRoleMenusTreeRef.value?.getCheckedData().keys || []),
+    ...(editRoleMenusTreeRef.value?.getIndeterminateData().keys || [])
   ]
 
-  flatMenu
-    .filter((m) => checkedIds.includes(m.id))
-    .forEach((m) => {
+  flatMenu.forEach((m) => {
+    if (checkedIds.includes(m.id)) {
       if (m.type === 'menu') {
         menuIds.push(m.id)
       } else {
         permissionIds.push(m.id)
       }
-    })
+    }
+  })
 
   http
     .post(
