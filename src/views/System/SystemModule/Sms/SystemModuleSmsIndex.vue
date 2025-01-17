@@ -282,7 +282,7 @@ const dataColumns: DataTableColumns = [
                 return h(NTag, { type: tagType, bordered: false }, { default: () => tagLabel })
               }
             },
-            { title: '创建时间', key: 'createTime', width: 160 }
+            { title: '创建时间', key: 'createdTime', width: 160 }
           ],
           data: row.signs,
           rowKey: (row: any) => row.id
@@ -357,7 +357,7 @@ const dataColumns: DataTableColumns = [
               }
             },
             { title: '模板内容', key: 'content', width: 600 },
-            { title: '创建时间', key: 'createTime', width: 160 }
+            { title: '创建时间', key: 'createdTime', width: 160 }
           ],
           data: row.templates,
           rowKey: (row: any) => row.id
@@ -407,7 +407,7 @@ const dataColumns: DataTableColumns = [
   { key: 'regionId', width: 120, title: '地域', align: 'center' },
   { key: 'accessKey', width: 180, title: 'AccessKey' },
   { key: 'remark', width: 240, title: '备注' },
-  { key: 'createTime', width: 180, title: '创建时间' },
+  { key: 'createdTime', width: 180, title: '创建时间' },
   {
     key: 'actions',
     title: '操作',

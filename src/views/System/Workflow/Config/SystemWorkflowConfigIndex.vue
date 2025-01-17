@@ -306,7 +306,7 @@ const workflowConfigDataRowKey = (row: any) => row.id
 // 流程版本展示列信息
 const workflowConfigDataColumns: DataTableColumns = [
   { key: 'version', title: '版本编号', width: 100 },
-  { key: 'createTime', title: '创建时间', width: 180 },
+  { key: 'createdTime', title: '创建时间', width: 180 },
   {
     key: 'actions',
     title: '操作',

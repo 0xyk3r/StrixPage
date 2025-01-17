@@ -89,7 +89,7 @@ const dataColumns: DataTableColumns = [
   { key: 'groupKey', title: '文件组配置 Key', width: 160 },
   { key: 'size', title: '文件大小', width: 120, render: (row: any) => formatFileSize(row.size) },
   { key: 'ext', title: '文件拓展名', width: 100 },
-  { key: 'createTime', title: '上传时间', width: 180 },
+  { key: 'createdTime', title: '上传时间', width: 180 },
   {
     key: 'actions',
     title: '操作',

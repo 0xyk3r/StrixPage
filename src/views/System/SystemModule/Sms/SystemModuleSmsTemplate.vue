@@ -120,7 +120,7 @@ const dataColumns: DataTableColumns = [
     }
   },
   { key: 'content', title: '模板内容', width: 600 },
-  { title: '创建时间', key: 'createTime', width: 180 }
+  { title: '创建时间', key: 'createdTime', width: 180 }
 ]
 // 加载列表
 const dataRef = ref()

@@ -356,7 +356,7 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'createTime', title: '创建时间', width: 180 },
+  { key: 'createdTime', title: '创建时间', width: 180 },
   {
     key: 'actions',
     title: '操作',

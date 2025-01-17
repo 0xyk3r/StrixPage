@@ -291,7 +291,7 @@ const dataColumns: DataTableColumns = [
               }
             },
             { title: '地域', key: 'region', width: 160 },
-            { title: '创建时间', key: 'createTime', width: 160 },
+            { title: '创建时间', key: 'createdTime', width: 160 },
             { title: '备注', key: 'remark', width: 160 }
           ],
           data: row.buckets,
@@ -375,7 +375,7 @@ const dataColumns: DataTableColumns = [
   { key: 'privateEndpoint', width: 180, title: '内网节点' },
   { key: 'accessKey', width: 160, title: 'AccessKey' },
   { key: 'remark', width: 180, title: '备注' },
-  { key: 'createTime', width: 180, title: '创建时间' },
+  { key: 'createdTime', width: 180, title: '创建时间' },
   {
     key: 'actions',
     title: '操作',

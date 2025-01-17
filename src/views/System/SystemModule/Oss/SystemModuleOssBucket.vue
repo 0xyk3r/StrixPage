@@ -148,7 +148,7 @@ const dataColumns: DataTableColumns = [
     }
   },
   { title: '地域', key: 'region', width: 160 },
-  { title: '创建时间', key: 'createTime', width: 180 }
+  { title: '创建时间', key: 'createdTime', width: 180 }
 ]
 // 加载列表
 const dataRef = ref()

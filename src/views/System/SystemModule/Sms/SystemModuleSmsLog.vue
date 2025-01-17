@@ -112,7 +112,7 @@ const dataColumns: DataTableColumns = [
     }
   },
   { key: 'platformResponse', title: '平台响应', width: 240 },
-  { key: 'createTime', title: '时间', width: 180 }
+  { key: 'createdTime', title: '时间', width: 180 }
 ]
 // 加载列表
 const dataRef = ref()

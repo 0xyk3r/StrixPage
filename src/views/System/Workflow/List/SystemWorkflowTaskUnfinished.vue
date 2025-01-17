@@ -68,14 +68,14 @@ const dataColumns: DataTableColumns = [
     }
   },
   {
-    key: 'instanceCreateBy',
+    key: 'instanceCreatedBy',
     title: '发起人',
     width: 140,
     render(row: any) {
-      return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreateBy })
+      return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreatedBy })
     }
   },
-  { key: 'instanceCreateTime', title: '提交时间', width: 160 },
+  { key: 'instanceCreatedTime', title: '提交时间', width: 160 },
   {
     key: 'nodeType',
     title: '当前节点',
