@@ -20,7 +20,7 @@ import { http } from '@/plugins/axios'
 const { dataType, dataId } = defineProps<StrixNameFetcherProps>()
 
 const loading = ref(true)
-const dataName = ref('')
+const dataName = ref('加载中...')
 
 async function fetchName(dataType: string, dataId: string): Promise<string> {
   return new Promise((resolve, reject) => {
