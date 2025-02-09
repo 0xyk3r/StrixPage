@@ -61,6 +61,9 @@
             placeholder="请选择存储平台"
           />
         </n-form-item>
+        <n-form-item label="存储地域" path="region">
+          <n-input v-model:value="addDataForm.region" clearable placeholder="请输入存储地域" />
+        </n-form-item>
         <n-form-item label="公网节点" path="publicEndpoint">
           <n-input
             v-model:value="addDataForm.publicEndpoint"
@@ -135,6 +138,9 @@
               clearable
               placeholder="请选择存储平台"
             />
+          </n-form-item>
+          <n-form-item label="存储地域" path="region">
+            <n-input v-model:value="editDataForm.region" clearable placeholder="请输入存储地域" />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
             <n-input
@@ -242,6 +248,7 @@ const {
     key: null,
     name: null,
     platform: null,
+    region: null,
     publicEndpoint: null,
     privateEndpoint: null,
     accessKey: null,
@@ -252,6 +259,7 @@ const {
     key: null,
     name: null,
     platform: null,
+    region: null,
     publicEndpoint: null,
     privateEndpoint: null,
     accessKey: null,
@@ -371,6 +379,7 @@ const dataColumns: DataTableColumns = [
       return h(StrixTag, { value: row.platform, dictName: 'StrixOssPlatform' })
     }
   },
+  { key: 'region', width: 120, title: '地域' },
   { key: 'publicEndpoint', width: 180, title: '公网节点' },
   { key: 'privateEndpoint', width: 180, title: '内网节点' },
   { key: 'accessKey', width: 160, title: 'AccessKey' },
@@ -451,9 +460,17 @@ const addDataRules: FormRules = {
     { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
   ],
   platform: [{ type: 'number', required: true, message: '请选择平台', trigger: 'change' }],
-  regionId: [
+  region: [
     { required: true, message: '请输入区域', trigger: 'blur' },
     { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
+  ],
+  publicEndpoint: [
+    { required: true, message: '请输入公网节点', trigger: 'blur' },
+    { min: 1, max: 128, message: '公网节点长度需在 1 - 128 字之内', trigger: 'blur' }
+  ],
+  privateEndpoint: [
+    { required: true, message: '请输入内网节点', trigger: 'blur' },
+    { min: 1, max: 128, message: '内网节点长度需在 1 - 128 字之内', trigger: 'blur' }
   ],
   accessKey: [
     { required: true, message: '请输入 AccessKey', trigger: 'blur' },
@@ -492,6 +509,10 @@ const editDataRules: FormRules = {
     { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
   ],
   platform: [{ type: 'number', required: true, message: '请选择平台', trigger: 'change' }],
+  region: [
+    { required: true, message: '请输入区域', trigger: 'blur' },
+    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
+  ],
   publicEndpoint: [
     { required: true, message: '请输入公网节点', trigger: 'blur' },
     { min: 1, max: 128, message: '公网节点长度需在 1 - 128 字之内', trigger: 'blur' }
