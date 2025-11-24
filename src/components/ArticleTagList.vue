@@ -29,7 +29,7 @@ import type { ArticleTagModel } from '@/@types/components/ArticleTag'
 import type { ArticleTagListProps } from '@/@types/components/ArticleTagList'
 import ArticleTag from '@/components/ArticleTag.vue'
 import { EventBus } from '@/plugins/event-bus'
-import { Icon } from '@iconify/vue'
+import StrixIcon from '@/components/Icon/StrixIcon.vue'
 
 const model = defineModel<ArticleTagModel[]>()
 const { mode = 'show' } = defineProps<ArticleTagListProps>()
@@ -61,12 +61,12 @@ const contextmenuList = [
   {
     key: 'edit',
     label: '编辑标签',
-    icon: () => h(Icon, { icon: 'ion:create-outline' })
+    icon: () => h(StrixIcon, { icon: 'square-pen' })
   },
   {
     key: 'delete',
     label: '删除标签',
-    icon: () => h(Icon, { icon: 'ion:close-outline' })
+    icon: () => h(StrixIcon, { icon: 'trash' })
   }
 ]
 const handleTabContextmenu = (e: MouseEvent, tagKey: string) => {

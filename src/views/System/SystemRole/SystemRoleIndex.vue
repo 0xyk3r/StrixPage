@@ -294,21 +294,21 @@ const dataColumns: DataTableColumns = [
         {
           type: 'info',
           label: '编辑菜单权限',
-          icon: 'ion:bookmarks-outline',
+          icon: 'menu',
           disabled: row.builtin === 1,
           onClick: () => showEditRoleMenusModal(row)
         },
         {
           type: 'warning',
           label: '编辑',
-          icon: 'ion:create-outline',
+          icon: 'square-pen',
           disabled: row.builtin === 1,
           onClick: () => showEditDataModal(row.id)
         },
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           disabled: row.builtin === 1,
           onClick: () => deleteData(row.id),
           popconfirm: true,

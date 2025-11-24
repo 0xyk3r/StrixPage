@@ -33,7 +33,7 @@
           :size="32"
         >
           <n-icon :size="18">
-            <Icon class="tabs-common-handler" icon="ion:grid" />
+            <StrixIcon class="tabs-common-handler" icon="compass" />
           </n-icon>
         </n-icon-wrapper>
       </n-dropdown>
@@ -58,9 +58,9 @@
 import { EventBus } from '@/plugins/event-bus'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useTabsBarStore } from '@/stores/tabs-bar'
-import { Icon } from '@iconify/vue'
 import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
+import StrixIcon from '@/components/Icon/StrixIcon.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,33 +76,41 @@ const showRightMenu = ref(false)
 let contextmenuRoutesIndex: number | null = null
 const contextmenuPosition = ref({ x: 0, y: 0 })
 const contextmenuList = [
-  { key: 'reloadRouter', label: '刷新', icon: () => h(Icon, { icon: 'ion:reload-outline' }) },
   {
     key: 'closeCurrTabs',
     label: '关闭',
-    icon: () => h(Icon, { icon: 'ion:close-outline' })
+    icon: () => h(StrixIcon, { icon: 'x' })
+  },
+  {
+    key: 'reloadRouter',
+    label: '刷新',
+    icon: () => h(StrixIcon, { icon: 'rotate-cw' })
   },
   {
     key: 'reloadAllRouter',
     label: '刷新全部',
-    icon: () => h(Icon, { icon: 'ion:reload-circle-outline' })
-  },
-  {
-    key: 'closeOtherTabs',
-    label: '关闭其他',
-    icon: () => h(Icon, { icon: 'ion:close-circle-outline' })
+    icon: () => h(StrixIcon, { icon: 'refresh-cw' })
   },
   {
     key: 'closeLeftTabs',
     label: '关闭左侧',
-    icon: () => h(Icon, { icon: 'ion:arrow-undo-outline' })
+    icon: () => h(StrixIcon, { icon: 'panel-left-close' })
   },
   {
     key: 'closeRightTabs',
     label: '关闭右侧',
-    icon: () => h(Icon, { icon: 'ion:arrow-redo-outline' })
+    icon: () => h(StrixIcon, { icon: 'panel-right-close' })
   },
-  { key: 'closeAllTabs', label: '关闭全部', icon: () => h(Icon, { icon: 'ion:power-outline' }) }
+  {
+    key: 'closeOtherTabs',
+    label: '关闭其他',
+    icon: () => h(StrixIcon, { icon: 'copy-minus' })
+  },
+  {
+    key: 'closeAllTabs',
+    label: '关闭全部',
+    icon: () => h(StrixIcon, { icon: 'copy-x' })
+  }
 ]
 const handleTabContextmenu = (e: MouseEvent, index: number): void => {
   showRightMenu.value = true

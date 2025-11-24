@@ -12,7 +12,7 @@
         :size="32"
       >
         <n-icon :size="18">
-          <Icon icon="ion:contrast" @click="changeTheme" />
+          <StrixIcon icon="contrast" @click="changeTheme" />
         </n-icon>
       </n-icon-wrapper>
 
@@ -24,7 +24,7 @@
         :size="32"
       >
         <n-icon :size="18">
-          <Icon icon="ion:expand" @click="switchFullscreen" />
+          <StrixIcon icon="expand" @click="switchFullscreen" />
         </n-icon>
       </n-icon-wrapper>
 
@@ -36,7 +36,7 @@
         :size="32"
       >
         <n-icon :size="18">
-          <Icon icon="ion:refresh" @click="reloadAll" />
+          <StrixIcon icon="refresh-cw" @click="reloadAll" />
         </n-icon>
       </n-icon-wrapper>
     </n-flex>
@@ -61,7 +61,6 @@ import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { createStrixMessage } from '@/utils/strix-message'
-import { Icon } from '@iconify/vue'
 import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
@@ -132,7 +131,7 @@ const logout = () => {
   align-items: center;
   justify-content: flex-end;
 
-  .n-icon .iconify:hover {
+  .n-icon .strix-icon:hover {
     color: #63e2b7;
   }
 

@@ -239,7 +239,7 @@
         <n-upload-dragger>
           <div style="margin-bottom: 12px">
             <n-icon :depth="3" size="48">
-              <Icon icon="ion:archive-outline"></Icon>
+              <StrixIcon icon="package-open"></StrixIcon>
             </n-icon>
           </div>
           <n-text style="font-size: 16px"> 点击或者拖动文件到该区域来上传</n-text>
@@ -258,7 +258,6 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { Icon } from '@iconify/vue'
 import { cloneDeep, pick } from 'lodash'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import { storeToRefs } from 'pinia'
@@ -346,26 +345,26 @@ const dataColumns: DataTableColumns = [
   {
     key: 'actions',
     title: '操作',
-    width: 180,
+    width: 220,
     align: 'center',
     render(row: any) {
       return handleOperate([
         {
           type: 'info',
           label: '上传文件',
-          icon: 'ion:cloud-upload-outline',
+          icon: 'upload',
           onClick: () => showUploadModal(row.key)
         },
         {
           type: 'warning',
           label: '编辑',
-          icon: 'ion:create-outline',
+          icon: 'square-pen',
           onClick: () => showEditDataModal(row.id)
         },
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deleteData(row.id),
           popconfirm: true,
           popconfirmMessage:

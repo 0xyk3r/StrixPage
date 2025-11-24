@@ -180,25 +180,25 @@ const dataColumns: DataTableColumns = [
           {
             type: 'info',
             label: '启动流程',
-            icon: 'ion:play-outline',
+            icon: 'play',
             onClick: () => {}
           },
           {
             type: 'success',
             label: '配置新版本',
-            icon: 'ion:add-outline',
+            icon: 'plus',
             onClick: () => openWorkflowEditor(row.id, 'new')
           },
           {
             type: 'warning',
             label: '编辑',
-            icon: 'ion:create-outline',
+            icon: 'square-pen',
             onClick: () => showEditDataModal(row.id)
           },
           {
             type: 'error',
             label: '删除',
-            icon: 'ion:trash-outline',
+            icon: 'trash',
             onClick: () => deleteData(row.id),
             popconfirm: true,
             popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
@@ -318,13 +318,13 @@ const workflowConfigDataColumns: DataTableColumns = [
           {
             type: 'warning',
             label: '查看',
-            icon: 'ion:eye-outline',
+            icon: 'eye',
             onClick: () => openWorkflowEditor(selectDataId.value, row.id)
           },
           {
             type: 'error',
             label: '删除',
-            icon: 'ion:trash-outline',
+            icon: 'trash',
             onClick: () => deleteWorkflowInstanceData(row.id),
             popconfirm: true,
             popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'

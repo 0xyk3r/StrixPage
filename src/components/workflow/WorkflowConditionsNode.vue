@@ -29,7 +29,7 @@
           <n-button circle class="wf-node-btn" size="medium" type="info">
             <template #icon>
               <n-icon size="24">
-                <Icon icon="ion:add-outline" />
+                <StrixIcon icon="circle-plus" />
               </n-icon>
             </template>
           </n-button>
@@ -50,8 +50,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
-
 const emit = defineEmits(['addNode', 'removeNode'])
 
 // 添加条件

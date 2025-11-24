@@ -114,7 +114,7 @@ const dataColumns: DataTableColumns = [
         {
           type: 'info',
           label: '查看',
-          icon: 'ion:eye-outline',
+          icon: 'eye',
           onClick: () => console.log('查看', row)
         }
       ])

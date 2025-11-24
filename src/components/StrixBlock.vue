@@ -20,7 +20,7 @@
       class="strix-block-control"
       @click="switchExpand"
     >
-      <Icon v-if="$slots.default" :icon="isExpanded ? 'ion:caret-up' : 'ion:caret-down'" inline />
+      <StrixIcon v-if="$slots.default" :icon="isExpanded ? 'chevron-up' : 'chevron-down'" inline />
       <transition name="text-slide">
         <span v-if="$slots.default" v-show="hovering">{{ isExpanded ? '收起' : '显示全部' }}</span>
       </transition>
@@ -43,7 +43,6 @@
 </template>
 <script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings'
-import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 
 defineProps({
@@ -85,7 +84,7 @@ watch(isExpanded, (val) => {
   &.hover {
     box-shadow: var(--box-shadow-1);
 
-    .strix-block-control .iconify {
+    .strix-block-control .strix-icon {
       transform: translateX(-40px);
     }
   }
@@ -138,7 +137,7 @@ watch(isExpanded, (val) => {
       bottom: 0;
     }
 
-    .iconify {
+    .strix-icon {
       height: 100%;
       transition: all 0.3s var(--n-bezier);
     }

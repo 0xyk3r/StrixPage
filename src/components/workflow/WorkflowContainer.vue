@@ -8,7 +8,7 @@
               <n-button>
                 <template #icon>
                   <n-icon>
-                    <Icon icon="ion:save-outline" />
+                    <StrixIcon icon="save" />
                   </n-icon>
                 </template>
                 保存
@@ -19,14 +19,14 @@
           <n-button @click="containerZoomIn">
             <template #icon>
               <n-icon>
-                <Icon icon="ion:add-outline" />
+                <StrixIcon icon="circle-plus" />
               </n-icon>
             </template>
           </n-button>
           <n-button @click="containerZoomOut">
             <template #icon>
               <n-icon>
-                <Icon icon="ion:remove-outline" />
+                <StrixIcon icon="circle-x" />
               </n-icon>
             </template>
           </n-button>
@@ -51,7 +51,6 @@
 </template>
 <script lang="ts" setup>
 import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
-import { Icon } from '@iconify/vue'
 
 const { dataJson } = defineProps<{ dataJson: string }>()
 const emit = defineEmits(['save'])

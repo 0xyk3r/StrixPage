@@ -240,7 +240,7 @@ const renderDataMenuExtra = (row: any) => {
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deleteData(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
@@ -359,7 +359,7 @@ const popularityDataColumns: DataTableColumns = [
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deletePopularitData(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
@@ -434,7 +434,7 @@ const calcResult = (value: number) => {
     margin: 0 5px;
   }
 
-  .iconify {
+  .strix-icon {
     margin-right: 10px;
   }
 }

@@ -5,7 +5,7 @@
         <n-card class="tool-card" hoverable>
           <template #header>
             <div class="tool-header">
-              <Icon :icon="item.icon" :width="32" />
+              <StrixIcon :icon="item.icon" :width="32" />
               {{ item.name }}
             </div>
           </template>
@@ -13,7 +13,7 @@
           <template #action>
             <n-button secondary strong type="primary" @click="openTool(item.url)">
               <template #icon>
-                <Icon icon="ion:open-outline" />
+                <StrixIcon icon="square-arrow-out-up-right" />
               </template>
               打开工具
             </n-button>
@@ -25,15 +25,13 @@
 </template>
 
 <script lang="ts" setup>
-import { Icon } from '@iconify/vue'
-
 const router = useRouter()
 
 const tools = [
   {
     name: '热度工具',
     description: '用于配置浏览量、人气值等数据的算法，以及查看相应数据的原始数值的工具。',
-    icon: 'ion:flame-outline',
+    icon: 'flame',
     url: '/system/tool/popularity'
   }
 ]
@@ -52,7 +50,7 @@ const openTool = (url: string) => {
     font-weight: 600;
     height: 50px;
 
-    .iconify {
+    .strix-icon {
       margin-right: 10px;
     }
   }

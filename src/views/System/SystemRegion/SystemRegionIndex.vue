@@ -225,19 +225,19 @@ const dataColumns: DataTableColumns = [
         {
           type: 'info',
           label: '添加子项',
-          icon: 'ion:add',
+          icon: 'plus',
           onClick: () => showAddDataModal(row.id)
         },
         {
           type: 'warning',
           label: '编辑',
-          icon: 'ion:create-outline',
+          icon: 'square-pen',
           onClick: () => showEditDataModal(row.id)
         },
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deleteData(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'

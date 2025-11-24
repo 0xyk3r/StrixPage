@@ -277,9 +277,9 @@ import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { Icon } from '@iconify/vue'
 import { cloneDeep, kebabCase, pick } from 'lodash'
 import { type DataTableColumns, type FormInst, type FormRules, NTag } from 'naive-ui'
+import StrixIcon from '@/components/Icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
@@ -351,7 +351,7 @@ const dataColumns: DataTableColumns = [
     align: 'center',
     width: 120,
     render(row: any) {
-      return h(Icon, { icon: kebabCase(row.icon), width: 24 })
+      return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 })
     }
   },
   { key: 'sortValue', title: '菜单排序', width: 120, align: 'center' },
@@ -365,20 +365,20 @@ const dataColumns: DataTableColumns = [
         {
           type: 'info',
           label: '添加',
-          icon: 'ion:add',
+          icon: 'plus',
           disabled: row.type === 'permission',
           onClick: () => showAddDataModal(row)
         },
         {
           type: 'warning',
           label: '编辑',
-          icon: 'ion:create-outline',
+          icon: 'square-pen',
           onClick: () => showEditDataModal(row)
         },
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deleteData(row),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'

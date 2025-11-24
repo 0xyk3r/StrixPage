@@ -106,11 +106,11 @@ import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { initStrixMessage } from '@/utils/strix-message'
 import { deepSearch } from '@/utils/strix-tools'
-import { Icon } from '@iconify/vue'
 import { kebabCase } from 'lodash'
 import { type MenuInst, type MenuOption, useOsTheme, useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
+import StrixIcon from '@/components/Icon/StrixIcon.vue'
 
 const route = useRoute()
 const osTheme = useOsTheme()
@@ -212,7 +212,7 @@ const handleMenuIconField = (list: any[]) => {
         child.iconName = child.icon
       }
       child.icon = () => {
-        return h(Icon, { icon: kebabCase(child.iconName) })
+        return h(StrixIcon, { icon: kebabCase(child.iconName) })
       }
     } else {
       child.icon = null

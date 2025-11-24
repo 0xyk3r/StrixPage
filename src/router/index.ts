@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/System/HomePage.vue'),
     redirect: '/index',
     meta: {
-      icon: 'ion:home-outline',
+      icon: 'house',
       title: ''
     },
     children: [

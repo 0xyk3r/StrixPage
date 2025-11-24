@@ -100,13 +100,13 @@ const dataColumns: DataTableColumns = [
         {
           type: 'primary',
           label: '下载文件',
-          icon: 'ion:download-outline',
+          icon: 'download',
           onClick: () => downloadFile(row.id)
         },
         {
           type: 'error',
           label: '删除文件',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           onClick: () => deleteFile(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据且同时从远程存储服务中删除该文件? 该操作不可恢复!'

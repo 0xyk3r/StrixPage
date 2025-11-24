@@ -283,20 +283,20 @@ const dataColumns: DataTableColumns = [
         {
           type: 'info',
           label: '查看字典数据',
-          icon: 'ion:list-outline',
+          icon: 'list',
           onClick: () => viewDictData(row.key)
         },
         {
           type: 'warning',
           label: '编辑',
-          icon: 'ion:create-outline',
+          icon: 'square-pen',
           disabled: row.provided === 1,
           onClick: () => showEditDataModal(row.id)
         },
         {
           type: 'error',
           label: '删除',
-          icon: 'ion:trash-outline',
+          icon: 'trash',
           disabled: row.provided === 1,
           onClick: () => deleteData(row.id),
           popconfirm: true,

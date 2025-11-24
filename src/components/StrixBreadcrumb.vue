@@ -8,7 +8,7 @@
         @click="jumpRoute(item)"
       >
         <n-icon v-if="item.meta.icon">
-          <Icon :icon="item.meta.icon" :width="16" />
+          <StrixIcon :icon="item.meta.icon" :width="16" />
         </n-icon>
         {{ item.meta._title || item.meta.title }}
       </n-breadcrumb-item>
@@ -19,7 +19,6 @@
 <script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
-import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 import type { RouteLocationMatched } from 'vue-router'
 

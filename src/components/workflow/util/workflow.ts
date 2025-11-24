@@ -33,14 +33,14 @@ export const nodeTypeMap: { [key: string]: any } = {
     name: '发起人',
     removable: false,
     configurable: false,
-    icon: 'ion:person-sharp'
+    icon: 'user'
   },
   approval: {
     name: '审批人',
     operationName: '审批',
     removable: true,
     configurable: true,
-    icon: 'ion:checkmark-done-circle',
+    icon: 'user-check',
     defaultProps: {
       assign: {
         type: 'USER',
@@ -63,7 +63,7 @@ export const nodeTypeMap: { [key: string]: any } = {
     operationName: '办理',
     removable: true,
     configurable: true,
-    icon: 'ion:checkbox',
+    icon: 'user-round-check',
     defaultProps: {
       assign: {
         type: 'USER',
@@ -82,7 +82,7 @@ export const nodeTypeMap: { [key: string]: any } = {
     operationName: '条件',
     removable: true,
     configurable: true,
-    icon: 'ion:git-branch-outline',
+    icon: 'split',
     defaultProps: {
       type: 'AND',
       groups: [
@@ -98,7 +98,7 @@ export const nodeTypeMap: { [key: string]: any } = {
     operationName: '抄送',
     removable: true,
     configurable: true,
-    icon: 'ion:paper-plane',
+    icon: 'send',
     defaultProps: {
       assign: {
         type: 'USER',
@@ -112,7 +112,7 @@ export const nodeTypeMap: { [key: string]: any } = {
     name: '空节点',
     removable: false,
     configurable: false,
-    icon: 'ion:square'
+    icon: 'square-dashed'
   }
 }
 

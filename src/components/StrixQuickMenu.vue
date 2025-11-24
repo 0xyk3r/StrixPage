@@ -17,7 +17,7 @@
           >
             <template #trigger>
               <a @click="item.callback">
-                <Icon v-if="item.icon" :icon="item.icon" :width="18" />
+                <StrixIcon v-if="item.icon" :icon="item.icon" :width="18" />
                 <p>{{ item.name }}</p>
               </a>
             </template>
@@ -31,7 +31,6 @@
 
 <script lang="ts" setup>
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import { Icon } from '@iconify/vue'
 import { storeToRefs } from 'pinia'
 
 const quickMenuStore = useQuickMenuStore()

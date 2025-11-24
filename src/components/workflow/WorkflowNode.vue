@@ -12,7 +12,7 @@
       <template #header>
         <div class="node-header-content">
           <n-icon size="12">
-            <Icon :icon="icon" />
+            <StrixIcon :icon="icon" />
           </n-icon>
           <div>{{ getTypeName(model.type) }} - {{ model.name }}</div>
         </div>
@@ -21,7 +21,7 @@
         <n-button v-if="removable" circle quaternary size="tiny" @click.stop="$emit('removeNode')">
           <template #icon>
             <n-icon size="14">
-              <Icon icon="ion:close-outline" />
+              <StrixIcon icon="circle-x" />
             </n-icon>
           </template>
         </n-button>
@@ -30,7 +30,7 @@
       <div class="node-body-content">
         <div>{{ showContent }}</div>
         <div v-if="configurable">
-          <Icon icon="ion:chevron-forward-outline" />
+          <StrixIcon icon="circle-chevron-right" />
         </div>
       </div>
     </n-card>
@@ -41,7 +41,7 @@
           <n-button circle class="wf-node-btn" size="medium" type="info">
             <template #icon>
               <n-icon size="24">
-                <Icon icon="ion:add-outline" />
+                <StrixIcon icon="circle-plus" />
               </n-icon>
             </template>
           </n-button>
@@ -73,11 +73,7 @@
               class="edit-input"
               placeholder="节点名称"
             />
-            <Icon
-              class="edit-btn"
-              icon="ion:create-outline"
-              @click="editNodeName = !editNodeName"
-            />
+            <StrixIcon class="edit-btn" icon="square-pen" @click="editNodeName = !editNodeName" />
             <span class="node-id-text">{{ model.id }}</span>
           </div>
         </template>
@@ -87,13 +83,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  getOperationName,
-  getTypeName,
-  nodeTypeMap,
-  type WorkflowNode
-} from '@/components/workflow/util/workflow.js'
-import { Icon } from '@iconify/vue'
+import { getOperationName, getTypeName, nodeTypeMap, type WorkflowNode } from '@/components/workflow/util/workflow.js'
 import ApprovalProps from './props/ApprovalProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'
@@ -102,7 +92,7 @@ import TaskProps from './props/TaskProps.vue'
 const model = defineModel<WorkflowNode>({ required: true })
 const emit = defineEmits(['addNode', 'removeNode'])
 
-const icon = computed(() => nodeTypeMap[model.value.type]?.icon || 'ion:help-circle')
+const icon = computed(() => nodeTypeMap[model.value.type]?.icon || 'badge-question-mark')
 const removable = computed(() => nodeTypeMap[model.value.type]?.removable || false)
 const configurable = computed(() => nodeTypeMap[model.value.type]?.configurable || false)
 

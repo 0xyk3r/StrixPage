@@ -1,5 +1,5 @@
-import { Icon } from '@iconify/vue'
 import { NButton, NFlex, NPopconfirm, NPopover } from 'naive-ui'
+import StrixIcon from '@/components/Icon/StrixIcon.vue'
 
 /**
  * 阻止事件冒泡
@@ -40,11 +40,11 @@ export const handleOperate = (buttons: any[], size = 'medium') => {
             positiveButtonProps: { type }
           },
           {
-            trigger: () => h(NButton, buttonProps, () => h(Icon, { icon })),
+            trigger: () => h(NButton, buttonProps, () => h(StrixIcon, { icon, size: 16 })),
             default: () => popconfirmMessage
           }
         )
-      : h(NButton, buttonProps, () => h(Icon, { icon }))
+      : h(NButton, buttonProps, () => h(StrixIcon, { icon, size: 16 }))
 
     return label
       ? h(
