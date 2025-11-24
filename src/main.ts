@@ -2,6 +2,8 @@ import './assets/style/base.scss'
 import './assets/style/common.scss'
 import './assets/style/rewrite.scss'
 
+import 'vfonts/Lato.css'
+
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
