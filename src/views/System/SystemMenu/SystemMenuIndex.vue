@@ -9,8 +9,8 @@
             </n-button>
           </n-gi>
         </n-grid>
-        <n-alert style="margin-top: 15px" title="提醒" type="warning">
-          Strix 理论支持无限级别菜单，但考虑到 UI 展示和性能问题，仍不建议配置超过 3 级菜单。
+        <n-alert closable style="margin-top: 15px" title="提醒" type="warning">
+          考虑到 UI 展示和性能问题，不建议配置超过 3 级菜单。
         </n-alert>
       </template>
     </strix-block>
