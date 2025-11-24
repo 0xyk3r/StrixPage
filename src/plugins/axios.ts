@@ -68,10 +68,11 @@ axios.interceptors.request.use((config) => {
     const queryString = qsStringify(params)
     const urlParams = qsParse(queryString)
     console.log(
-      '%cStrix%cGET%c ' + config.meta?.operate,
-      'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
-      'background: #333333; color: #ffffff; padding: 2px 4px; border-radius: 2px;',
-      '',
+      '%c Strix HTTP %c GET %c%s',
+      'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+      'background: #3b82f6; color: white; padding: 4px 6px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+      'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+      config.meta?.operate || '请求',
       urlParams
     )
 
@@ -79,10 +80,11 @@ axios.interceptors.request.use((config) => {
     config.headers.sign = paramsSign(signUrl, urlParams, config.headers.timestamp)
   } else {
     console.log(
-      '%cStrix%cPOST%c ' + config.meta?.operate,
-      'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
-      'background: #333333; color: #ffffff; padding: 2px 4px; border-radius: 2px;',
-      '',
+      '%c Strix HTTP %c POST %c%s',
+      'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+      'background: #f59e0b; color: white; padding: 4px 4px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+      'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+      config.meta?.operate || '请求',
       config.data
     )
 
@@ -112,10 +114,11 @@ axios.interceptors.response.use(
     if (response.data) {
       response.data = dec(response.data)
       console.log(
-        '%cStrix%c响应%c ' + response.config.meta?.operate,
-        'background: #ff6347; color: white; padding: 2px 4px; border-radius: 2px;',
-        'background: #333333; color: #4CAF50; padding: 2px 4px; border-radius: 2px;',
-        '',
+        '%c Strix HTTP %c 响应 %c%s',
+        'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+        'background: #059669; color: white; padding: 4px 6px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+        'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+        response.config.meta?.operate || '响应',
         response.data
       )
       if (
@@ -283,9 +286,9 @@ function paramsSign(url: string, params: any, timestamp: any) {
     encryptObj = merge(baseParams, params)
   }
   const sortEncryptObj = sortAsc(encryptObj)
-  console.log('待签名参数', sortEncryptObj)
+  // console.log('待签名参数', sortEncryptObj)
   const sortParamsJson = JSON.stringify(sortEncryptObj)
-  console.log('待签名数据', sortParamsJson)
+  // console.log('待签名数据', sortParamsJson)
   return MD5(sortParamsJson).toString()
 }
 
