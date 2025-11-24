@@ -74,7 +74,9 @@ axios.interceptors.request.use((config) => {
       '',
       urlParams
     )
-    config.headers.sign = paramsSign('/' + config.url, urlParams, config.headers.timestamp)
+
+    const signUrl = buildSignUrl(config.url)
+    config.headers.sign = paramsSign(signUrl, urlParams, config.headers.timestamp)
   } else {
     console.log(
       '%cStrix%cPOST%c ' + config.meta?.operate,
@@ -83,7 +85,9 @@ axios.interceptors.request.use((config) => {
       '',
       config.data
     )
-    config.headers.sign = paramsSign('/' + config.url, config.data, config.headers.timestamp)
+
+    const signUrl = buildSignUrl(config.url)
+    config.headers.sign = paramsSign(signUrl, config.data, config.headers.timestamp)
     if (config.data) {
       config.data = JSON.stringify(enc(config.data))
     }
@@ -134,6 +138,20 @@ axios.interceptors.response.use(
     createStrixMessage('error', '网络请求失败', error.message)
   }
 )
+
+/**
+ * 构建签名用的完整URL
+ * @param url 请求URL
+ * @returns 完整的签名URL
+ */
+function buildSignUrl(url: string | undefined): string {
+  if (!url) {
+    return ''
+  }
+
+  // 确保 url 以斜杠开头
+  return url.startsWith('/') ? url : '/' + url
+}
 
 /**
  * 加密
@@ -211,6 +229,35 @@ function handleError(response: AxiosResponse) {
 }
 
 /**
+ * 判断参数值在签名时是否需要过滤
+ * @param value 参数值
+ * @returns 是否需要过滤
+ */
+function shouldFilterParam(value: any): boolean {
+  // 检查 null 或 undefined
+  if (value == null) {
+    return true
+  }
+
+  // 检查空字符串
+  if (value === '') {
+    return true
+  }
+
+  // 检查空数组
+  if (Array.isArray(value) && value.length === 0) {
+    return true
+  }
+
+  // 检查空对象
+  if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
+    return true
+  }
+
+  return false
+}
+
+/**
  * 参数签名
  * @param url URL
  * @param params 参数
@@ -225,15 +272,20 @@ function paramsSign(url: string, params: any, timestamp: any) {
   let encryptObj = baseParams
   if (params) {
     for (const key in params) {
-      if (params[key] == null || params[key] === '') {
+      if (shouldFilterParam(params[key])) {
         params = omit(params, key)
+      }
+      if (typeof params[key] === 'string') {
+        // & -> &amp;
+        params[key] = params[key].replace(/&/g, '&amp;')
       }
     }
     encryptObj = merge(baseParams, params)
   }
   const sortEncryptObj = sortAsc(encryptObj)
+  console.log('待签名参数', sortEncryptObj)
   const sortParamsJson = JSON.stringify(sortEncryptObj)
-  // console.log("待签名数据", sortParamsJson);
+  console.log('待签名数据', sortParamsJson)
   return MD5(sortParamsJson).toString()
 }
 
