@@ -216,7 +216,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'sms',
-            name: 'SystemModuleSmsIndex',
+            name: 'SystemModuleSms',
             meta: {
               title: '短信服务配置',
               empty: true
@@ -263,7 +263,7 @@ const routes: RouteRecordRaw[] = [
           },
           {
             path: 'oss',
-            name: 'SystemModuleOssIndex',
+            name: 'SystemModuleOss',
             meta: {
               title: '存储服务配置',
               empty: true
