@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按名称搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -18,12 +14,7 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
@@ -133,11 +124,7 @@
             <n-input v-model:value="editDataForm.label" clearable placeholder="请输入字典标签" />
           </n-form-item>
           <n-form-item label="字典排序" path="sort">
-            <n-input-number
-              v-model:value="editDataForm.sort"
-              clearable
-              placeholder="请输入字典排序"
-            />
+            <n-input-number v-model:value="editDataForm.sort" clearable placeholder="请输入字典排序" />
           </n-form-item>
           <n-form-item label="字典样式" path="style">
             <n-select
@@ -250,7 +237,7 @@ const {
 const dataColumns: DataTableColumns = [
   { key: 'value', title: '字典值', width: 240 },
   { key: 'label', title: '字典标签', width: 240 },
-  { key: 'sort', title: '字典排序', width: 120, align: 'center' },
+  { key: 'sort', title: '字典排序', width: 90, align: 'center' },
   {
     key: 'style',
     title: '字典样式预览',
@@ -263,13 +250,13 @@ const dataColumns: DataTableColumns = [
   {
     key: 'status',
     title: '字典状态',
-    width: 120,
+    width: 90,
     align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'DictDataStatus' })
     }
   },
-  { key: 'remark', title: '备注', width: 240 },
+  { key: 'remark', title: '备注', width: 180 },
   {
     key: 'actions',
     title: '操作',
@@ -337,8 +324,7 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/dict/data/${dictKey}/update`, addDataForm.value, {
@@ -373,19 +359,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/dict/data/${dictKey}/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/dict/data/${dictKey}/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/dict/data/${dictKey}/update/${editDataId.value}`, editDataForm.value, {

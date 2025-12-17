@@ -68,30 +68,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler'
-      }
-    }
-  },
   build: {
-    // rollupOptions: {
-    //   output: {
-    //     manualChunks(id) {
-    //       if (id.includes('node_modules')) {
-    //         if (id.includes('echarts')) return 'echarts'
-    //       }
-    //     }
-    //   }
-    // },
-    cssMinify: 'lightningcss',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true
-      }
-    }
+    target: 'es2015'
   },
   server: {
     host: '127.0.0.1',

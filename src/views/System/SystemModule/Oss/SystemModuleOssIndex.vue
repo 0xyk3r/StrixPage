@@ -65,28 +65,16 @@
           <n-input v-model:value="addDataForm.region" clearable placeholder="请输入存储地域" />
         </n-form-item>
         <n-form-item label="公网节点" path="publicEndpoint">
-          <n-input
-            v-model:value="addDataForm.publicEndpoint"
-            clearable
-            placeholder="请输入公网节点"
-          />
+          <n-input v-model:value="addDataForm.publicEndpoint" clearable placeholder="请输入公网节点" />
         </n-form-item>
         <n-form-item label="内网节点" path="privateEndpoint">
-          <n-input
-            v-model:value="addDataForm.privateEndpoint"
-            clearable
-            placeholder="请输入内网节点"
-          />
+          <n-input v-model:value="addDataForm.privateEndpoint" clearable placeholder="请输入内网节点" />
         </n-form-item>
         <n-form-item label="AccessKey" path="accessKey">
           <n-input v-model:value="addDataForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input
-            v-model:value="addDataForm.accessSecret"
-            clearable
-            placeholder="请输入AccessSecret"
-          />
+          <n-input v-model:value="addDataForm.accessSecret" clearable placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -143,25 +131,13 @@
             <n-input v-model:value="editDataForm.region" clearable placeholder="请输入存储地域" />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
-            <n-input
-              v-model:value="editDataForm.publicEndpoint"
-              clearable
-              placeholder="请输入公网节点"
-            />
+            <n-input v-model:value="editDataForm.publicEndpoint" clearable placeholder="请输入公网节点" />
           </n-form-item>
           <n-form-item label="内网节点" path="privateEndpoint">
-            <n-input
-              v-model:value="editDataForm.privateEndpoint"
-              clearable
-              placeholder="请输入内网节点"
-            />
+            <n-input v-model:value="editDataForm.privateEndpoint" clearable placeholder="请输入内网节点" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
-            <n-input
-              v-model:value="editDataForm.accessKey"
-              clearable
-              placeholder="请输入AccessKey"
-            />
+            <n-input v-model:value="editDataForm.accessKey" clearable placeholder="请输入AccessKey" />
           </n-form-item>
           <n-form-item label="AccessSecret" path="accessSecret">
             <n-input
@@ -203,16 +179,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash'
-import {
-  type DataTableColumns,
-  type FormRules,
-  NDataTable,
-  NScrollbar,
-  NSpin,
-  NTabPane,
-  NTabs,
-  NTag
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储服务'
@@ -294,8 +261,8 @@ const dataColumns: DataTableColumns = [
                   ColdArchive: { type: 'error', label: '冷归档存储' },
                   default: { type: 'default', label: '未知' }
                 }
-                const { type, label } = storageClassMap[row.storageClass] || storageClassMap.default
-                return h(NTag, { type, bordered: false }, { default: () => label })
+                const storageClass = storageClassMap[row.storageClass] ?? { type: 'default' as NTagType, label: '未知' }
+                return h(NTag, { type: storageClass.type, bordered: false }, { default: () => storageClass.label })
               }
             },
             { title: '地域', key: 'region', width: 160 },
@@ -352,16 +319,12 @@ const dataColumns: DataTableColumns = [
         () => [
           h(NTabPane, { name: 'bucket', tab: '存储空间', class: 'expand-sign-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [
-                expandOssBucketChildrenVNode
-              ])
+              h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandOssBucketChildrenVNode])
             )
           ),
           h(NTabPane, { name: 'template', tab: '文件分组', class: 'expand-template-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [
-                expandOssFileGroupChildrenVNode
-              ])
+              h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandOssFileGroupChildrenVNode])
             )
           )
         ]
@@ -439,13 +402,11 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http
-        .get(`system/oss/${row.id}`, { meta: { operate: `加载${_baseName}信息` } })
-        .then(({ data: res }) => {
-          row.buckets = res.data.buckets
-          row.fileGroups = res.data.fileGroups
-          row.loaded = true
-        })
+      http.get(`system/oss/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+        row.buckets = res.data.buckets
+        row.fileGroups = res.data.fileGroups
+        row.loaded = true
+      })
     }
   })
 }
@@ -487,15 +448,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/oss/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/oss/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -532,19 +490,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/oss/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/oss/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/oss/update/${editDataId.value}`, editDataForm.value, {

@@ -10,7 +10,7 @@ import { Utf8 } from 'crypto-es/lib/core'
 import { HexFormatter } from 'crypto-es/lib/format-hex'
 import { MD5 } from 'crypto-es/lib/md5'
 import JSEncrypt from 'jsencrypt'
-import { merge, omit } from 'lodash'
+import { merge } from 'lodash'
 import { storeToRefs } from 'pinia'
 import { parse as qsParse, stringify as qsStringify } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
@@ -76,7 +76,7 @@ axios.interceptors.request.use((config) => {
       urlParams
     )
 
-    const signUrl = buildSignUrl(config.url)
+    const signUrl = buildSignUrl(config.baseURL || axios.defaults.baseURL, config.url)
     config.headers.sign = paramsSign(signUrl, urlParams, config.headers.timestamp)
   } else {
     console.log(
@@ -88,7 +88,7 @@ axios.interceptors.request.use((config) => {
       config.data
     )
 
-    const signUrl = buildSignUrl(config.url)
+    const signUrl = buildSignUrl(config.baseURL || axios.defaults.baseURL, config.url)
     config.headers.sign = paramsSign(signUrl, config.data, config.headers.timestamp)
     if (config.data) {
       config.data = JSON.stringify(enc(config.data))
@@ -102,9 +102,7 @@ axios.interceptors.response.use(
   (response) => {
     // GET 请求默认不显示成功通知，POST 请求默认显示成功通知
     const showNotify =
-      response.config.method === 'get'
-        ? response.config.meta?.notify === true
-        : response.config.meta?.notify !== false
+      response.config.method === 'get' ? response.config.meta?.notify === true : response.config.meta?.notify !== false
 
     // 已经请求成功 移除可取消请求
     if (response.config.meta?.requestGroup && response.config.meta?.requestId) {
@@ -121,18 +119,10 @@ axios.interceptors.response.use(
         response.config.meta?.operate || '响应',
         response.data
       )
-      if (
-        response.data.code !== 200 &&
-        !response.data.repCode &&
-        response.config.responseType !== 'blob'
-      ) {
+      if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
         handleError(response)
       } else if (showNotify) {
-        createStrixMessage(
-          'success',
-          (response.config.meta?.operate || '操作') + '成功',
-          '操作成功'
-        )
+        createStrixMessage('success', (response.config.meta?.operate || '操作') + '成功', '操作成功')
       }
     }
     return response
@@ -144,16 +134,22 @@ axios.interceptors.response.use(
 
 /**
  * 构建签名用的完整URL
+ * @param baseURL 基础URL
  * @param url 请求URL
  * @returns 完整的签名URL
  */
-function buildSignUrl(url: string | undefined): string {
-  if (!url) {
-    return ''
+function buildSignUrl(baseURL: string | undefined, url: string | undefined): string {
+  if (!baseURL || !url) {
+    return url || ''
   }
 
+  // 移除 baseURL 末尾的斜杠
+  const cleanBaseURL = baseURL.replace(/\/$/, '')
+
   // 确保 url 以斜杠开头
-  return url.startsWith('/') ? url : '/' + url
+  const cleanUrl = url.startsWith('/') ? url : '/' + url
+
+  return cleanBaseURL + cleanUrl
 }
 
 /**
@@ -232,32 +228,64 @@ function handleError(response: AxiosResponse) {
 }
 
 /**
- * 判断参数值在签名时是否需要过滤
- * @param value 参数值
- * @returns 是否需要过滤
+ * 递归过滤空值参数
+ * @param obj 待过滤的对象
+ * @returns 过滤后的对象
  */
-function shouldFilterParam(value: any): boolean {
-  // 检查 null 或 undefined
-  if (value == null) {
-    return true
+function filterEmptyParams(obj: any): any {
+  if (obj == null) {
+    return undefined
   }
 
-  // 检查空字符串
-  if (value === '') {
-    return true
+  // 处理数组
+  if (Array.isArray(obj)) {
+    const filtered = obj.map((item) => filterEmptyParams(item)).filter((item) => item !== undefined)
+    return filtered.length === 0 ? undefined : filtered
   }
 
-  // 检查空数组
-  if (Array.isArray(value) && value.length === 0) {
-    return true
+  // 处理对象
+  if (typeof obj === 'object') {
+    const filtered: Record<string, any> = {}
+    for (const key in obj) {
+      const value = filterEmptyParams(obj[key])
+      if (value !== undefined) {
+        filtered[key] = value
+      }
+    }
+    return Object.keys(filtered).length === 0 ? undefined : filtered
   }
 
-  // 检查空对象
-  if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0) {
-    return true
+  // 处理字符串
+  if (typeof obj === 'string') {
+    return obj === '' ? undefined : obj.replace(/&/g, '&amp;')
   }
 
-  return false
+  return obj
+}
+
+/**
+ * 参数排序
+ * @param jsonObj 待排序参数
+ * @returns 排序后的参数
+ */
+function sortAsc(jsonObj: Record<string, any>) {
+  const keys = Object.keys(jsonObj).sort()
+  const sortObj: Record<string, any> = {}
+  keys.forEach((key) => {
+    if (jsonObj[key] != null) {
+      const value = jsonObj[key]
+      // 递归处理对象类型
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        sortObj[key] = sortAsc(value)
+      } else if (Array.isArray(value)) {
+        // 处理数组，对数组中的对象元素进行排序
+        sortObj[key] = value.map((item) => (typeof item === 'object' && !Array.isArray(item) ? sortAsc(item) : item))
+      } else {
+        sortObj[key] = value
+      }
+    }
+  })
+  return sortObj
 }
 
 /**
@@ -272,40 +300,20 @@ function paramsSign(url: string, params: any, timestamp: any) {
     _requestUrl: url,
     _timestamp: timestamp
   }
+
   let encryptObj = baseParams
   if (params) {
-    for (const key in params) {
-      if (shouldFilterParam(params[key])) {
-        params = omit(params, key)
-      }
-      if (typeof params[key] === 'string') {
-        // & -> &amp;
-        params[key] = params[key].replace(/&/g, '&amp;')
-      }
+    const filteredParams = filterEmptyParams(params)
+    if (filteredParams !== undefined) {
+      encryptObj = merge(baseParams, filteredParams)
     }
-    encryptObj = merge(baseParams, params)
   }
+
   const sortEncryptObj = sortAsc(encryptObj)
   // console.log('待签名参数', sortEncryptObj)
   const sortParamsJson = JSON.stringify(sortEncryptObj)
   // console.log('待签名数据', sortParamsJson)
   return MD5(sortParamsJson).toString()
-}
-
-/**
- * 参数排序
- * @param jsonObj 待排序参数
- * @returns 排序后的参数
- */
-function sortAsc(jsonObj: Record<string, any>) {
-  const keys = Object.keys(jsonObj).sort()
-  const sortObj: Record<string, any> = {}
-  keys.forEach((key) => {
-    if (jsonObj[key] != null) {
-      sortObj[key] = jsonObj[key]
-    }
-  })
-  return sortObj
 }
 
 export const http = axios

@@ -60,6 +60,6 @@ declare module 'vue-router' {
     /**
      * 动态组件名称模板
      */
-    dynamieComponentNameTemplate?: string
+    dynamicComponentNameTemplate?: string
   }
 }

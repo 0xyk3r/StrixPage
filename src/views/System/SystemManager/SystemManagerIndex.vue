@@ -2,41 +2,45 @@
   <div>
     <strix-block cleanable @clear="clearSearch">
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
+        <n-grid :cols="12" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
+          <n-gi span="4">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（昵称、账号）"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
-          <n-gi :span="1">
+          <n-gi span="3">
+            <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+              <n-form-item-gi label="人员角色" path="roleId">
+                <n-select
+                  v-model:value="getDataListParams.roleId"
+                  :options="systemRoleSelectList"
+                  clearable
+                  placeholder="请选择人员角色"
+                  @update:value="getDataList"
+                />
+              </n-form-item-gi>
+            </n-form>
+          </n-gi>
+          <n-gi :span="2">
             <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="管理人员状态" path="status" span="6 s:3 m:2">
+          <n-form-item-gi label="人员状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
               :options="systemManagerStatusRef"
-              placeholder="请选择管理人员状态"
+              placeholder="请选择人员状态"
             />
           </n-form-item-gi>
-          <n-form-item-gi label="管理人员类型" path="type" span="6 s:3 m:2">
+          <n-form-item-gi label="人员类型" path="type" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.type"
               :options="systemManagerTypeRef"
-              placeholder="请选择管理人员类型"
+              placeholder="请选择人员类型"
             />
           </n-form-item-gi>
         </n-grid>
@@ -50,6 +54,7 @@
       :loading="dataLoading"
       :pagination="dataPagination"
       :row-key="dataRowKey"
+      remote
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
@@ -71,21 +76,13 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="管理人员昵称" path="nickname">
-          <n-input
-            v-model:value="addDataForm.nickname"
-            clearable
-            placeholder="请输入管理人员昵称"
-          />
+          <n-input v-model:value="addDataForm.nickname" clearable placeholder="请输入管理人员昵称" />
         </n-form-item>
         <n-form-item label="登录账号" path="loginName">
           <n-input v-model:value="addDataForm.loginName" clearable placeholder="请输入登录账号" />
         </n-form-item>
         <n-form-item label="登录密码" path="loginPassword">
-          <n-input
-            v-model:value="addDataForm.loginPassword"
-            clearable
-            placeholder="请输入登录密码"
-          />
+          <n-input v-model:value="addDataForm.loginPassword" clearable placeholder="请输入登录密码" />
         </n-form-item>
         <n-form-item label="管理人员状态" path="status">
           <n-select
@@ -103,7 +100,7 @@
             placeholder="请选择管理人员类型"
           />
         </n-form-item>
-        <n-form-item v-if="addDataForm.type == 2" label="平台地区权限" path="regionId">
+        <n-form-item label="所属地区" path="regionId">
           <n-tree-select
             v-model:value="addDataForm.regionId"
             :options="systemRegionCascaderOptions"
@@ -111,7 +108,7 @@
             clearable
             filterable
             key-field="value"
-            placeholder="请选择平台地区权限"
+            placeholder="请选择所属地区"
           />
         </n-form-item>
       </n-form>
@@ -141,25 +138,13 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="管理人员昵称" path="nickname">
-            <n-input
-              v-model:value="editDataForm.nickname"
-              clearable
-              placeholder="请输入管理人员昵称"
-            />
+            <n-input v-model:value="editDataForm.nickname" clearable placeholder="请输入管理人员昵称" />
           </n-form-item>
           <n-form-item label="登录账号" path="loginName">
-            <n-input
-              v-model:value="editDataForm.loginName"
-              clearable
-              placeholder="请输入登录账号"
-            />
+            <n-input v-model:value="editDataForm.loginName" clearable placeholder="请输入登录账号" />
           </n-form-item>
           <n-form-item label="登录密码" path="loginPassword">
-            <n-input
-              v-model:value="editDataForm.loginPassword"
-              clearable
-              placeholder="请输入登录密码"
-            />
+            <n-input v-model:value="editDataForm.loginPassword" clearable placeholder="请输入登录密码" />
           </n-form-item>
           <n-form-item label="管理人员状态" path="status">
             <n-select
@@ -177,7 +162,7 @@
               placeholder="请选择管理人员类型"
             />
           </n-form-item>
-          <n-form-item v-if="editDataForm.type == 2" label="平台地区权限" path="regionId">
+          <n-form-item label="所属地区" path="regionId">
             <n-tree-select
               v-model:value="editDataForm.regionId"
               :options="systemRegionCascaderOptions"
@@ -185,7 +170,7 @@
               clearable
               filterable
               key-field="value"
-              placeholder="请选择平台地区权限"
+              placeholder="请选择所属地区"
             />
           </n-form-item>
         </n-form>
@@ -272,6 +257,7 @@ const {
     keyword: null,
     status: null,
     type: null,
+    roleId: null,
     pageIndex: 1,
     pageSize: 10
   },
@@ -304,9 +290,7 @@ const dataColumns: DataTableColumns = [
       if (!row.roleIdArray) {
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
-      const rolesCheckboxRender = systemRoleSelectList.value.map(({ value, label }) =>
-        h(NCheckbox, { value, label })
-      )
+      const rolesCheckboxRender = systemRoleSelectList.value.map(({ value, label }) => h(NCheckbox, { value, label }))
       return h('div', { style: 'padding: 5px 10px;' }, [
         h(NH6, { prefix: 'bar', alignText: true }, () => '人员角色设置'),
         h(
@@ -346,10 +330,10 @@ const dataColumns: DataTableColumns = [
     width: 180,
     align: 'center',
     render(row: any) {
-      const tagText = row.type === 1 ? '所有地区' : managerRegionName(row.regionId)
+      const tagText = managerRegionName(row.regionId)
       return h(
         NTag,
-        { type: row.type === 1 ? 'success' : 'info', bordered: false },
+        { type: 'info', bordered: false },
         {
           default: () => tagText
         }
@@ -410,11 +394,9 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http
-        .get(`system/manager/${row.id}`, { meta: { operate: '加载角色详细信息' } })
-        .then(({ data: res }) => {
-          row.roleIdArray = res.data.roleIds?.split(',')
-        })
+      http.get(`system/manager/${row.id}`, { meta: { operate: '加载角色详细信息' } }).then(({ data: res }) => {
+        row.roleIdArray = res.data.roleIds?.split(',')
+      })
     }
   })
 }
@@ -422,25 +404,22 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  http
-    .get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } })
-    .then(({ data: res }) => {
-      systemRegionCascaderOptions.value = res.data.options
-    })
+  http.get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } }).then(({ data: res }) => {
+    systemRegionCascaderOptions.value = res.data.options
+  })
 }
 onMounted(getSystemRegionSelectList)
 // 加载所有人员角色选项
 const systemRoleSelectList = ref([])
 const getSystemRoleSelectList = () => {
-  http
-    .get('system/role/select', { meta: { operate: '加载系统角色下拉列表' } })
-    .then(({ data: res }) => {
-      systemRoleSelectList.value = res.data.options
-    })
+  http.get('system/role/select', { meta: { operate: '加载系统角色下拉列表' } }).then(({ data: res }) => {
+    systemRoleSelectList.value = res.data.options
+  })
 }
 onMounted(getSystemRoleSelectList)
 const managerRegionName = (regionId: string) => {
-  return deepSearch(systemRegionCascaderOptions.value, regionId, 'value')?.label
+  const regionName = deepSearch(systemRegionCascaderOptions.value, regionId, 'value')?.label
+  return regionName || '未设置'
 }
 
 // 更改系统人员角色
@@ -482,15 +461,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/manager/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/manager/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -512,19 +488,16 @@ const showEditDataModal = (id: string) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  http
-    .get(`system/manager/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/manager/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/manager/update/${editDataId.value}`, editDataForm.value, {
@@ -538,11 +511,9 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/manager/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/manager/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 </script>
 

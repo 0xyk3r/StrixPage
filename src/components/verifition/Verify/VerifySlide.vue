@@ -18,12 +18,7 @@
 
       <!-- 刷新按钮 -->
       <Transition name="fade">
-        <button
-          v-if="showRefresh"
-          aria-label="刷新验证码"
-          class="verify-slide__refresh"
-          @click="handleRefresh"
-        >
+        <button v-if="showRefresh" aria-label="刷新验证码" class="verify-slide__refresh" @click="handleRefresh">
           <StrixIcon :size="20" icon="refresh-cw" />
         </button>
       </Transition>
@@ -47,11 +42,7 @@
         }"
         class="verify-slide__puzzle-block"
       >
-        <img
-          :src="`data:image/png;base64,${blockBackImgBase}`"
-          alt="拼图块"
-          class="verify-slide__puzzle-image"
-        />
+        <img :src="`data:image/png;base64,${blockBackImgBase}`" alt="拼图块" class="verify-slide__puzzle-image" />
       </div>
     </div>
 
@@ -273,6 +264,14 @@ const handleError = (data: any) => {
   tipWords.value = errorMessages[data.repCode] || data.repMsg || '验证失败'
 }
 
+// 获取客户端 X 坐标的辅助函数
+const getClientX = (e: MouseEvent | TouchEvent): number => {
+  if (e instanceof TouchEvent && e.touches.length > 0) {
+    return e.touches[0]!.clientX
+  }
+  return (e as MouseEvent).clientX
+}
+
 // 开始拖动
 const handleStart = (e: MouseEvent | TouchEvent) => {
   if (status.value === 'success') return
@@ -280,7 +279,7 @@ const handleStart = (e: MouseEvent | TouchEvent) => {
   e.preventDefault()
   e.stopPropagation()
 
-  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+  const clientX = getClientX(e)
   const barRect = barAreaRef.value?.getBoundingClientRect()
   if (!barRect) return
 
@@ -299,7 +298,7 @@ const handleStart = (e: MouseEvent | TouchEvent) => {
 const handleMove = (e: MouseEvent | TouchEvent) => {
   if (status.value !== 'moving') return
 
-  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+  const clientX = getClientX(e)
   const barRect = barAreaRef.value?.getBoundingClientRect()
   if (!barRect) return
 
@@ -333,9 +332,7 @@ const verifyPosition = async () => {
   const standardDistance = (moveDistance * 310) / parseInt(computedSize.imgWidth)
 
   const pointData = { x: standardDistance, y: 5.0 }
-  const pointJson = secretKey.value
-    ? aesEncrypt(JSON.stringify(pointData), secretKey.value)
-    : JSON.stringify(pointData)
+  const pointJson = secretKey.value ? aesEncrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
 
   try {
     const { data: res } = await http.post(

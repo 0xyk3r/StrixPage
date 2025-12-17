@@ -28,28 +28,27 @@ export const useDictsStore = defineStore(
      * 加载服务端字典数据
      * *限流* 1s内仅在第一次调用时执行一次
      */
-    const loadDictData = throttle(
-      async function loadDictData(key) {
-        const { data: res } = await http.get(`system/common/dict/${key}`, {
-          meta: { operate: '获取字典数据', notify: false }
+    const loadDictData = async function loadDictData(key: string) {
+      const { data: res } = await http.get(`system/common/dict/${key}`, {
+        meta: { operate: '获取字典数据', notify: false }
+      })
+      if (res) {
+        dictMap.value[key] = res.data
+
+        res.data.dictDataList.forEach((item: any) => {
+          if (item.value != null) {
+            item.value = convertType(item.value, res.data.dataType)
+          }
         })
-        if (res) {
-          dictMap.value[key] = res.data
 
-          res.data.dictDataList.forEach((item: any) => {
-            if (item.value != null) {
-              item.value = convertType(item.value, res.data.dataType)
-            }
-          })
+        return res.data.dictDataList
+      } else {
+        return []
+      }
+    }
 
-          return res.data.dictDataList
-        } else {
-          return []
-        }
-      },
-      1000,
-      { leading: true, trailing: false }
-    )
+    // 添加请求缓存 Map,避免重复请求
+    const loadingMap = new Map<string, Promise<any>>()
 
     /**
      * 获取字典数据
@@ -70,7 +69,17 @@ export const useDictsStore = defineStore(
           return result
         }
       }
-      result = await loadDictData(key)
+
+      // 如果正在加载中,返回已有的 Promise
+      if (loadingMap.has(key)) {
+        result = await loadingMap.get(key)
+      } else {
+        const promise = loadDictData(key)
+        loadingMap.set(key, promise)
+        result = await promise
+        loadingMap.delete(key)
+      }
+
       if (isRef(resultRef)) {
         resultRef.value = result
       }
@@ -108,6 +117,8 @@ function convertType(value: string, typeName: any) {
     case 6:
       return Boolean(value)
     case 7:
+      return parseInt(value)
+    case 8:
       return parseInt(value)
     default:
       return value

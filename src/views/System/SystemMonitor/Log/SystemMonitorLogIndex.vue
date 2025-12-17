@@ -5,22 +5,13 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按操作名称搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按操作名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="操作类型" path="operationType" span="6 s:3 m:2">
             <n-select
@@ -87,11 +78,21 @@ const clearSearch = () => {
 // 展示列信息
 const dataColumns: DataTableColumns = [
   { key: 'operationGroup', title: '操作分组', width: 120 },
-  { key: 'operationName', title: '操作名称', width: 240 },
+  {
+    key: 'operationName',
+    title: '操作名称',
+    width: 240,
+    ellipsis: {
+      tooltip: {
+        width: 'trigger'
+      }
+    }
+  },
   {
     key: 'operationSpend',
     title: '响应时间',
-    width: 120,
+    width: 100,
+    align: 'center',
     render(row: any) {
       const type: NTagType =
         row.operationSpend < 100
@@ -113,7 +114,7 @@ const dataColumns: DataTableColumns = [
   {
     key: 'operationMethod',
     title: '请求方式',
-    width: 120,
+    width: 100,
     align: 'center',
     render(row: any) {
       return h(
@@ -125,12 +126,50 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'operationUrl', title: '请求地址', width: 240 },
-  { key: 'operationParam', title: '操作参数', width: 360 },
-  { key: 'clientUsername', title: '操作用户', width: 120 },
-  { key: 'clientIp', title: '操作IP', width: 120 },
-  { key: 'clientLocation', title: '操作位置', width: 120 },
-  { key: 'clientDevice', title: '操作设备', width: 120 },
+  {
+    key: 'operationUrl',
+    title: '请求地址',
+    width: 240,
+    ellipsis: {
+      tooltip: {
+        width: 'trigger'
+      }
+    }
+  },
+  {
+    key: 'operationParam',
+    title: '操作参数',
+    width: 360,
+    ellipsis: {
+      tooltip: {
+        width: 'trigger'
+      }
+    }
+  },
+  {
+    key: 'clientUsername',
+    title: '操作用户',
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    key: 'clientIp',
+    title: '操作IP',
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    key: 'clientDevice',
+    title: '操作设备',
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
   {
     key: 'responseCode',
     title: '响应状态',
@@ -152,7 +191,7 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'operationTime', title: '创建时间', width: 180 }
+  { key: 'operationTime', title: '发生时间', width: 180 }
 ]
 // 分页配置
 const dataPagination = createPagination(getDataListParams, () => {

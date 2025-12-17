@@ -23,7 +23,7 @@ export const useQuickMenuStore = defineStore('quickMenu', () => {
     let forCount = quickMenus.value.length
     for (let i = 0; i < forCount; i++) {
       const item = quickMenus.value[i]
-      if (item.id === quickMenuId) {
+      if (item && item.id === quickMenuId) {
         quickMenus.value.splice(i, 1)
         i--
         forCount--

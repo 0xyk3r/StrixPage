@@ -10,8 +10,8 @@ import { type Ref } from 'vue'
  */
 export const createPagination = (params: Ref<any>, loadFunc: () => void) => {
   const dataPagination = reactive({
-    page: 1,
-    pageSize: 10,
+    page: params.value.pageIndex || 1,
+    pageSize: params.value.pageSize || 10,
     showSizePicker: true,
     pageSizes: [10, 20, 30, 50, 100],
     itemCount: 0,
@@ -51,13 +51,15 @@ export function usePage(
   initDataFormFunc?: Function
 ) {
   const getDataListParams = ref(cloneDeep(initGetDataListParams))
-  const clearSearch = () => {
-    getDataListParams.value = cloneDeep(initGetDataListParams)
-    getDataListFunc()
-  }
   const dataPagination = createPagination(getDataListParams, () => {
     getDataListFunc()
   })
+  const clearSearch = () => {
+    getDataListParams.value = cloneDeep(initGetDataListParams)
+    dataPagination.page = initGetDataListParams.pageIndex || 1
+    dataPagination.pageSize = initGetDataListParams.pageSize || 10
+    getDataListFunc()
+  }
   const dataRowKey = (row: any) => row.id
 
   const addDataModalShow = ref(false)

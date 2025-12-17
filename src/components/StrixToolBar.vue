@@ -74,11 +74,7 @@ const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
 // 切换全屏状态
 const switchFullscreen = () => {
   if (!screenfull.isEnabled) {
-    return createStrixMessage(
-      'warning',
-      '进入全屏失败',
-      '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏'
-    )
+    return createStrixMessage('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
   }
   screenfull.toggle()
 }
@@ -126,10 +122,10 @@ const logout = () => {
 <style lang="scss" scoped>
 .toolbar-container {
   height: 100%;
-  margin-right: 50px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 10px;
 
   .n-icon .strix-icon:hover {
     color: #63e2b7;
@@ -137,7 +133,6 @@ const logout = () => {
 
   .user-dropdown {
     height: 100%;
-    margin-left: 10px;
     display: flex;
     align-items: center;
 

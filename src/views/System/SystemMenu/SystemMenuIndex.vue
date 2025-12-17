@@ -69,11 +69,7 @@
                 <n-input v-model:value="addDataForm.icon" clearable placeholder="请输入菜单图标" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                <n-input-number
-                  v-model:value="addDataForm.sortValue"
-                  clearable
-                  placeholder="请输入菜单排序"
-                />
+                <n-input-number v-model:value="addDataForm.sortValue" clearable placeholder="请输入菜单排序" />
               </n-form-item-gi>
             </n-grid>
           </n-form>
@@ -89,11 +85,7 @@
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
               <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                <n-input
-                  v-model:value="addPermissionForm.name"
-                  clearable
-                  placeholder="请输入权限名称"
-                />
+                <n-input v-model:value="addPermissionForm.name" clearable placeholder="请输入权限名称" />
               </n-form-item-gi>
               <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                 <n-tree-select
@@ -107,11 +99,7 @@
                 />
               </n-form-item-gi>
               <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                <n-input
-                  v-model:value="addPermissionForm.key"
-                  clearable
-                  placeholder="请输入权限标识"
-                />
+                <n-input v-model:value="addPermissionForm.key" clearable placeholder="请输入权限标识" />
               </n-form-item-gi>
               <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                 <n-input
@@ -159,11 +147,7 @@
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
                 <n-form-item-gi label="菜单名称" path="name" span="2 s:1">
-                  <n-input
-                    v-model:value="editDataForm.name"
-                    clearable
-                    placeholder="请输入菜单名称"
-                  />
+                  <n-input v-model:value="editDataForm.name" clearable placeholder="请输入菜单名称" />
                 </n-form-item-gi>
                 <n-form-item-gi label="父级菜单" path="parentId" span="2 s:1">
                   <n-tree-select
@@ -177,32 +161,16 @@
                   />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                  <n-input
-                    v-model:value="editDataForm.key"
-                    clearable
-                    placeholder="请输入权限标识"
-                  />
+                  <n-input v-model:value="editDataForm.key" clearable placeholder="请输入权限标识" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单路由" path="url" span="2 s:2">
-                  <n-input
-                    v-model:value="editDataForm.url"
-                    clearable
-                    placeholder="请输入菜单路由"
-                  />
+                  <n-input v-model:value="editDataForm.url" clearable placeholder="请输入菜单路由" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单图标" path="icon" span="2 s:1">
-                  <n-input
-                    v-model:value="editDataForm.icon"
-                    clearable
-                    placeholder="请输入菜单图标"
-                  />
+                  <n-input v-model:value="editDataForm.icon" clearable placeholder="请输入菜单图标" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                  <n-input-number
-                    v-model:value="editDataForm.sortValue"
-                    clearable
-                    placeholder="请输入菜单排序"
-                  />
+                  <n-input-number v-model:value="editDataForm.sortValue" clearable placeholder="请输入菜单排序" />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
@@ -218,11 +186,7 @@
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
                 <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                  <n-input
-                    v-model:value="editPermissionForm.name"
-                    clearable
-                    placeholder="请输入权限名称"
-                  />
+                  <n-input v-model:value="editPermissionForm.name" clearable placeholder="请输入权限名称" />
                 </n-form-item-gi>
                 <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                   <n-tree-select
@@ -236,11 +200,7 @@
                   />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                  <n-input
-                    v-model:value="editPermissionForm.key"
-                    clearable
-                    placeholder="请输入权限标识"
-                  />
+                  <n-input v-model:value="editPermissionForm.key" clearable placeholder="请输入权限标识" />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                   <n-input
@@ -439,21 +399,17 @@ const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
 const addData = () => {
   if (addDataModalType.value === 'menu') {
     addDataFormRef.value?.validate((errors) => {
-      if (errors)
-        return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      http
-        .post('system/menu/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-        .then(() => {
-          initDataForm()
-          getDataList()
-          EventBus.emit('refresh-menu')
-        })
+      http.post('system/menu/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+        initDataForm()
+        getDataList()
+        EventBus.emit('refresh-menu')
+      })
     })
   } else {
     addPermissionFormRef.value?.validate((errors) => {
-      if (errors)
-        return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       http
         .post('system/permission/update', addPermissionForm.value, {
@@ -492,30 +448,25 @@ const showEditDataModal = (row: any) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   if (row.type === 'menu') {
-    http
-      .get(`system/menu/${row.id}`, { meta: { operate: `加载${_baseName}信息` } })
-      .then(({ data: res }) => {
-        editDataId.value = row.id
-        const canUpdateFields = Object.keys(initEditDataForm)
-        editDataForm.value = pick(res.data, canUpdateFields)
-        editDataFormLoading.value = false
-      })
+    http.get(`system/menu/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+      editDataId.value = row.id
+      const canUpdateFields = Object.keys(initEditDataForm)
+      editDataForm.value = pick(res.data, canUpdateFields)
+      editDataFormLoading.value = false
+    })
   } else {
-    http
-      .get(`system/permission/${row.id}`, { meta: { operate: `加载权限信息信息` } })
-      .then(({ data: res }) => {
-        editDataId.value = row.id
-        const canUpdateFields = Object.keys(initEditPermissionForm)
-        editPermissionForm.value = pick(res.data, canUpdateFields)
-        editDataFormLoading.value = false
-      })
+    http.get(`system/permission/${row.id}`, { meta: { operate: `加载权限信息信息` } }).then(({ data: res }) => {
+      editDataId.value = row.id
+      const canUpdateFields = Object.keys(initEditPermissionForm)
+      editPermissionForm.value = pick(res.data, canUpdateFields)
+      editDataFormLoading.value = false
+    })
   }
 }
 const editData = () => {
   if (editDataModalType.value === 'menu') {
     editDataFormRef.value?.validate((errors) => {
-      if (errors)
-        return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       http
         .post(`system/menu/update/${editDataId.value}`, editDataForm.value, {
@@ -529,8 +480,7 @@ const editData = () => {
     })
   } else {
     editPermissionFormRef.value?.validate((errors) => {
-      if (errors)
-        return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       http
         .post(`system/permission/update/${editDataId.value}`, editPermissionForm.value, {
@@ -546,29 +496,23 @@ const editData = () => {
 
 const deleteData = ({ id, type }: { id: string; type: string }) => {
   if (type === 'menu') {
-    http
-      .post(`system/menu/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-      .then(() => {
-        getDataList()
-        EventBus.emit('refresh-menu')
-      })
+    http.post(`system/menu/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+      getDataList()
+      EventBus.emit('refresh-menu')
+    })
   } else {
-    http
-      .post(`system/permission/remove/${id}`, null, { meta: { operate: `删除系统权限` } })
-      .then(() => {
-        getDataList()
-      })
+    http.post(`system/permission/remove/${id}`, null, { meta: { operate: `删除系统权限` } }).then(() => {
+      getDataList()
+    })
   }
 }
 
 // 树形选择器数据
 const menuTreeRef = ref([])
 const getMenuTree = () => {
-  http
-    .get('system/menu/tree', { meta: { operate: `加载${_baseName}树形列表` } })
-    .then(({ data: res }) => {
-      menuTreeRef.value = res.data.tree
-    })
+  http.get('system/menu/tree', { meta: { operate: `加载${_baseName}树形列表` } }).then(({ data: res }) => {
+    menuTreeRef.value = res.data.tree
+  })
 }
 onMounted(getMenuTree)
 

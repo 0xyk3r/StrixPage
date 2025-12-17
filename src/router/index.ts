@@ -123,7 +123,7 @@ const routes: RouteRecordRaw[] = [
           parentRouteName: 'SystemDictIndex',
           isDynamicWrapper: true,
           dynamicComponent: () => import('@/views/System/SystemDict/SystemDictData.vue'),
-          dynamieComponentNameTemplate: 'SystemDictData-{dictKey}'
+          dynamicComponentNameTemplate: 'SystemDictData-{dictKey}'
         }
       },
       {
@@ -137,8 +137,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'server',
             name: 'SystemMonitorServerIndex',
-            component: () =>
-              import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
+            component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
             meta: {
               title: '系统运行信息',
               empty: false
@@ -147,8 +146,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'cache',
             name: 'SystemMonitorCacheIndex',
-            component: () =>
-              import('@/views/System/SystemMonitor/Cache/SystemMonitorCacheIndex.vue'),
+            component: () => import('@/views/System/SystemMonitor/Cache/SystemMonitorCacheIndex.vue'),
             meta: {
               title: '系统缓存信息',
               empty: false
@@ -252,8 +250,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'template',
                 name: 'SystemModuleSmsTemplate',
-                component: () =>
-                  import('@/views/System/SystemModule/Sms/SystemModuleSmsTemplate.vue'),
+                component: () => import('@/views/System/SystemModule/Sms/SystemModuleSmsTemplate.vue'),
                 meta: {
                   title: '短信模板列表',
                   empty: false
@@ -281,8 +278,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'bucket',
                 name: 'SystemModuleOssBucket',
-                component: () =>
-                  import('@/views/System/SystemModule/Oss/SystemModuleOssBucket.vue'),
+                component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssBucket.vue'),
                 meta: {
                   title: '存储空间管理',
                   empty: false
@@ -291,8 +287,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'filegroup',
                 name: 'SystemModuleOssFileGroup',
-                component: () =>
-                  import('@/views/System/SystemModule/Oss/SystemModuleOssFileGroup.vue'),
+                component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssFileGroup.vue'),
                 meta: {
                   title: '文件分组管理',
                   empty: false
@@ -331,8 +326,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'editor/:workflowId/:configId',
             name: 'SystemWorkflowConfigEditor',
-            component: () =>
-              import('@/views/System/Workflow/Config/SystemWorkflowConfigEditor.vue'),
+            component: () => import('@/views/System/Workflow/Config/SystemWorkflowConfigEditor.vue'),
             meta: {
               title: '流程绘制工具',
               empty: false,
@@ -361,8 +355,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'unfinished',
             name: 'SystemWorkflowTaskUnfinished',
-            component: () =>
-              import('@/views/System/Workflow/List/SystemWorkflowTaskUnfinished.vue'),
+            component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskUnfinished.vue'),
             meta: {
               title: '待我处理',
               empty: false

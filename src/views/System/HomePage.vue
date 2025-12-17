@@ -10,7 +10,7 @@
       collapse-mode="width"
       show-trigger="bar"
     >
-      <!-- Logo -->
+      <!-- Logo 或 系统标题 -->
       <div class="home-logo-container">
         <img :class="theme" class="home-logo" src="@/assets/img/logo-w.webp" />
       </div>
@@ -33,17 +33,19 @@
     <n-layout>
       <n-layout-header :style="'--n-color: ' + themeVars.bodyColor" class="home-header">
         <!-- 顶部栏 -->
-        <n-grid class="home-header-top" cols="24" item-responsive responsive="screen">
-          <n-gi span="1 m:1 l:6">
+        <div class="home-header-top">
+          <div class="header-section breadcrumb-section">
             <strix-breadcrumb />
-          </n-gi>
-          <n-gi span="1 m:1 l:12">
+          </div>
+          <div class="header-divider"></div>
+          <div class="header-section tabs-section">
             <strix-tabs-bar />
-          </n-gi>
-          <n-gi span="22 m:22 l:6">
+          </div>
+          <div class="header-divider"></div>
+          <div class="header-section toolbar-section">
             <strix-tool-bar />
-          </n-gi>
-        </n-grid>
+          </div>
+        </div>
       </n-layout-header>
       <n-layout-content
         :native-scrollbar="false"
@@ -58,16 +60,12 @@
           <n-text type="success">{{ route.meta._title || route.meta.title }}</n-text>
         </n-h3> -->
         <!-- 动态路由区域 -->
-        <div
-          v-if="routerViewShow"
-          :style="'--s-bg-color: ' + themeVars.cardColor"
-          class="home-content-view"
-        >
+        <div v-if="routerViewShow" :style="'--s-bg-color: ' + themeVars.cardColor" class="home-content-view">
           <router-view v-slot="{ Component, route }">
             <transition name="strix-zoom-in-top">
-              <!-- 根据 fullPath 缓存组件 解决组件复用问题 -->
+              <!-- 根据组件名称缓存组件，DynamicWrapper 路由会被动态包装 -->
               <keep-alive :include="tabsBarStore.cachedRouteNames">
-                <component :is="Component" :key="route.fullPath" />
+                <component :is="wrapDynamicComponent(Component, route)" :key="route.fullPath" />
               </keep-alive>
             </transition>
           </router-view>
@@ -111,10 +109,44 @@ import { type MenuInst, type MenuOption, useOsTheme, useThemeVars } from 'naive-
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import StrixIcon from '@/components/Icon/StrixIcon.vue'
+import { replaceDynamicName } from '@/utils/dynamic-component-util'
+import type { Component } from 'vue'
 
 const route = useRoute()
 const osTheme = useOsTheme()
 const themeVars = useThemeVars()
+
+// 缓存动态包装组件，确保同一路由使用相同的组件定义（引用稳定）
+const dynamicComponentCache = new Map<string, Component>()
+
+/**
+ * 为 DynamicWrapper 路由创建动态命名的包装组件
+ * 这样 keep-alive 可以区分不同参数的动态路由
+ */
+const wrapDynamicComponent = (Component: Component, route: any): Component => {
+  // 非 DynamicWrapper 路由直接返回原组件
+  if (!route.meta.isDynamicWrapper) {
+    return Component
+  }
+
+  // 生成动态组件名称
+  const dynamicComponentName = replaceDynamicName(route.meta.dynamicComponentNameTemplate as string, route.params)
+
+  // 从缓存中获取或创建包装组件
+  if (!dynamicComponentCache.has(dynamicComponentName)) {
+    dynamicComponentCache.set(
+      dynamicComponentName,
+      defineComponent({
+        name: dynamicComponentName,
+        setup() {
+          return () => h(Component)
+        }
+      })
+    )
+  }
+
+  return dynamicComponentCache.get(dynamicComponentName)!
+}
 
 initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
@@ -123,9 +155,7 @@ const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()
 const loginInfoStore = useLoginInfoStore()
 
-const theme = computed(() =>
-  globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme
-)
+const theme = computed(() => (globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme))
 const { loginInfo, loginTokenExpire } = storeToRefs(loginInfoStore) as LoginInfoStore
 
 // 左侧菜单栏折叠
@@ -141,12 +171,10 @@ const renewToken = () => {
     loginTokenExpire.value &&
     new Date(loginTokenExpire.value).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000
   ) {
-    http
-      .post('system/renewToken', null, { meta: { operate: '续期 Token ', notify: false } })
-      .then(({ data: res }) => {
-        loginInfoStore.updateLoginInfo(res)
-        loginInfo.value = res.data.info
-      })
+    http.post('system/renewToken', null, { meta: { operate: '续期 Token ', notify: false } }).then(({ data: res }) => {
+      loginInfoStore.updateLoginInfo(res)
+      loginInfo.value = res.data.info
+    })
   }
 }
 onMounted(renewToken)
@@ -249,10 +277,22 @@ useResizeDetector(document.getElementById('app'), (element) => {
   .home-sider {
     .home-logo-container {
       box-sizing: border-box;
-      padding: 15px 0;
+      padding: 20px 0;
       width: 100%;
       display: flex;
       justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      height: 75px;
+
+      .home-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--n-text-1);
+        user-select: none;
+        white-space: nowrap;
+        text-align: center;
+      }
 
       .home-logo {
         width: 60%;
@@ -278,10 +318,50 @@ useResizeDetector(document.getElementById('app'), (element) => {
     .home-header-top {
       height: 60px;
       margin: 0 20px;
-      align-content: center;
+      display: flex;
+      align-items: center;
+      gap: 16px;
 
-      & > div {
+      .header-section {
         height: 60px;
+        display: flex;
+        align-items: center;
+      }
+
+      .breadcrumb-section {
+        flex-shrink: 0;
+        max-width: 280px;
+        min-width: 0;
+        overflow: hidden;
+
+        @media (max-width: 1280px) {
+          display: none;
+        }
+      }
+
+      .tabs-section {
+        flex: 1;
+        min-width: 200px;
+        overflow: hidden;
+      }
+
+      .toolbar-section {
+        flex-shrink: 0;
+        width: auto;
+      }
+
+      .header-divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--n-border-color);
+        opacity: 0.3;
+        transition: opacity 0.3s var(--n-bezier);
+
+        @media (max-width: 1280px) {
+          &:first-of-type {
+            display: none;
+          }
+        }
       }
     }
   }

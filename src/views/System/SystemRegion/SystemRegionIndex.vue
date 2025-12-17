@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（名称）"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（名称）" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -191,8 +187,8 @@ const {
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'name', title: '地区名称', width: 240 },
-  { key: 'fullName', title: '完整地区名称', width: 360 },
+  { key: 'name', title: '地区名称', width: 180 },
+  { key: 'fullName', title: '完整地区名称', width: 320 },
   {
     key: 'level',
     title: '地区层级',
@@ -214,7 +210,7 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'remarks', title: '备注信息', width: 240 },
+  { key: 'remarks', title: '备注信息', width: 180 },
   {
     key: 'actions',
     title: '操作',
@@ -291,11 +287,9 @@ const onDataChildrenLoad = (row: any) => {
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  http
-    .get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } })
-    .then(({ data: res }) => {
-      systemRegionCascaderOptions.value = res.data.options
-    })
+  http.get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } }).then(({ data: res }) => {
+    systemRegionCascaderOptions.value = res.data.options
+  })
 }
 
 const addDataRules: FormRules = {
@@ -308,15 +302,12 @@ const showAddDataModal = (id?: string) => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/region/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/region/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -328,19 +319,16 @@ const showEditDataModal = (id: string) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  http
-    .get(`system/region/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/region/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/region/update/${editDataId.value}`, editDataForm.value, {
@@ -354,11 +342,9 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/region/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/region/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 </script>
 

@@ -10,22 +10,19 @@
     >
       <n-tab
         v-for="(item, index) in visitedRoutes"
-        :key="item.name"
+        :key="getRouteKey(item)"
         :closable="!isAffix(item)"
-        :name="item.meta.title"
+        :name="getRouteKey(item)"
         @contextmenu.prevent.stop="handleTabContextmenu($event, index)"
-      />
+      >
+        {{ item.meta.title }}
+      </n-tab>
     </n-tabs>
 
     <div class="tabs-bar-bottom-bar"></div>
 
     <Teleport defer to="#strix-tool-bar-item">
-      <n-dropdown
-        :options="contextmenuList"
-        placement="bottom-start"
-        trigger="hover"
-        @select="handleContextmenuSelect"
-      >
+      <n-dropdown :options="contextmenuList" placement="bottom-start" trigger="hover" @select="handleContextmenuSelect">
         <n-icon-wrapper
           :border-radius="5"
           :color="themeVars.actionColor"
@@ -70,6 +67,11 @@ const themeVars = useThemeVars()
 
 const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
+
+// 获取路由的唯一标识符，优先使用 fullPath，对于 fixed 标签页可能使用 path
+const getRouteKey = (route: any): string => {
+  return route.fullPath || route.path || route.name || ''
+}
 
 // tabs的右击相关逻辑
 const showRightMenu = ref(false)
@@ -163,22 +165,23 @@ const setupTabs = () => {
   }
   // 设置当前激活的标签页
   nextTick(() => {
-    tabActive.value = visitedRoutes.value.find((item) => item.path === route.path)?.meta.title || ''
+    const activeRoute = visitedRoutes.value.find((item) => item.path === route.path)
+    tabActive.value = activeRoute ? getRouteKey(activeRoute) : ''
   })
 }
 watch(() => route.path, setupTabs, { immediate: true })
 
 // 点击标签页
-const handleTabClick = (tab: string) => {
-  const r = visitedRoutes.value.find((item) => item.meta.title === tab)
+const handleTabClick = (tabKey: string) => {
+  const r = visitedRoutes.value.find((item) => getRouteKey(item) === tabKey)
   if (r?.path !== route.path) {
     router.push({ path: r.path, query: r.query })
   }
 }
 
 // 关闭标签页
-const closeTab = async (tab: string) => {
-  const index = visitedRoutes.value.findIndex((item) => item.meta.title === tab)
+const closeTab = async (tabKey: string) => {
+  const index = visitedRoutes.value.findIndex((item) => getRouteKey(item) === tabKey)
   if (index !== -1) {
     const view = visitedRoutes.value[index]
     // 如果关闭的是当前标签页 则跳转
@@ -199,11 +202,10 @@ const closeTab = async (tab: string) => {
 
 const reloadRouter = async () => {
   const oldIndex =
-    contextmenuRoutesIndex ??
-    visitedRoutes.value.findIndex((r: any) => tabActive.value === r.meta.title)
+    contextmenuRoutesIndex ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
   const view: any = visitedRoutes.value[oldIndex]
   if (view) {
-    const currentPath = view.fullPath
+    const currentPath = view.fullPath || view.path
     view.oldIndex = view.meta.fixed ? view.meta.fixedIndex : oldIndex
     tabsBarStore.addRefreshRoutes(view)
     tabsBarStore.delVisitedRoute(view)
@@ -218,8 +220,14 @@ const reloadAllRouter = () => {
 
 const closeCurrTabs = () => {
   const view = getContextmenuTagView()
+
+  // 固定标签页不允许关闭
+  if (view?.meta?.fixed) {
+    return
+  }
+
   if (view) {
-    closeTab(view.meta.title)
+    closeTab(getRouteKey(view))
   }
 }
 
@@ -228,8 +236,8 @@ const closeOtherTabs = () => {
   if (view) {
     tabsBarStore.delOthersVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        router.push('/redirect' + view.fullPath)
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+        router.push('/redirect' + (view.fullPath || view.path))
       }
     })
   }
@@ -240,8 +248,8 @@ const closeLeftTabs = () => {
   if (view) {
     tabsBarStore.delLeftVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        router.push('/redirect' + view.fullPath)
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+        router.push('/redirect' + (view.fullPath || view.path))
       }
     })
   }
@@ -252,8 +260,8 @@ const closeRightTabs = () => {
   if (view) {
     tabsBarStore.delRightVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === r.meta.title)) {
-        router.push('/redirect' + view.fullPath)
+      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+        router.push('/redirect' + (view.fullPath || view.path))
       }
     })
   }
@@ -269,9 +277,7 @@ const closeAllTabs = async () => {
 const isActive = (r: any) => route.path === r.path
 const isAffix = (r: any) => r.meta?.fixed
 const getContextmenuTagView = () => {
-  const index =
-    contextmenuRoutesIndex ??
-    visitedRoutes.value.findIndex((r: any) => tabActive.value === r.meta.title)
+  const index = contextmenuRoutesIndex ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
   return visitedRoutes.value[index]
 }
 </script>
@@ -284,7 +290,6 @@ const getContextmenuTagView = () => {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  margin: 0 15px;
   z-index: 499;
   user-select: none;
   box-sizing: border-box;

@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按字典标识或名称搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按字典标识或名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -18,12 +14,7 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
@@ -244,11 +235,11 @@ const {
 const dataColumns: DataTableColumns = [
   { key: 'key', title: '字典标识', width: 240 },
   { key: 'name', title: '字典名称', width: 320 },
-  { key: 'version', title: '字典版本', width: 120, align: 'center' },
+  { key: 'version', title: '字典版本', width: 90, align: 'center' },
   {
     key: 'status',
     title: '字典状态',
-    width: 120,
+    width: 90,
     align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'DictStatus' })
@@ -257,7 +248,7 @@ const dataColumns: DataTableColumns = [
   {
     key: 'dataType',
     title: '字典数据类型',
-    width: 160,
+    width: 120,
     align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
@@ -266,13 +257,13 @@ const dataColumns: DataTableColumns = [
   {
     key: 'provided',
     title: '是否内置',
-    width: 120,
+    width: 90,
     align: 'center',
     render(row: any) {
       return h(StrixTag, { value: row.provided, dictName: 'DictProvided' })
     }
   },
-  { key: 'remark', title: '备注', width: 240 },
+  { key: 'remark', title: '备注', width: 180, titleAlign: 'center' },
   {
     key: 'actions',
     title: '操作',
@@ -346,15 +337,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/dict/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/dict/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -375,19 +363,16 @@ const showEditDataModal = (id: any) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/dict/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/dict/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/dict/update/${editDataId.value}`, editDataForm.value, {
@@ -401,11 +386,9 @@ const editData = () => {
 }
 
 const deleteData = (id: any) => {
-  http
-    .post(`system/dict/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/dict/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 </script>
 

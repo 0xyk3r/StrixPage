@@ -33,4 +33,9 @@ const comp = computed(() => {
 })
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.strix-icon {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+</style>

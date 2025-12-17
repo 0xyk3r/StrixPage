@@ -59,12 +59,14 @@ const getBreadcrumbList = () => {
     handleRouteDynamicTitle(item)
   })
 
-  breadcrumbList.value = isSmallWindow.value
-    ? [matchedRoutes[matchedRoutes.length - 1]]
-    : matchedRoutes
+  breadcrumbList.value = isSmallWindow.value ? [matchedRoutes[matchedRoutes.length - 1]] : matchedRoutes
 }
 
 const jumpRoute = (item: RouteLocationMatched) => {
+  // 忽略动态包装组件
+  if (item.meta.isDynamicWrapper) {
+    return
+  }
   if (item.path === '') {
     item.path = '/'
   }
@@ -93,6 +95,7 @@ watch(
 
 <style lang="scss" scoped>
 .breadcrumb-container {
+  position: relative;
   width: 100%;
   height: 100%;
   max-width: 100%;
@@ -100,7 +103,8 @@ watch(
   align-items: center;
 
   white-space: nowrap;
-  overflow-x: scroll;
+  overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -110,6 +114,36 @@ watch(
   // 屏幕小于 1280px 时不显示
   @media (max-width: 1280px) {
     display: none;
+  }
+
+  // 添加渐变遮罩效果（当内容溢出时）
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, var(--n-color));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+
+  ::v-deep(.n-breadcrumb) {
+    .n-breadcrumb-item {
+      max-width: 150px;
+
+      .n-breadcrumb-item__link,
+      .n-breadcrumb-item__separator {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
 }
 </style>

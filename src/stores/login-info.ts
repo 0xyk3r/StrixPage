@@ -12,7 +12,7 @@ export const useLoginInfoStore = defineStore(
   () => {
     const loginToken = ref('')
     const loginTokenExpire = ref('')
-    const loginInfo = ref({})
+    const loginInfo = ref<any>({})
 
     function updateLoginInfo(loginResult: any) {
       loginToken.value = loginResult.data.token
