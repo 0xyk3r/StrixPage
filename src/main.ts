@@ -10,16 +10,17 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// 自定义指令
-import installDirectives from './directives'
 // pinia 持久化插件
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+
+import auth from './directives/auth.ts'
 
 const app = createApp(App)
 
 app.use(createPinia().use(piniaPluginPersistedstate))
 app.use(router)
 
-installDirectives(app)
+// 注册全局指令
+app.directive('auth', auth)
 
 app.mount('#app')
