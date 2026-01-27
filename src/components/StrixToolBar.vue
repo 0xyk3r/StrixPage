@@ -1,6 +1,9 @@
 <template>
   <div ref="toolbarContainerRef" class="toolbar-container">
     <n-flex :size="10" :wrap="false">
+      <!-- 通知 -->
+      <StrixNotification />
+
       <!-- Teleport 插入位置 -->
       <span id="strix-tool-bar-item"></span>
 
