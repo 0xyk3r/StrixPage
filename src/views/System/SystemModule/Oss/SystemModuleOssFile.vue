@@ -5,22 +5,13 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按文件名搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按文件名搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
@@ -62,7 +53,7 @@ import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { type DataTableColumns } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储文件'
@@ -137,11 +128,9 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http
-    .get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } })
-    .then(({ data: res }) => {
-      ossConfigSelectList.value = res.data.options
-    })
+  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+    ossConfigSelectList.value = res.data.options
+  })
 }
 onMounted(getOssConfigSelectList)
 // 加载文件组配置选项
@@ -161,11 +150,9 @@ const getOssFileGroupSelectList = (configKey?: string) => {
 onMounted(getOssFileGroupSelectList)
 
 const downloadFile = (id: string) => {
-  http
-    .get(`system/common/file/${id}`, { responseType: 'blob', meta: { operate: '下载文件' } })
-    .then((res) => {
-      downloadBlob(res, id)
-    })
+  http.get(`system/common/file/${id}`, { responseType: 'blob', meta: { operate: '下载文件' } }).then((res) => {
+    downloadBlob(res, id)
+  })
 }
 const deleteFile = (id: string) => {
   http.post(`system/oss/file/remove/${id}`, null, { meta: { operate: `删除文件` } }).then(() => {
