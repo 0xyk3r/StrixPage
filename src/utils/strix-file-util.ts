@@ -29,7 +29,7 @@ export const downloadBlob = (res: any, fileName: string) => {
  * @returns {string} blob url
  */
 export const convertBlob = (res: any) => {
-  let blob = new Blob([res.data], { type: res.headers['content-type'] })
+  const blob = new Blob([res.data], { type: res.headers['content-type'] })
   // 创建新的 URL 并指向 File 对象或 Blob 对象的地址
   return window.URL.createObjectURL(blob)
 }

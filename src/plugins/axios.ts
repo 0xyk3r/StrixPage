@@ -128,7 +128,7 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    createStrixMessage('error', '网络请求失败', error.message)
+    createStrixMessage('error', '网络请求失败', '服务正在维护中, 请稍后再试. (' + error.message + ')')
   }
 )
 

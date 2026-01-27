@@ -50,11 +50,7 @@
                     />
                   </n-form-item>
                   <n-form-item label="配置名称" path="name" span="2 s:1">
-                    <n-input
-                      v-model:value="editDataForm.name"
-                      clearable
-                      placeholder="请输入配置名称"
-                    />
+                    <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
                   </n-form-item>
                   <n-form-item label="初始值" path="initialValue" span="2 s:1">
                     <n-input-number
@@ -130,11 +126,7 @@
                 <div>
                   <n-tooltip trigger="hover">
                     <template #trigger>
-                      <n-input-number
-                        v-model:value="calcInput"
-                        :show-button="false"
-                        style="width: 100px"
-                      />
+                      <n-input-number v-model:value="calcInput" :show-button="false" style="width: 100px" />
                     </template>
                     原始数值（真实数值）
                   </n-tooltip>
@@ -164,8 +156,7 @@
                     <template #trigger>
                       <span>{{
                         Math.ceil(
-                          (editDataForm.initialValue + calcInput) * editDataForm.magValue +
-                            editDataForm.extraValue
+                          (editDataForm.initialValue + calcInput) * editDataForm.magValue + editDataForm.extraValue
                         )
                       }}</span>
                     </template>
@@ -261,7 +252,7 @@ const initDataForm = () => {
 
 // 编辑数据
 const editDataFormLoading = ref(false)
-let editDataId = ref(null)
+const editDataId = ref(null)
 const initEditDataForm = {
   name: null,
   configKey: null,
@@ -286,15 +277,12 @@ const editDataRules: FormRules = {
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
-      .post(
-        `${_baseApiPrefix}/update${editDataId.value ? '/' + editDataId.value : ''}`,
-        editDataForm.value,
-        { meta: { operate: `保存${_baseName}` } }
-      )
+      .post(`${_baseApiPrefix}/update${editDataId.value ? '/' + editDataId.value : ''}`, editDataForm.value, {
+        meta: { operate: `保存${_baseName}` }
+      })
       .then(() => {
         initDataForm()
         getDataList()

@@ -68,11 +68,7 @@
           <n-input v-model:value="addDataForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input
-            v-model:value="addDataForm.accessSecret"
-            clearable
-            placeholder="请输入AccessSecret"
-          />
+          <n-input v-model:value="addDataForm.accessSecret" clearable placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -129,11 +125,7 @@
             <n-input v-model:value="editDataForm.regionId" clearable placeholder="请输入所属地域" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
-            <n-input
-              v-model:value="editDataForm.accessKey"
-              clearable
-              placeholder="请输入AccessKey"
-            />
+            <n-input v-model:value="editDataForm.accessKey" clearable placeholder="请输入AccessKey" />
           </n-form-item>
           <n-form-item label="AccessSecret" path="accessSecret">
             <n-input
@@ -175,16 +167,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash'
-import {
-  type DataTableColumns,
-  type FormRules,
-  NDataTable,
-  NScrollbar,
-  NSpin,
-  NTabPane,
-  NTabs,
-  NTag
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '短信服务'
@@ -299,7 +282,7 @@ const dataColumns: DataTableColumns = [
               key: 'type',
               width: 100,
               render: (row: any) => {
-                let tagType: NTagType = 'primary'
+                const tagType: NTagType = 'primary'
                 let tagLabel = ''
                 switch (row.status) {
                   case 1:
@@ -377,16 +360,12 @@ const dataColumns: DataTableColumns = [
         () => [
           h(NTabPane, { name: 'sign', tab: '短信签名', class: 'expand-sign-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [
-                expandSmsSignChildrenVNode
-              ])
+              h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandSmsSignChildrenVNode])
             )
           ),
           h(NTabPane, { name: 'template', tab: '短信模板', class: 'expand-template-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [
-                expandSmsTemplateChildrenVNode
-              ])
+              h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandSmsTemplateChildrenVNode])
             )
           )
         ]
@@ -462,13 +441,11 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http
-        .get(`system/sms/${row.id}`, { meta: { operate: `加载${_baseName}信息` } })
-        .then(({ data: res }) => {
-          row.signs = res.data.signs
-          row.templates = res.data.templates
-          row.loaded = true
-        })
+      http.get(`system/sms/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+        row.signs = res.data.signs
+        row.templates = res.data.templates
+        row.loaded = true
+      })
     }
   })
 }
@@ -502,15 +479,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/sms/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/sms/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -539,19 +513,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/sms/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/sms/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/sms/update/${editDataId.value}`, editDataForm.value, {
