@@ -433,7 +433,7 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .verify-slide {
   width: 100%;
   user-select: none;

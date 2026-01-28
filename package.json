@@ -51,7 +51,6 @@
     "eslint-plugin-oxlint": "~1.41.0",
     "eslint-plugin-vue": "~10.7.0",
     "jiti": "^2.6.1",
-    "less": "^4.5.1",
     "lightningcss": "^1.31.1",
     "naive-ui": "^2.43.2",
     "npm-run-all2": "^8.0.4",

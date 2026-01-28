@@ -1,9 +1,6 @@
 <template>
   <Transition name="modal-fade">
-    <div
-      v-if="showBox"
-      :class="['verify-container', { 'verify-container--fixed': mode === 'fixed' }]"
-    >
+    <div v-if="showBox" :class="['verify-container', { 'verify-container--fixed': mode === 'fixed' }]">
       <div v-if="mode === 'pop'" class="verify-overlay" @click="close"></div>
       <div :class="['verify-modal', { 'verify-modal--pop': mode === 'pop' }]">
         <div class="verify-modal__header">
@@ -11,12 +8,7 @@
             <StrixIcon :size="24" class="verify-modal__icon" icon="shield" />
             <h3>安全验证</h3>
           </div>
-          <button
-            v-if="mode === 'pop'"
-            aria-label="关闭"
-            class="verify-modal__close"
-            @click="close"
-          >
+          <button v-if="mode === 'pop'" aria-label="关闭" class="verify-modal__close" @click="close">
             <StrixIcon :size="20" icon="x" />
           </button>
         </div>
@@ -113,13 +105,10 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .verify-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -134,10 +123,7 @@ defineExpose({
 
 .verify-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(8px);
 }
@@ -232,6 +218,7 @@ defineExpose({
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
