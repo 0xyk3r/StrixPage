@@ -137,9 +137,9 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import StrixBlock from '@/components/StrixBlock.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash-es'

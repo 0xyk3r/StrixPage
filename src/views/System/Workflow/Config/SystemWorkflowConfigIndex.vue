@@ -122,11 +122,12 @@
 
 <script lang="ts" setup>
 import { http } from '@/plugins/axios'
-import { createPagination, usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NFlex, NSpin } from 'naive-ui'
+import { usePagination } from '@/composables/usePagination.ts'
 
 const router = useRouter()
 
@@ -363,7 +364,7 @@ const getWorkflowInstanceDataList = () => {
     })
 }
 const workflowInstanceDataRowKey = (row: any) => row.id
-const workflowInstanceDataPagination = createPagination(getWorkflowInstanceDataListParams, getWorkflowInstanceDataList)
+const workflowInstanceDataPagination = usePagination(getWorkflowInstanceDataListParams, getWorkflowInstanceDataList)
 
 // 删除数据
 const deleteWorkflowInstanceData = (id: string) => {

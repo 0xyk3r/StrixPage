@@ -60,10 +60,10 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
-import { EventBus } from '@/plugins/event-bus'
-import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
-import { createStrixMessage } from '@/utils/strix-message'
+import { http } from '@/plugins/axios.ts'
+import { EventBus } from '@/plugins/event-bus.ts'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
+import { createStrixMessage } from '@/utils/strix-message.ts'
 import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'

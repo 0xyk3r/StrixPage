@@ -66,13 +66,7 @@
         <template #header>
           <div class="node-drawer-header">
             <span v-if="!editNodeName">{{ model.name }}</span>
-            <n-input
-              v-else
-              v-model:value="model.name"
-              :maxlength="16"
-              class="edit-input"
-              placeholder="节点名称"
-            />
+            <n-input v-else v-model:value="model.name" :maxlength="16" class="edit-input" placeholder="节点名称" />
             <StrixIcon class="edit-btn" icon="square-pen" @click="editNodeName = !editNodeName" />
             <span class="node-id-text">{{ model.id }}</span>
           </div>
@@ -83,7 +77,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { getOperationName, getTypeName, nodeTypeMap, type WorkflowNode } from '@/components/workflow/util/workflow.js'
+import { getOperationName, getTypeName, nodeTypeMap, type WorkflowNode } from '@/components/workflow/utils/workflow.js'
 import ApprovalProps from './props/ApprovalProps.vue'
 import CcProps from './props/CcProps.vue'
 import ConditionProps from './props/ConditionProps.vue'
@@ -120,8 +114,7 @@ const showContent = computed(() => {
     return '发起人发起该流程'
   } else if (nodeType === 'approval' || nodeType === 'task' || nodeType === 'cc') {
     const operationName = getOperationName(nodeType)
-    const { assign: { type: assignType, id: assignIds } = { type: '', id: [] } } =
-      model.value.props || {}
+    const { assign: { type: assignType, id: assignIds } = { type: '', id: [] } } = model.value.props || {}
     if (assignType === 'USER' || assignType === 'ROLE') {
       if (assignIds && assignIds.length > 0) {
         return '由 ' + assignIds.map((item: any) => item.name) + ' ' + operationName

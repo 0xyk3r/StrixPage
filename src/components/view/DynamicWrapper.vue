@@ -1,6 +1,6 @@
 <script lang="ts">
-import { useTabsBarStore } from '@/stores/tabs-bar'
-import { replaceDynamicName } from '@/utils/dynamic-component-util'
+import { useTabsBarStore } from '@/stores/tabs-bar.ts'
+import { replaceDynamicName } from '@/utils/dynamic-component-util.ts'
 import { type Component, defineComponent, h, onMounted, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 

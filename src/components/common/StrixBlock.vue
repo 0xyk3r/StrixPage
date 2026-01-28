@@ -42,7 +42,7 @@
   </n-el>
 </template>
 <script lang="ts" setup>
-import { useStrixSettingsStore } from '@/stores/strix-settings'
+import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
 import { storeToRefs } from 'pinia'
 
 defineProps({

@@ -48,12 +48,12 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import StrixBlock from '@/components/StrixBlock.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
-import { createPagination } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { useDict } from '@/composables/useDict.ts'
 import { cloneDeep } from 'lodash-es'
 import { type DataTableColumns, NTag } from 'naive-ui'
+import { usePagination } from '@/composables/usePagination.ts'
 
 // 本页面操作提示关键词
 const _baseName = '系统日志'
@@ -194,7 +194,7 @@ const dataColumns: DataTableColumns = [
   { key: 'operationTime', title: '发生时间', width: 180 }
 ]
 // 分页配置
-const dataPagination = createPagination(getDataListParams, () => {
+const dataPagination = usePagination(getDataListParams, () => {
   getDataList()
 })
 // 加载列表

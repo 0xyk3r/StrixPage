@@ -43,7 +43,7 @@
       <!-- 标签页 -->
       <n-tabs v-model:value="activeTab" type="line" @update:value="handleTabChange">
         <n-tab-pane name="unread" tab="未读">
-          <NotificationList
+          <StrixNotificationList
             :empty-text="'暂无未读通知'"
             :has-more="unreadHasMore"
             :loading="loading"
@@ -55,7 +55,7 @@
         </n-tab-pane>
 
         <n-tab-pane name="all" tab="历史">
-          <NotificationList
+          <StrixNotificationList
             :empty-text="'暂无通知'"
             :has-more="allHasMore"
             :loading="loading"
@@ -67,7 +67,7 @@
         </n-tab-pane>
 
         <n-tab-pane name="invalid" tab="已失效">
-          <NotificationList
+          <StrixNotificationList
             :empty-text="'暂无已失效通知'"
             :has-more="invalidHasMore"
             :loading="loading"
@@ -87,7 +87,7 @@ import { useNotificationStore } from '@/stores/notification'
 import type { NotificationItem } from '@/@types/components/notification'
 import { useThemeVars } from 'naive-ui'
 import { createStrixMessage } from '@/utils/strix-message'
-import NotificationList from '@/components/notification/NotificationList.vue'
+import StrixNotificationList from '@/components/notification/StrixNotificationList.vue'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()

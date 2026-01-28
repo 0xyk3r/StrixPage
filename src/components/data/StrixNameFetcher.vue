@@ -14,8 +14,8 @@
 </template>
 <script lang="ts" setup>
 import type { StrixNameFetcherProps } from '@/@types/components/StrixNameFetcher'
-import { callOnce } from '@/utils/strix-cache-call'
-import { http } from '@/plugins/axios'
+import { callOnce } from '@/utils/strix-cache-call.ts'
+import { http } from '@/plugins/axios.ts'
 
 const { dataType, dataId } = defineProps<StrixNameFetcherProps>()
 

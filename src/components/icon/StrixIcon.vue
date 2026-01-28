@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { getLucideComponent } from '@/components/Icon/StrixIconLoader.ts'
+import { getIconComponent } from '@/components/icon/iconLoader.ts'
 
 interface Props {
   icon?: string
@@ -29,11 +29,11 @@ const comp = computed(() => {
   const iconName = props.icon.includes('-')
     ? convertToPascalCase(props.icon)
     : props.icon.charAt(0).toUpperCase() + props.icon.slice(1)
-  return getLucideComponent(iconName)
+  return getIconComponent(iconName)
 })
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .strix-icon {
   display: inline-block;
   vertical-align: text-bottom;

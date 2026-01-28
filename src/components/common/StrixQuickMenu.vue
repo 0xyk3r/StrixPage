@@ -8,13 +8,7 @@
     >
       <transition-group name="quick-menu-list">
         <li v-for="item in quickMenus" :key="item.id" :class="'color-' + item.color">
-          <n-tooltip
-            :delay="300"
-            class="item"
-            placement="left"
-            style="max-width: 220px"
-            trigger="hover"
-          >
+          <n-tooltip :delay="300" class="item" placement="left" style="max-width: 220px" trigger="hover">
             <template #trigger>
               <a @click="item.callback">
                 <StrixIcon v-if="item.icon" :icon="item.icon" :width="18" />
@@ -30,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuickMenuStore } from '@/stores/quick-menu'
+import { useQuickMenuStore } from '@/stores/quick-menu.ts'
 import { storeToRefs } from 'pinia'
 
 const quickMenuStore = useQuickMenuStore()

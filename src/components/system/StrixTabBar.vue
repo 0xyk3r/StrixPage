@@ -52,12 +52,12 @@
 </template>
 
 <script lang="ts" setup>
-import { EventBus } from '@/plugins/event-bus'
-import { useQuickMenuStore } from '@/stores/quick-menu'
-import { useTabsBarStore } from '@/stores/tabs-bar'
+import { EventBus } from '@/plugins/event-bus.ts'
+import { useQuickMenuStore } from '@/stores/quick-menu.ts'
+import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import StrixIcon from '@/components/Icon/StrixIcon.vue'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 const route = useRoute()
 const router = useRouter()

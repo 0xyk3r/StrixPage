@@ -12,7 +12,7 @@
     >
       <!-- Logo 或 系统标题 -->
       <div class="home-logo-container">
-        <img :class="theme" class="home-logo" src="@/assets/img/logo-w.webp" />
+        <img :class="theme" alt="Logo" class="home-logo" src="@/assets/img/logo-w.webp" />
       </div>
       <!-- 菜单 -->
       <n-spin :show="menuLoading">
@@ -91,10 +91,10 @@
   </n-layout>
 </template>
 <script lang="ts" setup>
-import StrixBreadcrumb from '@/components/StrixBreadcrumb.vue'
-import StrixQuickMenu from '@/components/StrixQuickMenu.vue'
-import StrixTabsBar from '@/components/StrixTabBar.vue'
-import StrixToolBar from '@/components/StrixToolBar.vue'
+import StrixBreadcrumb from '@/components/system/StrixBreadcrumb.vue'
+import StrixQuickMenu from '@/components/common/StrixQuickMenu.vue'
+import StrixTabsBar from '@/components/system/StrixTabBar.vue'
+import StrixToolBar from '@/components/system/StrixToolBar.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { useResizeDetector } from '@/plugins/resize-detector'
@@ -108,7 +108,7 @@ import { kebabCase } from 'lodash-es'
 import { type MenuInst, type MenuOption, useOsTheme, useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
-import StrixIcon from '@/components/Icon/StrixIcon.vue'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import type { Component } from 'vue'
 

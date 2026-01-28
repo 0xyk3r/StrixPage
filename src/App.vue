@@ -4,7 +4,7 @@
       <n-notification-provider>
         <n-message-provider>
           <n-dialog-provider>
-            <SWPrompt />
+            <StrixSwNotify />
             <router-view />
           </n-dialog-provider>
         </n-message-provider>
@@ -28,7 +28,7 @@ import {
   useOsTheme,
   zhCN
 } from 'naive-ui'
-import SWPrompt from './components/SWPrompt.vue'
+import StrixSwNotify from './components/system/StrixSwNotify.vue'
 import { EventBus } from './plugins/event-bus'
 
 const globalSettingsStore = useStrixSettingsStore()

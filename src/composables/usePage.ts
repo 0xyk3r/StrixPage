@@ -1,39 +1,6 @@
 import { cloneDeep } from 'lodash-es'
-import type { FormInst, PaginationInfo } from 'naive-ui'
-import { type Ref } from 'vue'
-
-/**
- * 创建分页配置
- * @param params 分页配置参数
- * @param loadFunc 加载数据方法
- * @returns 分页配置
- */
-export const createPagination = (params: Ref<any>, loadFunc: () => void) => {
-  const dataPagination = reactive({
-    page: params.value.pageIndex || 1,
-    pageSize: params.value.pageSize || 10,
-    showSizePicker: true,
-    pageSizes: [10, 20, 30, 50, 100],
-    itemCount: 0,
-    prefix(info: PaginationInfo) {
-      return `共 ${info.itemCount} 条`
-    },
-    onChange: (page: number) => {
-      dataPagination.page = page
-      params.value.pageIndex = page
-      loadFunc()
-    },
-    onUpdatePageSize: (pageSize: number) => {
-      dataPagination.pageSize = pageSize
-      dataPagination.page = 1
-      params.value.pageSize = pageSize
-      params.value.pageIndex = 1
-      loadFunc()
-    }
-  })
-
-  return dataPagination
-}
+import type { FormInst } from 'naive-ui'
+import { usePagination } from '@/composables/usePagination.ts'
 
 /**
  * 通用页面逻辑
@@ -52,7 +19,7 @@ export function usePage(
   initDataFormFunc?: () => void
 ) {
   const getDataListParams = ref(cloneDeep(initGetDataListParams))
-  const dataPagination = createPagination(getDataListParams, () => {
+  const dataPagination = usePagination(getDataListParams, () => {
     getDataListFunc()
   })
   const clearSearch = () => {

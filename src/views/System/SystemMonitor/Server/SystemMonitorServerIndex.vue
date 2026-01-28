@@ -157,12 +157,10 @@ const serverInfo = ref<any>({})
 
 const getData = () => {
   loading.value = true
-  http
-    .get('system/monitor/server', { meta: { operate: '加载系统运行信息' } })
-    .then(({ data: res }) => {
-      loading.value = false
-      serverInfo.value = res.data.server
-    })
+  http.get('system/monitor/server', { meta: { operate: '加载系统运行信息' } }).then(({ data: res }) => {
+    loading.value = false
+    serverInfo.value = res.data.server
+  })
 }
 onMounted(getData)
 </script>

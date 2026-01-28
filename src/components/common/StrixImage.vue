@@ -2,8 +2,8 @@
   <n-image :src="imageSrc" :width="width" lazy />
 </template>
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
-import { convertBlob } from '@/utils/strix-file-util'
+import { http } from '@/plugins/axios.ts'
+import { convertBlob } from '@/utils/strix-file-util.ts'
 
 const { value } = defineProps({
   value: { type: [String, Number], required: true },

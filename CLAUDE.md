@@ -4,76 +4,122 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-StrixPage is a Vue 3 admin dashboard template for the ProjectAn Strix business platform. It's a Chinese-language enterprise application with built-in security features, state management, and PWA support.
+StrixPage is a Vue 3 admin dashboard for the ProjectAn Strix business platform. It uses Vue 3 + Vite + TypeScript with
+Naive UI as the component library.
 
-## Development Commands
+## Common Commands
 
 ```bash
-pnpm install          # Install dependencies
-pnpm dev              # Start dev server (localhost:19889, test mode)
-pnpm build            # Full build (type-check + build-only in parallel)
-pnpm build-only       # Build without type-checking
-pnpm type-check       # TypeScript type checking with vue-tsc
-pnpm lint             # ESLint with automatic fixes
-pnpm format           # Prettier formatting for src/
-pnpm preview          # Preview production build
+# Install dependencies (uses pnpm)
+pnpm install
+
+# Development server (runs on port 19889)
+pnpm dev
+
+# Production build (runs type-check in parallel with build)
+pnpm build
+
+# Type checking only
+pnpm type-check
+
+# Linting (runs oxlint then eslint with auto-fix)
+pnpm lint
+
+# Format code with Prettier
+pnpm format
 ```
-
-## Technical Stack
-
-- **Framework:** Vue 3.5 with Composition API, TypeScript 5.8, Vite 7.0
-- **Node:** 22+ required
-- **Package Manager:** pnpm
-- **UI Library:** Naive UI with auto-import configured
-- **State Management:** Pinia with localStorage persistence
-- **HTTP Client:** Axios with custom encryption/decryption interceptors
-- **Icons:** Lucide Vue Next
-- **Local Storage:** Dexie (IndexedDB wrapper)
 
 ## Architecture
 
-### Source Structure
+### Core Stack
 
-- `src/@types/` - TypeScript type definitions (auto-generated and custom)
-- `src/components/` - Reusable components, prefixed with `Strix` for custom components
-- `src/directives/` - Custom Vue directives (permission-based access control)
-- `src/plugins/` - Vue plugins (axios, event-bus, service worker, resize-detector)
-- `src/router/` - Vue Router with dynamic route definitions
-- `src/stores/` - Pinia stores for state management
-- `src/utils/` - Utility functions prefixed with `strix-` (messages, dialogs, dates, files)
-- `src/views/System/` - Page components organized by feature module
+- **Vue 3** with Composition API (`<script setup>`)
+- **Pinia** for state management with `pinia-plugin-persistedstate` for localStorage persistence
+- **Vue Router** with route guards for authentication
+- **Naive UI** as the UI component library (auto-imported via unplugin-vue-components)
+- **Axios** with RSA/AES encryption for API communication
+- **SCSS** for styling
+
+### Directory Structure
+
+- `src/components/` - Reusable components organized by category:
+    - `common/` - Generic UI components (StrixBlock, StrixImage, StrixTag, etc.)
+    - `system/` - Layout components (StrixBreadcrumb, StrixTabBar, StrixToolBar)
+    - `icon/` - Icon components (StrixIcon) (dynamically load icon names using `lucide-vue-next`)
+    - `data/` - Data fetching components (StrixNameFetcher, StrixManagerSelector, StrixRoleSelector)
+- `src/stores/` - Pinia stores (login-info, dict, tabs-bar, notification, etc.)
+- `src/composables/` - Vue composables (useDict, usePagination, usePage)
+- `src/plugins/` - Axios setup and event bus
+- `src/utils/` - Utility functions
+- `src/directives/` - Custom Vue directives (v-auth for permissions)
+- `src/views/System/` - Admin pages organized by feature module
 
 ### Key Patterns
 
-**Component Auto-Import:** Naive UI components are automatically imported via `unplugin-vue-components`. No manual imports needed for Naive UI components.
+**Auto-imports**: Vue APIs (ref, computed, watch, etc.) and Naive UI composables (useDialog, useMessage, etc.) are
+auto-imported via `unplugin-auto-import`.
 
-**State Management:** Pinia stores in `src/stores/` handle:
-- `login-info.ts` - Authentication state
-- `strix-settings.ts` - App settings and theme
-- `tabs-bar.ts` - Tab navigation
-- `dicts.ts` - Dictionary data
-- `http-canceler.ts` - Request cancellation
+**Path alias**: `@` maps to `src/` directory.
 
-**HTTP Security:** The Axios plugin (`src/plugins/axios.ts`) implements:
-- RSA asymmetric encryption for key exchange
-- AES encryption for request bodies
-- Request signing with MD5 hash
-- Token-based authentication in headers
+**Permission directive**: Use `v-auth` for permission-based rendering:
 
-**Utility Functions:** Located in `src/utils/`, these provide standardized:
-- Toast/alert messages (`strix-message.ts`)
-- Dialog management (`strix-dialog.ts`)
-- Loading indicators (`strix-loading-bar.ts`)
-- Date formatting (`strix-date-util.ts`)
-- File operations (`strix-file-util.ts`)
+```vue
 
-### Environment Configuration
+<div v-auth="'system:user:update'">...</div>
+<div v-auth="['perm1', 'perm2']">...</div>
+<div v-auth.and="['perm1', 'perm2']">...</div>
+```
 
-Environment variables in `.env` include RSA keys and AES IV for encryption. These are accessed via Vite's `import.meta.env`.
+**HTTP client**: Import from `@/plugins/axios`:
 
-## Code Style
+```typescript
+import { http } from '@/plugins/axios'
+// Requests are automatically encrypted/signed
+const { data } = await http.get('endpoint', { meta: { operate: '操作名' } })
+```
 
-- 2-space indentation, single quotes, 100-character line width
-- LF line endings, UTF-8 encoding
-- VS Code auto-fixes on save (ESLint + Prettier)
-- TypeScript strict mode enabled
+**Dictionary data**: Use the `useDict` composable for cached dictionary lookups:
+
+```typescript
+import { useDict } from '@/composables/useDict'
+
+const dictData = useDict('dictKey')
+```
+
+**Pagination**: Use `usePagination` composable with Naive UI tables.
+
+### API Communication
+
+All HTTP requests go through `/api/` base URL with:
+
+- RSA encryption for request body (POST)
+- AES encryption for response data
+- MD5 signing for request validation
+- Automatic token injection from login store
+
+Environment variables for encryption keys are in `.env`:
+
+- `VITE_APP_CLIENT_PRIVATE_KEY`
+- `VITE_APP_SERVER_PUBLIC_KEY`
+- `VITE_APP_IV`
+
+### State Management
+
+Pinia stores use the setup function syntax with `persist` option:
+
+```typescript
+export const useExampleStore = defineStore('example', () => {
+  // state and actions
+}, { persist: { key: '$key', storage: localStorage } })
+```
+
+### PWA Support
+
+The app supports PWA via `vite-plugin-pwa` with prompt-based updates. Service worker registration is handled
+automatically.
+
+## Development Notes
+
+- Node.js requirement: `^20.19.0 || >=22.12.0`
+- Dev server runs on `0.0.0.0:19889`
+- Lucide icons are used via `lucide-vue-next`

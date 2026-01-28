@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
+import { http } from '@/plugins/axios.ts'
 
 const show = defineModel('show', { type: Boolean, default: false })
 

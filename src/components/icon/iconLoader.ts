@@ -2,7 +2,7 @@ import { defineAsyncComponent } from 'vue'
 
 const iconCache: Record<string, any> = {}
 
-export function getLucideComponent(name: string) {
+export function getIconComponent(name: string) {
   if (iconCache[name]) return iconCache[name]
 
   const comp = defineAsyncComponent(async () => {

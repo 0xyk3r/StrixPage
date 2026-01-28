@@ -15,8 +15,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useStrixSettingsStore } from '@/stores/strix-settings'
-import { replaceDynamicName } from '@/utils/dynamic-component-util'
+import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
+import { replaceDynamicName } from '@/utils/dynamic-component-util.ts'
 import { storeToRefs } from 'pinia'
 import type { RouteLocationMatched } from 'vue-router'
 

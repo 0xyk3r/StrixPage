@@ -175,11 +175,11 @@
 
 <script lang="ts" setup>
 import { http } from '@/plugins/axios'
-import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
+import { usePagination } from '@/composables/usePagination.ts'
 
 const _baseName = '热度工具配置'
 const _baseApiPrefix = 'system/tool/popularity'
@@ -374,7 +374,7 @@ const getPopularitDataList = () => {
     })
 }
 const popularityDataRowKey = (row: any) => row.id
-const popularityDataPagination = createPagination(getPopularitDataListParams, getPopularitDataList)
+const popularityDataPagination = usePagination(getPopularitDataListParams, getPopularitDataList)
 
 // 修改数据数值
 const updatePopularityDataValue = debounce((id, value) => {

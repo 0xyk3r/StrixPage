@@ -4,9 +4,9 @@ import { controlStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { storeToRefs } from 'pinia'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
-const Redirect = () => import('@/components/StrixRedirect.vue')
-const NotFound = () => import('@/components/StrixNotFound.vue')
-const DynamicWrapper = () => import('@/components/DynamicWrapper.vue')
+const Redirect = () => import('@/components/view/StrixRedirect.vue')
+const NotFound = () => import('@/components/common/StrixNotFound.vue')
+const DynamicWrapper = () => import('@/components/view/DynamicWrapper.vue')
 
 const customRoutes: any[] = []
 

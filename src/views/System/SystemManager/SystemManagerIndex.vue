@@ -222,12 +222,12 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/StrixBlock.vue'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import { usePage } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { usePage } from '@/composables/usePage.ts'
+import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'

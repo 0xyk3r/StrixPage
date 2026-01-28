@@ -34,13 +34,7 @@
       </n-card>
     </div>
 
-    <div
-      class="wf-canvas-container"
-      @mousedown="startDrag"
-      @mousemove="onDrag"
-      @mouseup="endDrag"
-      @wheel="onWheel"
-    >
+    <div class="wf-canvas-container" @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @wheel="onWheel">
       <div :style="canvasStyle" class="wf-canvas">
         <n-el :style="'transform: scale(' + scale + ')'" class="wf-container" tag="div">
           <WorkflowBody />
@@ -50,7 +44,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { renderWorkflow, type WorkflowNode } from '@/components/workflow/util/workflow.js'
+import { renderWorkflow, type WorkflowNode } from '@/components/workflow/utils/workflow.js'
 
 const { dataJson } = defineProps<{ dataJson: string }>()
 const emit = defineEmits(['save'])

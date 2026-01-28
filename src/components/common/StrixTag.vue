@@ -5,7 +5,7 @@
 </template>
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import { useDict } from '@/utils/strix-dict-util'
+import { useDict } from '@/composables/useDict.ts'
 
 const { value, dictName, notFoundLabel } = defineProps({
   value: { type: [String, Number], required: true },

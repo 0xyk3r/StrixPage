@@ -10,10 +10,7 @@
           </n-flex>
         </n-radio-group>
       </n-form-item>
-      <n-form-item
-        v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'"
-        label="抄送对象选择"
-      >
+      <n-form-item v-if="cacheProps.assign.type === 'USER' || cacheProps.assign.type === 'ROLE'" label="抄送对象选择">
         <n-button v-if="cacheProps.assign.type === 'USER'" type="primary" @click="openUserSelector">
           选择人员
         </n-button>
@@ -31,12 +28,12 @@
         </n-radio-group>
       </n-form-item>
     </n-form>
-    <system-manager-selector
+    <strix-manager-selector
       v-model:show="showUserSelector"
       :value="cacheProps.assign.id"
       @complete="handleSelectUserComplete"
     />
-    <system-role-selector
+    <strix-role-selector
       v-model:show="showRoleSelector"
       :value="cacheProps.assign.id"
       @complete="handleSelectRoleComplete"
@@ -45,8 +42,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import SystemManagerSelector from '@/components/common/SystemManagerSelector.vue'
-import SystemRoleSelector from '@/components/common/SystemRoleSelector.vue'
+import StrixManagerSelector from '@/components/data/StrixManagerSelector.vue'
+import StrixRoleSelector from '@/components/data/StrixRoleSelector.vue'
 
 const $props = defineProps({
   modelValue: {

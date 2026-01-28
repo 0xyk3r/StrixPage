@@ -137,12 +137,12 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import StrixBlock from '@/components/StrixBlock.vue'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
-import { usePage } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { usePage } from '@/composables/usePage.ts'
+import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
@@ -336,9 +336,9 @@ const clearSearch = () => {
 }
 const filterDataList = computed(() =>
   dataRef.value?.filter((d) => {
-    let filterd = true
-    if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0) filterd = false
-    return filterd
+    let filtered = true
+    if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0) filtered = false
+    return filtered
   })
 )
 

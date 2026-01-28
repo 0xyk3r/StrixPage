@@ -1,5 +1,5 @@
 import { NButton, NFlex, NPopconfirm, NPopover } from 'naive-ui'
-import StrixIcon from '@/components/Icon/StrixIcon.vue'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 /**
  * 阻止事件冒泡
@@ -17,7 +17,7 @@ const btnSizeToFlexSize: { [key: string]: 'small' | 'medium' | 'large' | number 
 }
 
 export const handleOperate = (buttons: any[], size = 'medium') => {
-  const operateBtns = buttons.map((button) => {
+  const operateButtons = buttons.map((button) => {
     const { type, label, icon, disabled, onClick, popconfirm, popconfirmMessage } = button
 
     const clickHandler = (e: MouseEvent) => {
@@ -58,5 +58,5 @@ export const handleOperate = (buttons: any[], size = 'medium') => {
       : content
   })
 
-  return h(NFlex, { justify: 'center', size: btnSizeToFlexSize[size] }, () => operateBtns)
+  return h(NFlex, { justify: 'center', size: btnSizeToFlexSize[size] }, () => operateButtons)
 }

@@ -1,13 +1,21 @@
 import { http } from '@/plugins/axios'
 import { throttle } from 'lodash-es'
 import { defineStore } from 'pinia'
-import { type Ref } from 'vue'
 
-export const useDictsStore = defineStore(
-  'dicts',
+export interface DictItem {
+  label: string
+  value: string | number | boolean
+  [key: string]: any
+}
+
+export const useDictStore = defineStore(
+  'dict',
   () => {
     const versionMap = ref<any>([])
-    const dictMap = ref<any>({})
+    const dictMap = ref<Record<string, any>>({})
+
+    // 请求去重 Map，避免并发重复请求
+    const pendingMap = new Map<string, Promise<DictItem[]>>()
 
     /**
      * 刷新字典版本
@@ -25,14 +33,13 @@ export const useDictsStore = defineStore(
     )
 
     /**
-     * 加载服务端字典数据
-     * *限流* 1s内仅在第一次调用时执行一次
+     * 从服务端加载字典数据
      */
-    const loadDictData = async function loadDictData(key: string) {
+    async function fetchDictData(key: string): Promise<DictItem[]> {
       const { data: res } = await http.get(`system/common/dict/${key}`, {
         meta: { operate: '获取字典数据', notify: false }
       })
-      if (res) {
+      if (res?.data) {
         dictMap.value[key] = res.data
 
         res.data.dictDataList.forEach((item: any) => {
@@ -42,61 +49,56 @@ export const useDictsStore = defineStore(
         })
 
         return res.data.dictDataList
-      } else {
-        return []
       }
+      return []
     }
 
-    // 添加请求缓存 Map,避免重复请求
-    const loadingMap = new Map<string, Promise<any>>()
+    /**
+     * 检查缓存是否有效
+     */
+    async function isCacheValid(key: string): Promise<boolean> {
+      if (!dictMap.value[key]) return false
+      await refreshVersion()
+      const cache = dictMap.value[key]
+      const version = versionMap.value.find((item: any) => item.key === key)
+      return version && version.version === cache.version
+    }
 
     /**
-     * 获取字典数据
-     * @param {string} key 字典key
-     * @param {ref} resultRef 结果存储的ref
+     * 获取字典数据（支持缓存 + 并发去重）
+     * @param key 字典key
+     * @returns 字典数据列表
      */
-    async function getDictData(key: string, resultRef: Ref<any>) {
-      let result = null
-      if (dictMap.value[key]) {
-        await refreshVersion()
-        const cache = dictMap.value[key]
-        const version = versionMap.value.find((item: any) => item.key === key)
-        if (version && version.version === cache.version) {
-          result = dictMap.value[key].dictDataList
-          if (isRef(resultRef)) {
-            resultRef.value = result
-          }
-          return result
-        }
+    async function getDictData(key: string): Promise<DictItem[]> {
+      // 检查缓存是否有效
+      if (await isCacheValid(key)) {
+        return dictMap.value[key].dictDataList
       }
 
-      // 如果正在加载中,返回已有的 Promise
-      if (loadingMap.has(key)) {
-        result = await loadingMap.get(key)
-      } else {
-        const promise = loadDictData(key)
-        loadingMap.set(key, promise)
-        result = await promise
-        loadingMap.delete(key)
+      // 如果已有相同 key 的请求在进行中，复用该 Promise
+      if (pendingMap.has(key)) {
+        return pendingMap.get(key)!
       }
 
-      if (isRef(resultRef)) {
-        resultRef.value = result
-      }
-      return result
+      // 创建新请求并缓存 Promise
+      const promise = fetchDictData(key).finally(() => {
+        pendingMap.delete(key)
+      })
+      pendingMap.set(key, promise)
+
+      return promise
     }
 
     return {
       versionMap,
       dictMap,
       refreshVersion,
-      loadDictData,
       getDictData
     }
   },
   {
     persist: {
-      key: '$strix-dicts',
+      key: '$strix-dict',
       storage: localStorage
     }
   }

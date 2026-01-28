@@ -231,15 +231,15 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/StrixBlock.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
-import { usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, kebabCase, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NTag } from 'naive-ui'
-import StrixIcon from '@/components/Icon/StrixIcon.vue'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
 const _baseName = '系统菜单'

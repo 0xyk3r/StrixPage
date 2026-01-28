@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按名称搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -18,12 +14,7 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
@@ -96,9 +87,9 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import StrixBlock from '@/components/StrixBlock.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
@@ -141,9 +132,10 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render: (row: any) => {
-      const { label, type } = storageClassOptions.find(
-        (item) => item.value === row.storageClass
-      ) || { label: '未知', type: 'default' }
+      const { label, type } = storageClassOptions.find((item) => item.value === row.storageClass) || {
+        label: '未知',
+        type: 'default'
+      }
       return h(NTag, { type, bordered: false }, { default: () => label })
     }
   },
@@ -172,11 +164,9 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http
-    .get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } })
-    .then(({ data: res }) => {
-      ossConfigSelectList.value = res.data.options
-    })
+  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+    ossConfigSelectList.value = res.data.options
+  })
 }
 onMounted(getOssConfigSelectList)
 
@@ -201,8 +191,7 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post('system/oss/bucket/update', addDataForm.value, {

@@ -30,7 +30,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import VerifySlide from '@/components/verifition/Verify/VerifySlide.vue'
+import VerifySlide from '@/components/verifition/components/VerifySlide.vue'
 
 interface Props {
   mode?: 'pop' | 'fixed'

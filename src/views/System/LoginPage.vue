@@ -10,7 +10,7 @@
       <n-grid-item span="4 m:4 l:2">
         <div class="login-panel-right">
           <div class="login-panel-right-content">
-            <div class="login-panel-right-content-header" tag="div">
+            <div class="login-panel-right-content-header">
               <div class="login-panel-right-content-header-title">Strix 控制中心</div>
               <div class="login-panel-right-content-header-subtitle">Welcome Back</div>
             </div>
@@ -191,9 +191,7 @@ const login = () => {
     flex: 1;
     height: 100%;
     position: relative;
-    border-radius: 3rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
+    border-radius: 0.25rem 3rem 3rem 0.25rem;
     background-color: var(--action-color);
     box-sizing: border-box;
 

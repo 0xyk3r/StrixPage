@@ -2,11 +2,11 @@
  * 深度搜索value 树状数据搜索
  * @param {Array} data - 树状数据
  * @param {string} value - 要搜索的值
- * @param {string} key - 搜索的键名，默认为'id'
- * @param {string} sub - 子节点的键名，默认为'children'
+ * @param {string} key - 搜索的键名，默认为 `id`
+ * @param {string} sub - 子节点的键名，默认为 `children`
  * @returns {Object} - 返回搜索到的节点或false
  */
-export const deepSearch = (data: any[], value: string, key = 'id', sub = 'children'): any => {
+export const deepSearch = (data: any[], value: string, key: string = 'id', sub: string = 'children'): any => {
   if (!value || !data) {
     return false
   }
@@ -25,11 +25,11 @@ export const deepSearch = (data: any[], value: string, key = 'id', sub = 'childr
 /**
  * 深度搜索key 树状数据搜索 类似于.map(d => d[key]) 但是会递归子节点
  * @param {Array} data - 树状数据
- * @param {string} key - 映射的键名，默认为'id'
- * @param {string} sub - 子节点的键名，默认为'children'
+ * @param {string} key - 映射的键名，默认为 `id`
+ * @param {string} sub - 子节点的键名，默认为 `children`
  * @returns {Array} - 返回映射后的数组
  */
-export const deepMap = (data: any[], key = 'id', sub = 'children') => {
+export const deepMap = (data: any[], key: string = 'id', sub: string = 'children'): Array<any> => {
   if (!data) return []
   const results: any[] = data.flatMap((d) => [d[key], ...(d[sub] ? deepMap(d[sub], key, sub) : [])])
   return results.filter(Boolean)

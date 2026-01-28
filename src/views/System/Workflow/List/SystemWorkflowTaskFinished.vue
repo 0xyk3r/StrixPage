@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.workflowId"
-                clearable
-                placeholder="请输入搜索条件"
-              />
+              <n-input v-model:value="getDataListParams.workflowId" clearable placeholder="请输入搜索条件" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -30,11 +26,11 @@
 
 <script lang="ts" setup>
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { type DataTableColumns, NTag } from 'naive-ui'
-import StrixNameFetcher from '@/components/StrixNameFetcher.vue'
+import StrixNameFetcher from '@/components/data/StrixNameFetcher.vue'
 import { handleOperate } from '@/utils/strix-table-tool'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 
 // 本页面操作提示关键词
 const _baseName = '我处理的工作列表'

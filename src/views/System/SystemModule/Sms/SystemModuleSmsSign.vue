@@ -5,22 +5,13 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按签名搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按签名搜索" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
@@ -57,11 +48,11 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/StrixBlock.vue'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { usePage } from '@/composables/usePage.ts'
+import { useDict } from '@/composables/useDict.ts'
 import { type DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
@@ -120,11 +111,9 @@ onMounted(getDataList)
 // 加载短信配置选项
 const smsConfigSelectList = ref([])
 const getSmsConfigSelectList = () => {
-  http
-    .get('system/sms/config/select', { meta: { operate: '加载短信配置下拉列表' } })
-    .then(({ data: res }) => {
-      smsConfigSelectList.value = res.data.options
-    })
+  http.get('system/sms/config/select', { meta: { operate: '加载短信配置下拉列表' } }).then(({ data: res }) => {
+    smsConfigSelectList.value = res.data.options
+  })
 }
 onMounted(getSmsConfigSelectList)
 </script>

@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useTabsBarStore } from '@/stores/tabs-bar'
+import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 
 const route = useRoute()
 const router = useRouter()

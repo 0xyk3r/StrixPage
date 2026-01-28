@@ -159,11 +159,11 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import StrixBlock from '@/components/StrixBlock.vue'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { usePage } from '@/composables/usePage.ts'
+import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash-es'
@@ -238,7 +238,7 @@ const dataColumns: DataTableColumns = [
               key: 'status',
               width: 80,
               render: (row: any) => {
-                let tagType: NTagType = 'default'
+                let tagType: NTagType
                 let tagLabel = ''
                 switch (row.status) {
                   case 1:
@@ -312,7 +312,7 @@ const dataColumns: DataTableColumns = [
               key: 'status',
               width: 100,
               render: (row: any) => {
-                let tagType: NTagType = 'default'
+                let tagType: NTagType
                 let tagLabel = ''
                 switch (row.status) {
                   case 1:

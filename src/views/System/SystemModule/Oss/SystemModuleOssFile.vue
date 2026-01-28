@@ -48,9 +48,9 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/StrixBlock.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
-import { usePage } from '@/utils/common-page-util'
+import { usePage } from '@/composables/usePage.ts'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
 import type { DataTableColumns } from 'naive-ui'

@@ -2,7 +2,7 @@
   <div class="notification-list">
     <n-scrollbar style="max-height: 480px">
       <div v-if="notifications.length > 0" class="list-content">
-        <NotificationItem
+        <StrixNotificationItem
           v-for="item in notifications"
           :key="item.notificationId"
           :notification="item"
@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import type { NotificationItem as NotificationItemType } from '@/@types/components/notification'
-import NotificationItem from './NotificationItem.vue'
+import StrixNotificationItem from './StrixNotificationItem.vue'
 
 const props = defineProps<{
   notifications: NotificationItemType[]

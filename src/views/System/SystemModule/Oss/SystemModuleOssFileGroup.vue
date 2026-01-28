@@ -215,17 +215,16 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/StrixBlock.vue'
-import StrixTag from '@/components/StrixTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
 import { useLoginInfoStore } from '@/stores/login-info'
-import { usePage } from '@/utils/common-page-util'
-import { useDict } from '@/utils/strix-dict-util'
+import { usePage } from '@/composables/usePage.ts'
+import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
-import { storeToRefs } from 'pinia'
 
 const loginInfoStore = useLoginInfoStore()
 
@@ -234,7 +233,6 @@ const _baseName = '文件分组'
 
 // 加载字典
 const strixOssFileGroupSecretTypeRef = useDict('StrixOssFileGroupSecretType')
-const { loginToken } = storeToRefs(loginInfoStore)
 
 const {
   getDataListParams,
@@ -371,8 +369,8 @@ const handleAllowExtensionCreate = (label: string): string => {
     createStrixMessage('warning', '操作失败', '请输入正确的文件拓展名')
     return 'error'
   }
-  const l: string = label.startsWith('.') ? label : '.' + label
-  return l
+
+  return label.startsWith('.') ? label : '.' + label
 }
 
 const uploadModalShow = ref(false)
