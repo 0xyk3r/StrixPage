@@ -76,13 +76,31 @@
         require-mark-placement="right-hanging"
       >
         <n-form-item label="管理人员昵称" path="nickname">
-          <n-input v-model:value="addDataForm.nickname" clearable placeholder="请输入管理人员昵称" />
+          <n-input
+            v-model:value="addDataForm.nickname"
+            :maxlength="20"
+            clearable
+            placeholder="请输入管理人员昵称"
+            show-count
+          />
         </n-form-item>
         <n-form-item label="登录账号" path="loginName">
-          <n-input v-model:value="addDataForm.loginName" clearable placeholder="请输入登录账号" />
+          <n-input
+            v-model:value="addDataForm.loginName"
+            :maxlength="20"
+            clearable
+            placeholder="请输入登录账号"
+            show-count
+          />
         </n-form-item>
         <n-form-item label="登录密码" path="loginPassword">
-          <n-input v-model:value="addDataForm.loginPassword" clearable placeholder="请输入登录密码" />
+          <n-input
+            v-model:value="addDataForm.loginPassword"
+            :maxlength="20"
+            clearable
+            placeholder="请输入登录密码"
+            show-count
+          />
         </n-form-item>
         <n-form-item label="管理人员状态" path="status">
           <n-select
@@ -138,13 +156,31 @@
           require-mark-placement="right-hanging"
         >
           <n-form-item label="管理人员昵称" path="nickname">
-            <n-input v-model:value="editDataForm.nickname" clearable placeholder="请输入管理人员昵称" />
+            <n-input
+              v-model:value="editDataForm.nickname"
+              :maxlength="20"
+              clearable
+              placeholder="请输入管理人员昵称"
+              show-count
+            />
           </n-form-item>
           <n-form-item label="登录账号" path="loginName">
-            <n-input v-model:value="editDataForm.loginName" clearable placeholder="请输入登录账号" />
+            <n-input
+              v-model:value="editDataForm.loginName"
+              :maxlength="20"
+              clearable
+              placeholder="请输入登录账号"
+              show-count
+            />
           </n-form-item>
           <n-form-item label="登录密码" path="loginPassword">
-            <n-input v-model:value="editDataForm.loginPassword" clearable placeholder="请输入登录密码" />
+            <n-input
+              v-model:value="editDataForm.loginPassword"
+              :maxlength="20"
+              clearable
+              placeholder="请输入登录密码"
+              show-count
+            />
           </n-form-item>
           <n-form-item label="管理人员状态" path="status">
             <n-select
@@ -442,15 +478,15 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
 const addDataRules: FormRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
-    { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }
+    { min: 2, max: 20, message: '管理人员昵称长度需在2-20之间', trigger: 'blur' }
   ],
   loginName: [
     { required: true, message: '请输入登录账号', trigger: 'blur' },
-    { min: 4, max: 16, message: '登录账号长度需在4-16之间', trigger: 'blur' }
+    { min: 4, max: 20, message: '登录账号长度需在4-20之间', trigger: 'blur' }
   ],
   loginPassword: [
     { required: true, message: '请输入登录密码', trigger: 'blur' },
-    { min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }
+    { min: 6, max: 20, message: '登录密码长度需在6-20之间', trigger: 'blur' }
   ],
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
@@ -473,13 +509,13 @@ const addData = () => {
 const editDataRules: FormRules = {
   nickname: [
     { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
-    { min: 2, max: 16, message: '管理人员昵称长度需在2-16之间', trigger: 'blur' }
+    { min: 2, max: 20, message: '管理人员昵称长度需在2-20之间', trigger: 'blur' }
   ],
   loginName: [
     { required: true, message: '请输入登录账号', trigger: 'blur' },
-    { min: 4, max: 16, message: '登录账号长度需在4-16之间', trigger: 'blur' }
+    { min: 4, max: 20, message: '登录账号长度需在4-20之间', trigger: 'blur' }
   ],
-  loginPassword: [{ min: 6, max: 16, message: '登录密码长度需在6-16之间', trigger: 'blur' }],
+  loginPassword: [{ min: 6, max: 20, message: '登录密码长度需在6-20之间', trigger: 'blur' }],
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
 }
