@@ -26,6 +26,7 @@
                 <n-form-item label="登录账号" path="loginName">
                   <n-input
                     v-model:value="loginForm.loginName"
+                    :maxlength="20"
                     clearable
                     placeholder="请输入登录账号"
                     size="large"
@@ -34,6 +35,7 @@
                 <n-form-item label="登录密码" path="loginPassword">
                   <n-input
                     v-model:value="loginForm.loginPassword"
+                    :maxlength="20"
                     clearable
                     placeholder="请输入登录密码"
                     size="large"
@@ -95,11 +97,7 @@ initStrixMessage()
 const loggedJumpPath = route.query.to || '/'
 onMounted(() => {
   if (route.query.r === 'e') {
-    createStrixMessage(
-      'error',
-      '登录状态失效',
-      '由于在其他设备上登录或凭据过期，登录状态已失效，请重新登录'
-    )
+    createStrixMessage('error', '登录状态失效', '由于在其他设备上登录或凭据过期，登录状态已失效，请重新登录')
   }
 })
 
