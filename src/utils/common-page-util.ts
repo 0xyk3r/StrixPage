@@ -41,14 +41,15 @@ export const createPagination = (params: Ref<any>, loadFunc: () => void) => {
  * @param getDataListFunc 获取数据列表方法
  * @param initAddDataForm 初始新增表单表单
  * @param initEditDataForm 初始编辑表单表单
+ * @param initDataFormFunc 初始化表单方法
  * @returns
  */
 export function usePage(
   initGetDataListParams: any,
-  getDataListFunc: Function,
+  getDataListFunc: () => void,
   initAddDataForm: any,
   initEditDataForm: any,
-  initDataFormFunc?: Function
+  initDataFormFunc?: () => void
 ) {
   const getDataListParams = ref(cloneDeep(initGetDataListParams))
   const dataPagination = createPagination(getDataListParams, () => {

@@ -1,20 +1,19 @@
 {
   "name": "strix-page",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "author": "ProjectAn",
   "description": "A Vue 3.0 based admin dashboard template",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "eslint . --fix --cache",
+    "lint": "run-s lint:*",
+    "lint:oxlint": "oxlint . --fix",
+    "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
@@ -32,38 +31,44 @@
     "qs": "^6.14.0",
     "screenfull": "^6.0.2",
     "uuid": "^13.0.0",
-    "vue": "^3.5.25",
+    "vue": "^3.5.26",
     "vue-draggable-resizable": "^3.0.0",
     "vue-echarts": "^8.0.1",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@tsconfig/node24": "^24.0.3",
+    "@tsconfig/node24": "^24.0.4",
     "@types/element-resize-detector": "^1.1.6",
     "@types/lodash": "^4.17.21",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.9",
     "@types/qs": "^6.14.0",
     "@types/uuid": "^10.0.0",
-    "@vitejs/plugin-vue": "^6.0.2",
+    "@vitejs/plugin-vue": "^6.0.3",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.8.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-vue": "~10.5.1",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-oxlint": "~1.41.0",
+    "eslint-plugin-vue": "~10.7.0",
     "jiti": "^2.6.1",
     "less": "^4.4.2",
     "lightningcss": "^1.27.0",
     "naive-ui": "^2.43.2",
     "npm-run-all2": "^8.0.4",
-    "prettier": "3.6.2",
+    "oxlint": "~1.41.0",
+    "prettier": "3.8.1",
     "sass-embedded": "^1.93.3",
     "terser": "^5.44.1",
-    "typescript": "~5.9.0",
+    "typescript": "~5.9.3",
     "unplugin-auto-import": "^20.3.0",
     "unplugin-vue-components": "^30.0.0",
     "vfonts": "^0.0.3",
-    "vite": "^7.2.4",
+    "vite": "^7.3.1",
     "vite-plugin-pwa": "^0.20.5",
-    "vue-tsc": "^3.1.5"
+    "vue-tsc": "^3.2.2"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

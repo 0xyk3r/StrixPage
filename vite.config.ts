@@ -1,10 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
-import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/

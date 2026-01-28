@@ -1,48 +1,28 @@
 <template>
   <n-form :model="cacheProps">
     <n-form-item label="条件组之间的关系">
-      <n-switch
-        v-model:value="cacheProps.type"
-        :round="false"
-        checked-value="AND"
-        unchecked-value="OR"
-      >
+      <n-switch v-model:value="cacheProps.type" :round="false" checked-value="AND" unchecked-value="OR">
         <template #checked> 且</template>
         <template #unchecked> 或</template>
       </n-switch>
     </n-form-item>
     <n-flex vertical>
       <n-button @click="addConditionGroup">添加条件组</n-button>
-      <n-card
-        v-for="(item, index) in cacheProps.groups"
-        :key="index"
-        :title="'条件组 - ' + (index + 1)"
-      >
+      <n-card v-for="(item, index) in cacheProps.groups" :key="index" :title="'条件组 - ' + (Number(index) + 1)">
         <template #header-extra>
           <n-flex :size="5">
-            <n-switch
-              v-model:value="item.type"
-              :round="false"
-              checked-value="AND"
-              unchecked-value="OR"
-            >
+            <n-switch v-model:value="item.type" :round="false" checked-value="AND" unchecked-value="OR">
               <template #checked> 且</template>
               <template #unchecked> 或</template>
             </n-switch>
             <n-button size="tiny" type="info" @click="addCondition(item)">添加条件</n-button>
-            <n-button size="tiny" type="error" @click="cacheProps.groups.splice(index, 1)"
-              >删除条件组
-            </n-button>
+            <n-button size="tiny" type="error" @click="cacheProps.groups.splice(index, 1)">删除条件组 </n-button>
           </n-flex>
         </template>
         <n-flex vertical>
           <n-input-group v-for="(cItem, cIndex) in item.conditions" :key="cIndex">
             <n-input v-model:value="cItem.field" :style="{ width: '33%' }" placeholder="字段" />
-            <n-select
-              v-model:value="cItem.operator"
-              :options="operatorOptions"
-              :style="{ width: '33%' }"
-            />
+            <n-select v-model:value="cItem.operator" :options="operatorOptions" :style="{ width: '33%' }" />
             <n-input v-model:value="cItem.value" :style="{ width: '33%' }" placeholder="值" />
           </n-input-group>
         </n-flex>

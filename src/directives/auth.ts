@@ -125,8 +125,8 @@ function bindAuthEffect(el: HTMLElement, permissions: string[], mode: AuthMode) 
   // noinspection UnnecessaryLocalVariableJS
   const stopEffect = watchEffect(() => {
     // 触发响应式依赖收集
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const userPermissions = loginInfoStore.loginInfo.permissionKeys
+    console.debug('[v-auth] 当前用户权限：', userPermissions)
 
     // 检查权限
     const hasPermission = checkPermissions(permissions, mode)
@@ -220,8 +220,8 @@ export default {
       try {
         // 尝试将真实元素恢复到 DOM 中（虽然即将卸载）
         meta.parent.replaceChild(el, meta.placeholder)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
+        console.debug('[v-auth] 恢复元素时出错，可能是因为元素已被卸载：', e)
         // 忽略错误，元素即将被卸载
       }
     }

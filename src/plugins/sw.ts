@@ -4,26 +4,26 @@ import { useRegisterSW } from 'virtual:pwa-register/vue'
 export const useSW = () => {
   const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
     onRegisteredSW(swUrl, r) {
+      if (!r) return
       // 每小时检查一次更新
-      r &&
-        setInterval(
-          async () => {
-            if (r.installing || !navigator) return
+      setInterval(
+        async () => {
+          if (r.installing || !navigator) return
 
-            if ('connection' in navigator && !navigator.onLine) return
+          if ('connection' in navigator && !navigator.onLine) return
 
-            const resp = await fetch(swUrl, {
+          const resp = await fetch(swUrl, {
+            cache: 'no-store',
+            headers: {
               cache: 'no-store',
-              headers: {
-                cache: 'no-store',
-                'cache-control': 'no-cache'
-              }
-            })
+              'cache-control': 'no-cache'
+            }
+          })
 
-            if (resp?.status === 200) await r.update()
-          },
-          60 * 60 * 1000
-        )
+          if (resp?.status === 200) await r.update()
+        },
+        60 * 60 * 1000
+      )
     }
   })
 

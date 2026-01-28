@@ -416,7 +416,11 @@ router.beforeEach((to, form, next) => {
     to.meta.title = replaceDynamicName(to.meta.titleTemplate as string, to.params)
   }
   // 设置网页标题
-  to.meta.title ? (document.title = to.meta.title + ' - Strix') : (document.title = 'Strix')
+  if (to.meta.title) {
+    document.title = `${to.meta.title} - Strix`
+  } else {
+    document.title = 'Strix'
+  }
 
   if (to.path === '/login') return next()
   if (!loginToken.value) return next('/login?to=' + to.fullPath)

@@ -28,6 +28,10 @@ export default defineComponent({
       }
     })
 
+    onMounted(() => {
+      loadComponent()
+    })
+
     /**
      * 加载动态组件
      */
@@ -43,7 +47,6 @@ export default defineComponent({
         console.error('Failed to load component:', error)
       }
     }
-    onMounted(loadComponent)
 
     // render 函数：直接返回稳定的组件定义
     return () => h(DynamicComponent)
