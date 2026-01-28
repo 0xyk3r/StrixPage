@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
-    "crypto-es": "^2.1.0",
+    "crypto-es": "^3.1.2",
     "dexie": "^4.2.1",
     "echarts": "^6.0.0",
     "element-resize-detector": "^1.2.4",
