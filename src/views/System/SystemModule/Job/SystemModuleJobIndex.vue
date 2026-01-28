@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（任务名称）"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（任务名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -51,28 +47,16 @@
         <n-form-item label="调用目标" path="invokeTarget">
           <n-popover placement="bottom-start" trigger="focus">
             <template #trigger>
-              <n-input
-                v-model:value="addDataForm.invokeTarget"
-                clearable
-                placeholder="请输入调用目标"
-              />
+              <n-input v-model:value="addDataForm.invokeTarget" clearable placeholder="请输入调用目标" />
             </template>
             <p>请输入 组件名称.方法名称() 或 组件名称.方法名称(...参数列表)</p>
             <p>其中组件名称为 @Component 注解的值，参数列表可选、数量不限</p>
-            <p>
-              strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L, true)
-            </p>
-            <p>
-              为了系统安全考虑，所有定时任务调用目标类需使用 @StrixJob 注解，否则无法添加和调用。
-            </p>
+            <p>strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L, true)</p>
+            <p>为了系统安全考虑，所有定时任务调用目标类需使用 @StrixJob 注解，否则无法添加和调用。</p>
           </n-popover>
         </n-form-item>
         <n-form-item label="Cron 表达式" path="cronExpression">
-          <n-input
-            v-model:value="addDataForm.cronExpression"
-            clearable
-            placeholder="请输入 Cron 表达式"
-          />
+          <n-input v-model:value="addDataForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
         </n-form-item>
         <n-form-item label="计划错误策略" path="misfirePolicy">
           <n-select
@@ -91,12 +75,7 @@
           />
         </n-form-item>
         <n-form-item label="任务状态" path="status">
-          <n-select
-            v-model:value="addDataForm.status"
-            :options="jobStatusRef"
-            clearable
-            placeholder="请选择任务状态"
-          />
+          <n-select v-model:value="addDataForm.status" :options="jobStatusRef" clearable placeholder="请选择任务状态" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -128,18 +107,10 @@
             <n-input v-model:value="editDataForm.name" clearable placeholder="请输入任务名称" />
           </n-form-item>
           <n-form-item label="调用目标" path="invokeTarget">
-            <n-input
-              v-model:value="editDataForm.invokeTarget"
-              clearable
-              placeholder="请输入调用目标"
-            />
+            <n-input v-model:value="editDataForm.invokeTarget" clearable placeholder="请输入调用目标" />
           </n-form-item>
           <n-form-item label="Cron 表达式" path="cronExpression">
-            <n-input
-              v-model:value="editDataForm.cronExpression"
-              clearable
-              placeholder="请输入 Cron 表达式"
-            />
+            <n-input v-model:value="editDataForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
           </n-form-item>
           <n-form-item label="计划错误策略" path="misfirePolicy">
             <n-select
@@ -185,8 +156,8 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { pick } from 'lodash-es'
+import { type DataTableColumns, type FormRules } from 'naive-ui' // 本页面操作提示关键词
 
 // 本页面操作提示关键词
 const _baseName = '定时任务'
@@ -335,12 +306,8 @@ const addDataRules: FormRules = {
     { required: true, message: '请输入 Cron 表达式', trigger: 'blur' },
     { min: 5, max: 128, message: 'Cron 表达式 长度需在 5 - 128 字之内', trigger: 'blur' }
   ],
-  misfirePolicy: [
-    { type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }
-  ],
-  concurrent: [
-    { type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }
-  ],
+  misfirePolicy: [{ type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }],
+  concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
   status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
 }
 const showAddDataModal = () => {
@@ -348,15 +315,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/job/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/job/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -373,31 +337,24 @@ const editDataRules: FormRules = {
     { required: true, message: '请输入 Cron 表达式', trigger: 'blur' },
     { min: 5, max: 128, message: 'Cron 表达式 长度需在 5 - 128 字之内', trigger: 'blur' }
   ],
-  misfirePolicy: [
-    { type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }
-  ],
-  concurrent: [
-    { type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }
-  ],
+  misfirePolicy: [{ type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }],
+  concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
   status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
 }
 const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/job/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/job/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/job/update/${editDataId.value}`, editDataForm.value, {

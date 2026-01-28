@@ -178,7 +178,7 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { differenceWith, find, isEqual, pick } from 'lodash'
+import { differenceWith, find, isEqual, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词

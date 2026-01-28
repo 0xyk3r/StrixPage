@@ -146,7 +146,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
-import { differenceWith, find, isEqual, pick } from 'lodash'
+import { differenceWith, find, isEqual, pick } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,
@@ -207,11 +207,7 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
       return currentMenus.push(
         h(NGrid, { xGap: 10, cols: 6 }, () => [
           h(NGi, { span: 1 }, () =>
-            h(
-              NTag,
-              { closable: true, onClose: () => removeRolePermission(row, menu.id) },
-              () => menu.name
-            )
+            h(NTag, { closable: true, onClose: () => removeRolePermission(row, menu.id) }, () => menu.name)
           )
         ])
       )
@@ -262,9 +258,7 @@ const dataColumns: DataTableColumns = [
         () => [
           h(NTabPane, { name: 'menu', tab: '菜单权限 / 按钮权限', class: 'expand-menu-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h('div', { style: 'min-width: 800px; padding-bottom: 10px;' }, [
-                expandMenuChildrenVNode
-              ])
+              h('div', { style: 'min-width: 800px; padding-bottom: 10px;' }, [expandMenuChildrenVNode])
             )
           )
         ]
@@ -343,11 +337,7 @@ const clearSearch = () => {
 const filterDataList = computed(() =>
   dataRef.value?.filter((d) => {
     let filterd = true
-    if (
-      filterDataListParams.value.keyword &&
-      d.name.indexOf(filterDataListParams.value.keyword) < 0
-    )
-      filterd = false
+    if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0) filterd = false
     return filterd
   })
 )
@@ -361,11 +351,9 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http
-        .get(`system/role/${row.id}`, { meta: { operate: `加载${_baseName}信息` } })
-        .then(({ data: res }) => {
-          handleEditSuccessResponse(row, res.data)
-        })
+      http.get(`system/role/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+        handleEditSuccessResponse(row, res.data)
+      })
     }
   })
 }
@@ -381,15 +369,12 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/role/update', addDataForm.value, { meta: { operate: `修改${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/role/update', addDataForm.value, { meta: { operate: `修改${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -403,19 +388,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/role/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/role/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/role/update/${editDataId.value}`, editDataForm.value, {
@@ -429,11 +411,9 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/role/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/role/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 
 const removeRoleMenu = (row: any, menuId: string) => {
@@ -484,15 +464,13 @@ const showEditRoleMenusModal = (roleRow: any) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
   // 加载编辑前信息
-  http
-    .get(`system/role/${roleRow.id}`, { meta: { operate: `加载${_baseName}菜单信息` } })
-    .then(({ data: res }) => {
-      editRoleMenusRoleId = res.data.id
-      editRoleMenusRoleRow = roleRow
-      editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
-      editRoleMenusCheckedKeys.value.push(...deepMap(res.data.permissions, 'id'))
-      editRoleMenusLoading.value = false
-    })
+  http.get(`system/role/${roleRow.id}`, { meta: { operate: `加载${_baseName}菜单信息` } }).then(({ data: res }) => {
+    editRoleMenusRoleId = res.data.id
+    editRoleMenusRoleRow = roleRow
+    editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
+    editRoleMenusCheckedKeys.value.push(...deepMap(res.data.permissions, 'id'))
+    editRoleMenusLoading.value = false
+  })
 }
 const editRoleMenusTreeRef = ref<TreeInst | null>(null)
 const editRoleMenus = () => {

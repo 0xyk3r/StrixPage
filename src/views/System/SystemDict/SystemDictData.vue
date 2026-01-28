@@ -173,7 +173,7 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
 const route = useRoute()

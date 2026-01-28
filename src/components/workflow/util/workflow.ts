@@ -2,16 +2,9 @@ import '@/assets/style/components/workflow.scss'
 import WorkflowConditionsNode from '@/components/workflow/WorkflowConditionsNode.vue'
 import WorkflowNode from '@/components/workflow/WorkflowNode.vue'
 import { createStrixMessage } from '@/utils/strix-message'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 
-export type WorkflowNodeType =
-  | 'root'
-  | 'approval'
-  | 'task'
-  | 'conditions'
-  | 'condition'
-  | 'cc'
-  | 'empty'
+export type WorkflowNodeType = 'root' | 'approval' | 'task' | 'conditions' | 'condition' | 'cc' | 'empty'
 
 export interface WorkflowNode {
   id: string
@@ -233,11 +226,7 @@ const renderNode = (nodes: WorkflowNode[], node: WorkflowNode) => {
  * @param {Object} parentNode  父节点
  * @param {string} type  添加的节点类型
  */
-const handleAddChildren = (
-  nodes: WorkflowNode[],
-  parentNode: WorkflowNode,
-  type: WorkflowNodeType
-) => {
+const handleAddChildren = (nodes: WorkflowNode[], parentNode: WorkflowNode, type: WorkflowNodeType) => {
   const oldChildren = getChildrenNode(nodes, parentNode.id)
   const newNodeId = generateRandomId()
   // 深拷贝默认属性, 避免修改默认属性

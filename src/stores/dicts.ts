@@ -1,5 +1,5 @@
 import { http } from '@/plugins/axios'
-import { throttle } from 'lodash'
+import { throttle } from 'lodash-es'
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
 

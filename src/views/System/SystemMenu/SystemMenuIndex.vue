@@ -237,7 +237,7 @@ import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { cloneDeep, kebabCase, pick } from 'lodash'
+import { cloneDeep, kebabCase, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NTag } from 'naive-ui'
 import StrixIcon from '@/components/Icon/StrixIcon.vue'
 

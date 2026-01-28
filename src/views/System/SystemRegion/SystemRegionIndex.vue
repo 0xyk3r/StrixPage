@@ -142,7 +142,7 @@ import { http } from '@/plugins/axios'
 import { usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词

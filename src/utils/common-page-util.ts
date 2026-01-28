@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import type { FormInst, PaginationInfo } from 'naive-ui'
 import { type Ref } from 'vue'
 

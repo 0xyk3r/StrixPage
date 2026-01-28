@@ -15,12 +15,7 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="用户状态" path="status" span="6 s:3 m:2">
             <n-select
@@ -64,11 +59,7 @@
             <n-input v-model:value="editDataForm.nickname" clearable placeholder="请输入用户昵称" />
           </n-form-item>
           <n-form-item label="手机号码" path="phoneNumber">
-            <n-input
-              v-model:value="editDataForm.phoneNumber"
-              clearable
-              placeholder="请输入手机号码"
-            />
+            <n-input v-model:value="editDataForm.phoneNumber" clearable placeholder="请输入手机号码" />
           </n-form-item>
           <n-form-item label="用户状态" path="status">
             <n-select
@@ -99,8 +90,8 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { pick } from 'lodash-es'
+import { type DataTableColumns, type FormRules } from 'naive-ui' // 本页面操作提示关键词
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -203,19 +194,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/user/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/user/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`system/user/update/${editDataId.value}`, editDataForm.value, {
@@ -229,11 +217,9 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/user/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/user/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 </script>
 

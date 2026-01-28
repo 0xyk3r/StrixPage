@@ -125,7 +125,7 @@ import { http } from '@/plugins/axios'
 import { createPagination, usePage } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash'
+import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NFlex, NSpin } from 'naive-ui'
 
 const router = useRouter()
@@ -243,8 +243,7 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`${_baseApiPrefix}/update`, addDataForm.value, {
@@ -267,19 +266,16 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`${_baseApiPrefix}/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`${_baseApiPrefix}/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     http
       .post(`${_baseApiPrefix}/update/${editDataId.value}`, editDataForm.value, {
@@ -294,11 +290,9 @@ const editData = () => {
 
 // 删除数据
 const deleteData = (id: string) => {
-  http
-    .post(`${_baseApiPrefix}/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`${_baseApiPrefix}/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 
 const workflowConfigDataRef = ref([])
@@ -369,10 +363,7 @@ const getWorkflowInstanceDataList = () => {
     })
 }
 const workflowInstanceDataRowKey = (row: any) => row.id
-const workflowInstanceDataPagination = createPagination(
-  getWorkflowInstanceDataListParams,
-  getWorkflowInstanceDataList
-)
+const workflowInstanceDataPagination = createPagination(getWorkflowInstanceDataListParams, getWorkflowInstanceDataList)
 
 // 删除数据
 const deleteWorkflowInstanceData = (id: string) => {

@@ -178,7 +178,7 @@ import { http } from '@/plugins/axios'
 import { createPagination } from '@/utils/common-page-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { cloneDeep, debounce, pick } from 'lodash'
+import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
 
 const _baseName = '热度工具配置'

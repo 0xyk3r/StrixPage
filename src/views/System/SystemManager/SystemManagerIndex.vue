@@ -231,7 +231,7 @@ import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
-import { differenceWith, find, isEqual, pick } from 'lodash'
+import { differenceWith, find, isEqual, pick } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,

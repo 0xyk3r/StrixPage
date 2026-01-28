@@ -5,11 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="getDataListParams.keyword"
-                clearable
-                placeholder="按名称搜索"
-              />
+              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -21,12 +17,7 @@
           文件分组与文件属于强绑定模式，所以文件组创建后不建议进行修改或删除操作，删除会导致该文件组下所有文件无法获取。
         </n-alert>
       </template>
-      <n-form
-        :model="getDataListParams"
-        :show-feedback="false"
-        label-placement="left"
-        label-width="auto"
-      >
+      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
@@ -82,18 +73,10 @@
           <n-input v-model:value="addDataForm.name" clearable placeholder="请输入文件组名称" />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="bucketName">
-          <n-input
-            v-model:value="addDataForm.bucketName"
-            clearable
-            placeholder="请输入存储空间 (Bucket) 名称"
-          />
+          <n-input v-model:value="addDataForm.bucketName" clearable placeholder="请输入存储空间 (Bucket) 名称" />
         </n-form-item>
         <n-form-item label="Bucket 域名" path="bucketDomain">
-          <n-input
-            v-model:value="addDataForm.bucketDomain"
-            clearable
-            placeholder="请输入Bucket自定义域名"
-          />
+          <n-input v-model:value="addDataForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
           <n-input
@@ -118,11 +101,7 @@
           />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
-          <n-input-number
-            v-model:value="addDataForm.secretLevel"
-            clearable
-            placeholder="请输入查看权限等级"
-          />
+          <n-input-number v-model:value="addDataForm.secretLevel" clearable placeholder="请输入查看权限等级" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -165,11 +144,7 @@
             <n-input v-model:value="editDataForm.name" clearable placeholder="请输入文件组名称" />
           </n-form-item>
           <n-form-item label="Bucket 域名" path="bucketDomain">
-            <n-input
-              v-model:value="editDataForm.bucketDomain"
-              clearable
-              placeholder="请输入Bucket自定义域名"
-            />
+            <n-input v-model:value="editDataForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
             <n-input
@@ -194,11 +169,7 @@
             />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
-            <n-input-number
-              v-model:value="editDataForm.secretLevel"
-              clearable
-              placeholder="请输入查看权限等级"
-            />
+            <n-input-number v-model:value="editDataForm.secretLevel" clearable placeholder="请输入查看权限等级" />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
@@ -221,13 +192,7 @@
       </template>
     </n-modal>
 
-    <n-modal
-      v-model:show="uploadModalShow"
-      class="strix-form-modal"
-      preset="card"
-      size="huge"
-      title="上传文件"
-    >
+    <n-modal v-model:show="uploadModalShow" class="strix-form-modal" preset="card" size="huge" title="上传文件">
       <n-upload
         :action="uploadUrl"
         :headers="{ token: loginToken }"
@@ -258,7 +223,7 @@ import { usePage } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { cloneDeep, pick } from 'lodash'
+import { cloneDeep, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 
@@ -367,8 +332,7 @@ const dataColumns: DataTableColumns = [
           icon: 'trash',
           onClick: () => deleteData(row.id),
           popconfirm: true,
-          popconfirmMessage:
-            '是否确认删除这条数据? 删除后会导致该文件组下的所有文件无法访问！ 且该操作不可恢复!'
+          popconfirmMessage: '是否确认删除这条数据? 删除后会导致该文件组下的所有文件无法访问！ 且该操作不可恢复!'
         }
       ])
     }
@@ -396,11 +360,9 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http
-    .get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } })
-    .then(({ data: res }) => {
-      ossConfigSelectList.value = res.data.options
-    })
+  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+    ossConfigSelectList.value = res.data.options
+  })
 }
 onMounted(getOssConfigSelectList)
 
@@ -446,9 +408,7 @@ const addDataRules: FormRules = {
       }
     }
   ],
-  secretType: [
-    { type: 'number', required: true, message: '请选择查看权限类型', trigger: 'change' }
-  ],
+  secretType: [{ type: 'number', required: true, message: '请选择查看权限类型', trigger: 'change' }],
   secretLevel: [
     { type: 'number', required: true, message: '请填写查看权限等级', trigger: 'blur' },
     { type: 'number', min: 0, max: 10, message: '请输入有效数值 (1-10)', trigger: 'change' }
@@ -460,19 +420,16 @@ const showAddDataModal = () => {
 }
 const addData = () => {
   addDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     // 克隆 addDataForm 然后处理allowExtension
     const data = cloneDeep(addDataForm.value)
     data.allowExtension = data.allowExtension.join(',')
 
-    http
-      .post('system/oss/fileGroup/update', data, { meta: { operate: `添加${_baseName}` } })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    http.post('system/oss/fileGroup/update', data, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
@@ -505,21 +462,18 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http
-    .get(`system/oss/fileGroup/${id}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      editDataId.value = id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      // 处理 allowExtension 字段
-      res.data.allowExtension = res.data.allowExtension.split(',')
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
-    })
+  http.get(`system/oss/fileGroup/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    editDataId.value = id
+    const canUpdateFields = Object.keys(initEditDataForm)
+    // 处理 allowExtension 字段
+    res.data.allowExtension = res.data.allowExtension.split(',')
+    editDataForm.value = pick(res.data, canUpdateFields)
+    editDataFormLoading.value = false
+  })
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     // 克隆 editDataForm 然后处理allowExtension
     const data = cloneDeep(editDataForm.value)
@@ -537,11 +491,9 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/oss/fileGroup/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } })
-    .then(() => {
-      getDataList()
-    })
+  http.post(`system/oss/fileGroup/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    getDataList()
+  })
 }
 
 // 移除 allowExtension 中的错误项

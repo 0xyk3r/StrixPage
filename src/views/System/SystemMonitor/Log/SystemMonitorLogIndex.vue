@@ -52,7 +52,7 @@ import StrixBlock from '@/components/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { createPagination } from '@/utils/common-page-util'
 import { useDict } from '@/utils/strix-dict-util'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from 'lodash-es'
 import { type DataTableColumns, NTag } from 'naive-ui'
 
 // 本页面操作提示关键词
