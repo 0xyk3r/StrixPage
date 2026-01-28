@@ -7,9 +7,7 @@
         :clickable="!item.meta.empty"
         @click="jumpRoute(item)"
       >
-        <n-icon v-if="item.meta.icon">
-          <StrixIcon :icon="item.meta.icon" :width="16" />
-        </n-icon>
+        <StrixIcon v-if="item.meta.icon" :icon="item.meta.icon" :width="16" />
         {{ item.meta._title || item.meta.title }}
       </n-breadcrumb-item>
     </n-breadcrumb>
@@ -75,6 +73,28 @@ const jumpRoute = (item: RouteLocationMatched) => {
   }
 }
 
+// 鼠标滚轮横向滚动优化
+onMounted(() => {
+  if (breadcrumbContainerRef.value) {
+    breadcrumbContainerRef.value.addEventListener('wheel', handleWheel, { passive: false })
+  }
+})
+
+onUnmounted(() => {
+  if (breadcrumbContainerRef.value) {
+    breadcrumbContainerRef.value.removeEventListener('wheel', handleWheel)
+  }
+})
+
+const handleWheel = (e: WheelEvent) => {
+  if (breadcrumbContainerRef.value) {
+    // 阻止默认纵向滚动
+    e.preventDefault()
+    // 将纵向滚动转为横向滚动
+    breadcrumbContainerRef.value.scrollLeft += e.deltaY
+  }
+}
+
 watch(
   () => route.path,
   () => {
@@ -95,17 +115,15 @@ watch(
 
 <style lang="scss" scoped>
 .breadcrumb-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-
-  white-space: nowrap;
+  width: 210px;
   overflow-x: auto;
   overflow-y: hidden;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+
+  // 隐藏滚动条 - 跨浏览器
   scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
     display: none;
@@ -135,8 +153,14 @@ watch(
   }
 
   ::v-deep(.n-breadcrumb) {
+    flex-wrap: nowrap;
+
     .n-breadcrumb-item {
-      max-width: 150px;
+      flex-shrink: 0;
+
+      .n-breadcrumb-item__link {
+        max-width: none;
+      }
 
       .n-breadcrumb-item__link,
       .n-breadcrumb-item__separator {
