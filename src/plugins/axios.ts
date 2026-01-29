@@ -72,7 +72,7 @@ axios.interceptors.request.use((config) => {
       urlParams
     )
 
-    const signUrl = buildSignUrl(config.baseURL || axios.defaults.baseURL, config.url)
+    const signUrl = buildSignUrl(config.url)
     config.headers.sign = paramsSign(signUrl, urlParams, config.headers.timestamp)
   } else {
     console.log(
@@ -84,7 +84,7 @@ axios.interceptors.request.use((config) => {
       config.data
     )
 
-    const signUrl = buildSignUrl(config.baseURL || axios.defaults.baseURL, config.url)
+    const signUrl = buildSignUrl(config.url)
     config.headers.sign = paramsSign(signUrl, config.data, config.headers.timestamp)
     if (config.data) {
       config.data = JSON.stringify(enc(config.data))
@@ -130,22 +130,16 @@ axios.interceptors.response.use(
 
 /**
  * 构建签名用的完整URL
- * @param baseURL 基础URL
  * @param url 请求URL
  * @returns 完整的签名URL
  */
-function buildSignUrl(baseURL: string | undefined, url: string | undefined): string {
-  if (!baseURL || !url) {
-    return url || ''
+function buildSignUrl(url: string | undefined): string {
+  if (!url) {
+    return ''
   }
 
-  // 移除 baseURL 末尾的斜杠
-  const cleanBaseURL = baseURL.replace(/\/$/, '')
-
   // 确保 url 以斜杠开头
-  const cleanUrl = url.startsWith('/') ? url : '/' + url
-
-  return cleanBaseURL + cleanUrl
+  return url.startsWith('/') ? url : '/' + url
 }
 
 /**
