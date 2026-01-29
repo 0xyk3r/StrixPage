@@ -16,7 +16,7 @@
           <n-form-item-gi label="操作类型" path="operationType" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.operationType"
-              :options="sysLogOperTypeRef"
+              :options="systemLogOperTypeRef"
               clearable
               placeholder="请选择操作类型"
               @update:value="getDataList"
@@ -59,7 +59,7 @@ import { usePagination } from '@/composables/usePagination.ts'
 const _baseName = '系统日志'
 
 // 加载字典
-const sysLogOperTypeRef = useDict('SysLogOperType')
+const systemLogOperTypeRef = useDict('SystemLogOperType')
 
 // 获取列表请求参数
 const initGetDataListParams = {

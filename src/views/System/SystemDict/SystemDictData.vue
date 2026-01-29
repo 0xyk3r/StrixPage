@@ -19,7 +19,7 @@
           <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
-              :options="dictDataStatusRef"
+              :options="commonSwitchRef"
               clearable
               placeholder="请选择字典数据状态"
               @update:value="getDataList"
@@ -75,7 +75,7 @@
         <n-form-item label="字典状态" path="status">
           <n-select
             v-model:value="addDataForm.status"
-            :options="dictDataStatusRef"
+            :options="commonSwitchRef"
             clearable
             placeholder="请选择字典状态"
           />
@@ -137,7 +137,7 @@
           <n-form-item label="字典状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
-              :options="dictDataStatusRef"
+              :options="commonSwitchRef"
               clearable
               placeholder="请选择字典状态"
             />
@@ -186,7 +186,7 @@ const dictKey = route.params.dictKey
 
 // 加载字典
 const dictDataStyleRef = useDict('DictDataStyle')
-const dictDataStatusRef = useDict('DictDataStatus')
+const commonSwitchRef = useDict('CommonSwitch')
 
 const {
   getDataListParams,
@@ -253,7 +253,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'DictDataStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }
   },
   { key: 'remark', title: '备注', width: 180 },

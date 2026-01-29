@@ -29,7 +29,7 @@
           <n-form-item-gi label="状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
-              :options="strixSmsTemplateStatusRef"
+              :options="smsTemplateStatusRef"
               clearable
               placeholder="请选择状态"
               @update:value="getDataList"
@@ -38,7 +38,7 @@
           <n-form-item-gi label="类型" path="type" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.type"
-              :options="strixSmsTemplateTypeRef"
+              :options="smsTemplateTypeRef"
               clearable
               placeholder="请选择类型"
               @update:value="getDataList"
@@ -72,8 +72,8 @@ import { type DataTableColumns } from 'naive-ui'
 const _baseName = '短信模板'
 
 // 加载字典
-const strixSmsTemplateTypeRef = useDict('StrixSmsTemplateType')
-const strixSmsTemplateStatusRef = useDict('StrixSmsTemplateStatus')
+const smsTemplateTypeRef = useDict('SmsTemplateType')
+const smsTemplateStatusRef = useDict('SmsTemplateStatus')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -102,7 +102,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.type, dictName: 'StrixSmsTemplateType' })
+      return h(StrixTag, { value: row.type, dictName: 'SmsTemplateType' })
     }
   },
   {
@@ -111,7 +111,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'StrixSmsTemplateStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'SmsTemplateStatus' })
     }
   },
   { key: 'content', title: '模板内容', width: 600 },

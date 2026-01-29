@@ -25,7 +25,7 @@
           <n-form-item-gi label="状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
-              :options="strixSmsSignStatusRef"
+              :options="smsSignStatusRef"
               clearable
               placeholder="请选择状态"
               @update:value="getDataList"
@@ -59,7 +59,7 @@ import { type DataTableColumns } from 'naive-ui'
 const _baseName = '短信签名'
 
 // 加载字典
-const strixSmsSignStatusRef = useDict('StrixSmsSignStatus')
+const smsSignStatusRef = useDict('SmsSignStatus')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -85,7 +85,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'StrixSmsSignStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'SmsSignStatus' })
     }
   }
 ]

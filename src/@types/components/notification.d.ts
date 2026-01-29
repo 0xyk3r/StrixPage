@@ -51,8 +51,8 @@ export interface ListNotificationReq {
   pageIndex: number
   /** 已读状态 (0未读 1已读，null查询全部) */
   readStatus?: 0 | 1 | null
-  /** 有效状态 (1有效 2失效，null查询全部) */
-  validStatus?: 1 | 2 | null
+  /** 有效状态 (0无效 1有效，null查询全部) */
+  validStatus?: 0 | 1 | null
 }
 
 /**

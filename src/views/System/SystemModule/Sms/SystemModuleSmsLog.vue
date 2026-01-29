@@ -25,7 +25,7 @@
           <n-form-item-gi label="发送状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
-              :options="strixSmsLogStatusRef"
+              :options="smsLogStatusRef"
               clearable
               placeholder="请选择短信发送状态"
               @update:value="getDataList"
@@ -59,7 +59,7 @@ import { type DataTableColumns } from 'naive-ui'
 const _baseName = '短信日志'
 
 // 加载字典
-const strixSmsLogStatusRef = useDict('StrixSmsLogStatus')
+const smsLogStatusRef = useDict('SmsLogStatus')
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -86,7 +86,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.platform, dictName: 'StrixSmsPlatform' })
+      return h(StrixTag, { value: row.platform, dictName: 'SmsPlatform' })
     }
   },
   { key: 'signName', title: '签名', width: 160 },
@@ -99,7 +99,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'StrixSmsLogStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'SmsLogStatus' })
     }
   },
   { key: 'platformResponse', title: '平台响应', width: 240 },

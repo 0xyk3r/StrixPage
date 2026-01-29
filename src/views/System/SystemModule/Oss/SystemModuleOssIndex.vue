@@ -56,7 +56,7 @@
         <n-form-item label="存储平台" path="platform">
           <n-select
             v-model:value="addDataForm.platform"
-            :options="strixOssPlatformRef"
+            :options="ossPlatformRef"
             clearable
             placeholder="请选择存储平台"
           />
@@ -122,7 +122,7 @@
           <n-form-item label="存储平台" path="platform">
             <n-select
               v-model:value="editDataForm.platform"
-              :options="strixOssPlatformRef"
+              :options="ossPlatformRef"
               clearable
               placeholder="请选择存储平台"
             />
@@ -170,7 +170,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
@@ -185,7 +184,7 @@ import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, N
 const _baseName = '存储服务'
 
 // 加载字典
-const strixOssPlatformRef = useDict('StrixOssPlatform')
+const ossPlatformRef = useDict('OssPlatform')
 
 const {
   getDataListParams,
@@ -249,23 +248,6 @@ const dataColumns: DataTableColumns = [
         h(NDataTable, {
           columns: [
             { title: 'Bucket 名称', key: 'name', width: 200 },
-            {
-              title: '存储类型',
-              key: 'storageClass',
-              width: 80,
-              render: (row: any) => {
-                const storageClassMap: Record<string, { type: NTagType; label: string }> = {
-                  Standard: { type: 'success', label: '标准存储' },
-                  IA: { type: 'info', label: '低频访问存储' },
-                  Archive: { type: 'warning', label: '归档存储' },
-                  ColdArchive: { type: 'error', label: '冷归档存储' },
-                  default: { type: 'default', label: '未知' }
-                }
-                const storageClass = storageClassMap[row.storageClass] ?? { type: 'default' as NTagType, label: '未知' }
-                return h(NTag, { type: storageClass.type, bordered: false }, { default: () => storageClass.label })
-              }
-            },
-            { title: '地域', key: 'region', width: 160 },
             { title: '创建时间', key: 'createdTime', width: 160 },
             { title: '备注', key: 'remark', width: 160 }
           ],
@@ -339,7 +321,7 @@ const dataColumns: DataTableColumns = [
     title: '平台',
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.platform, dictName: 'StrixOssPlatform' })
+      return h(StrixTag, { value: row.platform, dictName: 'OssPlatform' })
     }
   },
   { key: 'region', width: 120, title: '地域' },

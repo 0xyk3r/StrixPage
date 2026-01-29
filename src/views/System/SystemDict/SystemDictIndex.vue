@@ -19,7 +19,7 @@
           <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.status"
-              :options="dictStatusRef"
+              :options="commonSwitchRef"
               clearable
               placeholder="请选择字典状态"
               @update:value="getDataList"
@@ -28,7 +28,7 @@
           <n-form-item-gi label="是否内置" path="provided" span="6 s:3 m:2">
             <n-select
               v-model:value="getDataListParams.provided"
-              :options="dictProvidedRef"
+              :options="commonFlagRef"
               clearable
               placeholder="请选择字典是否内置"
               @update:value="getDataList"
@@ -81,7 +81,7 @@
         <n-form-item label="字典状态" path="status">
           <n-select
             v-model:value="addDataForm.status"
-            :options="dictStatusRef"
+            :options="commonSwitchRef"
             clearable
             placeholder="请选择字典状态"
           />
@@ -140,7 +140,7 @@
           <n-form-item label="字典状态" path="status">
             <n-select
               v-model:value="editDataForm.status"
-              :options="dictStatusRef"
+              :options="commonSwitchRef"
               clearable
               placeholder="请选择字典状态"
             />
@@ -185,8 +185,8 @@ const router = useRouter()
 const _baseName = '系统字典'
 
 // 加载字典
-const dictStatusRef = useDict('DictStatus')
-const dictProvidedRef = useDict('DictProvided')
+const commonFlagRef = useDict('CommonFlag')
+const commonSwitchRef = useDict('CommonSwitch')
 const dictDataTypeRef = useDict('DictDataType')
 
 const {
@@ -242,7 +242,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'DictStatus' })
+      return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }
   },
   {
@@ -260,7 +260,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.provided, dictName: 'DictProvided' })
+      return h(StrixTag, { value: row.provided, dictName: 'CommonFlag' })
     }
   },
   { key: 'remark', title: '备注', width: 180, titleAlign: 'center' },

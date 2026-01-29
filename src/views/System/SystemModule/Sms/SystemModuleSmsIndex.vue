@@ -56,7 +56,7 @@
         <n-form-item label="短信平台" path="platform">
           <n-select
             v-model:value="addDataForm.platform"
-            :options="strixSmsPlatformRef"
+            :options="smsPlatformRef"
             clearable
             placeholder="请选择短信平台"
           />
@@ -116,7 +116,7 @@
           <n-form-item label="短信平台" path="platform">
             <n-select
               v-model:value="editDataForm.platform"
-              :options="strixSmsPlatformRef"
+              :options="smsPlatformRef"
               clearable
               placeholder="请选择短信平台"
             />
@@ -173,7 +173,7 @@ import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, N
 const _baseName = '短信服务'
 
 // 加载字典
-const strixSmsPlatformRef = useDict('StrixSmsPlatform')
+const smsPlatformRef = useDict('SmsPlatform')
 
 const {
   getDataListParams,
@@ -380,7 +380,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     render(row: any) {
-      return h(StrixTag, { value: row.platform, dictName: 'StrixSmsPlatform' })
+      return h(StrixTag, { value: row.platform, dictName: 'SmsPlatform' })
     }
   },
   { key: 'regionId', width: 120, title: '地域', align: 'center' },

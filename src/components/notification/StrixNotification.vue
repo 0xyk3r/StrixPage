@@ -263,7 +263,7 @@ const loadInvalidNotifications = async (pageIndex: number) => {
       pageSize: 20,
       pageIndex,
       readStatus: null,
-      validStatus: 2
+      validStatus: 0
     })
     if (res) {
       if (pageIndex === 1) {

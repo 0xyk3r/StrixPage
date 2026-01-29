@@ -66,14 +66,6 @@
         <n-form-item label="Bucket 名称" path="name">
           <n-input v-model:value="addDataForm.name" clearable placeholder="请输入 Bucket 名称" />
         </n-form-item>
-        <n-form-item label="存储类型" path="storageClass">
-          <n-select
-            v-model:value="addDataForm.storageClass"
-            :options="storageClassOptions"
-            clearable
-            placeholder="请选择存储类型"
-          />
-        </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
@@ -86,12 +78,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { NTagType } from '@/@types/naive-ui'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
-import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储空间'
@@ -117,29 +108,14 @@ const {
   },
   {
     configKey: null,
-    name: null,
-    storageClass: null
+    name: null
   },
   null
 )
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { title: '存储空间名称', key: 'name', width: 260 },
-  {
-    title: '存储类型',
-    key: 'storageClass',
-    width: 120,
-    align: 'center',
-    render: (row: any) => {
-      const { label, type } = storageClassOptions.find((item) => item.value === row.storageClass) || {
-        label: '未知',
-        type: 'default'
-      }
-      return h(NTag, { type, bordered: false }, { default: () => label })
-    }
-  },
-  { title: '地域', key: 'region', width: 160 },
+  { title: '存储空间名称', key: 'name' },
   { title: '创建时间', key: 'createdTime', width: 180 }
 ]
 // 加载列表
@@ -170,21 +146,12 @@ const getOssConfigSelectList = () => {
 }
 onMounted(getOssConfigSelectList)
 
-const storageClassOptions: { value: string; label: string; type: NTagType }[] = [
-  { value: 'Standard', label: '标准存储', type: 'success' },
-  { value: 'IA', label: '低频访问存储', type: 'info' },
-  { value: 'Archive', label: '归档存储', type: 'warning' },
-  { value: 'ColdArchive', label: '冷归档存储', type: 'error' },
-  { value: 'default', label: '未知', type: 'default' }
-]
-
 const addDataRules: FormRules = {
   configKey: [{ required: true, message: '请选择存储配置 Key', trigger: 'change' }],
   name: [
     { required: true, message: '请输入 Bucket 名称', trigger: 'blur' },
     { min: 1, max: 64, message: 'Bucket 名称需在 1 - 64 字之内', trigger: 'blur' }
-  ],
-  storageClass: [{ required: true, message: '请选择存储类型', trigger: 'change' }]
+  ]
 }
 const showAddDataModal = () => {
   addDataModalShow.value = true

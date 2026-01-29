@@ -95,7 +95,7 @@
         <n-form-item label="查看权限类型" path="secretType">
           <n-select
             v-model:value="addDataForm.secretType"
-            :options="strixOssFileGroupSecretTypeRef"
+            :options="ossFileGroupSecretTypeRef"
             clearable
             placeholder="请选择查看权限类型"
           />
@@ -163,7 +163,7 @@
           <n-form-item label="查看权限类型" path="secretType">
             <n-select
               v-model:value="editDataForm.secretType"
-              :options="strixOssFileGroupSecretTypeRef"
+              :options="ossFileGroupSecretTypeRef"
               clearable
               placeholder="请选择查看权限类型"
             />
@@ -218,7 +218,6 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
-import { useLoginInfoStore } from '@/stores/login-info'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -226,13 +225,11 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 
-const loginInfoStore = useLoginInfoStore()
-
 // 本页面操作提示关键词
 const _baseName = '文件分组'
 
 // 加载字典
-const strixOssFileGroupSecretTypeRef = useDict('StrixOssFileGroupSecretType')
+const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')
 
 const {
   getDataListParams,
@@ -299,7 +296,7 @@ const dataColumns: DataTableColumns = [
     render(row: any) {
       return h(StrixTag, {
         value: row.secretType,
-        dictName: 'StrixOssFileGroupSecretType',
+        dictName: 'OssFileGroupSecretType',
         afterLabel: ' / ' + row.secretLevel
       })
     }
