@@ -115,7 +115,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'system/dict/:dictKey',
-        name: 'DynamicWrapper',
+        name: 'SystemDictDynamicWrapper',
         component: DynamicWrapper,
         meta: {
           title: '字典数据',

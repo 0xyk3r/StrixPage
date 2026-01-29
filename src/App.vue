@@ -1,5 +1,10 @@
 <template>
-  <n-config-provider :date-locale="dateZhCN" :locale="zhCN" :theme="currentTheme">
+  <n-config-provider
+    :date-locale="dateZhCN"
+    :locale="zhCN"
+    :theme="currentTheme"
+    :theme-overrides="currentTheme === null ? lightThemeOverrides : darkThemeOverrides"
+  >
     <n-loading-bar-provider>
       <n-notification-provider>
         <n-message-provider>
@@ -19,6 +24,7 @@ import { useStrixSettingsStore } from '@/stores/strix-settings'
 import {
   darkTheme,
   dateZhCN,
+  type GlobalThemeOverrides,
   NConfigProvider,
   NDialogProvider,
   NGlobalStyle,
@@ -45,6 +51,17 @@ EventBus.on('changeTheme', () => {
   globalSettingsStore.setTheme(themeSetting.value)
 })
 
+// 亮色主题覆盖
+const lightThemeOverrides: GlobalThemeOverrides = {}
+
+// 暗色主题覆盖
+const darkThemeOverrides: GlobalThemeOverrides = {
+  Layout: {
+    color: 'rgb(24, 24, 28)'
+  }
+}
+
+// 计算当前主题
 const currentTheme = computed(() => {
   if (themeSetting.value === 'auto') {
     return osTheme.value === 'dark' ? darkTheme : null

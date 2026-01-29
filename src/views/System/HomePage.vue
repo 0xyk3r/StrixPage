@@ -1,18 +1,18 @@
 <template>
   <n-layout class="home-layout" has-sider @click="clickContainer">
+    <!-- 侧边栏 -->
     <n-layout-sider
       v-model:collapsed="siderCollapsed"
       :collapsed-width="70"
       :native-scrollbar="false"
-      :style="'--n-color: ' + themeVars.bodyColor"
       :width="240"
       class="home-sider"
       collapse-mode="width"
       show-trigger="bar"
     >
-      <!-- Logo 或 系统标题 -->
+      <!-- Logo -->
       <div class="home-logo-container">
-        <img :class="theme" alt="Logo" class="home-logo" src="@/assets/img/logo-w.webp" />
+        <img :class="['home-logo', { 'home-logo--light': isLightTheme }]" alt="Logo" src="@/assets/img/logo-w.webp" />
       </div>
       <!-- 菜单 -->
       <n-spin :show="menuLoading">
@@ -30,40 +30,35 @@
         />
       </n-spin>
     </n-layout-sider>
+
+    <!-- 主内容区 -->
     <n-layout>
-      <n-layout-header :style="'--n-color: ' + themeVars.bodyColor" class="home-header">
-        <!-- 顶部栏 -->
+      <!-- 顶部栏 -->
+      <n-layout-header class="home-header">
         <div class="home-header-top">
           <div class="header-section breadcrumb-section">
             <strix-breadcrumb />
           </div>
-          <div class="header-divider"></div>
           <div class="header-section tabs-section">
             <strix-tabs-bar />
           </div>
-          <div class="header-divider"></div>
           <div class="header-section toolbar-section">
             <strix-tool-bar />
           </div>
         </div>
       </n-layout-header>
+
+      <!-- 内容区域 -->
       <n-layout-content
         :native-scrollbar="false"
         :scrollbar-props="{ xScrollable: true }"
-        :style="'--n-color: ' + themeVars.actionColor"
         class="home-content"
-        content-style="padding: 24px;"
+        content-style="padding: 20px;"
         embedded
       >
-        <!-- 路由名称显示 -->
-        <!-- <n-h3 prefix="bar" align-text type="success">
-          <n-text type="success">{{ route.meta._title || route.meta.title }}</n-text>
-        </n-h3> -->
-        <!-- 动态路由区域 -->
-        <div v-if="routerViewShow" :style="'--s-bg-color: ' + themeVars.cardColor" class="home-content-view">
+        <div v-if="routerViewShow" class="home-content-view">
           <router-view v-slot="{ Component, route }">
-            <transition name="strix-zoom-in-top">
-              <!-- 根据组件名称缓存组件，DynamicWrapper 路由会被动态包装 -->
+            <transition name="strix-fade-slide">
               <keep-alive :include="tabsBarStore.cachedRouteNames">
                 <component :is="wrapDynamicComponent(Component, route)" :key="route.fullPath" />
               </keep-alive>
@@ -72,8 +67,10 @@
         </div>
       </n-layout-content>
     </n-layout>
+
     <!-- 快捷工具栏 -->
     <strix-quick-menu />
+
     <!-- 水印 -->
     <n-watermark
       :font-size="16"
@@ -90,99 +87,52 @@
     />
   </n-layout>
 </template>
+
 <script lang="ts" setup>
 import StrixBreadcrumb from '@/components/system/StrixBreadcrumb.vue'
 import StrixQuickMenu from '@/components/common/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/system/StrixTabBar.vue'
 import StrixToolBar from '@/components/system/StrixToolBar.vue'
-import { http } from '@/plugins/axios'
+import { useDynamicComponent } from '@/composables/useDynamicComponent'
+import { useHomeMenu } from '@/composables/useHomeMenu'
+import { useTokenRenewal } from '@/composables/useTokenRenewal'
 import { EventBus } from '@/plugins/event-bus'
 import { useResizeDetector } from '@/plugins/resize-detector'
-import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { initStrixMessage } from '@/utils/strix-message'
-import { deepSearch } from '@/utils/strix-tools'
-import { kebabCase } from 'lodash-es'
-import { type MenuInst, type MenuOption, useOsTheme, useThemeVars } from 'naive-ui'
-import { storeToRefs } from 'pinia'
-import { RouterLink } from 'vue-router'
-import StrixIcon from '@/components/icon/StrixIcon.vue'
-import { replaceDynamicName } from '@/utils/dynamic-component-util'
-import type { Component } from 'vue'
+import { useOsTheme } from 'naive-ui'
 
-const route = useRoute()
-const osTheme = useOsTheme()
-const themeVars = useThemeVars()
-
-// 缓存动态包装组件，确保同一路由使用相同的组件定义（引用稳定）
-const dynamicComponentCache = new Map<string, Component>()
-
-/**
- * 为 DynamicWrapper 路由创建动态命名的包装组件
- * 这样 keep-alive 可以区分不同参数的动态路由
- */
-const wrapDynamicComponent = (Component: Component, route: any): Component => {
-  // 非 DynamicWrapper 路由直接返回原组件
-  if (!route.meta.isDynamicWrapper) {
-    return Component
-  }
-
-  // 生成动态组件名称
-  const dynamicComponentName = replaceDynamicName(route.meta.dynamicComponentNameTemplate as string, route.params)
-
-  // 从缓存中获取或创建包装组件
-  if (!dynamicComponentCache.has(dynamicComponentName)) {
-    dynamicComponentCache.set(
-      dynamicComponentName,
-      defineComponent({
-        name: dynamicComponentName,
-        setup() {
-          return () => h(Component)
-        }
-      })
-    )
-  }
-
-  return dynamicComponentCache.get(dynamicComponentName)!
-}
-
+// 初始化全局工具
 initStrixLoadingBar(useLoadingBar())
 initStrixMessage()
 
+// Stores
 const tabsBarStore = useTabsBarStore()
 const globalSettingsStore = useStrixSettingsStore()
-const loginInfoStore = useLoginInfoStore()
 
-const theme = computed(() => (globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme))
-const { loginInfo, loginTokenExpire } = storeToRefs(loginInfoStore) as LoginInfoStore
+// 主题相关
+const osTheme = useOsTheme()
+const currentTheme = computed(() => (globalSettingsStore.theme === 'auto' ? osTheme.value : globalSettingsStore.theme))
+const isLightTheme = computed(() => currentTheme.value === 'light')
 
-// 左侧菜单栏折叠
+// 使用 Composables
+const { menuRef, menuLoading, menuList, menuSelected, renderMenuLabel } = useHomeMenu()
+const { wrapDynamicComponent } = useDynamicComponent()
+useTokenRenewal()
+
+// 侧边栏折叠状态
 const siderCollapsed = ref(globalSettingsStore.siderCollapsed)
 watch(siderCollapsed, (value) => {
   globalSettingsStore.setSiderCollapsed(value)
 })
 
-// Token续期
-const renewToken = () => {
-  // 如果token过期时间小于30天，则续期  (yyyy-MM-dd格式的字符串)
-  if (
-    loginTokenExpire.value &&
-    new Date(loginTokenExpire.value).getTime() - new Date().getTime() < 30 * 24 * 60 * 60 * 1000
-  ) {
-    http.post('system/renewToken', null, { meta: { operate: '续期 Token ', notify: false } }).then(({ data: res }) => {
-      loginInfoStore.updateLoginInfo(res)
-      loginInfo.value = res.data.info
-    })
-  }
-}
-onMounted(renewToken)
-
-// 点击任意地方的全局通知
+// 全局点击事件
 const clickContainer = () => {
   EventBus.emit('click-container')
 }
+
 // 强制刷新所有组件
 const routerViewShow = ref(true)
 const reloadAll = () => {
@@ -191,75 +141,14 @@ const reloadAll = () => {
     routerViewShow.value = true
   })
 }
+
 onMounted(() => {
   EventBus.on('reload-all', reloadAll)
 })
 
-// 加载系统主菜单
-const menuRef = ref<MenuInst | null>(null)
-const menuLoading = ref(false)
-const menuList = ref<any[]>([])
-const getMenuList = () => {
-  menuLoading.value = true
-  http
-    .get('system/menus', { meta: { operate: '加载系统主菜单' } })
-    .then(({ data: res }) => {
-      menuList.value = handleMenuIconField(res.data.menuList)
-      syncCurrentSelectMenu()
-    })
-    .finally(() => {
-      menuLoading.value = false
-    })
-}
-onMounted(getMenuList)
-// 监听来自其他页面的刷新菜单事件
-onMounted(() => {
-  EventBus.on('refresh-menu', getMenuList)
+onUnmounted(() => {
+  EventBus.off('reload-all', reloadAll)
 })
-// 监听路由变化以同步menu选中项
-const menuSelected = ref('')
-const syncCurrentSelectMenu = () => {
-  if (menuList.value && menuList.value.length > 0) {
-    const currentMenu = deepSearch(menuList.value, route.path, 'url')
-    if (currentMenu) {
-      menuSelected.value = currentMenu.id
-      nextTick(() => menuRef.value?.showOption())
-    }
-  }
-}
-watch(() => route.path, syncCurrentSelectMenu, {
-  immediate: true
-})
-
-// 对系统菜单api的响应结果进行二次处理
-const handleMenuIconField = (list: any[]) => {
-  for (const child of list) {
-    if (child.icon) {
-      if (!child.iconName) {
-        // 在这里将icon组件根据name缓存，解决被反复渲染
-        child.iconName = child.icon
-      }
-      child.icon = () => {
-        return h(StrixIcon, { icon: kebabCase(child.iconName) })
-      }
-    } else {
-      child.icon = null
-    }
-    if (child.children.length > 0) {
-      handleMenuIconField(child.children)
-    } else {
-      child.children = null
-    }
-  }
-  return list
-}
-
-const renderMenuLabel = (option: MenuOption): any => {
-  if (!option.children) {
-    return h(RouterLink, { to: option.url as string }, { default: () => option.name })
-  }
-  return option.name
-}
 
 // 监听窗口大小变化
 useResizeDetector(document.getElementById('app'), (element) => {
@@ -299,10 +188,10 @@ useResizeDetector(document.getElementById('app'), (element) => {
         -webkit-user-drag: none;
         user-select: none;
         transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
 
-      .home-logo.light {
-        filter: invert(1) brightness(1);
+        &--light {
+          filter: invert(1) brightness(1);
+        }
       }
     }
 
@@ -375,27 +264,22 @@ useResizeDetector(document.getElementById('app'), (element) => {
     .home-content-view {
       user-select: text;
 
-      .strix-zoom-in-top-enter-active,
-      .strix-zoom-in-top-leave-active {
-        filter: none;
+      .strix-fade-slide-enter-active,
+      .strix-fade-slide-leave-active {
         transition:
-          filter 0.4s ease,
-          transform 0.4s ease;
+          opacity 0.25s var(--n-bezier),
+          transform 0.25s var(--n-bezier);
       }
 
-      .strix-zoom-in-top-enter-from,
-      .strix-zoom-in-top-leave-from {
-        filter: blur(20px);
+      .strix-fade-slide-enter-from {
+        opacity: 0;
+        transform: translateY(-8px);
       }
 
-      .strix-zoom-in-top-leave-active {
+      .strix-fade-slide-leave-active {
         display: none;
       }
     }
   }
-
-  /* .home-footer {
-    height: 100px;
-  } */
 }
 </style>
