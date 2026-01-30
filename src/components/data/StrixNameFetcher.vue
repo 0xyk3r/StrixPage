@@ -30,10 +30,10 @@ async function fetchName(dataType: string, dataId: string): Promise<string> {
         meta: { operate: '数据 ID 映射' }
       })
       .then(({ data: res }) => {
-        if (!res.data) {
+        if (!res.data || !res.data.name) {
           reject(new Error('数据 ID 映射失败'))
         }
-        resolve(res.data)
+        resolve(res.data.name)
       })
   })
 }

@@ -234,7 +234,7 @@ const calculateSize = () => {
 const getPicture = async () => {
   try {
     const { data: res } = await http.post(
-      'captcha/get',
+      'system/captcha/get',
       { captchaType: 'blockPuzzle' },
       { meta: { operate: '验证码获取', notify: false } }
     )
@@ -336,7 +336,7 @@ const verifyPosition = async () => {
 
   try {
     const { data: res } = await http.post(
-      'captcha/check',
+      'system/captcha/check',
       {
         captchaType: 'blockPuzzle',
         pointJson,
