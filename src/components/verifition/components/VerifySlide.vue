@@ -10,8 +10,8 @@
     >
       <!-- 背景图片 -->
       <img
-        v-if="backImgBase"
-        :src="`data:image/png;base64,${backImgBase}`"
+        v-if="originalImageBase64"
+        :src="`data:image/png;base64,${originalImageBase64}`"
         alt="验证背景"
         class="verify-slide__bg-image"
       />
@@ -25,15 +25,15 @@
 
       <!-- 提示信息 -->
       <Transition name="slide-up">
-        <div v-if="tipWords" :class="['verify-slide__tip', statusClass]">
+        <div v-if="tipMsg" :class="['verify-slide__tip', statusClass]">
           <StrixIcon :icon="tipIcon" :size="18" class="verify-slide__tip-icon" />
-          <span>{{ tipWords }}</span>
+          <span>{{ tipMsg }}</span>
         </div>
       </Transition>
 
       <!-- 滑块拼图块 -->
       <div
-        v-if="blockBackImgBase"
+        v-if="jigsawImageBase64"
         :style="{
           width: blockWidth + 'px',
           height: computedSize.imgHeight,
@@ -42,7 +42,7 @@
         }"
         class="verify-slide__puzzle-block"
       >
-        <img :src="`data:image/png;base64,${blockBackImgBase}`" alt="拼图块" class="verify-slide__puzzle-image" />
+        <img :src="`data:image/png;base64,${jigsawImageBase64}`" alt="拼图块" class="verify-slide__puzzle-image" />
       </div>
     </div>
 
@@ -91,6 +91,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { http } from '@/plugins/axios'
 import { aesEncrypt } from '@/components/verifition/utils/ase'
+import type { ApiResponse } from '@/@types/plugins/axios.ts'
 
 interface Props {
   imgSize?: {
@@ -109,6 +110,29 @@ interface Props {
   explain?: string
 }
 
+// 验证码API响应类型
+interface CaptchaGetData {
+  uuid: string
+  originalImageBase64: string
+  jigsawImageBase64: string
+  secretKey: string
+}
+
+interface CaptchaCheckData {
+  result: boolean
+  captchaVerification: string
+}
+
+type VerifyStatus = 'idle' | 'moving' | 'success' | 'error'
+
+// 常量定义
+const STANDARD_IMG_WIDTH = 310 // 标准图片宽度（用于坐标转换）
+const DEFAULT_BLOCK_WIDTH_BASE = 400 // 默认拼图块宽度基准
+const SLIDER_RADIUS = 50 // 滑块半径（像素）
+const SUCCESS_DELAY = 800 // 成功后延迟关闭时间（毫秒）
+const ERROR_DELAY = 1000 // 失败后延迟刷新时间（毫秒）
+const RESET_TRANSITION_DURATION = 300 // 重置动画时长（毫秒）
+
 const props = withDefaults(defineProps<Props>(), {
   imgSize: () => ({ width: '400px', height: '200px' }),
   blockSize: () => ({ width: '60px', height: '60px' }),
@@ -123,18 +147,18 @@ const emit = defineEmits<{
 
 // 响应式状态
 const barAreaRef = ref<HTMLElement | null>(null)
-const backImgBase = ref('')
-const blockBackImgBase = ref('')
-const backToken = ref('')
+const originalImageBase64 = ref('')
+const jigsawImageBase64 = ref('')
+const uuid = ref('')
 const secretKey = ref('')
 
 const moveBlockLeft = ref('0')
 const leftBarWidth = ref('0')
 const displayText = ref(props.explain)
 const finishText = ref('')
-const tipWords = ref('')
+const tipMsg = ref('')
 
-const status = ref<'idle' | 'moving' | 'success' | 'error'>('idle')
+const status = ref<VerifyStatus>('idle')
 const showRefresh = ref(true)
 
 const transitionLeft = ref('')
@@ -152,12 +176,11 @@ const computedSize = reactive({
   barHeight: '0'
 })
 
-// 拼图块宽度
+// 拼图块宽度（根据实际图片宽度按比例缩放）
 const blockWidth = computed(() => {
   const width = parseInt(props.blockSize.width)
-  // 根据实际图片宽度按比例计算
   const imgWidth = parseInt(computedSize.imgWidth)
-  return Math.floor((imgWidth * width) / 400)
+  return Math.floor((imgWidth * width) / DEFAULT_BLOCK_WIDTH_BASE)
 })
 
 // 滑块图标
@@ -197,9 +220,8 @@ const tipIcon = computed(() => {
 // 进度条填充宽度（延伸到滑块中心）
 const barFillWidth = computed(() => {
   if (!leftBarWidth.value || leftBarWidth.value === '0') return '0'
-  const sliderRadius = 50
   const currentWidth = parseInt(leftBarWidth.value)
-  return currentWidth + sliderRadius + 'px'
+  return currentWidth + SLIDER_RADIUS + 'px'
 })
 
 // 进度条样式类
@@ -231,37 +253,26 @@ const calculateSize = () => {
 }
 
 // 获取验证码图片
-const getPicture = async () => {
+const getCaptcha = async () => {
   try {
-    const { data: res } = await http.post(
+    const { data: res } = await http.post<ApiResponse<CaptchaGetData>>(
       'system/captcha/get',
       { captchaType: 'blockPuzzle' },
       { meta: { operate: '验证码获取', notify: false } }
     )
 
-    if (res.data.repCode === '0000') {
-      backImgBase.value = res.data.repData.originalImageBase64
-      blockBackImgBase.value = res.data.repData.jigsawImageBase64
-      backToken.value = res.data.repData.token
-      secretKey.value = res.data.repData.secretKey
+    if (res.data) {
+      uuid.value = res.data.uuid
+      originalImageBase64.value = res.data.originalImageBase64
+      jigsawImageBase64.value = res.data.jigsawImageBase64
+      secretKey.value = res.data.secretKey
     } else {
-      handleError(res.data)
+      tipMsg.value = res.msg || '获取验证码失败'
     }
   } catch (error) {
     console.error('获取验证码失败:', error)
-    tipWords.value = '获取验证码失败，请重试'
+    tipMsg.value = '获取验证码失败，请重试'
   }
-}
-
-// 处理错误响应
-const handleError = (data: any) => {
-  const errorMessages: Record<string, string> = {
-    '6113': '验证系统未初始化，请稍后重试',
-    '6201': '请求次数过多，请稍后重试',
-    '6202': '错误次数过多，请稍后重试',
-    '6204': '验证次数过多，请稍后重试'
-  }
-  tipWords.value = errorMessages[data.repCode] || data.repMsg || '验证失败'
 }
 
 // 获取客户端 X 坐标的辅助函数
@@ -322,33 +333,33 @@ const handleEnd = () => {
   document.removeEventListener('touchend', handleEnd)
 
   endMoveTime.value = Date.now()
-  verifyPosition()
+  checkCaptcha()
 }
 
 // 验证位置
-const verifyPosition = async () => {
+const checkCaptcha = async () => {
   const moveDistance = parseInt(moveBlockLeft.value)
-  // 将移动距离转换为标准310px下的距离
-  const standardDistance = (moveDistance * 310) / parseInt(computedSize.imgWidth)
+  // 将移动距离转换为标准图片宽度下的距离
+  const standardDistance = (moveDistance * STANDARD_IMG_WIDTH) / parseInt(computedSize.imgWidth)
 
-  const pointData = { x: standardDistance, y: 5.0 }
+  const pointData = { x: standardDistance, y: props.vSpace }
   const pointJson = secretKey.value ? aesEncrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
 
   try {
-    const { data: res } = await http.post(
+    const { data: res } = await http.post<ApiResponse<CaptchaCheckData>>(
       'system/captcha/check',
       {
         captchaType: 'blockPuzzle',
         pointJson,
-        token: backToken.value
+        uuid: uuid.value
       },
       { meta: { operate: '验证码校验', notify: false } }
     )
 
-    if (res.data.repCode === '0000') {
-      handleSuccess(pointData)
+    if (res.data?.result) {
+      handleSuccess(res.data.captchaVerification)
     } else {
-      handleVerifyError()
+      handleVerifyError(res.msg)
     }
   } catch (error) {
     console.error('验证失败:', error)
@@ -357,32 +368,28 @@ const verifyPosition = async () => {
 }
 
 // 验证成功
-const handleSuccess = (pointData: { x: number; y: number }) => {
+const handleSuccess = (captchaVerification: string) => {
   status.value = 'success'
   showRefresh.value = false
 
   const duration = ((endMoveTime.value - startMoveTime.value) / 1000).toFixed(2)
-  tipWords.value = `验证成功 ${duration}s`
+  tipMsg.value = `验证成功 ${duration}s`
   finishText.value = '验证通过'
 
-  const captchaVerification = secretKey.value
-    ? aesEncrypt(`${backToken.value}---${JSON.stringify(pointData)}`, secretKey.value)
-    : `${backToken.value}---${JSON.stringify(pointData)}`
-
   setTimeout(() => {
-    tipWords.value = ''
+    tipMsg.value = ''
     emit('success', { captchaVerification })
-  }, 800)
+  }, SUCCESS_DELAY)
 }
 
 // 验证失败
-const handleVerifyError = () => {
+const handleVerifyError = (errorMsg?: string) => {
   status.value = 'error'
-  tipWords.value = '验证失败，请重试'
+  tipMsg.value = errorMsg || '验证失败，请重试'
 
   setTimeout(() => {
     refresh()
-  }, 1000)
+  }, ERROR_DELAY)
 }
 
 // 刷新
@@ -390,21 +397,21 @@ const refresh = () => {
   showRefresh.value = true
   status.value = 'idle'
   finishText.value = ''
-  tipWords.value = ''
+  tipMsg.value = ''
 
-  transitionLeft.value = 'left 0.3s ease'
-  transitionWidth.value = 'width 0.3s ease'
+  transitionLeft.value = `left ${RESET_TRANSITION_DURATION / 1000}s ease`
+  transitionWidth.value = `width ${RESET_TRANSITION_DURATION / 1000}s ease`
 
   moveBlockLeft.value = '0'
   leftBarWidth.value = '0'
 
-  getPicture()
+  getCaptcha()
 
   setTimeout(() => {
     transitionLeft.value = ''
     transitionWidth.value = ''
     displayText.value = props.explain
-  }, 300)
+  }, RESET_TRANSITION_DURATION)
 }
 
 // 手动刷新按钮点击
@@ -416,7 +423,7 @@ const handleRefresh = () => {
 // 初始化
 const init = () => {
   calculateSize()
-  getPicture()
+  getCaptcha()
 }
 
 // 监听尺寸变化

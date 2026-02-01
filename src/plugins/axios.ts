@@ -11,6 +11,7 @@ import { storeToRefs } from 'pinia'
 import { parse as qsParse, stringify as qsStringify } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
 import { type Ref } from 'vue'
+import type { ApiResponse } from '@/@types/plugins/axios.ts'
 
 let loginInfoStore: ReturnType<typeof useLoginInfoStore> | null = null
 let httpCancelerStore: ReturnType<typeof useHttpCancelerStore> | null = null
@@ -95,7 +96,7 @@ axios.interceptors.request.use((config) => {
 
 // 响应拦截器
 axios.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse<ApiResponse>) => {
     // GET 请求默认不显示成功通知，POST 请求默认显示成功通知
     const showNotify =
       response.config.method === 'get' ? response.config.meta?.notify === true : response.config.meta?.notify !== false
@@ -115,7 +116,7 @@ axios.interceptors.response.use(
         response.config.meta?.operate || '响应',
         response.data
       )
-      if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
+      if (response.data.code !== 200 && response.config.responseType !== 'blob') {
         handleError(response)
       } else if (showNotify) {
         createStrixMessage('success', (response.config.meta?.operate || '操作') + '成功', '操作成功')
