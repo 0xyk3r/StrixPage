@@ -13,7 +13,7 @@
           </button>
         </div>
         <div class="verify-modal__content">
-          <VerifySlide
+          <CaptchaPuzzle
             ref="instance"
             :bar-size="barSize"
             :block-size="blockSize"
@@ -30,7 +30,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import VerifySlide from '@/components/verifition/components/VerifySlide.vue'
+import CaptchaPuzzle from '@/components/captcha/components/CaptchaPuzzle.vue'
 
 interface Props {
   mode?: 'pop' | 'fixed'
@@ -72,7 +72,7 @@ const emit = defineEmits<{
   success: [payload: any]
 }>()
 
-const instance = ref<InstanceType<typeof VerifySlide> | null>(null)
+const instance = ref<InstanceType<typeof CaptchaPuzzle> | null>(null)
 const clickShow = ref(false)
 
 const showBox = computed(() => {

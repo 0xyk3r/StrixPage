@@ -57,7 +57,7 @@
                 </n-form-item>
               </n-form>
 
-              <VerifyContainer
+              <CaptchaContainer
                 v-if="loginVerifyShowStatus"
                 ref="verifyRef"
                 :img-size="{ width: '400px', height: '200px' }"
@@ -65,7 +65,7 @@
                 @success="verifySuccess"
               />
               <div class="copyright">
-                Copyright &copy; 2024 ProjectAn Strix |
+                Copyright &copy; 2026 ProjectAn Strix |
                 <a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2022027076号-1</a>
               </div>
             </div>
@@ -77,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import VerifyContainer from '@/components/verifition/VerifyContainer.vue'
+import CaptchaContainer from '@/components/captcha/CaptchaContainer.vue'
 import { http } from '@/plugins/axios'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useTabsBarStore } from '@/stores/tabs-bar'
@@ -119,7 +119,7 @@ const loginFormRules = {
   ]
 }
 
-const verifyRef = ref<Ref<InstanceType<typeof VerifyContainer>> | null>(null)
+const verifyRef = ref<Ref<InstanceType<typeof CaptchaContainer>> | null>(null)
 const loginVerifyShowStatus = ref(false)
 
 const validateForm = (callback: () => void) => {

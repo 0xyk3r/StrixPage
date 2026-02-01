@@ -90,7 +90,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { http } from '@/plugins/axios'
-import { aesEncrypt } from '@/components/verifition/utils/ase'
+import { aesEncrypt } from '@/components/captcha/utils/captcha-aes.ts'
 import type { ApiResponse } from '@/@types/plugins/axios.ts'
 
 interface Props {
