@@ -39,6 +39,10 @@ encJsEncrypt.setPublicKey(serverPubKey)
 const decJsEncrypt = new JSEncrypt()
 decJsEncrypt.setPrivateKey(clientPriKey)
 
+// 清除已有的拦截器
+axios.interceptors.request.clear()
+axios.interceptors.response.clear()
+
 // 请求拦截器
 axios.interceptors.request.use((config) => {
   initStore()
