@@ -12,6 +12,7 @@ import { parse as qsParse, stringify as qsStringify } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
 import { type Ref } from 'vue'
 import type { ApiResponse } from '@/@types/plugins/axios.ts'
+import router from '@/router'
 
 let loginInfoStore: ReturnType<typeof useLoginInfoStore> | null = null
 let httpCancelerStore: ReturnType<typeof useHttpCancelerStore> | null = null
@@ -215,7 +216,14 @@ function handleError(response: AxiosResponse) {
     // 登录失效 清除登录信息并跳转到登录页
     if (response.data.code === 401) {
       loginInfoStore?.clearLoginInfo()
-      location.href = '/login?r=e&to=' + location.pathname
+      // noinspection JSIgnoredPromiseFromCall
+      router.replace({
+        path: '/login',
+        query: {
+          r: 'e',
+          to: router.currentRoute.value.fullPath
+        }
+      })
     }
   }
   createStrixMessage('error', errTitle, errMsg)
