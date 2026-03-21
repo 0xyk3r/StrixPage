@@ -96,10 +96,10 @@
         <n-form-item label="登录密码" path="loginPassword">
           <n-input
             v-model:value="addDataForm.loginPassword"
-            :maxlength="20"
+            type="password"
+            show-password-on="click"
             clearable
             placeholder="请输入登录密码"
-            show-count
           />
         </n-form-item>
         <n-form-item label="管理人员状态" path="status">
@@ -176,10 +176,10 @@
           <n-form-item label="登录密码" path="loginPassword">
             <n-input
               v-model:value="editDataForm.loginPassword"
-              :maxlength="20"
+              type="password"
+              show-password-on="click"
               clearable
               placeholder="请输入登录密码"
-              show-count
             />
           </n-form-item>
           <n-form-item label="管理人员状态" path="status">

@@ -40,6 +40,7 @@
                     placeholder="请输入登录密码"
                     size="large"
                     type="password"
+                    show-password-on="click"
                   />
                 </n-form-item>
                 <n-form-item>
