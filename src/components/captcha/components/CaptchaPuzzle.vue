@@ -90,7 +90,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { http } from '@/plugins/axios'
-import { aesEncrypt } from '@/components/captcha/utils/captcha-aes.ts'
+import { sm4Encrypt } from '@/components/captcha/utils/captcha-sm4.ts'
 import type { ApiResponse } from '@/@types/plugins/axios.ts'
 
 interface Props {
@@ -343,7 +343,7 @@ const checkCaptcha = async () => {
   const standardDistance = (moveDistance * STANDARD_IMG_WIDTH) / parseInt(computedSize.imgWidth)
 
   const pointData = { x: standardDistance, y: props.vSpace }
-  const pointJson = secretKey.value ? aesEncrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
+  const pointJson = secretKey.value ? sm4Encrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
 
   try {
     const { data: res } = await http.post<ApiResponse<CaptchaCheckData>>(
