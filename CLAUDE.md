@@ -4,122 +4,93 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-StrixPage is a Vue 3 admin dashboard for the ProjectAn Strix business platform. It uses Vue 3 + Vite + TypeScript with
-Naive UI as the component library.
+StrixPage is a Vue 3 admin dashboard for the ProjectAn Strix business platform. It uses TypeScript, Vite, Naive UI
+component library, and Pinia for state management. All UI text is in Chinese.
 
-## Common Commands
+## Commands
 
 ```bash
-# Install dependencies (uses pnpm)
-pnpm install
-
-# Development server (runs on port 19889)
-pnpm dev
-
-# Production build (runs type-check in parallel with build)
-pnpm build
-
-# Type checking only
-pnpm type-check
-
-# Linting (runs oxlint then eslint with auto-fix)
-pnpm lint
-
-# Format code with Prettier
-pnpm format
+pnpm dev          # Start dev server (0.0.0.0:19889)
+pnpm build        # Type-check (vue-tsc) + Vite build in parallel
+pnpm preview      # Preview production build
+pnpm lint         # Run oxlint + eslint --fix
+pnpm format       # Prettier formatting
+pnpm type-check   # vue-tsc type checking only
 ```
+
+Node requirement: ^20.19.0 or >=22.12.0
 
 ## Architecture
 
-### Core Stack
+### Key Technologies
 
-- **Vue 3** with Composition API (`<script setup>`)
-- **Pinia** for state management with `pinia-plugin-persistedstate` for localStorage persistence
-- **Vue Router** with route guards for authentication
-- **Naive UI** as the UI component library (auto-imported via unplugin-vue-components)
-- **Axios** with RSA/AES encryption for API communication
+- **Vue 3.5** with Composition API (`<script setup>`)
+- **Vite 7** with auto-import (Vue/Vue Router APIs) and auto-component registration (Naive UI)
+- **Pinia 3** with `pinia-plugin-persistedstate` (localStorage)
+- **Naive UI** as the sole component library
+- **Axios** with encryption for API communication
+- **ECharts 6** for data visualization
+- **lucide-vue-next** for icons
 - **SCSS** for styling
 
-### Directory Structure
+### Path Alias
 
-- `src/components/` - Reusable components organized by category:
-    - `common/` - Generic UI components (StrixBlock, StrixImage, StrixTag, etc.)
-    - `system/` - Layout components (StrixBreadcrumb, StrixTabBar, StrixToolBar)
-    - `icon/` - Icon components (StrixIcon) (dynamically load icon names using `lucide-vue-next`)
-    - `data/` - Data fetching components (StrixNameFetcher, StrixManagerSelector, StrixRoleSelector)
-- `src/stores/` - Pinia stores (login-info, dict, tabs-bar, notification, etc.)
-- `src/composables/` - Vue composables (useDict, usePagination, usePage)
-- `src/plugins/` - Axios setup and event bus
-- `src/utils/` - Utility functions
-- `src/directives/` - Custom Vue directives (v-auth for permissions)
-- `src/views/System/` - Admin pages organized by feature module
+`@/` maps to `./src/`
 
-### Key Patterns
+### Source Structure
 
-**Auto-imports**: Vue APIs (ref, computed, watch, etc.) and Naive UI composables (useDialog, useMessage, etc.) are
-auto-imported via `unplugin-auto-import`.
+- `src/components/common/` — Reusable components (`StrixBlock`, `StrixTag`, `StrixImage`, etc.)
+- `src/components/data/` — Data selection components (Manager/Role pickers, NameFetcher)
+- `src/composables/` — Composition utilities (`usePage`, `useDict`, `usePagination`, `useBaseUrl`, `useTokenRenewal`)
+- `src/directives/auth.ts` — `v-auth` directive for permission-based element visibility
+- `src/plugins/axios.ts` — Axios instance with SM2/SM4 encryption and SM3 request signing
+- `src/stores/` — Pinia stores (login-info, dict, strix-settings, tabs-bar, http-canceler, etc.)
+- `src/utils/` — Utility functions (table tools, date/file/region utils, dialog/message helpers)
+- `src/views/System/` — All system management views (User, Role, Menu, Dict, Monitor, etc.)
 
-**Path alias**: `@` maps to `src/` directory.
+### HTTP Communication (`plugins/axios.ts`)
 
-**Permission directive**: Use `v-auth` for permission-based rendering:
+All API requests go through `/api/` and are encrypted/signed:
 
-```vue
+- **Request encryption:** SM4 encrypts body (random key per request), SM2 encrypts the SM4 key with server's public key
+- **Request signing:** SM3 hash of `(params/body + url + timestamp)`
+- **Response decryption:** Reverse SM2+SM4 decryption
+- **Config meta:** `meta.operate` (logging label), `meta.notify` (success toast), `meta.requestGroup` (cancellation
+  group)
+- **Error handling:** 401 → clear auth & redirect to login; 429 → rate limit with retry-after
 
-<div v-auth="'system:user:update'">...</div>
-<div v-auth="['perm1', 'perm2']">...</div>
-<div v-auth.and="['perm1', 'perm2']">...</div>
-```
+### Permission System
 
-**HTTP client**: Import from `@/plugins/axios`:
+- Permissions stored as `loginInfo.permissionKeys` in format `module:resource:action`
+- `v-auth="'system:user:update'"` — single permission check
+- `v-auth="['perm1', 'perm2']"` — OR logic (default), use `.and` modifier for AND
+- Super permission: `*:*:*`
 
-```typescript
-import { http } from '@/plugins/axios'
-// Requests are automatically encrypted/signed
-const { data } = await http.get('endpoint', { meta: { operate: '操作名' } })
-```
+### View Component Pattern
 
-**Dictionary data**: Use the `useDict` composable for cached dictionary lookups:
+List views follow a consistent structure:
 
-```typescript
-import { useDict } from '@/composables/useDict'
+1. `StrixBlock` with search/filter controls (cleanable)
+2. `n-data-table` with remote pagination via `usePage` composable
+3. Add/Edit modals with `n-form` validation
 
-const dictData = useDict('dictKey')
-```
+### Auto-imports (no manual import needed)
 
-**Pagination**: Use `usePagination` composable with Naive UI tables.
+- Vue Composition API: `ref`, `computed`, `watch`, `onMounted`, etc.
+- Vue Router: `useRouter`, `useRoute`, etc.
+- Naive UI: `useDialog`, `useMessage`, `useNotification`, `useLoadingBar`
 
-### API Communication
+### Theming
 
-All HTTP requests go through `/api/` base URL with:
-
-- RSA encryption for request body (POST)
-- AES encryption for response data
-- MD5 signing for request validation
-- Automatic token injection from login store
-
-Environment variables for encryption keys are in `.env`:
-
-- `VITE_APP_CLIENT_PRIVATE_KEY`
-- `VITE_APP_SERVER_PUBLIC_KEY`
-- `VITE_APP_IV`
-
-### State Management
-
-Pinia stores use the setup function syntax with `persist` option:
-
-```typescript
-export const useExampleStore = defineStore('example', () => {
-  // state and actions
-}, { persist: { key: '$key', storage: localStorage } })
-```
+- Dark/Light mode with OS detection, switchable via event bus
+- Theme overrides configured in `App.vue`
 
 ### PWA Support
-
 The app supports PWA via `vite-plugin-pwa` with prompt-based updates. Service worker registration is handled
 automatically.
 
-## Development Notes
+## Code Style
 
-- Node.js requirement: `^20.19.0 || >=22.12.0`
-- Dev server runs on `0.0.0.0:19889`
-- Lucide icons are used via `lucide-vue-next`
+- **Formatting:** Prettier — no semicolons, single quotes, 120 char width, no trailing commas
+- **Linting:** ESLint + OXLint; `@typescript-eslint/no-explicit-any` is disabled
+- **SCSS:** Global styles in `src/assets/style/`, component styles use `<style lang="scss" scoped>`
