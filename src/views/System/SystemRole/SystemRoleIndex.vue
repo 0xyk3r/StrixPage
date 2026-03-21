@@ -381,7 +381,7 @@ const addData = () => {
 const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
-    { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
+    { min: 2, max: 16, message: '角色名称长度需在2-16之间', trigger: 'blur' }
   ]
 }
 const showEditDataModal = (id: string) => {
