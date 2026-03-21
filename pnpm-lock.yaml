@@ -23,9 +23,6 @@ importers:
       element-resize-detector:
         specifier: ^1.2.4
         version: 1.2.4
-      jsencrypt:
-        specifier: ^3.5.4
-        version: 3.5.4
       lodash-es:
         specifier: ^4.17.23
         version: 4.17.23
@@ -47,6 +44,9 @@ importers:
       screenfull:
         specifier: ^6.0.2
         version: 6.0.2
+      sm-crypto:
+        specifier: ^0.4.0
+        version: 0.4.0
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -2258,8 +2258,8 @@ packages:
     resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
-  jsencrypt@3.5.4:
-    resolution: {integrity: sha512-kNjfYEMNASxrDGsmcSQh/rUTmcoRfSUkxnAz+MMywM8jtGu+fFEZ3nJjHM58zscVnwR0fYmG9sGkTDjqUdpiwA==}
+  jsbn@1.1.0:
+    resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
 
   jsesc@3.1.0:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
@@ -2998,6 +2998,9 @@ packages:
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  sm-crypto@0.4.0:
+    resolution: {integrity: sha512-OexH2V1EqmhXuOIPGoCl55OjMF0wwPUM/zhUjT0Q6vHBeopSRvTNRy76/1eRoFs3VBKt39hdFnxwpFmooHYa2A==}
 
   smob@1.5.0:
     resolution: {integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==}
@@ -5719,7 +5722,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jsencrypt@3.5.4: {}
+  jsbn@1.1.0: {}
 
   jsesc@3.1.0: {}
 
@@ -6431,6 +6434,10 @@ snapshots:
       side-channel-weakmap: 1.0.2
 
   signal-exit@4.1.0: {}
+
+  sm-crypto@0.4.0:
+    dependencies:
+      jsbn: 1.1.0
 
   smob@1.5.0: {}
 
