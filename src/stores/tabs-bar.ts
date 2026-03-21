@@ -1,11 +1,33 @@
 import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { defineStore } from 'pinia'
-import type { RouteLocationNormalizedGeneric } from 'vue-router'
+import type { HistoryState, RouteLocationNormalizedGeneric } from 'vue-router'
+
+// Vue Router 内部使用的 history.state 键，需要过滤掉
+const VUE_ROUTER_STATE_KEYS = new Set(['back', 'current', 'forward', 'position', 'replaced', 'scroll'])
+
+/**
+ * 从 window.history.state 中提取用户自定义的 state（排除 Vue Router 内部键）
+ */
+function extractUserState(): HistoryState | undefined {
+  const fullState = window.history.state
+  if (!fullState) return undefined
+  const userState: HistoryState = {}
+  let hasUserState = false
+  for (const key of Object.keys(fullState)) {
+    if (!VUE_ROUTER_STATE_KEYS.has(key)) {
+      userState[key] = fullState[key]
+      hasUserState = true
+    }
+  }
+  return hasUserState ? userState : undefined
+}
 
 export const useTabsBarStore = defineStore('tabsBar', () => {
   const visitedRoutes = ref<any[]>([])
   const refreshRoutes = ref<any[]>([])
   const cacheDynamicComponents = ref<string[]>([])
+  // 存储每个路由路径对应的用户自定义 history.state
+  const routeHistoryStateMap = new Map<string, HistoryState>()
 
   const cachedRouteNames = computed(() => {
     return visitedRoutes.value
@@ -42,11 +64,30 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
   }
 
   /**
+   * 保存当前路由的用户自定义 history.state
+   * 在每次路由变化后调用，确保 state 不会因标签页切换丢失
+   */
+  function saveRouteState(routePath: string) {
+    const userState = extractUserState()
+    if (userState) {
+      routeHistoryStateMap.set(routePath, userState)
+    }
+  }
+
+  /**
+   * 获取指定路由路径存储的用户自定义 state
+   */
+  function getRouteState(routePath: string): HistoryState | undefined {
+    return routeHistoryStateMap.get(routePath)
+  }
+
+  /**
    * 删除指定路由
    * @param route 路由
    */
   function delVisitedRoute(route: RouteLocationNormalizedGeneric) {
     visitedRoutes.value = visitedRoutes.value.filter((item) => item.path !== route.path)
+    routeHistoryStateMap.delete(route.path)
   }
 
   /**
@@ -54,6 +95,11 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * @param route 路由
    */
   function delOthersVisitedRoute(route: RouteLocationNormalizedGeneric) {
+    visitedRoutes.value.forEach((item) => {
+      if (item.path !== route.path && !item.meta.fixed) {
+        routeHistoryStateMap.delete(item.path)
+      }
+    })
     visitedRoutes.value = visitedRoutes.value.filter((item) => item.path === route.path || item.meta.fixed)
   }
 
@@ -64,6 +110,11 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
   function delLeftVisitedRoute(route: RouteLocationNormalizedGeneric) {
     const index = visitedRoutes.value.findIndex((item) => item.path === route.path)
     if (index !== -1) {
+      visitedRoutes.value.forEach((item, i) => {
+        if (i < index && !item.meta.fixed) {
+          routeHistoryStateMap.delete(item.path)
+        }
+      })
       visitedRoutes.value = visitedRoutes.value.filter((item, i) => i >= index || item.meta.fixed)
     }
   }
@@ -75,6 +126,11 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
   function delRightVisitedRoute(route: RouteLocationNormalizedGeneric) {
     const index = visitedRoutes.value.findIndex((item) => item.path === route.path)
     if (index !== -1) {
+      visitedRoutes.value.forEach((item, i) => {
+        if (i > index && !item.meta.fixed) {
+          routeHistoryStateMap.delete(item.path)
+        }
+      })
       visitedRoutes.value = visitedRoutes.value.filter((item, i) => i <= index || item.meta.fixed)
     }
   }
@@ -83,6 +139,11 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * 删除所有路由
    */
   function delAllVisitedRoutes() {
+    visitedRoutes.value.forEach((item) => {
+      if (!item.meta.fixed) {
+        routeHistoryStateMap.delete(item.path)
+      }
+    })
     visitedRoutes.value = visitedRoutes.value.filter((item) => item.meta.fixed)
   }
 
@@ -156,6 +217,8 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
     delRightVisitedRoute,
     delAllVisitedRoutes,
     addRefreshRoutes,
-    updateVisitedRouteTitle
+    updateVisitedRouteTitle,
+    saveRouteState,
+    getRouteState
   }
 })

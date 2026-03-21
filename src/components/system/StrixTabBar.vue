@@ -162,6 +162,8 @@ const setupTabs = () => {
   const { name, meta } = route
   if (name && meta.title && !meta.empty) {
     tabsBarStore.addVisitedRoute(route)
+    // 保存路由的 history.state，防止标签页切换时丢失
+    tabsBarStore.saveRouteState(route.path)
   }
   // 设置当前激活的标签页
   nextTick(() => {
@@ -175,7 +177,8 @@ watch(() => route.path, setupTabs, { immediate: true })
 const handleTabClick = (tabKey: string) => {
   const r = visitedRoutes.value.find((item) => getRouteKey(item) === tabKey)
   if (r?.path !== route.path) {
-    router.push({ path: r.path, query: r.query })
+    const state = tabsBarStore.getRouteState(r.path)
+    router.push({ path: r.path, query: r.query, state })
   }
 }
 
@@ -188,12 +191,16 @@ const closeTab = async (tabKey: string) => {
     if (isActive(view)) {
       if (index - 1 < 0) {
         if (visitedRoutes.value.length > 1) {
-          await router.push(visitedRoutes.value[index + 1])
+          const target = visitedRoutes.value[index + 1]
+          const state = tabsBarStore.getRouteState(target.path)
+          await router.push({ path: target.path, query: target.query, state })
         } else {
           await router.push('/')
         }
       } else {
-        await router.push(visitedRoutes.value[index - 1])
+        const target = visitedRoutes.value[index - 1]
+        const state = tabsBarStore.getRouteState(target.path)
+        await router.push({ path: target.path, query: target.query, state })
       }
     }
     tabsBarStore.delVisitedRoute(view)
