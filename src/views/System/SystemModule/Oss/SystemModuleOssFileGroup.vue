@@ -195,7 +195,7 @@
     <n-modal v-model:show="uploadModalShow" class="strix-form-modal" preset="card" size="huge" title="上传文件">
       <n-upload
         :action="uploadUrl"
-        :headers="{ token: loginToken }"
+        :headers="{ Authorization: `Bearer ${loginToken}` }"
         :max="5"
         :show-remove-button="false"
         directory-dnd
@@ -224,9 +224,14 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
+import { storeToRefs } from 'pinia'
 
 // 本页面操作提示关键词
 const _baseName = '文件分组'
+
+const loginInfoStore = useLoginInfoStore()
+const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
 
 // 加载字典
 const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')

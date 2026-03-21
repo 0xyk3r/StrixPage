@@ -41,8 +41,10 @@ axios.interceptors.response.clear()
 axios.interceptors.request.use((config) => {
   initStore()
   config.headers['Content-Type'] = 'application/json'
-  config.headers.token = token?.value
   config.headers.timestamp = new Date().getTime() + ''
+  if (token?.value) {
+    config.headers.Authorization = `Bearer ${token.value}`
+  }
 
   // 支持取消请求
   if (config.meta?.requestGroup) {
