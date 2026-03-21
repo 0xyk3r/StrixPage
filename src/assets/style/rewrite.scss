@@ -8,23 +8,28 @@
 }
 
 // n-table 数据载入动画
-@for $n from 0 through 100 {
-  .n-data-table-tbody {
-    .n-data-table-tr:nth-child(#{$n}) {
-      opacity: 0;
-      animation: animation-table-tr 360ms $n * 30ms forwards ease-out;
-    }
+// 前 $_max-stagger 行使用交错延迟产生波浪效果，之后的行立即渐入
+$_max-stagger: 20;
+$_stagger-step: 18ms;
+$_anim-duration: 280ms;
+
+.n-data-table-tbody .n-data-table-tr {
+  animation: animation-table-tr $_anim-duration both ease-out;
+}
+
+@for $n from 1 through $_max-stagger {
+  .n-data-table-tbody .n-data-table-tr:nth-child(#{$n}) {
+    animation-delay: #{($n - 1) * $_stagger-step};
   }
 }
 
 @keyframes animation-table-tr {
-  0% {
-    transform: translateX(-30px);
-    opacity: 0.1;
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
-
-  100% {
-    transform: translateX(0);
+  to {
     opacity: 1;
+    transform: none;
   }
 }
