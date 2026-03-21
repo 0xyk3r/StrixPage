@@ -77,45 +77,19 @@ const clearSearch = () => {
 }
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'operationGroup', title: '操作分组', width: 120 },
+  { key: 'operationGroup', title: '操作模块', width: 140, ellipsis: { tooltip: true } },
   {
     key: 'operationName',
     title: '操作名称',
-    width: 240,
-    ellipsis: {
-      tooltip: {
-        width: 'trigger'
-      }
-    }
-  },
-  {
-    key: 'operationSpend',
-    title: '响应时间',
-    width: 100,
-    align: 'center',
-    render(row: any) {
-      const type: NTagType =
-        row.operationSpend < 100
-          ? 'success'
-          : row.operationSpend < 200
-            ? 'info'
-            : row.operationSpend < 500
-              ? 'warning'
-              : 'error'
-      return h(
-        NTag,
-        { type, bordered: false },
-        {
-          default: () => row.operationSpend + 'ms'
-        }
-      )
-    }
+    width: 180,
+    ellipsis: { tooltip: true }
   },
   {
     key: 'operationMethod',
     title: '请求方式',
-    width: 100,
+    width: 90,
     align: 'center',
+    ellipsis: { tooltip: false },
     render(row: any) {
       return h(
         NTag,
@@ -129,20 +103,20 @@ const dataColumns: DataTableColumns = [
   {
     key: 'operationUrl',
     title: '请求地址',
-    width: 240,
+    width: 200,
     ellipsis: {
       tooltip: {
-        width: 'trigger'
+        contentStyle: { maxWidth: '480px' }
       }
     }
   },
   {
     key: 'operationParam',
     title: '操作参数',
-    width: 360,
+    width: 200,
     ellipsis: {
       tooltip: {
-        width: 'trigger'
+        contentStyle: { maxWidth: '720px' }
       }
     }
   },
@@ -150,31 +124,63 @@ const dataColumns: DataTableColumns = [
     key: 'clientUsername',
     title: '操作用户',
     width: 120,
-    ellipsis: {
-      tooltip: true
-    }
+    ellipsis: { tooltip: true }
   },
   {
     key: 'clientIp',
     title: '操作IP',
-    width: 120,
-    ellipsis: {
-      tooltip: true
-    }
+    width: 100,
+    ellipsis: { tooltip: true }
   },
   {
     key: 'clientDevice',
     title: '操作设备',
     width: 120,
-    ellipsis: {
-      tooltip: true
+    ellipsis: { tooltip: true }
+  },
+  { key: 'operationTime', title: '发生时间', width: 180 },
+  {
+    key: 'operationSpend',
+    title: '响应时间',
+    width: 90,
+    align: 'center',
+    ellipsis: { tooltip: false },
+    render(row: any) {
+      let type: NTagType
+      if (row.operationMethod === 'GET') {
+        type =
+          row.operationSpend < 500
+            ? 'success'
+            : row.operationSpend < 1500
+              ? 'info'
+              : row.operationSpend < 5000
+                ? 'warning'
+                : 'error'
+      } else {
+        type =
+          row.operationSpend < 2000
+            ? 'success'
+            : row.operationSpend < 5000
+              ? 'info'
+              : row.operationSpend < 10000
+                ? 'warning'
+                : 'error'
+      }
+      return h(
+        NTag,
+        { type, bordered: false },
+        {
+          default: () => (row.operationSpend ? row.operationSpend + 'ms' : '失败')
+        }
+      )
     }
   },
   {
     key: 'responseCode',
     title: '响应状态',
-    width: 120,
+    width: 90,
     align: 'center',
+    ellipsis: { tooltip: false },
     render(row: any) {
       let type: NTagType = 'warning'
       if (row.responseCode === 200) {
@@ -191,7 +197,16 @@ const dataColumns: DataTableColumns = [
       )
     }
   },
-  { key: 'operationTime', title: '发生时间', width: 180 }
+  {
+    key: 'responseMsg',
+    title: '响应消息',
+    width: 200,
+    ellipsis: {
+      tooltip: {
+        contentStyle: { maxWidth: '480px' }
+      }
+    }
+  }
 ]
 // 分页配置
 const dataPagination = usePagination(getDataListParams, () => {
