@@ -486,7 +486,20 @@ const addDataRules: FormRules = {
   ],
   loginPassword: [
     { required: true, message: '请输入登录密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '登录密码长度需在6-20之间', trigger: 'blur' }
+    { min: 8, max: 32, message: '登录密码长度需在8-32之间', trigger: 'blur' },
+    {
+      validator: (_rule: any, value: string) => {
+        if (!value) return true
+        let categories = 0
+        if (/[A-Z]/.test(value)) categories++
+        if (/[a-z]/.test(value)) categories++
+        if (/\d/.test(value)) categories++
+        if (/[^A-Za-z0-9]/.test(value)) categories++
+        return categories >= 3
+      },
+      message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
+      trigger: 'blur'
+    }
   ],
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
@@ -515,7 +528,22 @@ const editDataRules: FormRules = {
     { required: true, message: '请输入登录账号', trigger: 'blur' },
     { min: 4, max: 20, message: '登录账号长度需在4-20之间', trigger: 'blur' }
   ],
-  loginPassword: [{ min: 6, max: 20, message: '登录密码长度需在6-20之间', trigger: 'blur' }],
+  loginPassword: [
+    { min: 8, max: 32, message: '登录密码长度需在8-32之间', trigger: 'blur' },
+    {
+      validator: (_rule: any, value: string) => {
+        if (!value) return true
+        let categories = 0
+        if (/[A-Z]/.test(value)) categories++
+        if (/[a-z]/.test(value)) categories++
+        if (/\d/.test(value)) categories++
+        if (/[^A-Za-z0-9]/.test(value)) categories++
+        return categories >= 3
+      },
+      message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
+      trigger: 'blur'
+    }
+  ],
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
 }
