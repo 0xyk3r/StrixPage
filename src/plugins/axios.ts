@@ -325,7 +325,6 @@ function paramsSignGet(url: string, params: any, timestamp: any): string {
     paramsJson = JSON.stringify(filtered)
   }
   const content = paramsJson + '|' + url + '|' + timestamp
-  console.log('GET 签名数据', content)
   return sm3(content)
 }
 
