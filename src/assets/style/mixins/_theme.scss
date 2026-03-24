@@ -1,0 +1,121 @@
+// ============================================================
+// Nebula Design System — Theme Mixin
+// ============================================================
+// 提供主题相关的 mixin, 用于在组件中应用主题感知样式
+
+@use '../tokens/colors' as c;
+
+// 在 dark 主题下应用样式
+@mixin dark {
+  [data-theme='dark'] & {
+    @content;
+  }
+}
+
+// 在 light 主题下应用样式
+@mixin light {
+  [data-theme='light'] & {
+    @content;
+  }
+}
+
+// 主题感知属性: 一次性设置 dark/light 值
+// 用法: @include theme-prop(background, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+@mixin theme-prop($property, $dark-value, $light-value) {
+  [data-theme='dark'] & {
+    #{$property}: $dark-value;
+  }
+  [data-theme='light'] & {
+    #{$property}: $light-value;
+  }
+}
+
+// 生成 CSS Custom Properties 的主题值映射
+// 注入到 :root 或 [data-theme] 选择器
+@mixin inject-dark-theme-vars {
+  // 背景
+  --strix-bg-base: #{c.$dark-bg-base};
+  --strix-bg-elevated: #{c.$dark-bg-elevated};
+  --strix-bg-surface: #{c.$dark-bg-surface};
+  --strix-bg-surface-hover: #{c.$dark-bg-surface-hover};
+  --strix-bg-overlay: #{c.$dark-bg-overlay};
+
+  // 边框
+  --strix-border-subtle: #{c.$dark-border-subtle};
+  --strix-border-default: #{c.$dark-border-default};
+  --strix-border-accent: #{c.$dark-border-accent};
+  --strix-border-accent-hover: #{c.$dark-border-accent-hover};
+
+  // 文字
+  --strix-text-primary: #{c.$dark-text-primary};
+  --strix-text-secondary: #{c.$dark-text-secondary};
+  --strix-text-tertiary: #{c.$dark-text-tertiary};
+  --strix-text-dim: #{c.$dark-text-dim};
+  --strix-text-muted: #{c.$dark-text-muted};
+  --strix-text-accent: #{c.$dark-text-accent};
+
+  // 语义色
+  --strix-color-accent: #{c.$color-accent-green};
+  --strix-color-accent-secondary: #{c.$color-accent-teal};
+  --strix-color-success: #{c.$color-success};
+  --strix-color-warning: #{c.$color-warning};
+  --strix-color-error: #{c.$color-error};
+  --strix-color-info: #{c.$color-info};
+
+  // 组件特定
+  --strix-glass-bg: rgba(12, 14, 24, 0.88);
+  --strix-glass-border: rgba(99, 226, 183, 0.06);
+  --strix-accent-glow: rgba(99, 226, 183, 0.12);
+  --strix-accent-glow-subtle: rgba(99, 226, 183, 0.06);
+
+  // Logo 渐变
+  --strix-logo-gradient: linear-gradient(135deg, #a7f3d0 0%, #63e2b7 40%, #4ecdc4 70%, #d1fae5 100%);
+
+  // 选中色
+  --strix-selection-bg: rgba(0, 196, 182, 0.75);
+  --strix-selection-color: #f7f7f7;
+}
+
+@mixin inject-light-theme-vars {
+  // 背景
+  --strix-bg-base: #{c.$light-bg-base};
+  --strix-bg-elevated: #{c.$light-bg-elevated};
+  --strix-bg-surface: #{c.$light-bg-surface};
+  --strix-bg-surface-hover: #{c.$light-bg-surface-hover};
+  --strix-bg-overlay: #{c.$light-bg-overlay};
+
+  // 边框
+  --strix-border-subtle: #{c.$light-border-subtle};
+  --strix-border-default: #{c.$light-border-default};
+  --strix-border-accent: #{c.$light-border-accent};
+  --strix-border-accent-hover: #{c.$light-border-accent-hover};
+
+  // 文字
+  --strix-text-primary: #{c.$light-text-primary};
+  --strix-text-secondary: #{c.$light-text-secondary};
+  --strix-text-tertiary: #{c.$light-text-tertiary};
+  --strix-text-dim: #{c.$light-text-dim};
+  --strix-text-muted: #{c.$light-text-muted};
+  --strix-text-accent: #{c.$light-text-accent};
+
+  // 语义色 (light 下稍调整)
+  --strix-color-accent: #{c.$light-text-accent};
+  --strix-color-accent-secondary: #3bb5a5;
+  --strix-color-success: #2db48c;
+  --strix-color-warning: #d4930d;
+  --strix-color-error: #d03050;
+  --strix-color-info: #2080f0;
+
+  // 组件特定
+  --strix-glass-bg: rgba(255, 255, 255, 0.85);
+  --strix-glass-border: rgba(0, 0, 0, 0.08);
+  --strix-accent-glow: rgba(45, 180, 140, 0.1);
+  --strix-accent-glow-subtle: rgba(45, 180, 140, 0.05);
+
+  // Logo 渐变
+  --strix-logo-gradient: linear-gradient(135deg, #065f46 0%, #2db48c 40%, #0d9488 70%, #064e3b 100%);
+
+  // 选中色
+  --strix-selection-bg: rgba(0, 196, 182, 0.35);
+  --strix-selection-color: #1a1a2e;
+}

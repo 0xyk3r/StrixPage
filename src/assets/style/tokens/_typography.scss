@@ -1,0 +1,44 @@
+// ============================================================
+// Nebula Design System — Typography Tokens
+// ============================================================
+
+// ---- 字体族 ----
+// 显示/标题字体 — Outfit: 几何感、现代
+$font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+// 正文字体 — Manrope: 清晰、优雅
+$font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+// 等宽字体 — Geist Mono: 代码/快捷键
+$font-mono: 'Geist Mono', 'Fira Code', 'JetBrains Mono', monospace;
+
+// ---- 字号 ----
+$text-2xs: 10px;
+$text-xs: 11px;
+$text-sm: 12px;
+$text-base: 13px;
+$text-md: 14px;
+$text-lg: 16px;
+$text-xl: 18px;
+$text-2xl: 22px;
+$text-3xl: 28px;
+$text-4xl: 34px;
+
+// ---- 字重 ----
+$weight-light: 300;
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+$weight-extrabold: 800;
+
+// ---- 行高 ----
+$leading-tight: 1.2;
+$leading-snug: 1.35;
+$leading-normal: 1.5;
+$leading-relaxed: 1.7;
+
+// ---- 字间距 ----
+$tracking-tight: -0.01em;
+$tracking-normal: 0;
+$tracking-wide: 0.04em;
+$tracking-wider: 0.08em;
+$tracking-widest: 0.15em;

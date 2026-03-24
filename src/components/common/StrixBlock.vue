@@ -1,46 +1,40 @@
 <template>
-  <n-el
-    :class="[{ hover: hovering }]"
-    class="strix-block"
-    tag="div"
+  <div
+    :class="['strix-block', { expanded: isExpanded, hovering }]"
     @mouseenter="hovering = true"
     @mouseleave="hovering = false"
   >
-    <div class="strix-block-body">
+    <!-- 主内容区 -->
+    <div class="strix-block__body">
       <slot name="body" />
     </div>
-    <div v-show="cleanable || $slots.default" class="strix-block-more">
-      <div v-if="$slots.default" class="strix-block-more-body">
+
+    <!-- 可展开高级区域 -->
+    <div v-if="cleanable || $slots.default" ref="moreRef" class="strix-block__more">
+      <div v-if="$slots.default" ref="moreBodyRef" class="strix-block__more-inner">
         <slot />
       </div>
     </div>
-    <div
-      v-show="cleanable || $slots.default"
-      :class="{ 'is-fixed': fixedControl }"
-      class="strix-block-control"
-      @click="switchExpand"
-    >
-      <StrixIcon v-if="$slots.default" :icon="isExpanded ? 'chevron-up' : 'chevron-down'" inline />
-      <transition name="text-slide">
-        <span v-if="$slots.default" v-show="hovering">{{ isExpanded ? '收起' : '显示全部' }}</span>
-      </transition>
-      <!-- 左侧按钮 -->
-      <div class="control-button-container left">
-        <n-button
-          v-if="cleanable"
-          :quaternary="!isSmallWindow"
-          :tertiary="isSmallWindow"
-          type="error"
-          @click.stop="$emit('clear')"
-        >
-          {{ isSmallWindow ? '清除' : '清除搜索条件' }}
-        </n-button>
-      </div>
-      <!-- 右侧按钮 -->
-      <div class="control-button-container right" />
+
+    <!-- 控制栏 -->
+    <div v-if="cleanable || $slots.default" :class="['strix-block__control', { 'is-fixed': isExpanded }]">
+      <!-- 清除按钮 -->
+      <button v-if="cleanable" class="strix-block__clear" @click.stop="$emit('clear')">
+        <StrixIcon icon="x-circle" :size="13" />
+        <span>{{ isSmallWindow ? '清除' : '清除搜索条件' }}</span>
+      </button>
+
+      <!-- 展开/折叠触发器 -->
+      <button v-if="$slots.default" class="strix-block__toggle" @click="switchExpand">
+        <span class="strix-block__toggle-text">{{ isExpanded ? '收起筛选' : '展开筛选' }}</span>
+        <span :class="['strix-block__toggle-icon', { flipped: isExpanded }]">
+          <StrixIcon icon="chevron-down" :size="14" />
+        </span>
+      </button>
     </div>
-  </n-el>
+  </div>
 </template>
+
 <script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
 import { storeToRefs } from 'pinia'
@@ -51,131 +45,148 @@ defineProps({
 defineEmits(['clear'])
 const slots = useSlots()
 
-const { proxy } = getCurrentInstance() as any
 const globalSettingsStore = useStrixSettingsStore()
 const { isSmallWindow } = storeToRefs(globalSettingsStore)
 
-const moreElement = () => proxy.$el.querySelector('.strix-block-more')
-const moreBodyElement = () => proxy.$el.querySelector('.strix-block-more-body')
-
+const moreRef = ref<HTMLElement>()
+const moreBodyRef = ref<HTMLElement>()
 const hovering = ref(false)
-const fixedControl = ref(true)
-// 是否展开
+
 const isExpanded = ref(false)
 const switchExpand = () => {
   if (slots.default) {
     isExpanded.value = !isExpanded.value
   }
 }
+
 watch(isExpanded, (val) => {
-  const newMoreBodyHeight = moreBodyElement()?.clientHeight + 20 || 0
-  moreElement().style.height = val ? `${newMoreBodyHeight + 1}px` : '0'
-  fixedControl.value = val
+  if (!moreRef.value || !moreBodyRef.value) return
+  const contentHeight = moreBodyRef.value.scrollHeight
+  moreRef.value.style.height = val ? `${contentHeight}px` : '0'
 })
 </script>
 <style lang="scss" scoped>
 .strix-block {
-  margin-bottom: 20px;
-  background-color: var(--card-color);
-  border: solid 1px var(--border-color);
-  border-radius: var(--border-radius);
-  transition: all 0.3s var(--n-bezier);
+  position: relative;
+  margin-bottom: $space-4;
+  border-radius: $radius-lg;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  transition:
+    border-color $duration-normal $ease-out-smooth,
+    box-shadow $duration-normal $ease-out-smooth;
 
-  &.hover {
-    box-shadow: var(--box-shadow-1);
-
-    .strix-block-control .strix-icon {
-      transform: translateX(-40px);
-    }
+  &.hovering {
+    border-color: var(--strix-border-default);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
   }
 
-  .strix-block-body {
-    padding: 15px;
+  &.expanded {
+    border-color: var(--strix-border-accent);
+    box-shadow:
+      0 0 0 1px var(--strix-border-accent),
+      0 4px 20px rgba(0, 0, 0, 0.06);
   }
+}
 
-  .strix-block-more {
-    height: 0;
-    overflow: hidden;
-    background-color: var(--card-color);
-    border-top: solid 1px var(--border-color);
-    transition: all 0.3s var(--n-bezier);
+// ---- 主体内容 ----
+.strix-block__body {
+  padding: $space-4;
+}
 
-    .strix-block-more-body {
-      margin: 10px;
-      padding: 10px;
-      box-sizing: border-box;
-      word-break: break-word;
-      color: var(--text-color-3);
-      font-size: var(--font-size);
-      line-height: var(--line-height);
-      background-color: var(--card-color);
-      transition: all 0.3s var(--n-bezier);
-    }
+// ---- 可展开区域 ----
+.strix-block__more {
+  height: 0;
+  overflow: hidden;
+  transition: height $duration-normal $ease-out-smooth;
+}
+
+.strix-block__more-inner {
+  padding: 0 $space-4 $space-3;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity $duration-normal $ease-out-smooth,
+    transform $duration-normal $ease-out-smooth;
+
+  .expanded & {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  .strix-block-control {
-    height: 44px;
-    margin-top: -1px;
-    text-align: center;
-    color: var(--text-color-3);
-    background-color: var(--card-color);
-    border-bottom-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-    border-top: solid 1px var(--border-color);
-    cursor: pointer;
-    position: relative;
-    box-sizing: border-box;
-    transition: all 0.3s var(--n-bezier);
+// ---- 控制栏 ----
+.strix-block__control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 $space-3;
+  border-top: 1px solid var(--strix-border-subtle);
+  border-radius: 0 0 $radius-lg $radius-lg;
+  background: var(--strix-bg-surface);
+  gap: $space-2;
 
-    &:hover:not(:has(.control-button-container:hover)) {
-      color: var(--primary-color);
-      background-color: var(--tag-color);
-    }
+  &.is-fixed {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
+}
 
-    &.is-fixed {
-      position: sticky;
-      bottom: 0;
-    }
+// ---- 清除按钮 ----
+.strix-block__clear {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: 4px $space-2;
+  border-radius: $radius-sm;
+  border: none;
+  background: transparent;
+  color: var(--strix-color-error);
+  font-size: $text-xs;
+  cursor: pointer;
+  transition: all $duration-fast;
+  opacity: 0.7;
 
-    .strix-icon {
-      height: 100%;
-      transition: all 0.3s var(--n-bezier);
-    }
+  &:hover {
+    opacity: 1;
+    background: rgba($color-error, 0.08);
+  }
+}
 
-    > span {
-      position: absolute;
-      line-height: 44px;
-      display: inline-block;
-      transform: translateX(-30px);
-      transition: all 0.3s var(--n-bezier);
-    }
+// ---- 展开/折叠按钮 ----
+.strix-block__toggle {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: 4px $space-3;
+  border-radius: $radius-pill;
+  border: none;
+  background: transparent;
+  color: var(--strix-text-muted);
+  font-size: $text-xs;
+  cursor: pointer;
+  transition: all $duration-fast;
+  margin-left: auto;
 
-    & .text-slide-enter-from,
-    & .text-slide-leave-to {
-      opacity: 0;
-      transform: translateX(-15px);
-    }
+  &:hover {
+    color: var(--strix-text-accent);
+    background: var(--strix-bg-surface-hover);
+  }
+}
 
-    .control-button-container {
-      position: absolute;
-      top: 0;
-      right: 0;
-      line-height: 40px;
-      padding-left: 5px;
-      padding-right: 5px;
+.strix-block__toggle-text {
+  transition: opacity $duration-fast;
+}
 
-      &.left {
-        left: 0;
-        width: 80px;
-        padding-left: 5px;
-      }
+.strix-block__toggle-icon {
+  display: flex;
+  align-items: center;
+  transition: transform $duration-normal $ease-out-smooth;
 
-      &.right {
-        right: 0;
-        width: 80px;
-        padding-right: 5px;
-      }
-    }
+  &.flipped {
+    transform: rotate(180deg);
   }
 }
 </style>

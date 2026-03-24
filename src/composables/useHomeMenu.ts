@@ -1,36 +1,39 @@
-import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
 import { deepSearch } from '@/utils/strix-tools'
 import { kebabCase } from 'lodash-es'
-import type { MenuInst, MenuOption } from 'naive-ui'
-import { RouterLink } from 'vue-router'
+
+export interface MenuItem {
+  id: string
+  name: string
+  url?: string
+  icon?: string
+  iconName?: string
+  children?: MenuItem[] | null
+  [key: string]: any
+}
 
 /**
  * 首页菜单逻辑 Composable
- * 包含菜单加载、图标处理、标签渲染、选中状态同步
+ * 包含菜单加载、图标处理、选中状态同步
  */
 export function useHomeMenu() {
+  const router = useRouter()
   const route = useRoute()
 
-  const menuRef = ref<MenuInst | null>(null)
   const menuLoading = ref(false)
-  const menuList = ref<any[]>([])
+  const menuList = ref<MenuItem[]>([])
   const menuSelected = ref('')
+  const expandedKeys = ref<Set<string>>(new Set())
 
   /**
    * 处理菜单图标字段
-   * 将图标名称转换为图标组件渲染函数
+   * 将图标名称转换为 kebab-case 格式供 StrixIcon 使用
    */
-  const handleMenuIconField = (list: any[]): any[] => {
+  const handleMenuIconField = (list: MenuItem[]): MenuItem[] => {
     for (const child of list) {
       if (child.icon) {
-        if (!child.iconName) {
-          child.iconName = child.icon
-        }
-        child.icon = () => h(StrixIcon, { icon: kebabCase(child.iconName) })
-      } else {
-        child.icon = null
+        child.iconName = child.iconName || kebabCase(child.icon as string)
       }
       if (child.children && child.children.length > 0) {
         handleMenuIconField(child.children)
@@ -49,8 +52,47 @@ export function useHomeMenu() {
       const currentMenu = deepSearch(menuList.value, route.path, 'url')
       if (currentMenu) {
         menuSelected.value = currentMenu.id
-        nextTick(() => menuRef.value?.showOption())
+        // 展开包含当前选中项的父菜单
+        expandParentMenus(menuList.value, currentMenu.id)
       }
+    }
+  }
+
+  /**
+   * 递归查找并展开包含指定菜单项的所有父级
+   */
+  const expandParentMenus = (items: MenuItem[], targetId: string, parentIds: string[] = []): boolean => {
+    for (const item of items) {
+      if (item.id === targetId) {
+        parentIds.forEach((id) => expandedKeys.value.add(id))
+        return true
+      }
+      if (item.children && item.children.length > 0) {
+        if (expandParentMenus(item.children, targetId, [...parentIds, item.id])) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  /**
+   * 切换子菜单展开/折叠
+   */
+  const toggleExpand = (id: string) => {
+    if (expandedKeys.value.has(id)) {
+      expandedKeys.value.delete(id)
+    } else {
+      expandedKeys.value.add(id)
+    }
+  }
+
+  /**
+   * 导航到指定菜单项
+   */
+  const navigateTo = (item: MenuItem) => {
+    if (item.url) {
+      router.push(item.url)
     }
   }
 
@@ -71,20 +113,27 @@ export function useHomeMenu() {
   }
 
   /**
-   * 渲染菜单标签
-   * 如果是叶子节点则渲染为 RouterLink
+   * 获取所有叶子菜单项 (用于命令面板搜索)
    */
-  const renderMenuLabel = (option: MenuOption): any => {
-    if (!option.children) {
-      return h(RouterLink, { to: option.url as string }, { default: () => option.name })
+  const getAllLeafItems = computed(() => {
+    const result: MenuItem[] = []
+    const walk = (items: MenuItem[]) => {
+      for (const item of items) {
+        if (item.children && item.children.length > 0) {
+          walk(item.children)
+        } else if (item.url) {
+          result.push(item)
+        }
+      }
     }
-    return option.name
-  }
+    walk(menuList.value)
+    return result
+  })
 
   // 监听路由变化以同步菜单选中项
   watch(() => route.path, syncCurrentSelectMenu, { immediate: true })
 
-  // 初始化：加载菜单和监听刷新事件
+  // 初始化
   onMounted(() => {
     loadMenuList()
     EventBus.on('refresh-menu', loadMenuList)
@@ -95,11 +144,13 @@ export function useHomeMenu() {
   })
 
   return {
-    menuRef,
     menuLoading,
     menuList,
     menuSelected,
-    renderMenuLabel,
-    loadMenuList
+    expandedKeys,
+    toggleExpand,
+    navigateTo,
+    loadMenuList,
+    getAllLeafItems
   }
 }

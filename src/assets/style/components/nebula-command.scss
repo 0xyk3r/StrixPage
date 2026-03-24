@@ -1,0 +1,206 @@
+// ============================================================
+// Nebula Design System — Command Palette Styles
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// ---- 遮罩 ----
+.nebula-cmd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-cmd-palette;
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+}
+
+// ---- 面板容器 ----
+.nebula-cmd-panel {
+  width: $cmd-palette-width;
+  max-width: 92vw;
+  border-radius: $radius-xl;
+  @include glass;
+  border: 1px solid var(--strix-border-default);
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+  animation: nebula-scale-in $duration-normal $ease-out-expo;
+}
+
+// ---- 搜索框 ----
+.nebula-cmd-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-bottom: 1px solid var(--strix-border-subtle);
+}
+
+.nebula-cmd-input-icon {
+  color: var(--strix-text-tertiary);
+  flex-shrink: 0;
+}
+
+.nebula-cmd-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: $text-lg;
+  font-family: $font-body;
+  color: var(--strix-text-primary);
+  line-height: 1.4;
+
+  &::placeholder {
+    color: var(--strix-text-muted);
+  }
+}
+
+.nebula-cmd-esc {
+  padding: 2px $space-2;
+  border-radius: $radius-xs;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  color: var(--strix-text-muted);
+  font-size: $text-2xs;
+  font-family: $font-mono;
+  flex-shrink: 0;
+}
+
+// ---- 结果列表 ----
+.nebula-cmd-results {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: $space-2;
+  @include thin-scrollbar;
+}
+
+.nebula-cmd-group {
+  &:not(:first-child) {
+    margin-top: $space-1;
+  }
+}
+
+.nebula-cmd-group-label {
+  padding: $space-1 $space-3;
+  font-size: $text-2xs;
+  text-transform: uppercase;
+  letter-spacing: $tracking-wider;
+  color: var(--strix-text-muted);
+  font-weight: $weight-bold;
+}
+
+.nebula-cmd-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $duration-fast;
+  color: var(--strix-text-secondary);
+  font-size: $text-md;
+
+  &:hover,
+  &--active {
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-primary);
+  }
+
+  &--active {
+    background: var(--strix-border-accent);
+    color: var(--strix-text-accent);
+  }
+}
+
+.nebula-cmd-item__icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--strix-text-tertiary);
+
+  .nebula-cmd-item--active & {
+    color: var(--strix-text-accent);
+  }
+}
+
+.nebula-cmd-item__text {
+  flex: 1;
+  @include text-ellipsis;
+}
+
+// ---- 空状态 ----
+.nebula-cmd-empty {
+  padding: $space-8 $space-4;
+  text-align: center;
+  color: var(--strix-text-muted);
+  font-size: $text-sm;
+}
+
+// ---- 底部提示 ----
+.nebula-cmd-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+  padding: $space-2 $space-4;
+  border-top: 1px solid var(--strix-border-subtle);
+
+  span {
+    font-size: $text-2xs;
+    color: var(--strix-text-muted);
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+  }
+
+  kbd {
+    padding: 1px 5px;
+    border-radius: $radius-xs;
+    background: var(--strix-bg-surface);
+    border: 1px solid var(--strix-border-default);
+    font-family: $font-mono;
+    font-size: $text-2xs;
+    color: var(--strix-text-tertiary);
+  }
+}
+
+// ---- 过渡动画 ----
+.nebula-cmd-enter-active {
+  transition: opacity $duration-normal $ease-out-expo;
+
+  .nebula-cmd-panel {
+    transition: transform $duration-normal $ease-out-expo, opacity $duration-normal $ease-out-expo;
+  }
+}
+
+.nebula-cmd-leave-active {
+  transition: opacity $duration-normal $ease-out-smooth;
+
+  .nebula-cmd-panel {
+    transition: transform $duration-normal $ease-out-smooth, opacity $duration-fast $ease-out-smooth;
+  }
+}
+
+.nebula-cmd-enter-from {
+  opacity: 0;
+
+  .nebula-cmd-panel {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+}
+
+.nebula-cmd-leave-to {
+  opacity: 0;
+
+  .nebula-cmd-panel {
+    opacity: 0;
+    transform: scale(0.92) translateY(-15px);
+  }
+}

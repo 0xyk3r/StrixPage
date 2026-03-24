@@ -1,0 +1,31 @@
+// ============================================================
+// Nebula Design System — Shadow & Glow Tokens
+// ============================================================
+
+// ---- 阴影 ----
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.2);
+$shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
+$shadow-2xl: 0 20px 70px rgba(0, 0, 0, 0.5);
+
+// ---- 发光效果 (accent glow) ----
+$glow-accent-subtle: 0 0 12px rgba(99, 226, 183, 0.08);
+$glow-accent-soft: 0 0 18px rgba(99, 226, 183, 0.12);
+$glow-accent-medium: 0 0 24px rgba(99, 226, 183, 0.15);
+$glow-accent-strong: 0 0 30px rgba(99, 226, 183, 0.25);
+
+// ---- 毛玻璃背景 ----
+$glass-blur-sm: blur(12px);
+$glass-blur-md: blur(30px);
+$glass-blur-lg: blur(50px);
+$glass-saturate: saturate(1.5);
+
+// ---- 光带效果 (顶部装饰线) ----
+// 使用时通过 ::after 伪元素实现
+$light-ridge-gradient: linear-gradient(
+    to right,
+    transparent,
+    rgba(99, 226, 183, 0.25),
+    transparent
+);

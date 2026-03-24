@@ -1,100 +1,105 @@
 <template>
-  <n-popover
-    v-model:show="showPopover"
-    :show-arrow="false"
-    :style="{ padding: 0, width: '400px', maxHeight: '600px' }"
-    placement="bottom-end"
-    trigger="manual"
-    @clickoutside="handleClickOutside"
-  >
-    <template #trigger>
-      <div class="notification-trigger" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
-        <n-badge :max="99" :show="notificationStore.unreadCount > 0" :value="badgeValue">
-          <n-icon-wrapper
-            :border-radius="5"
-            :color="themeVars.actionColor"
-            :icon-color="themeVars.textColorBase"
-            :size="32"
+  <div class="nebula-notif-anchor" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+    <!-- Trigger Button -->
+    <button class="nebula-toolbar__btn nebula-notif-trigger" title="通知">
+      <StrixIcon icon="bell" :size="15" />
+      <span v-if="notificationStore.unreadCount > 0" class="nebula-notif-badge">
+        {{ badgeValue }}
+      </span>
+    </button>
+
+    <!-- Backdrop (click outside) -->
+    <div v-if="showPanel" class="nebula-notif-backdrop" @click="showPanel = false" />
+
+    <!-- Dropdown Panel -->
+    <Transition name="nebula-notif">
+      <div
+        v-if="showPanel"
+        class="nebula-notif-panel"
+        @mouseenter="handlePanelMouseEnter"
+        @mouseleave="handlePanelMouseLeave"
+      >
+        <!-- Header -->
+        <div class="nebula-notif-header">
+          <div class="nebula-notif-header__left">
+            <span class="nebula-notif-header__id">PANEL::NOTIFICATIONS</span>
+            <span class="nebula-notif-header__title">通知中心</span>
+          </div>
+          <button
+            v-if="notificationStore.unreadCount > 0"
+            class="nebula-notif-header__action"
+            @click="handleMarkAllAsRead"
           >
-            <n-icon :size="18">
-              <StrixIcon icon="bell" />
-            </n-icon>
-          </n-icon-wrapper>
-        </n-badge>
+            全部已读
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="nebula-notif-tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :class="['nebula-notif-tab', { 'is-active': activeTab === tab.key }]"
+            @click="switchTab(tab.key)"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <StrixNotificationList
+          v-if="activeTab === 'unread'"
+          empty-text="暂无未读通知"
+          :has-more="unreadHasMore"
+          :loading="loading"
+          :notifications="unreadNotifications"
+          @load-more="loadMoreUnread"
+          @mark-as-read="handleMarkAsRead"
+          @item-click="handleItemClick"
+        />
+        <StrixNotificationList
+          v-else-if="activeTab === 'all'"
+          empty-text="暂无通知记录"
+          :has-more="allHasMore"
+          :loading="loading"
+          :notifications="allNotifications"
+          @load-more="loadMoreAll"
+          @mark-as-read="handleMarkAsRead"
+          @item-click="handleItemClick"
+        />
+        <StrixNotificationList
+          v-else
+          empty-text="暂无已失效通知"
+          :has-more="invalidHasMore"
+          :loading="loading"
+          :notifications="invalidNotifications"
+          @load-more="loadMoreInvalid"
+          @mark-as-read="handleMarkAsRead"
+          @item-click="handleItemClick"
+        />
       </div>
-    </template>
-
-    <!-- 通知面板 -->
-    <div class="notification-panel" @mouseenter="handlePanelMouseEnter" @mouseleave="handlePanelMouseLeave">
-      <!-- 头部 -->
-      <div class="panel-header">
-        <span class="panel-title">通知中心</span>
-        <n-button
-          v-if="notificationStore.unreadCount > 0"
-          size="small"
-          text
-          type="primary"
-          @click="handleMarkAllAsRead"
-        >
-          全部已读
-        </n-button>
-      </div>
-
-      <!-- 标签页 -->
-      <n-tabs v-model:value="activeTab" type="line" @update:value="handleTabChange">
-        <n-tab-pane name="unread" tab="未读">
-          <StrixNotificationList
-            :empty-text="'暂无未读通知'"
-            :has-more="unreadHasMore"
-            :loading="loading"
-            :notifications="unreadNotifications"
-            @load-more="loadMoreUnread"
-            @mark-as-read="handleMarkAsRead"
-            @item-click="handleItemClick"
-          />
-        </n-tab-pane>
-
-        <n-tab-pane name="all" tab="历史">
-          <StrixNotificationList
-            :empty-text="'暂无通知'"
-            :has-more="allHasMore"
-            :loading="loading"
-            :notifications="allNotifications"
-            @load-more="loadMoreAll"
-            @mark-as-read="handleMarkAsRead"
-            @item-click="handleItemClick"
-          />
-        </n-tab-pane>
-
-        <n-tab-pane name="invalid" tab="已失效">
-          <StrixNotificationList
-            :empty-text="'暂无已失效通知'"
-            :has-more="invalidHasMore"
-            :loading="loading"
-            :notifications="invalidNotifications"
-            @load-more="loadMoreInvalid"
-            @mark-as-read="handleMarkAsRead"
-            @item-click="handleItemClick"
-          />
-        </n-tab-pane>
-      </n-tabs>
-    </div>
-  </n-popover>
+    </Transition>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { useNotificationStore } from '@/stores/notification'
 import type { NotificationItem } from '@/@types/components/notification'
-import { useThemeVars } from 'naive-ui'
 import { createStrixMessage } from '@/utils/strix-message'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixNotificationList from '@/components/notification/StrixNotificationList.vue'
 
 const router = useRouter()
 const notificationStore = useNotificationStore()
-const themeVars = useThemeVars()
 
-// Popover 显示状态
-const showPopover = ref(false)
+const tabs = [
+  { key: 'unread' as const, label: '未读' },
+  { key: 'all' as const, label: '历史' },
+  { key: 'invalid' as const, label: '已失效' }
+]
+
+// 面板显示状态
+const showPanel = ref(false)
 let hoverTimer: ReturnType<typeof setTimeout> | null = null
 let leaveTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -128,6 +133,12 @@ const badgeValue = computed(() => {
   return count > 99 ? '99+' : count
 })
 
+// 切换标签页
+const switchTab = (tab: 'unread' | 'all' | 'invalid') => {
+  activeTab.value = tab
+  loadNotifications()
+}
+
 // 鼠标进入触发区域
 const handleMouseEnter = () => {
   if (leaveTimer) {
@@ -135,7 +146,7 @@ const handleMouseEnter = () => {
     leaveTimer = null
   }
   hoverTimer = setTimeout(() => {
-    showPopover.value = true
+    showPanel.value = true
     loadNotifications()
   }, 200)
 }
@@ -147,7 +158,7 @@ const handleMouseLeave = () => {
     hoverTimer = null
   }
   leaveTimer = setTimeout(() => {
-    showPopover.value = false
+    showPanel.value = false
   }, 200)
 }
 
@@ -162,18 +173,8 @@ const handlePanelMouseEnter = () => {
 // 鼠标离开面板区域
 const handlePanelMouseLeave = () => {
   leaveTimer = setTimeout(() => {
-    showPopover.value = false
+    showPanel.value = false
   }, 200)
-}
-
-// 点击外部关闭
-const handleClickOutside = () => {
-  showPopover.value = false
-}
-
-// 切换标签页
-const handleTabChange = () => {
-  loadNotifications()
 }
 
 // 加载通知列表
@@ -293,7 +294,6 @@ const loadMoreInvalid = () => {
 const handleMarkAsRead = async (notificationId: string) => {
   try {
     await notificationStore.markAsRead(notificationId)
-    // 更新列表中的已读状态
     const updateReadStatus = (list: NotificationItem[]) => {
       const item = list.find((n) => n.notificationId === notificationId)
       if (item) {
@@ -304,7 +304,6 @@ const handleMarkAsRead = async (notificationId: string) => {
     updateReadStatus(unreadNotifications.value)
     updateReadStatus(allNotifications.value)
     updateReadStatus(invalidNotifications.value)
-    // 从未读列表中移除
     unreadNotifications.value = unreadNotifications.value.filter((n) => n.notificationId !== notificationId)
     unreadTotal.value--
   } catch (error) {
@@ -317,17 +316,14 @@ const handleMarkAsRead = async (notificationId: string) => {
 const handleMarkAllAsRead = async () => {
   try {
     await notificationStore.markAllAsRead()
-    // 清空未读列表
     unreadNotifications.value = []
     unreadTotal.value = 0
-    // 更新全部列表中的已读状态
     allNotifications.value.forEach((n) => {
       if (n.readStatus === 0) {
         n.readStatus = 1
         n.readAt = new Date().toISOString()
       }
     })
-    // 更新失效列表中的已读状态
     invalidNotifications.value.forEach((n) => {
       if (n.readStatus === 0) {
         n.readStatus = 1
@@ -343,38 +339,32 @@ const handleMarkAllAsRead = async () => {
 
 // 点击通知项
 const handleItemClick = async (notification: NotificationItem) => {
-  // 如果未读，先标记为已读
   if (notification.readStatus === 0) {
     await handleMarkAsRead(notification.notificationId)
   }
 
-  // 执行跳转
   if (notification.jumpType === 'PAGE') {
-    // 路由跳转
     try {
       const jumpParams = notification.jumpParams ? JSON.parse(notification.jumpParams) : {}
       await router.push({
         name: notification.jumpTarget,
         state: jumpParams
       })
-      showPopover.value = false
+      showPanel.value = false
     } catch (error) {
       console.error('路由跳转失败:', error)
       createStrixMessage('error', '跳转失败', '路由跳转失败，请检查路由配置')
     }
   } else if (notification.jumpType === 'URL') {
-    // URL 跳转
     window.open(notification.jumpTarget, '_blank')
-    showPopover.value = false
+    showPanel.value = false
   }
 }
 
-// 组件挂载时开始轮询
 onMounted(() => {
   notificationStore.startPolling()
 })
 
-// 组件卸载时停止轮询
 onUnmounted(() => {
   notificationStore.stopPolling()
   if (hoverTimer) clearTimeout(hoverTimer)
@@ -383,35 +373,11 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.notification-trigger {
-  cursor: pointer;
+.nebula-notif-enter-active {
+  animation: nebula-notif-enter 0.25s $ease-out-expo both;
 }
 
-.notification-panel {
-  width: 100%;
-
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    border-bottom: 1px solid var(--n-border-color);
-
-    .panel-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--n-text-color);
-    }
-  }
-
-  :deep(.n-tabs) {
-    .n-tabs-nav {
-      padding: 0 16px;
-    }
-
-    .n-tab-pane {
-      padding: 0;
-    }
-  }
+.nebula-notif-leave-active {
+  animation: nebula-notif-enter 0.15s $ease-out-expo reverse both;
 }
 </style>

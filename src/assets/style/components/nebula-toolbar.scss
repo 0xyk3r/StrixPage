@@ -1,0 +1,152 @@
+// ============================================================
+// Nebula Design System — Toolbar Styles
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-toolbar {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: $space-2;
+  flex-shrink: 0;
+}
+
+// ---- 工具栏按钮组 ----
+.nebula-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: 2px;
+  border-radius: $radius-pill;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+}
+
+// ---- 工具栏按钮 ----
+.nebula-toolbar__btn {
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-circle;
+  background: transparent;
+  border: none;
+  color: var(--strix-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all $duration-fast;
+  position: relative;
+  padding: 0;
+
+  &:hover {
+    color: var(--strix-text-accent);
+    background: var(--strix-border-accent);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+// ---- 通知徽标 ----
+.nebula-toolbar__badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-circle;
+  background: $color-error;
+  border: 1.5px solid var(--strix-bg-base);
+  animation: nebula-pulse-dot 2s infinite;
+}
+
+// ---- 用户信息 ----
+.nebula-toolbar__user {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 3px $space-3 3px $space-2;
+  border-radius: $radius-pill;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  cursor: pointer;
+  transition: all $duration-fast;
+  position: relative;
+
+  &:hover {
+    border-color: var(--strix-border-default);
+    background: var(--strix-bg-surface-hover);
+  }
+}
+
+.nebula-toolbar__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: $radius-circle;
+  background: var(--strix-border-accent);
+  color: var(--strix-text-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $text-xs;
+  font-weight: $weight-bold;
+  flex-shrink: 0;
+}
+
+.nebula-toolbar__name {
+  font-size: $text-sm;
+  color: var(--strix-text-secondary);
+  white-space: nowrap;
+  max-width: 80px;
+  @include text-ellipsis;
+}
+
+.nebula-toolbar__chevron {
+  color: var(--strix-text-muted);
+  transition: transform $duration-fast;
+  flex-shrink: 0;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+// ---- 用户下拉菜单 ----
+.nebula-user-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 140px;
+  padding: $space-1;
+  border-radius: $radius-lg;
+  @include glass;
+  border: 1px solid var(--strix-border-default);
+  box-shadow: $shadow-lg;
+  z-index: $z-popover;
+  animation: nebula-context-in $duration-fast $ease-out-expo;
+}
+
+.nebula-user-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  color: var(--strix-text-secondary);
+  cursor: pointer;
+  transition: all $duration-fast;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-primary);
+  }
+
+  &--danger:hover {
+    background: rgba($color-error, 0.1);
+    color: $color-error;
+  }
+}

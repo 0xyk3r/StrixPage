@@ -1,53 +1,90 @@
 <template>
-  <div id="tabs-bar-container" class="tabs-bar-container">
-    <n-tabs
-      :value="tabActive"
-      animated
-      class="tabs-content"
-      type="card"
-      @close="closeTab"
-      @update:value="handleTabClick"
-    >
-      <n-tab
+  <div class="nebula-tabs">
+    <!-- 左滚动箭头 -->
+    <button :class="['nebula-tabs__arrow', { visible: canScrollLeft }]" @click="scrollLeft">
+      <StrixIcon icon="chevron-left" :size="12" />
+    </button>
+
+    <!-- 标签滚动区域 -->
+    <div ref="scrollRef" class="nebula-tabs__scroll" @wheel.prevent="handleWheel">
+      <div
         v-for="(item, index) in visitedRoutes"
         :key="getRouteKey(item)"
-        :closable="!isAffix(item)"
-        :name="getRouteKey(item)"
+        :class="[
+          'nebula-tab',
+          {
+            'nebula-tab--active': isActive(item),
+            'nebula-tab--fixed': isAffix(item)
+          }
+        ]"
+        @click="handleTabClick(getRouteKey(item))"
         @contextmenu.prevent.stop="handleTabContextmenu($event, index)"
       >
-        {{ item.meta.title }}
-      </n-tab>
-    </n-tabs>
+        <StrixIcon v-if="isAffix(item)" icon="pin" :size="10" class="nebula-tab__pin" />
+        <span class="nebula-tab__text">{{ item.meta.title }}</span>
+        <button v-if="!isAffix(item)" class="nebula-tab__close" @click.stop="closeTab(getRouteKey(item))">
+          <StrixIcon icon="x" :size="10" />
+        </button>
+      </div>
+    </div>
 
-    <div class="tabs-bar-bottom-bar"></div>
+    <!-- 右滚动箭头 -->
+    <button :class="['nebula-tabs__arrow', { visible: canScrollRight }]" @click="scrollRight">
+      <StrixIcon icon="chevron-right" :size="12" />
+    </button>
 
-    <Teleport defer to="#strix-tool-bar-item">
-      <n-dropdown :options="contextmenuList" placement="bottom-start" trigger="hover" @select="handleContextmenuSelect">
-        <n-icon-wrapper
-          :border-radius="5"
-          :color="themeVars.actionColor"
-          :icon-color="themeVars.textColorBase"
-          :size="32"
-        >
-          <n-icon :size="18">
-            <StrixIcon class="tabs-common-handler" icon="compass" />
-          </n-icon>
-        </n-icon-wrapper>
-      </n-dropdown>
+    <!-- 标签数量 -->
+    <div v-if="visitedRoutes.length > 3" class="nebula-tabs__count">{{ visitedRoutes.length }}</div>
+
+    <!-- 右键菜单 -->
+    <Teleport to="body">
+      <div
+        v-if="showRightMenu"
+        class="nebula-context-menu"
+        :style="{ left: contextmenuPosition.x + 'px', top: contextmenuPosition.y + 'px' }"
+      >
+        <div class="nebula-context-item" @click="handleContextmenuSelect('closeCurrTabs')">
+          <StrixIcon icon="x" :size="14" />
+          <span>关闭</span>
+        </div>
+        <div class="nebula-context-item" @click="handleContextmenuSelect('reloadRouter')">
+          <StrixIcon icon="rotate-cw" :size="14" />
+          <span>刷新</span>
+        </div>
+        <div class="nebula-context-item" @click="handleContextmenuSelect('reloadAllRouter')">
+          <StrixIcon icon="refresh-cw" :size="14" />
+          <span>刷新全部</span>
+        </div>
+        <div class="nebula-context-divider" />
+        <div class="nebula-context-item" @click="handleContextmenuSelect('closeLeftTabs')">
+          <StrixIcon icon="panel-left-close" :size="14" />
+          <span>关闭左侧</span>
+        </div>
+        <div class="nebula-context-item" @click="handleContextmenuSelect('closeRightTabs')">
+          <StrixIcon icon="panel-right-close" :size="14" />
+          <span>关闭右侧</span>
+        </div>
+        <div class="nebula-context-item" @click="handleContextmenuSelect('closeOtherTabs')">
+          <StrixIcon icon="copy-minus" :size="14" />
+          <span>关闭其他</span>
+        </div>
+        <div class="nebula-context-divider" />
+        <div class="nebula-context-item nebula-context-item--danger" @click="handleContextmenuSelect('closeAllTabs')">
+          <StrixIcon icon="copy-x" :size="14" />
+          <span>关闭全部</span>
+        </div>
+      </div>
     </Teleport>
 
-    <teleport to=".n-config-provider">
-      <n-dropdown
-        :options="contextmenuList"
-        :show="showRightMenu"
-        :x="contextmenuPosition.x"
-        :y="contextmenuPosition.y"
-        placement="bottom-start"
-        trigger="manual"
-        @clickoutside="clearContextmenuSelect"
-        @select="handleContextmenuSelect"
+    <!-- 全局点击关闭右键菜单 -->
+    <Teleport to="body">
+      <div
+        v-if="showRightMenu"
+        class="nebula-context-backdrop"
+        @click="clearContextmenuSelect"
+        @contextmenu.prevent="clearContextmenuSelect"
       />
-    </teleport>
+    </Teleport>
   </div>
 </template>
 
@@ -55,7 +92,6 @@
 import { EventBus } from '@/plugins/event-bus.ts'
 import { useQuickMenuStore } from '@/stores/quick-menu.ts'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
-import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
@@ -63,12 +99,71 @@ const route = useRoute()
 const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 const quickMenuStore = useQuickMenuStore()
-const themeVars = useThemeVars()
 
 const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
 
-// 获取路由的唯一标识符，优先使用 fullPath，对于 fixed 标签页可能使用 path
+// 滚动相关
+const scrollRef = ref<HTMLDivElement>()
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
+
+const checkScroll = () => {
+  const el = scrollRef.value
+  if (!el) return
+  canScrollLeft.value = el.scrollLeft > 2
+  canScrollRight.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 2
+}
+
+const scrollLeft = () => {
+  scrollRef.value?.scrollBy({ left: -160, behavior: 'smooth' })
+}
+
+const scrollRight = () => {
+  scrollRef.value?.scrollBy({ left: 160, behavior: 'smooth' })
+}
+
+const handleWheel = (e: WheelEvent) => {
+  scrollRef.value?.scrollBy({ left: e.deltaY > 0 ? 80 : -80 })
+}
+
+// 滚动到当前活动标签
+const scrollToActive = () => {
+  nextTick(() => {
+    const el = scrollRef.value
+    if (!el) return
+    const activeTab = el.querySelector('.nebula-tab--active') as HTMLElement
+    if (activeTab) {
+      const tabLeft = activeTab.offsetLeft
+      const tabWidth = activeTab.offsetWidth
+      const scrollLeft = el.scrollLeft
+      const visibleWidth = el.clientWidth
+
+      if (tabLeft < scrollLeft) {
+        el.scrollTo({ left: tabLeft - 8, behavior: 'smooth' })
+      } else if (tabLeft + tabWidth > scrollLeft + visibleWidth) {
+        el.scrollTo({ left: tabLeft + tabWidth - visibleWidth + 8, behavior: 'smooth' })
+      }
+    }
+    checkScroll()
+  })
+}
+
+onMounted(() => {
+  checkScroll()
+  const el = scrollRef.value
+  if (el) {
+    el.addEventListener('scroll', checkScroll, { passive: true })
+    const observer = new ResizeObserver(checkScroll)
+    observer.observe(el)
+    onUnmounted(() => {
+      el.removeEventListener('scroll', checkScroll)
+      observer.disconnect()
+    })
+  }
+})
+
+// 获取路由的唯一标识符
 const getRouteKey = (route: any): string => {
   return route.fullPath || route.path || route.name || ''
 }
@@ -77,54 +172,20 @@ const getRouteKey = (route: any): string => {
 const showRightMenu = ref(false)
 let contextmenuRoutesIndex: number | null = null
 const contextmenuPosition = ref({ x: 0, y: 0 })
-const contextmenuList = [
-  {
-    key: 'closeCurrTabs',
-    label: '关闭',
-    icon: () => h(StrixIcon, { icon: 'x' })
-  },
-  {
-    key: 'reloadRouter',
-    label: '刷新',
-    icon: () => h(StrixIcon, { icon: 'rotate-cw' })
-  },
-  {
-    key: 'reloadAllRouter',
-    label: '刷新全部',
-    icon: () => h(StrixIcon, { icon: 'refresh-cw' })
-  },
-  {
-    key: 'closeLeftTabs',
-    label: '关闭左侧',
-    icon: () => h(StrixIcon, { icon: 'panel-left-close' })
-  },
-  {
-    key: 'closeRightTabs',
-    label: '关闭右侧',
-    icon: () => h(StrixIcon, { icon: 'panel-right-close' })
-  },
-  {
-    key: 'closeOtherTabs',
-    label: '关闭其他',
-    icon: () => h(StrixIcon, { icon: 'copy-minus' })
-  },
-  {
-    key: 'closeAllTabs',
-    label: '关闭全部',
-    icon: () => h(StrixIcon, { icon: 'copy-x' })
-  }
-]
+
 const handleTabContextmenu = (e: MouseEvent, index: number): void => {
   showRightMenu.value = true
   contextmenuRoutesIndex = index
   contextmenuPosition.value = { x: e.x, y: e.y }
 }
+
 const clearContextmenuSelect = () => {
   showRightMenu.value = false
   setTimeout(() => {
     contextmenuRoutesIndex = null
   }, 50)
 }
+
 const handleContextmenuSelect = (key: string) => {
   const actions: Record<string, () => void> = {
     reloadRouter,
@@ -158,18 +219,16 @@ watch(
 
 // 初始化标签页
 const setupTabs = () => {
-  // 添加 当前路由 标签页
   const { name, meta } = route
   if (name && meta.title && !meta.empty) {
     tabsBarStore.addVisitedRoute(route)
-    // 保存路由的 history.state，防止标签页切换时丢失
     tabsBarStore.saveRouteState(route.path)
   }
-  // 设置当前激活的标签页
   nextTick(() => {
     const activeRoute = visitedRoutes.value.find((item) => item.path === route.path)
     tabActive.value = activeRoute ? getRouteKey(activeRoute) : ''
   })
+  scrollToActive()
 }
 watch(() => route.path, setupTabs, { immediate: true })
 
@@ -187,7 +246,6 @@ const closeTab = async (tabKey: string) => {
   const index = visitedRoutes.value.findIndex((item) => getRouteKey(item) === tabKey)
   if (index !== -1) {
     const view = visitedRoutes.value[index]
-    // 如果关闭的是当前标签页 则跳转
     if (isActive(view)) {
       if (index - 1 < 0) {
         if (visitedRoutes.value.length > 1) {
@@ -227,15 +285,8 @@ const reloadAllRouter = () => {
 
 const closeCurrTabs = () => {
   const view = getContextmenuTagView()
-
-  // 固定标签页不允许关闭
-  if (view?.meta?.fixed) {
-    return
-  }
-
-  if (view) {
-    closeTab(getRouteKey(view))
-  }
+  if (view?.meta?.fixed) return
+  if (view) closeTab(getRouteKey(view))
 }
 
 const closeOtherTabs = () => {
@@ -280,7 +331,7 @@ const closeAllTabs = async () => {
   await router.push(defaultView ?? '/')
 }
 
-// 一些通用处理函数
+// 通用函数
 const isActive = (r: any) => route.path === r.path
 const isAffix = (r: any) => r.meta?.fixed
 const getContextmenuTagView = () => {
@@ -290,139 +341,10 @@ const getContextmenuTagView = () => {
 </script>
 
 <style lang="scss" scoped>
-.tabs-bar-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
-  z-index: 499;
-  user-select: none;
-  box-sizing: border-box;
-  transition: border 0.3s var(--n-bezier);
-
-  // 屏幕小于 1280px 时不显示
-  @media (max-width: 1280px) {
-    display: none;
-  }
-
-  .tabs-content {
-    height: 34px;
-  }
-
-  .tabs-bar-bottom-bar {
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    border-radius: 4px;
-    background-color: var(--n-border-color);
-    transition: background-color 0.3s var(--n-bezier);
-  }
-}
-
-::v-deep(.tabs-content) {
-  .n-tabs-nav-scroll-content {
-    justify-content: center;
-
-    .n-tabs-wrapper {
-      .n-tabs-tab-wrapper {
-        .n-tabs-tab {
-          box-sizing: border-box;
-          height: 34px;
-          line-height: 34px;
-          transition:
-            all 0.3s var(--n-bezier),
-            width 0.6s !important;
-          padding-right: 20px;
-
-          .n-base-close {
-            width: 0;
-            margin-left: 0;
-            overflow: hidden;
-            transform-origin: 100% 50%;
-            transition: all 0.3s var(--n-bezier);
-
-            .n-base-icon {
-              overflow: hidden;
-            }
-          }
-
-          &:after {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            content: '';
-            background-color: var(--n-tab-text-color-active);
-            transition:
-              all 0.3s var(--n-bezier),
-              border 0s,
-              color 0.1s,
-              font-size 0s;
-          }
-
-          &:hover {
-            border: 1px solid var(--n-tab-text-color-hover);
-
-            &.n-tabs-tab--closable {
-              padding-right: 10px;
-
-              .n-base-close {
-                width: 18px;
-                margin-left: 6px;
-              }
-            }
-
-            &:after {
-              width: 100%;
-            }
-          }
-        }
-
-        .n-tabs-tab--active {
-          &:after {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            content: '';
-            background-color: var(--n-tab-text-color-active);
-            transition:
-              all 0.3s var(--n-bezier),
-              border 0s,
-              color 0.1s,
-              font-size 0s;
-          }
-        }
-
-        .n-tabs-tab-pad {
-          width: 6px;
-          border: none;
-        }
-      }
-    }
-
-    .n-tabs-pad {
-      flex-grow: 0 !important;
-      border: none !important;
-    }
-  }
-}
-
-.tabs-common-handler {
-  color: var(--n-tab-text-color);
-  outline: none;
-  cursor: pointer;
-  transition: transform 1s;
-}
-
-.tabs-common-handler:hover {
-  color: #63e2b7;
-  transform: rotate(90deg);
+// 右键菜单透明遮罩
+.nebula-context-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc($z-popover - 1);
 }
 </style>

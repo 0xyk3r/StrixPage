@@ -3,14 +3,9 @@ import { defineStore } from 'pinia'
 export const useStrixSettingsStore = defineStore(
   'globalSettings',
   () => {
-    const siderCollapsed = ref(false)
     const ignoreScreenSizeWarning = ref(false)
     const isSmallWindow = ref(false)
     const theme = ref('auto')
-
-    const setSiderCollapsed = (value: boolean) => {
-      siderCollapsed.value = value
-    }
 
     const setIgnoreScreenSizeWarning = (value: boolean) => {
       ignoreScreenSizeWarning.value = value
@@ -25,11 +20,9 @@ export const useStrixSettingsStore = defineStore(
     }
 
     return {
-      siderCollapsed,
       ignoreScreenSizeWarning,
       isSmallWindow,
       theme,
-      setSiderCollapsed,
       setIgnoreScreenSizeWarning,
       setIsSmallWindow,
       setTheme

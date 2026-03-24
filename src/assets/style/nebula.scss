@@ -1,0 +1,431 @@
+// ============================================================
+// Nebula Design System — Root Entry
+// ============================================================
+// 注入 CSS Custom Properties 到 :root / [data-theme]
+// 此文件在 main.ts 中导入, 仅输出一次
+
+@use 'tokens/typography' as t;
+@use 'tokens/spacing' as sp;
+@use 'tokens/animations' as a;
+@use 'mixins/theme' as theme;
+@use 'components/nebula-layout';
+@use 'components/nebula-tabs';
+@use 'components/nebula-breadcrumb';
+@use 'components/nebula-toolbar';
+@use 'components/nebula-command';
+@use 'components/nebula-login';
+@use 'components/nebula-captcha';
+@use 'components/nebula-index';
+@use 'components/nebula-notification';
+
+// ---- Google Fonts 加载 ----
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap');
+
+// ---- 默认 Dark 主题 (作为 :root 默认) ----
+:root {
+  @include theme.inject-dark-theme-vars;
+
+  // 布局尺寸变量
+  --strix-header-height: #{sp.$header-height};
+  --strix-drawer-width: #{sp.$drawer-width};
+}
+
+// ---- Dark 主题 ----
+[data-theme='dark'] {
+  @include theme.inject-dark-theme-vars;
+}
+
+// ---- Light 主题 ----
+[data-theme='light'] {
+  @include theme.inject-light-theme-vars;
+}
+
+// ---- 全局基础样式 ----
+html {
+  font-family: t.$font-body;
+  font-size: t.$text-md;
+  line-height: t.$leading-normal;
+  color: var(--strix-text-primary);
+  background: var(--strix-bg-base);
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+::selection {
+  background: var(--strix-selection-bg);
+  color: var(--strix-selection-color);
+}
+
+// 禁止浏览器自动填充行为更改输入框的背景颜色
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-transition-delay: 99999s !important;
+  -webkit-transition: color 99999s ease-out, background-color 99999s ease-out !important;
+}
+
+// ---- 主题切换全局过渡 ----
+html.theme-transitioning * {
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease,
+  box-shadow 0.35s ease !important;
+}
+
+// ============================================================
+// Keyframes — 全局动画定义 (仅输出一次)
+// ============================================================
+
+// 呼吸脉冲 (Logo 按钮)
+@keyframes nebula-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(99, 226, 183, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(99, 226, 183, 0.12);
+  }
+}
+
+// Logo 文字流光
+@keyframes nebula-logo-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+// Logo 光点脉冲
+@keyframes nebula-logo-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+// 抽屉 Logo 文字入场 (从左侧滑入 + 缩放 + 渐变闪烁)
+@keyframes nebula-drawer-logo-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.85);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(2px) scale(1.02);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+// 抽屉 Logo 光点入场
+@keyframes nebula-drawer-dot-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 极光漂浮
+@keyframes nebula-float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(20px, -12px) scale(1.06);
+  }
+}
+
+// 淡入上滑 (页面切换)
+@keyframes nebula-fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// 淡出下滑
+@keyframes nebula-fade-slide-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+// 缩放弹入 (命令面板)
+@keyframes nebula-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 表格行交错
+@keyframes nebula-stagger-row {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// 通知脉冲
+@keyframes nebula-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// 旋转 (加载动画)
+@keyframes nebula-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ---- 登录页动画 ----
+
+// 面板启动入场
+@keyframes nebula-login-boot {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0);
+  }
+}
+
+// 元素交错上浮
+@keyframes nebula-login-el-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// HUD 角标淡入
+@keyframes nebula-login-hud-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 面板扫描线
+@keyframes nebula-login-scan-sweep {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.6;
+  }
+  95% {
+    opacity: 0.6;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+// 状态指示灯闪烁
+@keyframes nebula-login-status-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+// 终端光标闪烁
+@keyframes nebula-login-cursor-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// 按钮扫描光束
+@keyframes nebula-login-btn-scan {
+  from {
+    left: -40px;
+  }
+  to {
+    left: calc(100% + 40px);
+  }
+}
+
+// ---- 验证码动画 ----
+
+// 验证码弹窗入场
+@keyframes nebula-captcha-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// 验证码失败抖动
+@keyframes nebula-captcha-shake {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0);
+  }
+  20% {
+    transform: translateY(-50%) translateX(-6px);
+  }
+  40% {
+    transform: translateY(-50%) translateX(5px);
+  }
+  60% {
+    transform: translateY(-50%) translateX(-4px);
+  }
+  80% {
+    transform: translateY(-50%) translateX(3px);
+  }
+}
+
+// ---- 首页动画 ----
+
+@keyframes nebula-index-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nebula-index-clock-blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes nebula-index-card-scan {
+  0% {
+    left: -60px;
+    opacity: 0.7;
+  }
+  100% {
+    left: calc(100% + 60px);
+    opacity: 0;
+  }
+}
+
+// ============================================================
+// Notification Panel Animations
+// ============================================================
+
+@keyframes nebula-notif-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nebula-notif-badge-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes nebula-notif-dot-pulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+// ============================================================
+// Route Transitions — 路由切换动画
+// ============================================================
+
+.nebula-page-enter-active {
+  animation: nebula-fade-slide-in a.$duration-page a.$ease-out-expo;
+}
+
+.nebula-page-leave-active {
+  animation: nebula-fade-slide-out 180ms a.$ease-out-smooth;
+  position: absolute;
+  inset: 0;
+}

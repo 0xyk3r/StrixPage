@@ -1,0 +1,68 @@
+// ============================================================
+// Nebula Design System — Glassmorphism Mixin
+// ============================================================
+
+@use '../tokens/shadows' as s;
+
+// 毛玻璃面板效果
+// 用法: @include glass; 或 @include glass($blur: 30px, $opacity: 0.85);
+@mixin glass($blur: 50px, $saturate: 1.5) {
+  background: var(--strix-glass-bg);
+  backdrop-filter: blur($blur) saturate($saturate);
+  -webkit-backdrop-filter: blur($blur) saturate($saturate);
+  border: 1px solid var(--strix-glass-border);
+}
+
+// 轻量毛玻璃 (用于小元素, 如标签、按钮)
+@mixin glass-light($blur: 12px) {
+  background: var(--strix-bg-surface);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid var(--strix-border-subtle);
+}
+
+// 表面卡片 (无毛玻璃, 但有统一的背景和边框)
+@mixin surface {
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    border-color: var(--strix-border-default);
+    background: var(--strix-bg-surface-hover);
+  }
+}
+
+// 强调表面 (带 accent 边框)
+@mixin surface-accent {
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-accent);
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: var(--strix-border-accent-hover);
+    box-shadow: #{s.$glow-accent-soft};
+  }
+}
+
+// 顶部光带装饰 (通过 ::after 伪元素)
+@mixin light-ridge {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: #{s.$light-ridge-gradient};
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+}

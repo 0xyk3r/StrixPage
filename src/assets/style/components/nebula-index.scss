@@ -1,0 +1,493 @@
+// ============================================================
+// Nebula Design System — Index Page (Mission Control)
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-index {
+  padding: 16px 32px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 768px) {
+    padding: 12px 18px 24px;
+  }
+}
+
+// ============================================================
+// Hero — Asymmetric two-column
+// ============================================================
+.nebula-index__hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 12px 0 0;
+
+  @media (max-width: 860px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+}
+
+.nebula-index__hero-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.nebula-index__hero-right {
+  flex-shrink: 0;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.25s both;
+}
+
+.nebula-index__session {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-accent);
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.7;
+  animation: nebula-index-up 0.6s $ease-out-expo both;
+}
+
+.nebula-index__session-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--strix-text-accent);
+  box-shadow: 0 0 8px var(--strix-accent-glow);
+  animation: nebula-login-status-blink 2s ease-in-out infinite;
+}
+
+.nebula-index__greeting {
+  font-family: $font-display;
+  font-size: $text-base;
+  font-weight: $weight-light;
+  color: var(--strix-text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.08s both;
+}
+
+.nebula-index__username {
+  font-family: $font-display;
+  font-size: 42px;
+  font-weight: $weight-extrabold;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  background: var(--strix-logo-gradient);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.15s both, nebula-logo-shimmer 6s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--strix-accent-glow-subtle));
+
+  @media (max-width: 600px) {
+    font-size: 30px;
+  }
+}
+
+.nebula-index__role-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.2s both;
+}
+
+.nebula-index__role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  border: 1px solid var(--strix-border-accent-hover);
+  border-radius: 3px;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-accent);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.nebula-index__role-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--strix-border-accent), transparent 80%);
+  opacity: 0.3;
+}
+
+// ============================================================
+// HUD Clock — sci-fi panel with corner brackets
+// ============================================================
+.nebula-index__hud-clock {
+  position: relative;
+  padding: 18px 28px 14px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 4px;
+  text-align: center;
+  transition: border-color 0.3s;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+  }
+}
+
+.nebula-index__hud-clock-label {
+  font-family: $font-mono;
+  font-size: 9px;
+  color: var(--strix-text-muted);
+  letter-spacing: 2.5px;
+  margin-bottom: 8px;
+}
+
+.nebula-index__hud-clock-digits {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+}
+
+.nebula-index__hud-digit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-mono;
+  font-size: 36px;
+  font-weight: $weight-bold;
+  color: var(--strix-text-primary);
+  min-width: 0.65em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 16px var(--strix-accent-glow-subtle);
+  padding: 2px 4px;
+  background: var(--strix-bg-surface-hover);
+  border-radius: 3px;
+}
+
+.nebula-index__hud-sep {
+  font-family: $font-mono;
+  font-size: 28px;
+  font-weight: $weight-bold;
+  color: var(--strix-text-accent);
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.6;
+  animation: nebula-index-clock-blink 1s step-end infinite;
+}
+
+.nebula-index__hud-clock-date {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-dim);
+  letter-spacing: 1.5px;
+  margin-top: 8px;
+}
+
+// Corner HUD brackets
+$hud-br: 10px;
+
+.nebula-index__hud-corner {
+  position: absolute;
+  width: $hud-br;
+  height: $hud-br;
+  pointer-events: none;
+
+  &.tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid var(--strix-border-accent-hover);
+    border-left: 2px solid var(--strix-border-accent-hover);
+  }
+
+  &.tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid var(--strix-border-accent-hover);
+    border-right: 2px solid var(--strix-border-accent-hover);
+  }
+
+  &.bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid var(--strix-border-accent-hover);
+    border-left: 2px solid var(--strix-border-accent-hover);
+  }
+
+  &.br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid var(--strix-border-accent-hover);
+    border-right: 2px solid var(--strix-border-accent-hover);
+  }
+}
+
+// ============================================================
+// Divider
+// ============================================================
+.nebula-index__divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0 18px;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.3s both;
+}
+
+.nebula-index__divider-label {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.nebula-index__divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--strix-border-subtle), transparent);
+}
+
+// ============================================================
+// Module Grid
+// ============================================================
+.nebula-index__modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================
+// Module Card — with scan sweep effect
+// ============================================================
+.nebula-index__card {
+  position: relative;
+  padding: 20px 22px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: nebula-index-up 0.5s $ease-out-expo var(--d, 0.4s) both;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--strix-border-accent);
+    opacity: 0.15;
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+    box-shadow: 0 0 0 1px var(--strix-accent-glow-subtle),
+    0 4px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+
+    &::before {
+      opacity: 1;
+      box-shadow: 0 0 10px var(--strix-accent-glow);
+    }
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.99);
+  }
+}
+
+// Scan sweep bar on hover
+.nebula-index__card-scan {
+  position: absolute;
+  top: 0;
+  left: -60px;
+  width: 60px;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+      90deg,
+      transparent,
+      var(--strix-accent-glow-subtle) 40%,
+      var(--strix-accent-glow-subtle) 60%,
+      transparent
+  );
+  opacity: 0;
+
+  &.is-active {
+    animation: nebula-index-card-scan 0.6s ease-out forwards;
+  }
+}
+
+.nebula-index__card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.nebula-index__card-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--strix-border-default);
+  border-radius: 6px;
+  color: var(--strix-text-accent);
+  background: var(--strix-accent-glow-subtle);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+
+  .nebula-index__card:hover & {
+    border-color: var(--strix-border-accent);
+    box-shadow: 0 0 12px var(--strix-accent-glow-subtle);
+  }
+}
+
+.nebula-index__card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nebula-index__card-title {
+  font-family: $font-body;
+  font-size: $text-base;
+  font-weight: $weight-semibold;
+  color: var(--strix-text-primary);
+  margin-bottom: 2px;
+}
+
+.nebula-index__card-count {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.nebula-index__card-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nebula-index__card-child {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-dim);
+  padding: 3px 10px;
+  background: var(--strix-bg-surface-hover);
+  border-radius: 3px;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+
+  // Only leaf items are interactive
+  &.is-leaf {
+    cursor: pointer;
+    transition: all $duration-fast;
+
+    &:hover {
+      color: var(--strix-text-accent);
+      border-color: var(--strix-border-accent);
+      background: var(--strix-accent-glow-subtle);
+    }
+  }
+}
+
+.nebula-index__card-more {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  padding: 3px 10px;
+  letter-spacing: 0.3px;
+}
+
+// ============================================================
+// Footer — project info + status
+// ============================================================
+.nebula-index__footer {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--strix-border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.8s both;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.nebula-index__info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.nebula-index__info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nebula-index__info-sep {
+  color: var(--strix-text-muted);
+  font-size: $text-2xs;
+  margin: 0 6px;
+  opacity: 0.5;
+}
+
+.nebula-index__info-key {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-dim);
+  letter-spacing: 0.5px;
+
+  &::after {
+    content: ':';
+    margin-left: 1px;
+    color: var(--strix-border-subtle);
+  }
+}
+
+.nebula-index__info-val {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-secondary);
+  letter-spacing: 0.3px;
+}
+
+.nebula-index__status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.nebula-index__status-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--strix-text-muted);
+  opacity: 0.5;
+}

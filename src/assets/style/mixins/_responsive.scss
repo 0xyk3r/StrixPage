@@ -1,0 +1,92 @@
+// ============================================================
+// Nebula Design System — Responsive Mixin
+// ============================================================
+
+@use '../tokens/spacing' as sp;
+
+// 最小宽度 (桌面优先的断点)
+@mixin screen-sm-up {
+  @media (min-width: #{sp.$breakpoint-sm}) {
+    @content;
+  }
+}
+
+@mixin screen-md-up {
+  @media (min-width: #{sp.$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin screen-lg-up {
+  @media (min-width: #{sp.$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin screen-xl-up {
+  @media (min-width: #{sp.$breakpoint-xl}) {
+    @content;
+  }
+}
+
+// 最大宽度 (移动优先的断点)
+@mixin screen-sm-down {
+  @media (max-width: #{sp.$breakpoint-sm - 1}) {
+    @content;
+  }
+}
+
+@mixin screen-md-down {
+  @media (max-width: #{sp.$breakpoint-md - 1}) {
+    @content;
+  }
+}
+
+@mixin screen-lg-down {
+  @media (max-width: #{sp.$breakpoint-lg - 1}) {
+    @content;
+  }
+}
+
+@mixin screen-xl-down {
+  @media (max-width: #{sp.$breakpoint-xl - 1}) {
+    @content;
+  }
+}
+
+// 文本截断
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 隐藏滚动条但保留滚动功能
+@mixin hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// 细滚动条
+@mixin thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--strix-border-default) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--strix-border-default);
+    border-radius: 4px;
+  }
+}

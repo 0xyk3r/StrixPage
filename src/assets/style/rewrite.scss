@@ -1,5 +1,6 @@
 /**
  * 对 Naive UI 组件库样式的重写
+ * 与 Nebula 设计系统对齐
  */
 
 // n-alert 去除 margin
@@ -7,14 +8,13 @@
   margin: 0;
 }
 
-// n-table 数据载入动画
-// 前 $_max-stagger 行使用交错延迟产生波浪效果，之后的行立即渐入
+// n-table 数据载入动画 — 使用 Nebula 交错动画
 $_max-stagger: 20;
 $_stagger-step: 18ms;
 $_anim-duration: 280ms;
 
 .n-data-table-tbody .n-data-table-tr {
-  animation: animation-table-tr $_anim-duration both ease-out;
+  animation: nebula-stagger-row $_anim-duration both ease-out;
 }
 
 @for $n from 1 through $_max-stagger {
@@ -23,13 +23,15 @@ $_anim-duration: 280ms;
   }
 }
 
-@keyframes animation-table-tr {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+// NaiveUI 全局圆角增强
+.n-card {
+  border-radius: 10px !important;
+}
+
+.n-dialog {
+  border-radius: 14px !important;
+}
+
+.n-modal .n-card {
+  border-radius: 14px !important;
 }

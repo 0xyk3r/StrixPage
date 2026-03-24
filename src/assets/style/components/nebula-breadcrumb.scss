@@ -1,0 +1,70 @@
+// ============================================================
+// Nebula Design System — Breadcrumb Styles
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  // 小屏幕隐藏
+  @media (max-width: $breakpoint-xl) {
+    display: none;
+  }
+}
+
+// ---- 面包屑项 ----
+.nebula-crumb {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  padding: 2px $space-1;
+  border-radius: $radius-sm;
+  font-size: $text-sm;
+  color: var(--strix-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all $duration-fast;
+  cursor: default;
+  line-height: 1;
+
+  &--link {
+    cursor: pointer;
+
+    &:hover {
+      color: var(--strix-text-secondary);
+      background: var(--strix-bg-surface);
+    }
+  }
+
+  // 最后一项 (当前页面)
+  &--current {
+    color: var(--strix-text-primary);
+    font-weight: $weight-medium;
+    flex-shrink: 1;
+    min-width: 0;
+    @include text-ellipsis;
+  }
+}
+
+// ---- 分隔符 ----
+.nebula-crumb__sep {
+  color: var(--strix-text-muted);
+  font-size: $text-xs;
+  flex-shrink: 0;
+  margin: 0 1px;
+  user-select: none;
+}
+
+// ---- 图标 ----
+.nebula-crumb__icon {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  opacity: 0.7;
+}

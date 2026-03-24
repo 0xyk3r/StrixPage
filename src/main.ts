@@ -1,4 +1,4 @@
-import './assets/style/base.scss'
+import './assets/style/nebula.scss'
 import './assets/style/common.scss'
 import './assets/style/rewrite.scss'
 

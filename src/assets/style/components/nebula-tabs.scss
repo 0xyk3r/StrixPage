@@ -1,0 +1,236 @@
+// ============================================================
+// Nebula Design System — Tab Bar Styles
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-tabs {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: $space-1;
+  min-width: 0;
+  position: relative;
+}
+
+// ---- 滚动箭头 ----
+.nebula-tabs__arrow {
+  width: 22px;
+  height: 22px;
+  border-radius: $radius-circle;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  color: var(--strix-text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all $duration-fast;
+  opacity: 0;
+  pointer-events: none;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-secondary);
+    border-color: var(--strix-border-default);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+// ---- 标签滚动容器 ----
+.nebula-tabs__scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
+  scroll-behavior: smooth;
+  @include hide-scrollbar;
+  padding: 2px 0;
+}
+
+// ---- 单个标签胶囊 ----
+.nebula-tab {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  height: 28px;
+  padding: 0 $space-3;
+  border-radius: $radius-pill;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--strix-text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all $duration-fast;
+  position: relative;
+  font-size: $text-sm;
+  font-weight: $weight-medium;
+  max-width: 180px;
+  user-select: none;
+
+  &:hover {
+    background: var(--strix-bg-surface);
+    color: var(--strix-text-secondary);
+    border-color: var(--strix-border-subtle);
+
+    .nebula-tab__close {
+      opacity: 1;
+      width: 14px;
+    }
+  }
+
+  &--active {
+    background: var(--strix-border-accent);
+    color: var(--strix-text-accent);
+    border-color: var(--strix-border-accent-hover);
+
+    &:hover {
+      background: var(--strix-border-accent);
+      color: var(--strix-text-accent);
+      border-color: var(--strix-border-accent-hover);
+    }
+  }
+
+  &--fixed {
+    padding-right: $space-3;
+
+    .nebula-tab__close {
+      display: none;
+    }
+  }
+
+  &--dragging {
+    opacity: 0.5;
+  }
+}
+
+// ---- 固定标签标记 ----
+.nebula-tab__pin {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  color: var(--strix-text-muted);
+}
+
+// ---- 标签文字 ----
+.nebula-tab__text {
+  @include text-ellipsis;
+  max-width: 130px;
+  line-height: 1;
+}
+
+// ---- 关闭按钮 ----
+.nebula-tab__close {
+  width: 0;
+  height: 14px;
+  border-radius: $radius-circle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-muted);
+  flex-shrink: 0;
+  transition: all $duration-fast;
+  opacity: 0;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  &:hover {
+    color: var(--strix-color-error);
+    background: rgba($color-error, 0.12);
+  }
+}
+
+// ---- 标签数量指示器 ----
+.nebula-tabs__count {
+  height: 20px;
+  min-width: 20px;
+  padding: 0 $space-1;
+  border-radius: $radius-pill;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  color: var(--strix-text-muted);
+  font-size: $text-2xs;
+  font-family: $font-mono;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+// ---- 右键上下文菜单 ----
+.nebula-context-menu {
+  position: fixed;
+  z-index: $z-popover;
+  min-width: 160px;
+  padding: $space-1;
+  border-radius: $radius-lg;
+  @include glass;
+  border: 1px solid var(--strix-border-default);
+  box-shadow: $shadow-lg;
+  animation: nebula-context-in $duration-fast $ease-out-expo;
+}
+
+@keyframes nebula-context-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.nebula-context-item {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 6px $space-3;
+  border-radius: $radius-md;
+  font-size: $text-sm;
+  color: var(--strix-text-secondary);
+  cursor: pointer;
+  transition: all $duration-fast;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-primary);
+  }
+
+  &--danger:hover {
+    background: rgba($color-error, 0.1);
+    color: $color-error;
+  }
+}
+
+.nebula-context-divider {
+  height: 1px;
+  margin: $space-1 $space-2;
+  background: var(--strix-border-subtle);
+}
+
+// ---- 小屏幕隐藏 ----
+@media (max-width: $breakpoint-lg) {
+  .nebula-tabs {
+    display: none;
+  }
+}

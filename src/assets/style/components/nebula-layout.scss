@@ -1,0 +1,151 @@
+// ============================================================
+// Nebula Layout — 主布局样式
+// ============================================================
+
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-app {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--strix-bg-base);
+}
+
+// ---- Header ----
+.nebula-header {
+  position: relative;
+  z-index: $z-header;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  height: var(--strix-header-height);
+  padding: 0 $space-4;
+  flex-shrink: 0;
+}
+
+// ---- Logo 按钮 ----
+.nebula-logo-btn {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: $radius-md;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.35s $ease-out-expo;
+
+  &:hover {
+    background: var(--strix-accent-glow-subtle);
+  }
+
+  &:active {
+    .nebula-logo-text {
+      transform: scale(0.97);
+    }
+  }
+
+  // 面板打开时，隐藏 header Logo (面板内有独立的 Logo)
+  &.drawer-open {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.nebula-logo-text {
+  font-family: $font-display;
+  font-weight: $weight-extrabold;
+  font-size: 20px;
+  font-style: italic;
+  letter-spacing: -0.5px;
+  padding-right: 3px;
+  background: var(--strix-logo-gradient);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nebula-logo-shimmer 6s ease-in-out infinite;
+  transition: all 0.45s $ease-out-expo;
+
+  .nebula-logo-btn:hover:not(.drawer-open) & {
+    filter: drop-shadow(0 0 12px var(--strix-accent-glow));
+    transform: scale(1.04);
+  }
+}
+
+.nebula-logo-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--strix-text-accent);
+  margin-left: 2px;
+  position: relative;
+  top: -0.55em;
+  box-shadow: 0 0 8px var(--strix-accent-glow);
+  animation: nebula-logo-pulse 2s ease-in-out infinite;
+  transition: all 0.45s $ease-out-expo;
+}
+
+.nebula-logo-hint {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px 8px;
+  border-radius: $radius-xs;
+  background: var(--strix-bg-elevated);
+  border: 1px solid var(--strix-border-default);
+  color: var(--strix-text-muted);
+  font-size: $text-2xs;
+  font-family: $font-mono;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $duration-fast;
+  z-index: $z-popover;
+
+  .nebula-logo-btn:hover & {
+    opacity: 1;
+  }
+}
+
+// ---- Header Sections ----
+.nebula-header__breadcrumb {
+  flex-shrink: 0;
+  width: 200px;
+  min-width: 0;
+  overflow: hidden;
+
+  @include screen-xl-down {
+    display: none;
+  }
+}
+
+.nebula-header__tabs {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nebula-header__toolbar {
+  flex-shrink: 0;
+}
+
+// ---- Main Content ----
+.nebula-main {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  z-index: $z-base;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $space-3 $space-4 $space-4;
+  @include thin-scrollbar;
+}
+
+.nebula-content-view {
+  position: relative;
+  user-select: text;
+  min-height: 100%;
+}

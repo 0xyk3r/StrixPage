@@ -1,61 +1,51 @@
 <template>
-  <div ref="toolbarContainerRef" class="toolbar-container">
-    <n-flex :size="10" :wrap="false">
-      <!-- 通知 -->
-      <StrixNotification />
+  <div class="nebula-toolbar">
+    <!-- 通知 -->
+    <StrixNotification />
 
-      <!-- Teleport 插入位置 -->
-      <span id="strix-tool-bar-item"></span>
+    <!-- 工具按钮组 -->
+    <div class="nebula-toolbar__group">
+      <!-- 主题切换 -->
+      <button class="nebula-toolbar__btn" title="切换主题" @click="changeTheme">
+        <StrixIcon icon="contrast" :size="15" />
+      </button>
 
-      <!-- 更改主题 -->
-      <n-icon-wrapper
-        :border-radius="5"
-        :color="themeVars.actionColor"
-        :icon-color="themeVars.textColorBase"
-        :size="32"
-      >
-        <n-icon :size="18">
-          <StrixIcon icon="contrast" @click="changeTheme" />
-        </n-icon>
-      </n-icon-wrapper>
-
-      <!-- 切换全屏 -->
-      <n-icon-wrapper
-        :border-radius="5"
-        :color="themeVars.actionColor"
-        :icon-color="themeVars.textColorBase"
-        :size="32"
-      >
-        <n-icon :size="18">
-          <StrixIcon icon="expand" @click="switchFullscreen" />
-        </n-icon>
-      </n-icon-wrapper>
+      <!-- 全屏切换 -->
+      <button class="nebula-toolbar__btn" title="全屏" @click="switchFullscreen">
+        <StrixIcon icon="expand" :size="15" />
+      </button>
 
       <!-- 刷新全部 -->
-      <n-icon-wrapper
-        :border-radius="5"
-        :color="themeVars.actionColor"
-        :icon-color="themeVars.textColorBase"
-        :size="32"
-      >
-        <n-icon :size="18">
-          <StrixIcon icon="refresh-cw" @click="reloadAll" />
-        </n-icon>
-      </n-icon-wrapper>
-    </n-flex>
+      <button class="nebula-toolbar__btn" title="刷新" @click="reloadAll">
+        <StrixIcon icon="refresh-cw" :size="15" />
+      </button>
+    </div>
 
-    <n-dropdown
-      :options="avatarDropdownOptions"
-      placement="bottom-start"
-      trigger="hover"
-      @select="handleAvatarDropdownSelect"
-    >
-      <span class="user-dropdown">
-        <span class="user-name">
-          {{ loginInfo.nickname || '未知' }}
-        </span>
-      </span>
-    </n-dropdown>
+    <!-- 用户信息 -->
+    <div class="nebula-toolbar__user" @click.stop="toggleUserMenu">
+      <div class="nebula-toolbar__avatar">
+        {{ avatarLetter }}
+      </div>
+      <span class="nebula-toolbar__name">{{ loginInfo.nickname || '未知' }}</span>
+      <StrixIcon icon="chevron-down" :size="12" :class="['nebula-toolbar__chevron', { open: showUserMenu }]" />
+
+      <!-- 用户下拉菜单 -->
+      <Transition name="nebula-overlay">
+        <div v-if="showUserMenu" class="nebula-user-dropdown" @click.stop>
+          <div class="nebula-user-dropdown__item" @click="handleUserAction('setting')">
+            <StrixIcon icon="settings" :size="14" />
+            <span>个人设置</span>
+          </div>
+          <div
+            class="nebula-user-dropdown__item nebula-user-dropdown__item--danger"
+            @click="handleUserAction('logout')"
+          >
+            <StrixIcon icon="log-out" :size="14" />
+            <span>退出登录</span>
+          </div>
+        </div>
+      </Transition>
+    </div>
   </div>
 </template>
 
@@ -64,17 +54,38 @@ import { http } from '@/plugins/axios.ts'
 import { EventBus } from '@/plugins/event-bus.ts'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { createStrixMessage } from '@/utils/strix-message.ts'
-import { useThemeVars } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
 
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()
-const themeVars = useThemeVars()
 
 const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
 
-// 切换全屏状态
+// 头像首字母
+const avatarLetter = computed(() => {
+  const name = loginInfo.value.nickname || '?'
+  return name.charAt(0).toUpperCase()
+})
+
+// 用户菜单
+const showUserMenu = ref(false)
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value
+}
+
+// 全局点击关闭菜单
+const closeUserMenu = () => {
+  showUserMenu.value = false
+}
+onMounted(() => {
+  document.addEventListener('click', closeUserMenu)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', closeUserMenu)
+})
+
+// 切换全屏
 const switchFullscreen = () => {
   if (!screenfull.isEnabled) {
     return createStrixMessage('warning', '进入全屏失败', '您的浏览器不支持或拒绝了全屏操作，请您手动使用F11进入全屏')
@@ -82,27 +93,23 @@ const switchFullscreen = () => {
   screenfull.toggle()
 }
 
-// 监听mitt通知并刷新所有组件
-onMounted(() => {
-  EventBus.on('reload-router-view', reloadAll)
-})
-
 // 切换主题
 const changeTheme = () => {
   EventBus.emit('changeTheme')
 }
 
-// 切换主题
+// 刷新全部
 const reloadAll = () => {
   EventBus.emit('reload-all')
 }
 
-// 右上角头像下拉菜单
-const avatarDropdownOptions = [
-  { key: 'setting', label: '个人设置' },
-  { key: 'logout', label: '退出登录' }
-]
-const handleAvatarDropdownSelect = (key: string) => {
+onMounted(() => {
+  EventBus.on('reload-router-view', reloadAll)
+})
+
+// 用户菜单操作
+const handleUserAction = (key: string) => {
+  showUserMenu.value = false
   switch (key) {
     case 'setting':
       createStrixMessage('warning', '操作失败', '该功能暂未开放，敬请期待')
@@ -121,32 +128,3 @@ const logout = () => {
   })
 }
 </script>
-
-<style lang="scss" scoped>
-.toolbar-container {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-
-  .n-icon .strix-icon:hover {
-    color: #63e2b7;
-  }
-
-  .user-dropdown {
-    height: 100%;
-    display: flex;
-    align-items: center;
-
-    .user-name {
-      cursor: pointer;
-      white-space: nowrap;
-
-      &:hover {
-        color: #63e2b7;
-      }
-    }
-  }
-}
-</style>

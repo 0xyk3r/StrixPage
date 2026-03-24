@@ -1,0 +1,612 @@
+// ============================================================
+// Nebula Design System — Login Page Styles (Sci-Fi Terminal)
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// ---- 全页容器 ----
+.nebula-login {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: $font-body;
+  background: var(--strix-bg-base);
+}
+
+// ---- 画布网格背景 ----
+.nebula-login__grid {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+// ---- 扫描线纹理 ----
+.nebula-login__scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.02) 2px, rgba(0, 0, 0, 0.02) 4px);
+}
+
+// ---- HUD 四角装饰 ----
+.nebula-login__hud-corner {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  animation: nebula-login-hud-in 0.6s ease 1.6s both;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: var(--strix-border-accent);
+    opacity: 0.6;
+  }
+
+  &--tl {
+    top: 16px;
+    left: 16px;
+
+    &::before {
+      width: 18px;
+      height: 1px;
+      top: 0;
+      left: 0;
+    }
+
+    &::after {
+      width: 1px;
+      height: 18px;
+      top: 0;
+      left: 0;
+    }
+  }
+
+  &--tr {
+    top: 16px;
+    right: 16px;
+
+    &::before {
+      width: 18px;
+      height: 1px;
+      top: 0;
+      right: 0;
+    }
+
+    &::after {
+      width: 1px;
+      height: 18px;
+      top: 0;
+      right: 0;
+    }
+  }
+
+  &--bl {
+    bottom: 16px;
+    left: 16px;
+
+    &::before {
+      width: 18px;
+      height: 1px;
+      bottom: 0;
+      left: 0;
+    }
+
+    &::after {
+      width: 1px;
+      height: 18px;
+      bottom: 0;
+      left: 0;
+    }
+  }
+
+  &--br {
+    bottom: 16px;
+    right: 16px;
+
+    &::before {
+      width: 18px;
+      height: 1px;
+      bottom: 0;
+      right: 0;
+    }
+
+    &::after {
+      width: 1px;
+      height: 18px;
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+
+.nebula-login__hud-label {
+  position: fixed;
+  z-index: 5;
+  pointer-events: none;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: nebula-login-hud-in 0.6s ease 1.9s both;
+
+  &--tl {
+    top: 24px;
+    left: 60px;
+  }
+
+  &--br {
+    bottom: 24px;
+    right: 60px;
+  }
+}
+
+// ---- 切角面板 ----
+$cut: 20px;
+$cut-sm: 14px;
+
+.nebula-login__panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 440px;
+  filter: drop-shadow(0 0 1px var(--strix-border-accent));
+  animation: nebula-login-boot 1s $ease-out-expo 0.3s both;
+
+  @media (max-width: 500px) {
+    width: calc(100% - 24px);
+  }
+}
+
+.nebula-login__frame {
+  position: relative;
+  padding: 52px 44px 44px;
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(40px) saturate(130%);
+  clip-path: polygon(
+      0 $cut, $cut 0,
+      calc(100% - #{$cut}) 0, 100% $cut,
+      100% calc(100% - #{$cut}), calc(100% - #{$cut}) 100%,
+      $cut 100%, 0 calc(100% - #{$cut})
+  );
+
+  @media (max-width: 500px) {
+    padding: 40px 28px 36px;
+    clip-path: polygon(
+        0 $cut-sm, $cut-sm 0,
+        calc(100% - #{$cut-sm}) 0, 100% $cut-sm,
+        100% calc(100% - #{$cut-sm}), calc(100% - #{$cut-sm}) 100%,
+        $cut-sm 100%, 0 calc(100% - #{$cut-sm})
+    );
+  }
+}
+
+// 面板扫描线
+.nebula-login__scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--strix-border-accent), transparent);
+  opacity: 0;
+  animation: nebula-login-scan-sweep 4s ease-in-out 2.5s infinite;
+  z-index: 15;
+  pointer-events: none;
+}
+
+// ---- 面板标题栏 ----
+.nebula-login__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--strix-border-subtle);
+  animation: nebula-login-el-up 0.7s $ease-out-expo 0.7s both;
+}
+
+.nebula-login__panel-id {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 1.5px;
+}
+
+.nebula-login__panel-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+}
+
+.nebula-login__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--strix-text-accent);
+  box-shadow: 0 0 8px var(--strix-accent-glow);
+  animation: nebula-login-status-blink 2s ease-in-out infinite;
+}
+
+// ---- Logo ----
+.nebula-login__logo {
+  text-align: center;
+  margin: 28px 0 4px;
+  animation: nebula-login-el-up 0.7s $ease-out-expo 0.85s both;
+}
+
+.nebula-login__logo-text {
+  font-family: $font-display;
+  font-weight: $weight-extrabold;
+  font-size: 54px;
+  font-style: italic;
+  letter-spacing: -2px;
+  padding-right: 5px;
+  background: var(--strix-logo-gradient);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nebula-logo-shimmer 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px var(--strix-accent-glow-subtle));
+}
+
+.nebula-login__logo-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--strix-text-accent);
+  margin-left: 1px;
+  position: relative;
+  top: -0.55em;
+  box-shadow: 0 0 14px var(--strix-accent-glow);
+  animation: nebula-logo-pulse 2s ease-in-out infinite;
+}
+
+// ---- 标语 ----
+.nebula-login__tagline {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: nebula-login-el-up 0.7s $ease-out-expo 0.95s both;
+}
+
+.nebula-login__tagline-text {
+  font-family: $font-mono;
+  font-size: $text-xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.nebula-login__cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--strix-border-accent);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: nebula-login-cursor-blink 1s step-end infinite;
+}
+
+// ---- 表单 ----
+.nebula-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+// ---- 字段组 ----
+.nebula-login__field {
+  animation: nebula-login-el-up 0.7s $ease-out-expo var(--d, 1s) both;
+}
+
+.nebula-login__field-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.nebula-login__indicator {
+  width: 3px;
+  height: 14px;
+  background: var(--strix-text-accent);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: all $duration-normal ease;
+  box-shadow: 0 0 6px var(--strix-accent-glow-subtle);
+}
+
+.nebula-login__label-text {
+  font-family: $font-mono;
+  font-size: $text-xs;
+  color: var(--strix-text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nebula-login__required {
+  font-size: $text-sm;
+  color: $color-error;
+  line-height: 1;
+}
+
+// ---- 输入框外壳 ----
+.nebula-login__input-shell {
+  position: relative;
+  border: 1px solid var(--strix-border-default);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.35s ease;
+  background: var(--strix-bg-surface);
+
+  // 左侧装饰条
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--strix-border-accent);
+    opacity: 0.2;
+    transition: all 0.35s ease;
+    z-index: 2;
+  }
+
+  // 底部扫描线
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--strix-border-accent), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s $ease-out-expo;
+    z-index: 2;
+  }
+}
+
+// Focus 状态
+.nebula-login__field.focused {
+  .nebula-login__input-shell {
+    border-color: var(--strix-border-accent);
+    box-shadow: 0 0 0 1px var(--strix-accent-glow-subtle),
+    0 0 24px rgba(99, 226, 183, 0.04),
+    inset 0 0 30px rgba(99, 226, 183, 0.015);
+
+    &::before {
+      background: var(--strix-text-accent);
+      opacity: 1;
+      box-shadow: 0 0 8px var(--strix-accent-glow);
+    }
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .nebula-login__indicator {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--strix-accent-glow);
+  }
+}
+
+// Error 状态
+.nebula-login__field.has-error {
+  .nebula-login__input-shell {
+    border-color: $color-error;
+
+    &::before {
+      background: $color-error;
+      opacity: 0.8;
+    }
+  }
+
+  .nebula-login__indicator {
+    background: $color-error;
+    box-shadow: 0 0 6px rgba($color-error, 0.4);
+  }
+}
+
+// ---- 输入框 ----
+.nebula-login__input {
+  width: 100%;
+  height: 50px;
+  padding: 0 16px 0 18px;
+  border: none;
+  background: transparent;
+  color: var(--strix-text-primary);
+  font-size: $text-sm;
+  font-family: $font-body;
+  outline: none;
+  position: relative;
+  z-index: 1;
+
+  &::placeholder {
+    color: var(--strix-text-muted);
+    font-family: $font-mono;
+    font-size: $text-xs;
+    letter-spacing: 0.5px;
+  }
+
+  &--password {
+    padding-right: 50px;
+  }
+}
+
+// ---- 密码切换 ----
+.nebula-login__toggle-pwd {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  color: var(--strix-text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $duration-fast;
+  z-index: 3;
+
+  &:hover {
+    color: var(--strix-text-accent);
+    background: var(--strix-accent-glow-subtle);
+  }
+}
+
+// ---- 字段错误 ----
+.nebula-login__field-error {
+  margin-top: 8px;
+  font-size: $text-2xs;
+  font-family: $font-mono;
+  color: $color-error;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.5px;
+  animation: nebula-login-el-up 0.3s $ease-out-expo both;
+}
+
+// ---- 操作栏 ----
+.nebula-login__actions {
+  margin-top: 12px;
+  animation: nebula-login-el-up 0.7s $ease-out-expo 1.2s both;
+}
+
+// ---- 登录按钮 (充能/扫描风格) ----
+.nebula-login__submit {
+  width: 100%;
+  height: 52px;
+  border: 1px solid var(--strix-border-accent);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--strix-text-accent);
+  font-size: $text-sm;
+  font-weight: $weight-bold;
+  font-family: $font-mono;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s ease;
+
+  // 充能填充
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, var(--strix-accent-glow-subtle), transparent);
+    transition: width 0.5s $ease-out-expo;
+  }
+
+  // 扫描光束
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    left: -40px;
+    background: linear-gradient(90deg, transparent, rgba(99, 226, 183, 0.15), transparent);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--strix-text-accent);
+    box-shadow: 0 0 20px var(--strix-accent-glow-subtle), inset 0 0 20px rgba(99, 226, 183, 0.02);
+
+    &::before {
+      width: 100%;
+    }
+
+    &::after {
+      animation: nebula-login-btn-scan 1.2s ease 0.3s;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.nebula-login__submit-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.nebula-login__bracket {
+  font-weight: $weight-light;
+  opacity: 0.5;
+  transition: all $duration-normal;
+
+  .nebula-login__submit:hover & {
+    opacity: 1;
+    letter-spacing: 2px;
+  }
+}
+
+.nebula-login__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: nebula-spin 0.6s linear infinite;
+}
+
+// ---- 版权 ----
+.nebula-login__copyright {
+  position: fixed;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: $text-2xs;
+  font-family: $font-mono;
+  color: var(--strix-text-muted);
+  z-index: 10;
+  animation: nebula-login-el-up 0.6s ease 1.5s both;
+
+  a {
+    color: var(--strix-text-muted);
+    text-decoration: none;
+    transition: color $duration-fast;
+
+    &:hover {
+      color: var(--strix-text-accent);
+    }
+  }
+}

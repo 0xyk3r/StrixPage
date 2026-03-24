@@ -122,6 +122,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/assets/style/tokens" as *;\n@use "@/assets/style/mixins" as *;\n`
+      }
+    }
+  },
   build: {
     target: 'es2015'
   },

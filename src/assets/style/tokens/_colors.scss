@@ -1,0 +1,78 @@
+// ============================================================
+// Nebula Design System — Color Tokens
+// ============================================================
+// 通过 CSS Custom Properties 实现运行时主题切换
+// 使用 [data-theme="dark"] / [data-theme="light"] 选择器
+
+// ---- 编译期常量: 原始色板 ----
+// 主色 (Accent)
+$color-accent-green: #63e2b7;
+$color-accent-teal: #4ecdc4;
+$color-accent-mint: #88d8a8;
+
+// 语义色
+$color-success: #63e2b7;
+$color-warning: #f2c97d;
+$color-error: #e88080;
+$color-info: #70c0e8;
+
+// ---- Dark 主题原始值 ----
+$dark-bg-base: #06060e;
+$dark-bg-elevated: #0a0b14;
+$dark-bg-surface: rgba(255, 255, 255, 0.022);
+$dark-bg-surface-hover: rgba(255, 255, 255, 0.04);
+$dark-bg-overlay: rgba(0, 0, 0, 0.35);
+
+$dark-border-subtle: rgba(255, 255, 255, 0.04);
+$dark-border-default: rgba(255, 255, 255, 0.06);
+$dark-border-accent: rgba(99, 226, 183, 0.12);
+$dark-border-accent-hover: rgba(99, 226, 183, 0.25);
+
+$dark-text-primary: #e0e0e0;
+$dark-text-secondary: rgba(255, 255, 255, 0.55);
+$dark-text-tertiary: rgba(255, 255, 255, 0.3);
+$dark-text-dim: rgba(255, 255, 255, 0.4);
+$dark-text-muted: rgba(255, 255, 255, 0.22);
+$dark-text-accent: #63e2b7;
+
+// ---- Light 主题原始值 ----
+$light-bg-base: #f5f6fa;
+$light-bg-elevated: #ffffff;
+$light-bg-surface: rgba(0, 0, 0, 0.025);
+$light-bg-surface-hover: rgba(0, 0, 0, 0.05);
+$light-bg-overlay: rgba(0, 0, 0, 0.18);
+
+$light-border-subtle: rgba(0, 0, 0, 0.06);
+$light-border-default: rgba(0, 0, 0, 0.09);
+$light-border-accent: rgba(45, 180, 140, 0.2);
+$light-border-accent-hover: rgba(45, 180, 140, 0.4);
+
+$light-text-primary: #1a1a2e;
+$light-text-secondary: rgba(0, 0, 0, 0.6);
+$light-text-tertiary: rgba(0, 0, 0, 0.35);
+$light-text-dim: rgba(0, 0, 0, 0.45);
+$light-text-muted: rgba(0, 0, 0, 0.28);
+$light-text-accent: #2db48c;
+
+// ---- NaiveUI 主题对接颜色 (用于 themeOverrides) ----
+$naive-dark-body-color: #0a0b14;
+$naive-dark-card-color: #0f1019;
+$naive-dark-modal-color: #12131e;
+$naive-dark-popover-color: #12131e;
+$naive-dark-table-color: rgba(255, 255, 255, 0.022);
+$naive-dark-input-color: rgba(255, 255, 255, 0.035);
+$naive-dark-action-color: rgba(255, 255, 255, 0.035);
+$naive-dark-hover-color: rgba(255, 255, 255, 0.06);
+$naive-dark-border-color: rgba(255, 255, 255, 0.06);
+$naive-dark-divider-color: rgba(255, 255, 255, 0.06);
+
+$naive-light-body-color: #f5f6fa;
+$naive-light-card-color: #ffffff;
+$naive-light-modal-color: #ffffff;
+$naive-light-popover-color: #ffffff;
+$naive-light-table-color: rgba(0, 0, 0, 0.02);
+$naive-light-input-color: rgba(0, 0, 0, 0.03);
+$naive-light-action-color: rgba(0, 0, 0, 0.03);
+$naive-light-hover-color: rgba(0, 0, 0, 0.06);
+$naive-light-border-color: rgba(0, 0, 0, 0.09);
+$naive-light-divider-color: rgba(0, 0, 0, 0.09);

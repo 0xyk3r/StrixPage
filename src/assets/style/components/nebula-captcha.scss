@@ -1,0 +1,420 @@
+// ============================================================
+// Nebula Design System — Captcha Styles (Sci-Fi Terminal)
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+$captcha-cut: 16px;
+
+// ---- 验证码遮罩 ----
+.nebula-captcha-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-notification;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+// ---- 验证码弹窗 (切角面板) ----
+.nebula-captcha-modal {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  filter: drop-shadow(0 0 1px var(--strix-border-accent));
+  animation: nebula-captcha-enter 0.4s $ease-out-expo both;
+}
+
+.nebula-captcha__frame {
+  position: relative;
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(40px) saturate(130%);
+  clip-path: polygon(
+      0 $captcha-cut, $captcha-cut 0,
+      calc(100% - #{$captcha-cut}) 0, 100% $captcha-cut,
+      100% calc(100% - #{$captcha-cut}), calc(100% - #{$captcha-cut}) 100%,
+      $captcha-cut 100%, 0 calc(100% - #{$captcha-cut})
+  );
+  overflow: hidden;
+}
+
+// 面板扫描线
+.nebula-captcha__scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--strix-border-accent), transparent);
+  opacity: 0;
+  animation: nebula-login-scan-sweep 4s ease-in-out 1s infinite;
+  z-index: 15;
+  pointer-events: none;
+}
+
+// ---- 弹窗头部 (终端风格) ----
+.nebula-captcha__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--strix-border-subtle);
+}
+
+.nebula-captcha__panel-id {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+  letter-spacing: 1.5px;
+}
+
+.nebula-captcha__panel-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  color: var(--strix-text-muted);
+}
+
+.nebula-captcha__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--strix-text-accent);
+  box-shadow: 0 0 8px var(--strix-accent-glow);
+  animation: nebula-login-status-blink 2s ease-in-out infinite;
+}
+
+.nebula-captcha__close {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--strix-border-default);
+  background: transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-muted);
+  transition: all $duration-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+    color: var(--strix-text-accent);
+    box-shadow: 0 0 8px var(--strix-accent-glow-subtle);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+// ---- 弹窗内容 ----
+.nebula-captcha__body {
+  padding: 20px 24px 24px;
+}
+
+// ---- 拼图验证码 ----
+.nebula-puzzle {
+  width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+// ---- 图片区域 ----
+.nebula-puzzle__image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+}
+
+// ---- 刷新按钮 ----
+.nebula-puzzle__refresh {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--strix-border-default);
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(8px);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-secondary);
+  transition: all $duration-fast;
+  z-index: 5;
+
+  &:hover {
+    color: var(--strix-text-accent);
+    border-color: var(--strix-border-accent);
+    box-shadow: 0 0 8px var(--strix-accent-glow-subtle);
+    transform: rotate(90deg);
+  }
+
+  &:active {
+    transform: rotate(90deg) scale(0.9);
+  }
+}
+
+// ---- 提示条 ----
+.nebula-puzzle__tip {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: $text-xs;
+  font-family: $font-mono;
+  font-weight: $weight-bold;
+  color: white;
+  letter-spacing: 0.5px;
+  z-index: 4;
+
+  &--success {
+    background: rgba($color-success, 0.88);
+  }
+
+  &--error {
+    background: rgba($color-error, 0.88);
+  }
+}
+
+// ---- 拼图滑块块 ----
+.nebula-puzzle__piece {
+  position: absolute;
+  top: 0;
+  z-index: 3;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+}
+
+// ---- 滑动条 (科幻风格) ----
+.nebula-puzzle__track {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  margin-top: 14px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 3px;
+  overflow: visible;
+}
+
+// ---- 轨道文字 ----
+.nebula-puzzle__track-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $text-xs;
+  font-family: $font-mono;
+  color: var(--strix-text-muted);
+  letter-spacing: 1px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+// ---- 进度填充 ----
+.nebula-puzzle__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 3px;
+  z-index: 2;
+  transition: background $duration-fast;
+
+  &--moving {
+    background: linear-gradient(90deg, var(--strix-accent-glow-subtle), transparent);
+    opacity: 0.5;
+  }
+
+  &--success {
+    background: linear-gradient(90deg, rgba($color-success, 0.2), rgba($color-success, 0.05));
+    opacity: 0.6;
+  }
+
+  &--error {
+    background: linear-gradient(90deg, rgba($color-error, 0.2), rgba($color-error, 0.05));
+    opacity: 0.6;
+  }
+}
+
+.nebula-puzzle__fill-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $text-xs;
+  font-family: $font-mono;
+  color: white;
+  font-weight: $weight-bold;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+
+// ---- 滑块拇指 ----
+.nebula-puzzle__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0;
+  width: 44px;
+  height: 44px;
+  background: var(--strix-bg-elevated);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 3px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-secondary);
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color $duration-fast, color $duration-fast, box-shadow $duration-fast, background $duration-fast;
+
+  &:hover {
+    border-color: var(--strix-text-accent);
+    color: var(--strix-text-accent);
+    box-shadow: 0 0 12px var(--strix-accent-glow-subtle);
+  }
+
+  &--moving {
+    cursor: grabbing;
+    border-color: var(--strix-text-accent);
+    color: var(--strix-text-accent);
+    box-shadow: 0 0 16px var(--strix-accent-glow-subtle);
+    transform: translateY(-50%) scale(1.06);
+  }
+
+  &--success {
+    border-color: $color-success;
+    background: $color-success;
+    color: white;
+    cursor: default;
+    box-shadow: 0 0 12px rgba($color-success, 0.4);
+
+    &:hover {
+      transform: translateY(-50%);
+    }
+  }
+
+  &--error {
+    border-color: $color-error;
+    background: $color-error;
+    color: white;
+    cursor: default;
+    animation: nebula-captcha-shake 0.5s ease;
+
+    &:hover {
+      transform: translateY(-50%);
+    }
+  }
+}
+
+// ---- 过渡动画 ----
+.nebula-captcha-enter-active,
+.nebula-captcha-leave-active {
+  transition: opacity $duration-normal $ease-out-smooth;
+}
+
+.nebula-captcha-enter-from,
+.nebula-captcha-leave-to {
+  opacity: 0;
+}
+
+.nebula-captcha-enter-active .nebula-captcha-modal,
+.nebula-captcha-leave-active .nebula-captcha-modal {
+  transition: all $duration-normal $ease-out-expo;
+}
+
+.nebula-captcha-enter-from .nebula-captcha-modal {
+  transform: scale(0.92) translateY(12px);
+  opacity: 0;
+}
+
+.nebula-captcha-leave-to .nebula-captcha-modal {
+  transform: scale(0.95) translateY(-8px);
+  opacity: 0;
+}
+
+// ---- 图片提示过渡 ----
+.nebula-tip-enter-active,
+.nebula-tip-leave-active {
+  transition: all $duration-fast ease;
+}
+
+.nebula-tip-enter-from {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.nebula-tip-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+// ---- 淡入淡出 ----
+.nebula-fade-enter-active,
+.nebula-fade-leave-active {
+  transition: opacity $duration-fast ease;
+}
+
+.nebula-fade-enter-from,
+.nebula-fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 480px) {
+  .nebula-captcha__head {
+    padding: 14px 18px;
+  }
+
+  .nebula-captcha__body {
+    padding: 16px 18px 20px;
+  }
+
+  .nebula-puzzle__track {
+    height: 40px;
+  }
+
+  .nebula-puzzle__thumb {
+    width: 40px;
+    height: 40px;
+  }
+}

@@ -1,116 +1,71 @@
 <template>
-  <div class="verify-slide">
+  <div class="nebula-puzzle">
     <!-- 验证图片区域 -->
-    <div
-      :style="{
-        width: computedSize.imgWidth,
-        height: computedSize.imgHeight
-      }"
-      class="verify-slide__image-panel"
-    >
-      <!-- 背景图片 -->
-      <img
-        v-if="originalImageBase64"
-        :src="`data:image/png;base64,${originalImageBase64}`"
-        alt="验证背景"
-        class="verify-slide__bg-image"
-      />
+    <div ref="imageRef" class="nebula-puzzle__image">
+      <img v-if="bgImage" :src="`data:image/png;base64,${bgImage}`" alt="验证背景" />
 
-      <!-- 刷新按钮 -->
-      <Transition name="fade">
-        <button v-if="showRefresh" aria-label="刷新验证码" class="verify-slide__refresh" @click="handleRefresh">
-          <StrixIcon :size="20" icon="refresh-cw" />
+      <!-- 刷新 -->
+      <Transition name="nebula-fade">
+        <button v-if="canRefresh" class="nebula-puzzle__refresh" aria-label="刷新验证码" @click="handleRefresh">
+          <StrixIcon icon="refresh-cw" :size="16" />
         </button>
       </Transition>
 
-      <!-- 提示信息 -->
-      <Transition name="slide-up">
-        <div v-if="tipMsg" :class="['verify-slide__tip', statusClass]">
-          <StrixIcon :icon="tipIcon" :size="18" class="verify-slide__tip-icon" />
-          <span>{{ tipMsg }}</span>
+      <!-- 状态提示 -->
+      <Transition name="nebula-tip">
+        <div v-if="tipText" :class="['nebula-puzzle__tip', `nebula-puzzle__tip--${status}`]">
+          <StrixIcon :icon="status === 'success' ? 'circle-check' : 'circle-alert'" :size="16" />
+          <span>{{ tipText }}</span>
         </div>
       </Transition>
 
-      <!-- 滑块拼图块 -->
+      <!-- 拼图块 -->
       <div
-        v-if="jigsawImageBase64"
-        :style="{
-          width: blockWidth + 'px',
-          height: computedSize.imgHeight,
-          left: moveBlockLeft,
-          transition: transitionLeft
-        }"
-        class="verify-slide__puzzle-block"
+        v-if="puzzleImage"
+        class="nebula-puzzle__piece"
+        :style="{ width: pieceWidth + 'px', height: '100%', left: thumbLeft, transition: thumbTransition }"
       >
-        <img :src="`data:image/png;base64,${jigsawImageBase64}`" alt="拼图块" class="verify-slide__puzzle-image" />
+        <img :src="`data:image/png;base64,${puzzleImage}`" alt="拼图块" />
       </div>
     </div>
 
-    <!-- 滑动条区域 -->
-    <div
-      ref="barAreaRef"
-      :style="{
-        width: computedSize.barWidth,
-        height: computedSize.barHeight
-      }"
-      class="verify-slide__bar"
-    >
-      <!-- 提示文字 -->
-      <div class="verify-slide__bar-text">{{ displayText }}</div>
+    <!-- 滑动条 -->
+    <div ref="trackRef" class="nebula-puzzle__track">
+      <div class="nebula-puzzle__track-text">{{ hintText }}</div>
 
-      <!-- 已滑动区域 -->
-      <div
-        :class="barFillClass"
-        :style="{
-          width: barFillWidth,
-          transition: transitionWidth
-        }"
-        class="verify-slide__bar-fill"
-      >
-        <div class="verify-slide__bar-fill-text">{{ finishText }}</div>
-      </div>
+      <!-- 进度填充 -->
+      <div :class="['nebula-puzzle__fill', fillClass]" :style="{ width: fillWidth, transition: fillTransition }" />
+      <div class="nebula-puzzle__fill-text">{{ doneText }}</div>
 
-      <!-- 滑块 -->
+      <!-- 滑块拇指 -->
       <div
-        :class="sliderClass"
-        :style="{
-          left: moveBlockLeft,
-          transition: transitionLeft
-        }"
-        class="verify-slide__slider"
-        @mousedown="handleStart"
-        @touchstart="handleStart"
+        :class="['nebula-puzzle__thumb', thumbClass]"
+        :style="{ left: thumbLeft, transition: thumbTransition }"
+        @mousedown="onDragStart"
+        @touchstart="onDragStart"
       >
-        <StrixIcon :icon="sliderIcon" :size="24" />
+        <StrixIcon :icon="thumbIcon" :size="20" />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { http } from '@/plugins/axios'
-import { sm4Encrypt } from '@/components/captcha/utils/captcha-sm4.ts'
-import type { ApiResponse } from '@/@types/plugins/axios.ts'
+import { sm4Encrypt } from '@/components/captcha/utils/captcha-sm4'
+import type { ApiResponse } from '@/@types/plugins/axios'
 
-interface Props {
-  imgSize?: {
-    width: string
-    height: string
-  }
-  blockSize?: {
-    width: string
-    height: string
-  }
-  barSize?: {
-    width: string
-    height: string
-  }
-  vSpace?: number
-  explain?: string
-}
+// ---- 常量 ----
+const STANDARD_WIDTH = 310
+const PIECE_RATIO = 60 / 400
+const THUMB_SIZE = 44
+const SUCCESS_DELAY = 800
+const ERROR_DELAY = 1000
+const RESET_DURATION = 300
 
-// 验证码API响应类型
+type Status = 'idle' | 'moving' | 'success' | 'error'
+
 interface CaptchaGetData {
   uuid: string
   originalImageBase64: string
@@ -123,625 +78,197 @@ interface CaptchaCheckData {
   captchaVerification: string
 }
 
-type VerifyStatus = 'idle' | 'moving' | 'success' | 'error'
-
-// 常量定义
-const STANDARD_IMG_WIDTH = 310 // 标准图片宽度（用于坐标转换）
-const DEFAULT_BLOCK_WIDTH_BASE = 400 // 默认拼图块宽度基准
-const SLIDER_RADIUS = 50 // 滑块半径（像素）
-const SUCCESS_DELAY = 800 // 成功后延迟关闭时间（毫秒）
-const ERROR_DELAY = 1000 // 失败后延迟刷新时间（毫秒）
-const RESET_TRANSITION_DURATION = 300 // 重置动画时长（毫秒）
-
-const props = withDefaults(defineProps<Props>(), {
-  imgSize: () => ({ width: '400px', height: '200px' }),
-  blockSize: () => ({ width: '60px', height: '60px' }),
-  barSize: () => ({ width: '400px', height: '50px' }),
-  vSpace: 5,
-  explain: '向右滑动完成验证'
-})
-
 const emit = defineEmits<{
   success: [payload: { captchaVerification: string }]
 }>()
 
-// 响应式状态
-const barAreaRef = ref<HTMLElement | null>(null)
-const originalImageBase64 = ref('')
-const jigsawImageBase64 = ref('')
+// ---- 模板引用 ----
+const imageRef = ref<HTMLElement>()
+const trackRef = ref<HTMLElement>()
+
+// ---- 状态 ----
+const bgImage = ref('')
+const puzzleImage = ref('')
 const uuid = ref('')
 const secretKey = ref('')
+const status = ref<Status>('idle')
+const tipText = ref('')
+const hintText = ref('向右滑动完成验证')
+const doneText = ref('')
+const canRefresh = ref(true)
+const thumbLeft = ref('0px')
+const fillWidth = ref('0px')
+const thumbTransition = ref('')
+const fillTransition = ref('')
 
-const moveBlockLeft = ref('0')
-const leftBarWidth = ref('0')
-const displayText = ref(props.explain)
-const finishText = ref('')
-const tipMsg = ref('')
+// 拖动临时变量
+let dragStartX = 0
+let dragStartTime = 0
 
-const status = ref<VerifyStatus>('idle')
-const showRefresh = ref(true)
+// ---- 计算属性 ----
+const actualWidth = computed(() => imageRef.value?.offsetWidth || STANDARD_WIDTH)
+const pieceWidth = computed(() => Math.floor(actualWidth.value * PIECE_RATIO))
 
-const transitionLeft = ref('')
-const transitionWidth = ref('')
-
-const startMoveTime = ref(0)
-const endMoveTime = ref(0)
-const startX = ref(0)
-
-// 计算尺寸
-const computedSize = reactive({
-  imgWidth: '0',
-  imgHeight: '0',
-  barWidth: '0',
-  barHeight: '0'
+const thumbIcon = computed(() => {
+  if (status.value === 'success') return 'check'
+  if (status.value === 'error') return 'x'
+  return 'arrow-right'
 })
 
-// 拼图块宽度（根据实际图片宽度按比例缩放）
-const blockWidth = computed(() => {
-  const width = parseInt(props.blockSize.width)
-  const imgWidth = parseInt(computedSize.imgWidth)
-  return Math.floor((imgWidth * width) / DEFAULT_BLOCK_WIDTH_BASE)
-})
+const thumbClass = computed(() => ({
+  'nebula-puzzle__thumb--moving': status.value === 'moving',
+  'nebula-puzzle__thumb--success': status.value === 'success',
+  'nebula-puzzle__thumb--error': status.value === 'error'
+}))
 
-// 滑块图标
-const sliderIcon = computed(() => {
-  switch (status.value) {
-    case 'success':
-      return 'check'
-    case 'error':
-      return 'x'
-    default:
-      return 'arrow-right'
-  }
-})
+const fillClass = computed(() => ({
+  'nebula-puzzle__fill--moving': status.value === 'moving',
+  'nebula-puzzle__fill--success': status.value === 'success',
+  'nebula-puzzle__fill--error': status.value === 'error'
+}))
 
-// 滑块样式类
-const sliderClass = computed(() => {
-  return {
-    'verify-slide__slider--moving': status.value === 'moving',
-    'verify-slide__slider--success': status.value === 'success',
-    'verify-slide__slider--error': status.value === 'error'
-  }
-})
-
-// 状态样式类
-const statusClass = computed(() => {
-  return {
-    'verify-slide__tip--success': status.value === 'success',
-    'verify-slide__tip--error': status.value === 'error'
-  }
-})
-
-// 提示图标
-const tipIcon = computed(() => {
-  return status.value === 'success' ? 'circle-check' : 'circle-alert'
-})
-
-// 进度条填充宽度（延伸到滑块中心）
-const barFillWidth = computed(() => {
-  if (!leftBarWidth.value || leftBarWidth.value === '0') return '0'
-  const currentWidth = parseInt(leftBarWidth.value)
-  return currentWidth + SLIDER_RADIUS + 'px'
-})
-
-// 进度条样式类
-const barFillClass = computed(() => {
-  return {
-    'verify-slide__bar-fill--moving': status.value === 'moving',
-    'verify-slide__bar-fill--success': status.value === 'success',
-    'verify-slide__bar-fill--error': status.value === 'error'
-  }
-})
-
-// 计算尺寸
-const calculateSize = () => {
-  const parseSize = (size: string, containerSize: number) => {
-    if (size.includes('%')) {
-      return (parseInt(size) / 100) * containerSize + 'px'
-    }
-    return size
-  }
-
-  const container = barAreaRef.value?.parentElement
-  const containerWidth = container?.offsetWidth || window.innerWidth
-  const containerHeight = container?.offsetHeight || window.innerHeight
-
-  computedSize.imgWidth = parseSize(props.imgSize.width, containerWidth)
-  computedSize.imgHeight = parseSize(props.imgSize.height, containerHeight)
-  computedSize.barWidth = parseSize(props.barSize.width, containerWidth)
-  computedSize.barHeight = parseSize(props.barSize.height, containerHeight)
-}
-
-// 获取验证码图片
-const getCaptcha = async () => {
+// ---- API ----
+const fetchCaptcha = async () => {
   try {
     const { data: res } = await http.post<ApiResponse<CaptchaGetData>>(
       'system/captcha/get',
       { captchaType: 'blockPuzzle' },
       { meta: { operate: '验证码获取', notify: false } }
     )
-
     if (res.data) {
       uuid.value = res.data.uuid
-      originalImageBase64.value = res.data.originalImageBase64
-      jigsawImageBase64.value = res.data.jigsawImageBase64
+      bgImage.value = res.data.originalImageBase64
+      puzzleImage.value = res.data.jigsawImageBase64
       secretKey.value = res.data.secretKey
     } else {
-      tipMsg.value = res.msg || '获取验证码失败'
+      tipText.value = res.msg || '获取验证码失败'
     }
-  } catch (error) {
-    console.error('获取验证码失败:', error)
-    tipMsg.value = '获取验证码失败，请重试'
+  } catch {
+    tipText.value = '获取验证码失败，请重试'
   }
 }
 
-// 获取客户端 X 坐标的辅助函数
-const getClientX = (e: MouseEvent | TouchEvent): number => {
-  if (e instanceof TouchEvent && e.touches.length > 0) {
-    return e.touches[0]!.clientX
-  }
-  return (e as MouseEvent).clientX
-}
-
-// 开始拖动
-const handleStart = (e: MouseEvent | TouchEvent) => {
-  if (status.value === 'success') return
-
-  e.preventDefault()
-  e.stopPropagation()
-
-  const clientX = getClientX(e)
-  const barRect = barAreaRef.value?.getBoundingClientRect()
-  if (!barRect) return
-
-  startX.value = clientX - barRect.left
-  startMoveTime.value = Date.now()
-  status.value = 'moving'
-  displayText.value = ''
-
-  document.addEventListener('mousemove', handleMove)
-  document.addEventListener('touchmove', handleMove)
-  document.addEventListener('mouseup', handleEnd)
-  document.addEventListener('touchend', handleEnd)
-}
-
-// 拖动中
-const handleMove = (e: MouseEvent | TouchEvent) => {
-  if (status.value !== 'moving') return
-
-  const clientX = getClientX(e)
-  const barRect = barAreaRef.value?.getBoundingClientRect()
-  if (!barRect) return
-
-  let left = clientX - barRect.left - startX.value
-  const maxLeft = barRect.width - parseInt(computedSize.barHeight)
-
-  // 限制移动范围
-  left = Math.max(0, Math.min(left, maxLeft))
-
-  moveBlockLeft.value = left + 'px'
-  leftBarWidth.value = left + 'px'
-}
-
-// 结束拖动
-const handleEnd = () => {
-  if (status.value !== 'moving') return
-
-  document.removeEventListener('mousemove', handleMove)
-  document.removeEventListener('touchmove', handleMove)
-  document.removeEventListener('mouseup', handleEnd)
-  document.removeEventListener('touchend', handleEnd)
-
-  endMoveTime.value = Date.now()
-  checkCaptcha()
-}
-
-// 验证位置
-const checkCaptcha = async () => {
-  const moveDistance = parseInt(moveBlockLeft.value)
-  // 将移动距离转换为标准图片宽度下的距离
-  const standardDistance = (moveDistance * STANDARD_IMG_WIDTH) / parseInt(computedSize.imgWidth)
-
-  const pointData = { x: standardDistance, y: props.vSpace }
+const verifyCaptcha = async () => {
+  const moveDistance = parseInt(thumbLeft.value)
+  const standardDistance = (moveDistance * STANDARD_WIDTH) / actualWidth.value
+  const pointData = { x: standardDistance, y: 5 }
   const pointJson = secretKey.value ? sm4Encrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
 
   try {
     const { data: res } = await http.post<ApiResponse<CaptchaCheckData>>(
       'system/captcha/check',
-      {
-        captchaType: 'blockPuzzle',
-        pointJson,
-        uuid: uuid.value
-      },
+      { captchaType: 'blockPuzzle', pointJson, uuid: uuid.value },
       { meta: { operate: '验证码校验', notify: false } }
     )
-
     if (res.data?.result) {
-      handleSuccess(res.data.captchaVerification)
+      onSuccess(res.data.captchaVerification)
     } else {
-      handleVerifyError(res.msg)
+      onError(res.msg)
     }
-  } catch (error) {
-    console.error('验证失败:', error)
-    handleVerifyError()
+  } catch {
+    onError()
   }
 }
 
-// 验证成功
-const handleSuccess = (captchaVerification: string) => {
-  status.value = 'success'
-  showRefresh.value = false
+// ---- 拖动逻辑 ----
+const getClientX = (e: MouseEvent | TouchEvent): number => {
+  return e instanceof TouchEvent && e.touches.length > 0 ? e.touches[0]!.clientX : (e as MouseEvent).clientX
+}
 
-  const duration = ((endMoveTime.value - startMoveTime.value) / 1000).toFixed(2)
-  tipMsg.value = `验证成功 ${duration}s`
-  finishText.value = '验证通过'
+const onDragStart = (e: MouseEvent | TouchEvent) => {
+  if (status.value === 'success') return
+  e.preventDefault()
+  e.stopPropagation()
+
+  const trackRect = trackRef.value?.getBoundingClientRect()
+  if (!trackRect) return
+
+  dragStartX = getClientX(e) - trackRect.left
+  dragStartTime = Date.now()
+  status.value = 'moving'
+  hintText.value = ''
+
+  document.addEventListener('mousemove', onDragMove)
+  document.addEventListener('touchmove', onDragMove)
+  document.addEventListener('mouseup', onDragEnd)
+  document.addEventListener('touchend', onDragEnd)
+}
+
+const onDragMove = (e: MouseEvent | TouchEvent) => {
+  if (status.value !== 'moving') return
+
+  const trackRect = trackRef.value?.getBoundingClientRect()
+  if (!trackRect) return
+
+  const maxLeft = trackRect.width - THUMB_SIZE
+  let left = getClientX(e) - trackRect.left - dragStartX
+  left = Math.max(0, Math.min(left, maxLeft))
+
+  thumbLeft.value = left + 'px'
+  fillWidth.value = left + THUMB_SIZE / 2 + 'px'
+}
+
+const onDragEnd = () => {
+  if (status.value !== 'moving') return
+
+  document.removeEventListener('mousemove', onDragMove)
+  document.removeEventListener('touchmove', onDragMove)
+  document.removeEventListener('mouseup', onDragEnd)
+  document.removeEventListener('touchend', onDragEnd)
+
+  verifyCaptcha()
+}
+
+// ---- 结果处理 ----
+const onSuccess = (captchaVerification: string) => {
+  status.value = 'success'
+  canRefresh.value = false
+  const duration = ((Date.now() - dragStartTime) / 1000).toFixed(2)
+  tipText.value = `验证成功 ${duration}s`
+  doneText.value = '验证通过'
 
   setTimeout(() => {
-    tipMsg.value = ''
+    tipText.value = ''
     emit('success', { captchaVerification })
   }, SUCCESS_DELAY)
 }
 
-// 验证失败
-const handleVerifyError = (errorMsg?: string) => {
+const onError = (msg?: string) => {
   status.value = 'error'
-  tipMsg.value = errorMsg || '验证失败，请重试'
+  tipText.value = msg || '验证失败，请重试'
 
-  setTimeout(() => {
-    refresh()
-  }, ERROR_DELAY)
+  setTimeout(() => refresh(), ERROR_DELAY)
 }
 
-// 刷新
+// ---- 刷新 ----
 const refresh = () => {
-  showRefresh.value = true
+  canRefresh.value = true
   status.value = 'idle'
-  finishText.value = ''
-  tipMsg.value = ''
+  tipText.value = ''
+  doneText.value = ''
+  hintText.value = '向右滑动完成验证'
 
-  transitionLeft.value = `left ${RESET_TRANSITION_DURATION / 1000}s ease`
-  transitionWidth.value = `width ${RESET_TRANSITION_DURATION / 1000}s ease`
+  const sec = RESET_DURATION / 1000 + 's'
+  thumbTransition.value = `left ${sec} ease`
+  fillTransition.value = `width ${sec} ease`
 
-  moveBlockLeft.value = '0'
-  leftBarWidth.value = '0'
+  thumbLeft.value = '0px'
+  fillWidth.value = '0px'
 
-  getCaptcha()
+  fetchCaptcha()
 
   setTimeout(() => {
-    transitionLeft.value = ''
-    transitionWidth.value = ''
-    displayText.value = props.explain
-  }, RESET_TRANSITION_DURATION)
+    thumbTransition.value = ''
+    fillTransition.value = ''
+  }, RESET_DURATION)
 }
 
-// 手动刷新按钮点击
 const handleRefresh = () => {
   if (status.value === 'moving') return
   refresh()
 }
 
-// 初始化
-const init = () => {
-  calculateSize()
-  getCaptcha()
-}
+onMounted(() => fetchCaptcha())
 
-// 监听尺寸变化
-watch(() => props.imgSize, init, { deep: true })
-
-// 挂载时初始化
-onMounted(() => {
-  init()
-})
-
-// 暴露方法
-defineExpose({
-  refresh
-})
+defineExpose({ refresh })
 </script>
-
-<style lang="scss" scoped>
-.verify-slide {
-  width: 100%;
-  user-select: none;
-  -webkit-user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  &__image-panel {
-    position: relative;
-    margin-bottom: 16px;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #f8fafc;
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  }
-
-  &__bg-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-  }
-
-  &__refresh {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px);
-    border-radius: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #475569;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    z-index: 10;
-
-    &:hover {
-      background: white;
-      color: #0ea5e9;
-      transform: rotate(90deg);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    &:active {
-      transform: rotate(90deg) scale(0.95);
-    }
-  }
-
-  &__tip {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    color: white;
-    z-index: 5;
-
-    &--success {
-      background: rgba(34, 197, 94, 0.95);
-    }
-
-    &--error {
-      background: rgba(239, 68, 68, 0.95);
-    }
-  }
-
-  &__tip-icon {
-    flex-shrink: 0;
-  }
-
-  &__puzzle-block {
-    position: absolute;
-    top: 0;
-    z-index: 3;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
-  }
-
-  &__puzzle-image {
-    width: 100%;
-    height: 100%;
-    display: block;
-    pointer-events: none;
-  }
-
-  &__bar {
-    position: relative;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 2px solid #e2e8f0;
-    border-radius: 25px;
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-
-  &__bar-text {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    color: #94a3b8;
-    font-weight: 500;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  &__bar-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    border-radius: 23px;
-    z-index: 2;
-    transition: background 0.3s ease;
-
-    &--moving {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    }
-
-    &--success {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-    }
-
-    &--error {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    }
-  }
-
-  &__bar-fill-text {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    color: white;
-    font-weight: 600;
-    pointer-events: none;
-  }
-
-  &__slider {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 0;
-    width: 50px;
-    height: 50px;
-    background: white;
-    border: 3px solid #e2e8f0;
-    border-radius: 50%;
-    cursor: grab;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #64748b;
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    z-index: 10;
-    user-select: none;
-    -webkit-user-select: none;
-
-    &:hover {
-      border-color: #0ea5e9;
-      color: #0ea5e9;
-      box-shadow:
-        0 10px 15px -3px rgba(14, 165, 233, 0.2),
-        0 4px 6px -2px rgba(14, 165, 233, 0.1);
-      transform: translateY(-50%) scale(1.05);
-    }
-
-    &--moving {
-      cursor: grabbing;
-      border-color: #0ea5e9;
-      color: #0ea5e9;
-      box-shadow:
-        0 10px 15px -3px rgba(14, 165, 233, 0.3),
-        0 4px 6px -2px rgba(14, 165, 233, 0.15);
-      transform: translateY(-50%) scale(1.05);
-    }
-
-    &--success {
-      border-color: #22c55e;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      cursor: default;
-      box-shadow:
-        0 10px 15px -3px rgba(34, 197, 94, 0.3),
-        0 4px 6px -2px rgba(34, 197, 94, 0.15);
-
-      &:hover {
-        transform: translateY(-50%) scale(1);
-      }
-    }
-
-    &--error {
-      border-color: #ef4444;
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: white;
-      cursor: default;
-      animation: shake 0.5s ease;
-
-      &:hover {
-        transform: translateY(-50%) scale(1);
-      }
-    }
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateY(-50%) translateX(0);
-  }
-  25% {
-    transform: translateY(-50%) translateX(-5px);
-  }
-  75% {
-    transform: translateY(-50%) translateX(5px);
-  }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-up-enter-from {
-  transform: translateY(100%);
-  opacity: 0;
-}
-
-.slide-up-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-@media (max-width: 640px) {
-  .verify-slide {
-    &__image-panel {
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-
-    &__refresh {
-      width: 36px;
-      height: 36px;
-      top: 8px;
-      right: 8px;
-    }
-
-    &__tip {
-      height: 40px;
-      font-size: 14px;
-    }
-
-    &__bar {
-      border-radius: 20px;
-    }
-
-    &__slider {
-      width: 44px;
-      height: 44px;
-    }
-
-    &__bar-text,
-    &__bar-fill-text {
-      font-size: 14px;
-    }
-  }
-}
-</style>
