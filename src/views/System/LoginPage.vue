@@ -60,10 +60,7 @@
                 maxlength="20"
                 autocomplete="username"
                 @focus="focusedField = 'loginName'"
-                @blur="
-                  focusedField = ''
-                  validateField('loginName')
-                "
+                @blur="onBlur('loginName')"
                 @input="clearError('loginName')"
               />
             </div>
@@ -95,10 +92,7 @@
                 maxlength="20"
                 autocomplete="current-password"
                 @focus="focusedField = 'loginPassword'"
-                @blur="
-                  focusedField = ''
-                  validateField('loginPassword')
-                "
+                @blur="onBlur('loginPassword')"
                 @input="clearError('loginPassword')"
               />
               <button
@@ -326,6 +320,11 @@ const validateAll = (): boolean => {
     if (!validateField(field)) valid = false
   }
   return valid
+}
+
+const onBlur = (field: string): void => {
+  focusedField.value = ''
+  validateField(field)
 }
 
 // ---- 验证码 ----
