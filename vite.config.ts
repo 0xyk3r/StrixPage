@@ -35,11 +35,14 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
         // 允许较大的字体文件被预缓存 (阿里妈妈方圆体 ~3MB)
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        // 防止 Service Worker 拦截 /api 等非前端路径
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api/],
         // 运行时缓存配置
         runtimeCaching: [
           {
-            // 缓存 API 请求（可选，按需调整）
-            urlPattern: /^https:\/\/.*\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            // 缓存图片资源（同域 + CDN）
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'images-cache',
@@ -51,7 +54,7 @@ export default defineConfig({
           },
           {
             // 缓存字体文件
-            urlPattern: /^https:\/\/.*\.(?:woff|woff2|ttf|eot)$/i,
+            urlPattern: /\.(?:woff|woff2|ttf|eot)$/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'fonts-cache',
