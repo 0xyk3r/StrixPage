@@ -48,11 +48,12 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { useDict } from '@/composables/useDict.ts'
 import { cloneDeep } from 'lodash-es'
-import { type DataTableColumns, NTag } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import { usePagination } from '@/composables/usePagination.ts'
 
 // 本页面操作提示关键词
@@ -92,7 +93,7 @@ const dataColumns: DataTableColumns = [
     ellipsis: { tooltip: false },
     render(row: any) {
       return h(
-        NTag,
+        NebulaTag,
         { type: row.operationMethod === 'POST' ? 'info' : 'default', bordered: false },
         {
           default: () => row.operationMethod
@@ -167,7 +168,7 @@ const dataColumns: DataTableColumns = [
                 : 'error'
       }
       return h(
-        NTag,
+        NebulaTag,
         { type, bordered: false },
         {
           default: () => (row.operationSpend ? row.operationSpend + 'ms' : '失败')
@@ -189,7 +190,7 @@ const dataColumns: DataTableColumns = [
         type = 'error'
       }
       return h(
-        NTag,
+        NebulaTag,
         { type, bordered: false },
         {
           default: () => row.responseCode

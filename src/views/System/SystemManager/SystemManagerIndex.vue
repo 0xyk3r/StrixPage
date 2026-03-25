@@ -224,6 +224,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import { http } from '@/plugins/axios'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { usePage } from '@/composables/usePage.ts'
@@ -240,7 +241,6 @@ import {
   NFlex,
   NH6,
   NSpin,
-  NTag,
   NTreeSelect
 } from 'naive-ui'
 
@@ -368,7 +368,7 @@ const dataColumns: DataTableColumns = [
     render(row: any) {
       const tagText = managerRegionName(row.regionId)
       return h(
-        NTag,
+        NebulaTag,
         { type: 'info', bordered: false },
         {
           default: () => tagText

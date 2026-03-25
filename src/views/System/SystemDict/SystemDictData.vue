@@ -166,6 +166,7 @@
 </template>
 
 <script lang="ts" setup>
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
@@ -244,7 +245,7 @@ const dataColumns: DataTableColumns = [
     width: 240,
     align: 'center',
     render(row: any) {
-      return h('span', { class: ['nebula-tag', `nebula-tag--${row.style || 'default'}`] }, row.label)
+      return h(NebulaTag, { type: row.style || 'default' }, () => row.label)
     }
   },
   {

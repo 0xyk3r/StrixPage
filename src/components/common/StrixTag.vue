@@ -1,11 +1,10 @@
 <template>
-  <span :class="['nebula-tag', `nebula-tag--${tag.type}`]">
-    {{ beforeLabel }}{{ tag.label }}{{ afterLabel }}
-  </span>
+  <NebulaTag :type="tag.type"> {{ beforeLabel }}{{ tag.label }}{{ afterLabel }} </NebulaTag>
 </template>
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
 import { useDict } from '@/composables/useDict.ts'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 
 const { value, dictName, notFoundLabel } = defineProps({
   value: { type: [String, Number], required: true },

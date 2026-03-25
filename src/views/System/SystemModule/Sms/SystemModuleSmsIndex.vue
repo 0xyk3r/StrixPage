@@ -159,6 +159,7 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
@@ -262,7 +263,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
+                return h(NebulaTag, { type: tagType }, () => tagLabel)
               }
             },
             { title: '创建时间', key: 'createdTime', width: 160 }
@@ -304,7 +305,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
+                return h(NebulaTag, { type: tagType }, () => tagLabel)
               }
             },
             {
@@ -336,7 +337,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
+                return h(NebulaTag, { type: tagType }, () => tagLabel)
               }
             },
             { title: '模板内容', key: 'content', width: 600 },

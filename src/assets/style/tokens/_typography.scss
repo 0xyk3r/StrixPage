@@ -3,24 +3,24 @@
 // ============================================================
 
 // ---- 字体族 ----
-// 显示/标题字体 — Outfit: 几何感、现代
-$font-display: 'Outfit', system-ui, -apple-system, sans-serif;
-// 正文字体 — Manrope: 清晰、优雅
-$font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+// 显示/标题字体 — Outfit: 几何感、现代 | Alimama FangYuanTi: 方圆融合中文
+$font-display: 'Outfit', 'Alimama FangYuanTi', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;
+// 正文字体 — Manrope: 清晰、优雅 | Alimama FangYuanTi: 方圆融合中文
+$font-body: 'Manrope', 'Alimama FangYuanTi', 'PingFang SC', 'Microsoft YaHei UI', system-ui, sans-serif;
 // 等宽字体 — Geist Mono: 代码/快捷键
 $font-mono: 'Geist Mono', 'Fira Code', 'JetBrains Mono', monospace;
 
 // ---- 字号 ----
-$text-2xs: 10px;
-$text-xs: 11px;
-$text-sm: 12px;
-$text-base: 13px;
-$text-md: 14px;
-$text-lg: 16px;
-$text-xl: 18px;
-$text-2xl: 22px;
-$text-3xl: 28px;
-$text-4xl: 34px;
+$text-2xs: 12px;
+$text-xs: 13px;
+$text-sm: 14px;
+$text-base: 15px;
+$text-md: 16px;
+$text-lg: 17px;
+$text-xl: 20px;
+$text-2xl: 24px;
+$text-3xl: 30px;
+$text-4xl: 36px;
 
 // ---- 字重 ----
 $weight-light: 300;

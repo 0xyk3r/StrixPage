@@ -231,6 +231,7 @@
 </template>
 
 <script lang="ts" setup>
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { EventBus } from '@/plugins/event-bus'
@@ -298,7 +299,9 @@ const dataColumns: DataTableColumns = [
     align: 'center',
     width: 120,
     render(row) {
-      return h('span', { class: ['nebula-tag', row.type === 'menu' ? 'nebula-tag--success' : 'nebula-tag--info'] }, row.type === 'menu' ? '菜单' : '按钮')
+      return h(NebulaTag, { type: row.type === 'menu' ? 'success' : 'info' }, () =>
+        row.type === 'menu' ? '菜单' : '按钮'
+      )
     }
   },
   { key: 'key', title: '权限标识', width: 240 },

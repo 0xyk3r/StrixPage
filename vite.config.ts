@@ -33,6 +33,8 @@ export default defineConfig({
       workbox: {
         // 缓存所有静态资源
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        // 允许较大的字体文件被预缓存 (阿里妈妈方圆体 ~3MB)
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         // 运行时缓存配置
         runtimeCaching: [
           {

@@ -20,10 +20,9 @@
 // ---- Table Header ----
 .n-data-table-thead {
   .n-data-table-th {
-    font-family: $font-mono;
-    font-size: 10px !important;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    font-family: $font-body;
+    font-size: 13px !important;
+    letter-spacing: 0.3px;
     font-weight: 500 !important;
 
     .n-data-table-th__title {
@@ -54,8 +53,8 @@
 // ---- Pagination Area ----
 .n-data-table .n-pagination {
   .n-pagination-prefix {
-    font-family: $font-mono;
-    font-size: 11px;
+    font-family: $font-body;
+    font-size: 13px;
     color: var(--strix-text-dim);
     letter-spacing: 0.3px;
   }
@@ -117,7 +116,7 @@
 
     // Nested table header inherits parent's mono style
     .n-data-table-th {
-      font-size: 9.5px !important;
+      font-size: 11.5px !important;
       letter-spacing: 0.6px;
     }
   }
@@ -141,7 +140,7 @@
 
       .n-tabs-tab {
         border-radius: calc(#{$radius-md} - 2px);
-        font-size: 12px;
+        font-size: 14px;
       }
     }
   }
@@ -156,7 +155,7 @@
   // Tags in expand rows (closable permission tags)
   .n-tag {
     border-radius: $radius-sm;
-    font-size: 11px;
+    font-size: 13px;
     transition: all $duration-fast;
   }
 
@@ -291,101 +290,67 @@
 // Nebula Tag (pill-style status tags)
 // ============================================================
 
-.nebula-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 10px;
-  border-radius: 9999px;
-  font-family: $font-body;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  line-height: 1.6;
-  border: 1px solid;
-  white-space: nowrap;
-
-  &--default {
-    background: var(--strix-bg-surface);
-    color: var(--strix-text-secondary);
-    border-color: var(--strix-border-default);
-  }
-
-  &--success {
-    background: rgba($color-success, 0.08);
-    color: $color-success;
-    border-color: rgba($color-success, 0.2);
-  }
-
-  &--warning {
-    background: rgba($color-warning, 0.08);
-    color: $color-warning;
-    border-color: rgba($color-warning, 0.2);
-  }
-
-  &--error {
-    background: rgba($color-error, 0.08);
-    color: $color-error;
-    border-color: rgba($color-error, 0.2);
-  }
-
-  &--info {
-    background: rgba($color-info, 0.08);
-    color: $color-info;
-    border-color: rgba($color-info, 0.2);
-  }
-
-  &--primary {
-    background: rgba($color-accent-green, 0.08);
-    color: $color-accent-green;
-    border-color: rgba($color-accent-green, 0.2);
-  }
-}
-
-// Light theme adjustments for tags
+// Light theme adjustments for action buttons
 [data-theme='light'] {
-  .nebula-tag {
-    &--success {
-      color: darken($color-success, 15%);
-    }
-
-    &--warning {
-      color: darken($color-warning, 15%);
-    }
-
-    &--error {
-      color: darken($color-error, 10%);
-    }
-
-    &--info {
-      color: darken($color-info, 15%);
-    }
-
-    &--primary {
-      color: darken($color-accent-green, 15%);
-    }
-  }
-
   .nebula-action-btn {
+    border-color: rgba(0, 0, 0, 0.12);
+    color: rgba(0, 0, 0, 0.55);
+
+    &:hover {
+      border-color: rgba(0, 0, 0, 0.25);
+      color: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.04);
+    }
+
     &.is-primary {
-      color: darken($color-accent-green, 10%);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.25);
+
+      &:hover {
+        border-color: rgba(22, 163, 74, 0.45);
+        background: rgba(22, 163, 74, 0.06);
+      }
     }
 
     &.is-warning {
-      color: darken($color-warning, 10%);
+      color: #b45309;
+      border-color: rgba(234, 138, 0, 0.25);
+
+      &:hover {
+        border-color: rgba(234, 138, 0, 0.45);
+        background: rgba(234, 138, 0, 0.06);
+      }
     }
 
     &.is-error,
     &.is-danger {
-      color: darken($color-error, 5%);
+      color: #b91c1c;
+      border-color: rgba(220, 38, 38, 0.2);
+
+      &:hover {
+        border-color: rgba(220, 38, 38, 0.4);
+        background: rgba(220, 38, 38, 0.06);
+      }
     }
 
     &.is-info {
-      color: darken($color-info, 10%);
+      color: #0369a1;
+      border-color: rgba(14, 116, 209, 0.25);
+
+      &:hover {
+        border-color: rgba(14, 116, 209, 0.45);
+        background: rgba(14, 116, 209, 0.06);
+      }
     }
 
     &.is-success {
-      color: darken($color-success, 10%);
+      color: #15803d;
+      border-color: rgba(22, 163, 74, 0.25);
+
+      &:hover {
+        border-color: rgba(22, 163, 74, 0.45);
+        background: rgba(22, 163, 74, 0.06);
+      }
     }
   }
 }
@@ -442,14 +407,14 @@
 .n-modal .n-form {
   // Form item labels
   .n-form-item-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--strix-text-secondary);
   }
 
   // Form item feedback (validation errors)
   .n-form-item-feedback-wrapper {
-    font-size: 11px;
+    font-size: 13px;
     min-height: 18px;
   }
 }
@@ -493,7 +458,7 @@
   // Date picker in filters
   .n-date-picker {
     .n-input {
-      font-size: 12px;
+      font-size: 13px;
     }
   }
 }

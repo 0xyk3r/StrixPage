@@ -137,6 +137,7 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
@@ -157,7 +158,6 @@ import {
   NSpin,
   NTabPane,
   NTabs,
-  NTag,
   type TreeInst
 } from 'naive-ui'
 
@@ -207,7 +207,7 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
       return currentMenus.push(
         h(NGrid, { xGap: 10, cols: 6 }, () => [
           h(NGi, { span: 1 }, () =>
-            h(NTag, { closable: true, onClose: () => removeRolePermission(row, menu.id) }, () => menu.name)
+            h(NebulaTag, { closable: true, onClose: () => removeRolePermission(row, menu.id) }, () => menu.name)
           )
         ])
       )
@@ -217,7 +217,7 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
       h(NGrid, { xGap: 10, cols: 6 }, () => [
         h(NGi, { span: 1 }, () =>
           h(
-            NTag,
+            NebulaTag,
             {
               type: colorList[colorIndex],
               closable: true,
@@ -511,7 +511,7 @@ const editRoleMenus = () => {
 }
 const editRoleMenusRenderPrefix = ({ option: row }: { option: any }) => {
   return h(
-    NTag,
+    NebulaTag,
     { type: row.type === 'menu' ? 'success' : 'info', bordered: false, size: 'tiny' },
     { default: () => (row.type === 'menu' ? '菜单' : '按钮') }
   )
@@ -533,7 +533,7 @@ const editRoleMenusRenderPrefix = ({ option: row }: { option: any }) => {
 }
 
 ::v-deep(.expand-permission-pane) {
-  .n-tag:not(:last-child) {
+  .nebula-tag:not(:last-child) {
     margin: 0 8px 8px 0;
   }
 }

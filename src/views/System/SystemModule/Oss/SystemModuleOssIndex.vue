@@ -173,12 +173,13 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '存储服务'
@@ -273,7 +274,7 @@ const dataColumns: DataTableColumns = [
               render(row: any) {
                 const tagText = row.secretType === 1 ? '管理端文件' : '用户端文件'
                 return h(
-                  NTag,
+                  NebulaTag,
                   { type: row.secretType === 1 ? 'success' : 'info', bordered: false },
                   {
                     default: () => tagText + '/' + row.secretLevel

@@ -19,8 +19,8 @@
 @use 'components/nebula-notification';
 @use 'components/nebula-table';
 
-// ---- Google Fonts 加载 ----
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap');
+// ---- 本地字体加载 ----
+@use 'fonts';
 
 // ---- 默认 Dark 主题 (作为 :root 默认) ----
 :root {

@@ -11,7 +11,7 @@
         <n-divider />
         <div>
           <strong>当前权限：</strong>
-          <n-tag
+          <NebulaTag
             v-for="perm in loginInfoStore.loginInfo.permissionKeys || []"
             :key="perm"
             size="small"
@@ -19,7 +19,7 @@
             type="info"
           >
             {{ perm }}
-          </n-tag>
+          </NebulaTag>
           <n-text v-if="!loginInfoStore.loginInfo.permissionKeys?.length" depth="3"> （无权限） </n-text>
         </div>
       </n-card>
@@ -101,6 +101,7 @@
 </template>
 
 <script lang="ts" setup>
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import { useLoginInfoStore } from '@/stores/login-info'
 
 const loginInfoStore = useLoginInfoStore()

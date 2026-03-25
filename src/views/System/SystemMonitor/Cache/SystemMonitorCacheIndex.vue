@@ -46,9 +46,9 @@
               <n-divider style="margin: 0" />
               <n-statistic label="运行模式">
                 <template #default>
-                  <n-tag :type="cacheInfo.info?.redis_mode === 'standalone' ? 'info' : 'success'">
+                  <NebulaTag :type="cacheInfo.info?.redis_mode === 'standalone' ? 'info' : 'success'">
                     {{ cacheInfo.info?.redis_mode === 'standalone' ? '单机' : '集群' }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
               <n-divider style="margin: 0" />
@@ -69,17 +69,17 @@
             <n-space :size="12" vertical>
               <n-statistic label="连接数量">
                 <template #default>
-                  <n-tag :bordered="false" size="large" type="info">
+                  <NebulaTag :bordered="false" size="large" type="info">
                     {{ cacheInfo.info?.connected_clients || 0 }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
               <n-divider style="margin: 0" />
               <n-statistic label="缓存数量">
                 <template #default>
-                  <n-tag :bordered="false" size="large" type="success">
+                  <NebulaTag :bordered="false" size="large" type="success">
                     {{ cacheInfo.dbSize || 0 }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
               <n-divider style="margin: 0" />
@@ -95,9 +95,9 @@
             <n-space :size="12" vertical>
               <n-statistic label="内存用量">
                 <template #default>
-                  <n-tag :bordered="false" size="large" type="warning">
+                  <NebulaTag :bordered="false" size="large" type="warning">
                     {{ cacheInfo.info?.used_memory_human || '-' }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
               <n-divider style="margin: 0" />
@@ -130,17 +130,17 @@
             <n-space :size="12" vertical>
               <n-statistic label="AOF状态">
                 <template #default>
-                  <n-tag :type="cacheInfo.info?.aof_enabled === '0' ? 'default' : 'success'">
+                  <NebulaTag :type="cacheInfo.info?.aof_enabled === '0' ? 'default' : 'success'">
                     {{ cacheInfo.info?.aof_enabled === '0' ? '关闭' : '开启' }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
               <n-divider style="margin: 0" />
               <n-statistic label="RDB状态">
                 <template #default>
-                  <n-tag :type="cacheInfo.info?.rdb_last_bgsave_status === 'ok' ? 'success' : 'error'">
+                  <NebulaTag :type="cacheInfo.info?.rdb_last_bgsave_status === 'ok' ? 'success' : 'error'">
                     {{ cacheInfo.info?.rdb_last_bgsave_status || '-' }}
-                  </n-tag>
+                  </NebulaTag>
                 </template>
               </n-statistic>
             </n-space>
@@ -187,6 +187,7 @@
 </template>
 
 <script lang="ts" setup>
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import { http } from '@/plugins/axios'
 import type { GaugeSeriesOption, PieSeriesOption } from 'echarts/charts'
 import { GaugeChart, PieChart } from 'echarts/charts'

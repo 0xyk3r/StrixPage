@@ -137,13 +137,14 @@
 
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
+import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统地区'
@@ -199,7 +200,7 @@ const dataColumns: DataTableColumns = [
       const tagType: NTagType = (tagTypes[row.level] as NTagType) || 'default'
       const tagBordered = row.level === 6
       return h(
-        NTag,
+        NebulaTag,
         { type: tagType, bordered: tagBordered },
         {
           default: () => {
