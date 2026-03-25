@@ -92,6 +92,20 @@
 // Expanded content area
 .n-data-table .n-data-table-td--expand {
   padding: $space-4 $space-5 !important;
+  position: relative;
+
+  // Left accent border strip
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: $space-2;
+    bottom: $space-2;
+    width: 2px;
+    border-radius: 1px;
+    background: var(--strix-border-accent);
+    opacity: 0.6;
+  }
 
   // Nested tables in expand rows
   .n-data-table {
@@ -100,18 +114,73 @@
     .n-data-table-wrapper {
       border-radius: $radius-md;
     }
+
+    // Nested table header inherits parent's mono style
+    .n-data-table-th {
+      font-size: 9.5px !important;
+      letter-spacing: 0.6px;
+    }
   }
 
-  // Tabs inside expand rows
+  // Tabs inside expand rows (segment style)
   .n-tabs {
+    .n-tabs-nav {
+      padding: 0 0 $space-3;
+    }
+
     .n-tab-pane {
       padding-top: $space-3;
     }
+
+    // Segment type tab rail styling
+    &.n-tabs--segment-type {
+      .n-tabs-rail {
+        border-radius: $radius-md;
+        padding: 2px;
+      }
+
+      .n-tabs-tab {
+        border-radius: calc(#{$radius-md} - 2px);
+        font-size: 12px;
+      }
+    }
+  }
+
+  // Checkbox groups in expand rows (e.g. role selection)
+  .n-checkbox-group {
+    .n-checkbox {
+      --n-border-radius: 4px;
+    }
+  }
+
+  // Tags in expand rows (closable permission tags)
+  .n-tag {
+    border-radius: $radius-sm;
+    font-size: 11px;
+    transition: all $duration-fast;
+  }
+
+  // Empty state in expand
+  .n-empty {
+    padding: $space-6 0;
+    opacity: 0.6;
   }
 
   // Loading indicator in expand
   .n-spin-container {
     padding: $space-4 0;
+  }
+
+  // Scrollbar in expand
+  .n-scrollbar {
+    > .n-scrollbar-rail--horizontal {
+      height: 3px;
+
+      > .n-scrollbar-rail__scrollbar {
+        height: 3px;
+        border-radius: 1.5px;
+      }
+    }
   }
 }
 
@@ -272,12 +341,13 @@
 }
 
 // ============================================================
-// Modal Form Overrides (.strix-form-modal)
+// Modal Form Overrides
 // ============================================================
 
 .n-modal {
   &.n-card {
     border-radius: $radius-lg;
+    border: 1px solid var(--strix-border-subtle);
 
     .n-card-header {
       padding: $space-5 $space-6 $space-4;
@@ -285,11 +355,16 @@
       .n-card-header__main {
         font-family: $font-display;
         font-weight: $weight-semibold;
+        letter-spacing: 0.2px;
       }
 
       .n-card-header__close {
         border-radius: $radius-sm;
         transition: all $duration-fast;
+
+        &:hover {
+          background: var(--strix-bg-surface-hover);
+        }
       }
     }
 
@@ -299,6 +374,84 @@
 
     .n-card__footer {
       padding: $space-3 $space-6 $space-5;
+
+      // Footer buttons alignment
+      .n-flex {
+        gap: $space-2;
+      }
     }
+  }
+}
+
+// Modal backdrop
+.n-modal-mask {
+  backdrop-filter: blur(4px);
+}
+
+// Form inside modal
+.n-modal .n-form {
+  // Form item labels
+  .n-form-item-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--strix-text-secondary);
+  }
+
+  // Form item feedback (validation errors)
+  .n-form-item-feedback-wrapper {
+    font-size: 11px;
+    min-height: 18px;
+  }
+}
+
+// Spin overlay inside modal
+.n-modal .n-spin-container {
+  .n-spin-content {
+    transition: opacity $duration-fast;
+  }
+}
+
+// ============================================================
+// Search Area Input Refinements (inside StrixBlock)
+// ============================================================
+
+// Input group search pattern: [input][button]
+.strix-block {
+  .n-input-group {
+    // Make search button seamlessly attach to input
+    .n-button {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    .n-input {
+      .n-input__border,
+      .n-input__state-border {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  }
+
+  // Select components in filters
+  .n-form-item .n-select {
+    .n-base-selection {
+      transition: border-color $duration-fast;
+    }
+  }
+
+  // Date picker in filters
+  .n-date-picker {
+    .n-input {
+      font-size: 12px;
+    }
+  }
+}
+
+// Grid layout consistency in search area
+.strix-block__body,
+.strix-block__more-inner {
+  .n-grid {
+    align-items: flex-end;
   }
 }
