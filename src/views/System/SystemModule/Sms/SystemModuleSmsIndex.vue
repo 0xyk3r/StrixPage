@@ -167,7 +167,7 @@ import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual, pick } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '短信服务'
@@ -262,7 +262,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h(NTag, { type: tagType, bordered: false }, { default: () => tagLabel })
+                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
               }
             },
             { title: '创建时间', key: 'createdTime', width: 160 }
@@ -304,7 +304,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h(NTag, { type: tagType, bordered: false }, { default: () => tagLabel })
+                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
               }
             },
             {
@@ -336,7 +336,7 @@ const dataColumns: DataTableColumns = [
                     tagLabel = '未知'
                     break
                 }
-                return h(NTag, { type: tagType, bordered: false }, { default: () => tagLabel })
+                return h('span', { class: ['nebula-tag', `nebula-tag--${tagType}`] }, tagLabel)
               }
             },
             { title: '模板内容', key: 'content', width: 600 },

@@ -1,7 +1,7 @@
 <template>
-  <n-tag :bordered="false" :disabled="loading" :type="tag.type">
+  <span :class="['nebula-tag', `nebula-tag--${tag.type}`]">
     {{ beforeLabel }}{{ tag.label }}{{ afterLabel }}
-  </n-tag>
+  </span>
 </template>
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
@@ -16,8 +16,6 @@ const { value, dictName, notFoundLabel } = defineProps({
 })
 
 const dict = useDict(dictName)
-
-const loading = computed(() => !dict || dict.value.length === 0)
 
 const tag = computed(() => {
   if (!dict || dict.value.length === 0) {

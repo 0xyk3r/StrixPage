@@ -238,7 +238,7 @@ import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, kebabCase, pick } from 'lodash-es'
-import { type DataTableColumns, type FormInst, type FormRules, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
@@ -298,9 +298,7 @@ const dataColumns: DataTableColumns = [
     align: 'center',
     width: 120,
     render(row) {
-      return h(NTag, { type: row.type === 'menu' ? 'success' : 'info', bordered: false }, () =>
-        row.type === 'menu' ? '菜单' : '按钮'
-      )
+      return h('span', { class: ['nebula-tag', row.type === 'menu' ? 'nebula-tag--success' : 'nebula-tag--info'] }, row.type === 'menu' ? '菜单' : '按钮')
     }
   },
   { key: 'key', title: '权限标识', width: 240 },

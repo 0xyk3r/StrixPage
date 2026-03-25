@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula Table Design Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Nebula Dark Theme */
+  --bg-base: #06060e;
+  --bg-elevated: #0a0b14;
+  --bg-surface: rgba(255,255,255,0.022);
+  --bg-surface-hover: rgba(255,255,255,0.045);
+  --border-subtle: rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.06);
+  --border-accent: rgba(99,226,183,0.12);
+  --border-accent-hover: rgba(99,226,183,0.25);
+  --text-primary: #e0e0e0;
+  --text-secondary: rgba(255,255,255,0.55);
+  --text-dim: rgba(255,255,255,0.4);
+  --text-muted: rgba(255,255,255,0.22);
+  --text-accent: #63e2b7;
+  --accent-glow: rgba(99,226,183,0.15);
+  --color-error: #e88080;
+  --color-warning: #f2c97d;
+  --color-success: #63e2b7;
+  --color-info: #70c0e8;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.demo-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(6,6,14,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-default);
+}
+.demo-nav__title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-right: 16px;
+}
+.demo-nav__btn {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.demo-nav__btn:hover, .demo-nav__btn.active {
+  border-color: var(--border-accent-hover);
+  color: var(--text-accent);
+  background: rgba(99,226,183,0.05);
+}
+
+.demo-section {
+  display: none;
+  margin-top: 56px;
+  padding-top: 16px;
+}
+.demo-section.active { display: block; }
+.demo-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+.demo-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.demo-desc {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-bottom: 20px;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   OPTION A: "Frosted Glass" — 毛玻璃风格
+   Refined, layered glass panels with subtle depth
+   ============================================================ */
+.glass-search-block {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  backdrop-filter: blur(12px);
+}
+.glass-search-input {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  transition: border 0.15s;
+}
+.glass-search-input:focus { border-color: var(--border-accent-hover); }
+.glass-search-input::placeholder { color: var(--text-dim); }
+.glass-search-btn {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border: 1px solid var(--border-accent-hover);
+  border-radius: var(--radius-sm);
+  background: rgba(99,226,183,0.06);
+  color: var(--text-accent);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.glass-search-btn:hover {
+  background: rgba(99,226,183,0.12);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.glass-add-btn {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid var(--border-accent-hover);
+  border-radius: var(--radius-sm);
+  background: var(--text-accent);
+  color: #06060e;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+
+.glass-table-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+.glass-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.glass-table thead th {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border-default);
+  background: rgba(255,255,255,0.01);
+  position: sticky;
+  top: 0;
+}
+.glass-table tbody tr {
+  transition: background 0.15s;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.glass-table tbody tr:last-child { border-bottom: none; }
+.glass-table tbody tr:hover {
+  background: var(--bg-surface-hover);
+}
+.glass-table td {
+  padding: 11px 18px;
+  font-size: 12.5px;
+}
+.glass-table .col-name { font-weight: 500; }
+.glass-table .col-secondary { color: var(--text-secondary); font-size: 12px; }
+
+.glass-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.glass-tag--success { background: rgba(99,226,183,0.1); color: var(--color-success); border: 1px solid rgba(99,226,183,0.2); }
+.glass-tag--warning { background: rgba(242,201,125,0.1); color: var(--color-warning); border: 1px solid rgba(242,201,125,0.2); }
+.glass-tag--error { background: rgba(232,128,128,0.1); color: var(--color-error); border: 1px solid rgba(232,128,128,0.2); }
+.glass-tag--info { background: rgba(112,192,232,0.1); color: var(--color-info); border: 1px solid rgba(112,192,232,0.2); }
+
+.glass-action-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-size: 13px;
+  margin: 0 2px;
+}
+.glass-action-btn:hover { border-color: var(--border-accent-hover); color: var(--text-accent); background: rgba(99,226,183,0.05); }
+.glass-action-btn.danger:hover { border-color: rgba(232,128,128,0.3); color: var(--color-error); background: rgba(232,128,128,0.05); }
+
+.glass-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-subtle);
+}
+.glass-pagination__info {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.glass-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.glass-page-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.glass-page-btn:hover { border-color: var(--border-accent-hover); color: var(--text-primary); }
+.glass-page-btn.active { border-color: var(--text-accent); color: var(--text-accent); background: rgba(99,226,183,0.06); }
+
+/* ============================================================
+   OPTION B: "Fluid Cards" — 流体卡片风格
+   Each row is a standalone card with generous spacing
+   ============================================================ */
+.fluid-search-block {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fluid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fluid-list-header {
+  display: grid;
+  grid-template-columns: 1fr 140px 120px 100px 120px;
+  padding: 0 20px 8px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.fluid-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: 1fr 140px 120px 100px 120px;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  cursor: default;
+}
+.fluid-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 0 0 1px var(--border-accent);
+  transform: translateY(-1px);
+}
+.fluid-card__name {
+  font-weight: 600;
+  font-size: 13px;
+}
+.fluid-card__sub { color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
+.fluid-card__field { color: var(--text-secondary); font-size: 12px; }
+.fluid-card__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   OPTION C: "Hybrid" — 保留 NaiveUI DataTable + Nebula 样式覆盖
+   Override NaiveUI table via CSS custom properties + targeted styles
+   ============================================================ */
+.hybrid-note {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.hybrid-note h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-accent);
+}
+.hybrid-note p {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+.hybrid-code {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  overflow-x: auto;
+  margin-top: 8px;
+}
+.hybrid-code .hl { color: var(--text-accent); }
+.hybrid-code .cm { color: var(--text-dim); }
+
+/* Simulated NaiveUI DataTable with Nebula override styling */
+.hybrid-table-wrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+.hybrid-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-surface);
+}
+.hybrid-table thead th {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: left;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background: rgba(255,255,255,0.015);
+}
+.hybrid-table tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s;
+}
+.hybrid-table tbody tr:hover { background: var(--bg-surface-hover); }
+.hybrid-table tbody tr:last-child { border-bottom: none; }
+.hybrid-table td { padding: 12px 16px; font-size: 12.5px; }
+
+.hybrid-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.01);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Comparison grid */
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.comparison-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.comparison-card h4 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-accent);
+  margin-bottom: 10px;
+}
+.comparison-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.comparison-item .icon { font-size: 13px; }
+.comparison-item .icon.yes { color: var(--color-success); }
+.comparison-item .icon.no { color: var(--color-error); }
+.comparison-item .icon.maybe { color: var(--color-warning); }
+
+.divider {
+  height: 1px;
+  background: var(--border-default);
+  margin: 32px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="demo-nav">
+  <span class="demo-nav__title">Nebula Table Design</span>
+  <button class="demo-nav__btn active" onclick="showSection('a')">A: Frosted Glass</button>
+  <button class="demo-nav__btn" onclick="showSection('b')">B: Fluid Cards</button>
+  <button class="demo-nav__btn" onclick="showSection('c')">C: Hybrid (NaiveUI)</button>
+  <button class="demo-nav__btn" onclick="showSection('compare')">对比分析</button>
+</nav>
+
+<!-- ============================================================
+     OPTION A: Frosted Glass Table
+     ============================================================ -->
+<section id="section-a" class="demo-section active">
+  <div class="demo-label">DESIGN_CONCEPT::A</div>
+  <div class="demo-title">Frosted Glass Table — 毛玻璃数据表格</div>
+  <div class="demo-desc">
+    完全自定义实现的表格组件，使用 Nebula 设计系统的毛玻璃效果。表头使用等宽字体（Geist Mono）以增强技术感。
+    行悬停有微妙的背景变化。搜索栏和表格统一在圆角容器中。此方案<strong>完全替换 NaiveUI DataTable</strong>，
+    提供最大的样式控制权，但需要自行实现排序、展开行、树形数据等高级功能。
+  </div>
+
+  <!-- Search Block -->
+  <div class="glass-search-block">
+    <input class="glass-search-input" placeholder="搜索用户（昵称、手机号码）" />
+    <button class="glass-search-btn">搜索</button>
+    <button class="glass-add-btn">+ 新增用户</button>
+  </div>
+
+  <!-- Data Table -->
+  <div class="glass-table-wrap">
+    <table class="glass-table">
+      <thead>
+        <tr>
+          <th style="width:180px">用户昵称</th>
+          <th style="width:140px">手机号码</th>
+          <th style="width:100px">用户状态</th>
+          <th style="width:100px">用户类型</th>
+          <th style="width:160px">创建时间</th>
+          <th style="width:100px;text-align:center">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-name">张三</td>
+          <td class="col-secondary">138****1234</td>
+          <td><span class="glass-tag glass-tag--success">正常</span></td>
+          <td><span class="glass-tag glass-tag--info">管理员</span></td>
+          <td class="col-secondary">2025-03-15 09:32</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">李思思</td>
+          <td class="col-secondary">139****5678</td>
+          <td><span class="glass-tag glass-tag--success">正常</span></td>
+          <td><span class="glass-tag glass-tag--info">普通用户</span></td>
+          <td class="col-secondary">2025-03-12 14:21</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">王伍</td>
+          <td class="col-secondary">137****9012</td>
+          <td><span class="glass-tag glass-tag--warning">停用</span></td>
+          <td><span class="glass-tag glass-tag--info">普通用户</span></td>
+          <td class="col-secondary">2025-03-10 08:15</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">赵六</td>
+          <td class="col-secondary">136****3456</td>
+          <td><span class="glass-tag glass-tag--error">锁定</span></td>
+          <td><span class="glass-tag glass-tag--info">管理员</span></td>
+          <td class="col-secondary">2025-02-28 11:45</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">孙七</td>
+          <td class="col-secondary">135****7890</td>
+          <td><span class="glass-tag glass-tag--success">正常</span></td>
+          <td><span class="glass-tag glass-tag--info">普通用户</span></td>
+          <td class="col-secondary">2025-02-20 16:33</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="glass-pagination">
+      <span class="glass-pagination__info">共 128 条</span>
+      <div class="glass-pagination__pages">
+        <button class="glass-page-btn">‹</button>
+        <button class="glass-page-btn active">1</button>
+        <button class="glass-page-btn">2</button>
+        <button class="glass-page-btn">3</button>
+        <button class="glass-page-btn">…</button>
+        <button class="glass-page-btn">13</button>
+        <button class="glass-page-btn">›</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OPTION B: Fluid Cards
+     ============================================================ -->
+<section id="section-b" class="demo-section">
+  <div class="demo-label">DESIGN_CONCEPT::B</div>
+  <div class="demo-title">Fluid Cards — 流体卡片列表</div>
+  <div class="demo-desc">
+    每行数据以独立卡片形式呈现，圆角边框配合悬停微位移效果。适合数据密度较低的场景。
+    视觉上更现代、更有呼吸感。但对于<strong>大量数据和高密度场景</strong>（如日志查询、文件列表），
+    卡片间距会占用更多垂直空间。此方案同样<strong>完全替换 NaiveUI DataTable</strong>。
+  </div>
+
+  <div class="fluid-search-block">
+    <input class="glass-search-input" placeholder="搜索用户（昵称、手机号码）" />
+    <button class="glass-search-btn">搜索</button>
+    <button class="glass-add-btn">+ 新增用户</button>
+  </div>
+
+  <div class="fluid-list-header">
+    <span>用户信息</span>
+    <span>手机号码</span>
+    <span>状态</span>
+    <span>类型</span>
+    <span style="text-align:right">操作</span>
+  </div>
+  <div class="fluid-list">
+    <div class="fluid-card">
+      <div>
+        <div class="fluid-card__name">张三</div>
+        <div class="fluid-card__sub">创建于 2025-03-15</div>
+      </div>
+      <div class="fluid-card__field">138****1234</div>
+      <div><span class="glass-tag glass-tag--success">正常</span></div>
+      <div><span class="glass-tag glass-tag--info">管理员</span></div>
+      <div class="fluid-card__actions">
+        <button class="glass-action-btn" title="编辑">✎</button>
+        <button class="glass-action-btn danger" title="删除">✕</button>
+      </div>
+    </div>
+    <div class="fluid-card">
+      <div>
+        <div class="fluid-card__name">李思思</div>
+        <div class="fluid-card__sub">创建于 2025-03-12</div>
+      </div>
+      <div class="fluid-card__field">139****5678</div>
+      <div><span class="glass-tag glass-tag--success">正常</span></div>
+      <div><span class="glass-tag glass-tag--info">普通用户</span></div>
+      <div class="fluid-card__actions">
+        <button class="glass-action-btn" title="编辑">✎</button>
+        <button class="glass-action-btn danger" title="删除">✕</button>
+      </div>
+    </div>
+    <div class="fluid-card">
+      <div>
+        <div class="fluid-card__name">王伍</div>
+        <div class="fluid-card__sub">创建于 2025-03-10</div>
+      </div>
+      <div class="fluid-card__field">137****9012</div>
+      <div><span class="glass-tag glass-tag--warning">停用</span></div>
+      <div><span class="glass-tag glass-tag--info">普通用户</span></div>
+      <div class="fluid-card__actions">
+        <button class="glass-action-btn" title="编辑">✎</button>
+        <button class="glass-action-btn danger" title="删除">✕</button>
+      </div>
+    </div>
+    <div class="fluid-card">
+      <div>
+        <div class="fluid-card__name">赵六</div>
+        <div class="fluid-card__sub">创建于 2025-02-28</div>
+      </div>
+      <div class="fluid-card__field">136****3456</div>
+      <div><span class="glass-tag glass-tag--error">锁定</span></div>
+      <div><span class="glass-tag glass-tag--info">管理员</span></div>
+      <div class="fluid-card__actions">
+        <button class="glass-action-btn" title="编辑">✎</button>
+        <button class="glass-action-btn danger" title="删除">✕</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     OPTION C: Hybrid (NaiveUI + Nebula Override)
+     ============================================================ -->
+<section id="section-c" class="demo-section">
+  <div class="demo-label">DESIGN_CONCEPT::C</div>
+  <div class="demo-title">Hybrid — NaiveUI DataTable + Nebula 样式覆盖</div>
+  <div class="demo-desc">
+    <strong>推荐方案。</strong>保留 NaiveUI DataTable 的核心功能（展开行、树形数据、懒加载、远程分页、选择列），
+    同时通过 NaiveUI ThemeOverrides + 全局 CSS 深度覆盖来统一 Nebula 视觉风格。
+    此方案的改动量最小、风险最低，且能保留已有的 23 个数据表页面的全部业务逻辑不变。
+    仅需修改：搜索栏区域、操作按钮渲染函数、标签渲染函数、和全局表格样式覆盖。
+  </div>
+
+  <div class="hybrid-note">
+    <h3>实现策略</h3>
+    <p>1. <strong>NaiveUI ThemeOverrides</strong> — 在 App.vue 中为 DataTable 组件设置圆角、背景色、边框色、hover 色等</p>
+    <p>2. <strong>全局 SCSS 覆盖</strong> — 创建 <code>nebula-table.scss</code>，使用 <code>::v-deep</code> / 全局选择器覆盖 NaiveUI 内部 DOM 节点的间距、字体、过渡等</p>
+    <p>3. <strong>操作列重构</strong> — 重写 <code>handleOperate()</code> 工具函数，将 NButton 替换为自定义 Nebula 样式按钮</p>
+    <p>4. <strong>StrixTag 升级</strong> — 更新 StrixTag 组件使用 Nebula pill 样式标签替代 NTag</p>
+    <p>5. <strong>分页组件</strong> — 可考虑自定义分页样式覆盖 或 保留 NaiveUI NPagination (已通过 ThemeOverrides 适配)</p>
+
+    <div class="hybrid-code">
+<span class="cm">// App.vue — DataTable ThemeOverrides 示例</span>
+<span class="hl">DataTable</span>: {
+  borderRadius: '<span class="hl">14px</span>',
+  thColor: 'rgba(255, 255, 255, 0.015)',
+  thTextColor: 'rgba(255, 255, 255, 0.4)',
+  tdColor: 'transparent',
+  tdColorHover: 'rgba(255, 255, 255, 0.03)',
+  borderColor: 'rgba(255, 255, 255, 0.06)',
+  thFontWeight: '<span class="hl">500</span>',
+  fontSizeSmall: '<span class="hl">12px</span>',
+  fontSizeMedium: '<span class="hl">13px</span>',
+}
+    </div>
+  </div>
+
+  <!-- Visual preview of what the hybrid approach looks like -->
+  <div class="hybrid-table-wrap">
+    <table class="hybrid-table">
+      <thead>
+        <tr>
+          <th style="width:180px">用户昵称</th>
+          <th style="width:140px">手机号码</th>
+          <th style="width:100px">用户状态</th>
+          <th style="width:100px">用户类型</th>
+          <th style="width:160px">创建时间</th>
+          <th style="width:100px;text-align:center">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-name">张三</td>
+          <td class="col-secondary">138****1234</td>
+          <td><span class="glass-tag glass-tag--success">正常</span></td>
+          <td><span class="glass-tag glass-tag--info">管理员</span></td>
+          <td class="col-secondary">2025-03-15 09:32</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">李思思</td>
+          <td class="col-secondary">139****5678</td>
+          <td><span class="glass-tag glass-tag--success">正常</span></td>
+          <td><span class="glass-tag glass-tag--info">普通用户</span></td>
+          <td class="col-secondary">2025-03-12 14:21</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">王伍</td>
+          <td class="col-secondary">137****9012</td>
+          <td><span class="glass-tag glass-tag--warning">停用</span></td>
+          <td><span class="glass-tag glass-tag--info">普通用户</span></td>
+          <td class="col-secondary">2025-03-10 08:15</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-name">赵六</td>
+          <td class="col-secondary">136****3456</td>
+          <td><span class="glass-tag glass-tag--error">锁定</span></td>
+          <td><span class="glass-tag glass-tag--info">管理员</span></td>
+          <td class="col-secondary">2025-02-28 11:45</td>
+          <td style="text-align:center">
+            <button class="glass-action-btn" title="编辑">✎</button>
+            <button class="glass-action-btn danger" title="删除">✕</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="hybrid-pagination">
+      <span class="glass-pagination__info">共 128 条</span>
+      <div class="glass-pagination__pages">
+        <button class="glass-page-btn">‹</button>
+        <button class="glass-page-btn active">1</button>
+        <button class="glass-page-btn">2</button>
+        <button class="glass-page-btn">3</button>
+        <button class="glass-page-btn">…</button>
+        <button class="glass-page-btn">13</button>
+        <button class="glass-page-btn">›</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     COMPARISON
+     ============================================================ -->
+<section id="section-compare" class="demo-section">
+  <div class="demo-label">ANALYSIS::COMPARISON</div>
+  <div class="demo-title">三种方案对比分析</div>
+  <div class="demo-desc">综合考虑样式控制力、开发成本、功能完整性和维护性的全面对比。</div>
+
+  <div class="comparison-grid">
+    <div class="comparison-card">
+      <h4>A: Frosted Glass (全自定义)</h4>
+      <div class="comparison-item"><span class="icon yes">✓</span> 样式 100% 可控</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 与 Nebula 设计无缝融合</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 体积更小（无 NaiveUI 表格代码）</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 需要自行实现展开行</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 需要自行实现树形数据</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 需要自行实现懒加载</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 需要自行实现选择列</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 改动量极大（23个页面）</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 测试回归风险高</div>
+    </div>
+
+    <div class="comparison-card">
+      <h4>B: Fluid Cards (全自定义)</h4>
+      <div class="comparison-item"><span class="icon yes">✓</span> 视觉最具特色</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 现代卡片化设计</div>
+      <div class="comparison-item"><span class="icon maybe">△</span> 低密度数据效果最佳</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 高密度数据浪费垂直空间</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 展开行、树形数据实现复杂</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 需要完全重写 23 个页面</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 不适合日志/文件等列表</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 维护成本高</div>
+      <div class="comparison-item"><span class="icon no">✗</span> 测试回归风险最高</div>
+    </div>
+
+    <div class="comparison-card" style="border-color: var(--border-accent-hover);">
+      <h4>C: Hybrid（推荐）</h4>
+      <div class="comparison-item"><span class="icon yes">✓</span> 保留全部高级功能</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 展开行/树形/懒加载无需重写</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 改动量最小、风险最低</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 23 个页面业务逻辑不变</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 通过 ThemeOverrides 适配</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 可逐步增强定制化程度</div>
+      <div class="comparison-item"><span class="icon maybe">△</span> 样式控制约 85%</div>
+      <div class="comparison-item"><span class="icon maybe">△</span> 部分内部结构难以覆盖</div>
+      <div class="comparison-item"><span class="icon yes">✓</span> 可与 A 方案组合使用</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="hybrid-note">
+    <h3>推荐策略：C + A 混合方案</h3>
+    <p><strong>核心思路：</strong>使用方案 C（NaiveUI DataTable + Nebula 样式覆盖）作为基础，同时将搜索栏、操作按钮、标签等"周边组件"替换为完全自定义的 Nebula 组件（方案 A 的元素）。</p>
+    <p><strong>具体做法：</strong></p>
+    <p>① <strong>DataTable 主体</strong> → 保留 NaiveUI，通过 ThemeOverrides + SCSS 覆盖实现 Nebula 风格</p>
+    <p>② <strong>搜索栏</strong> → StrixBlock 已经是自定义组件（已完成 Nebula 化），内部输入框保留 NaiveUI（通过 ThemeOverrides 已适配）</p>
+    <p>③ <strong>操作按钮</strong> → 重写 handleOperate()，使用 Nebula 风格图标按钮替代 NButton</p>
+    <p>④ <strong>标签/状态</strong> → 升级 StrixTag，使用 Nebula pill 样式替代 NTag</p>
+    <p>⑤ <strong>分页</strong> → 保留 NaiveUI NPagination（可通过 ThemeOverrides 调整风格），或后续替换为自定义分页</p>
+    <p>⑥ <strong>弹窗/表单</strong> → 保留 NaiveUI NModal + NForm（通过 ThemeOverrides 适配圆角、颜色等）</p>
+  </div>
+</section>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.demo-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.demo-nav__btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

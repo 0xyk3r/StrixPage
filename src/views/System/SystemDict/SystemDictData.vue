@@ -174,7 +174,7 @@ import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NTag } from 'naive-ui'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 const route = useRoute()
 
@@ -244,7 +244,7 @@ const dataColumns: DataTableColumns = [
     width: 240,
     align: 'center',
     render(row: any) {
-      return h(NTag, { type: row.style, bordered: false }, { default: () => row.label })
+      return h('span', { class: ['nebula-tag', `nebula-tag--${row.style || 'default'}`] }, row.label)
     }
   },
   {

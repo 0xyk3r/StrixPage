@@ -27,7 +27,7 @@
 <script lang="ts" setup>
 import { http } from '@/plugins/axios'
 import { usePage } from '@/composables/usePage.ts'
-import { type DataTableColumns, NTag } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixNameFetcher from '@/components/data/StrixNameFetcher.vue'
 import { handleOperate } from '@/utils/strix-table-tool'
 import StrixTag from '@/components/common/StrixTag.vue'
@@ -90,7 +90,7 @@ const dataColumns: DataTableColumns = [
     align: 'center',
     render(row: any) {
       if (!row.operationType) {
-        return h(NTag, { type: 'warning' }, { default: () => '待处理' })
+        return h('span', { class: 'nebula-tag nebula-tag--warning' }, '待处理')
       }
       return h(StrixTag, {
         value: row.operationType,

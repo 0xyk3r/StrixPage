@@ -89,7 +89,103 @@ const lightThemeOverrides: GlobalThemeOverrides = {
     dividerColor: 'rgba(0, 0, 0, 0.09)',
     borderRadius: '10px',
     borderRadiusSmall: '6px',
-    fontFamily: "'Manrope', system-ui, -apple-system, sans-serif"
+    fontFamily: "'Manrope', system-ui, -apple-system, sans-serif",
+    fontSize: '13px',
+    fontSizeMedium: '13px',
+    fontSizeSmall: '12px',
+    heightMedium: '34px',
+    heightSmall: '28px'
+  },
+  DataTable: {
+    borderRadius: '14px',
+    thColor: 'rgba(0, 0, 0, 0.02)',
+    thTextColor: 'rgba(0, 0, 0, 0.45)',
+    thFontWeight: '500',
+    tdColor: 'transparent',
+    tdColorHover: 'rgba(0, 0, 0, 0.025)',
+    tdColorStriped: 'rgba(0, 0, 0, 0.015)',
+    borderColor: 'rgba(0, 0, 0, 0.07)',
+    paginationMargin: '14px 0 0 0',
+    emptyPadding: '40px 0',
+    thPaddingSmall: '10px 14px',
+    thPaddingMedium: '12px 16px',
+    tdPaddingSmall: '9px 14px',
+    tdPaddingMedium: '11px 16px',
+    fontSizeSmall: '12px',
+    fontSizeMedium: '12.5px'
+  },
+  Pagination: {
+    itemBorderRadius: '6px',
+    itemSize: '28px',
+    itemSizeMedium: '28px',
+    itemMargin: '0 2px 0 0',
+    buttonBorderRadius: '6px',
+    itemFontSize: '12px'
+  },
+  Card: {
+    borderRadius: '14px',
+    paddingMedium: '20px',
+    paddingHuge: '24px',
+    titleFontSizeMedium: '15px',
+    titleFontSizeHuge: '16px',
+    titleFontWeight: '600'
+  },
+  Dialog: {
+    borderRadius: '14px',
+    padding: '24px',
+    titleFontSize: '16px',
+    titleFontWeight: '600',
+    fontSize: '13px'
+  },
+  Input: {
+    borderRadius: '6px',
+    heightMedium: '34px',
+    heightSmall: '28px',
+    fontSizeMedium: '12.5px',
+    fontSizeSmall: '12px',
+    paddingMedium: '0 12px'
+  },
+  Button: {
+    borderRadiusMedium: '6px',
+    borderRadiusSmall: '6px',
+    borderRadiusTiny: '4px',
+    fontSizeMedium: '12.5px',
+    fontSizeSmall: '12px',
+    heightMedium: '34px',
+    heightSmall: '28px',
+    heightTiny: '22px',
+    paddingMedium: '0 16px',
+    paddingSmall: '0 12px',
+    iconMarginMedium: '6px',
+    iconMarginSmall: '4px'
+  },
+  Tag: {
+    borderRadius: '9999px',
+    fontSizeSmall: '10px',
+    fontSizeMedium: '11px',
+    heightSmall: '20px',
+    heightMedium: '24px',
+    padding: '0 10px'
+  },
+  Form: {
+    feedbackFontSizeMedium: '11px',
+    labelFontSizeTopMedium: '12px',
+    blankHeightMedium: '34px'
+  },
+  Tabs: {
+    tabFontSizeMedium: '13px',
+    tabFontSizeSmall: '12px',
+    tabGapMediumLine: '24px',
+    tabPaddingMediumLine: '10px 0',
+    panePaddingMedium: '16px 0 0 0'
+  },
+  Popconfirm: {
+    fontSize: '12.5px'
+  },
+  Popover: {
+    borderRadius: '10px',
+    fontSize: '12px',
+    padding: '8px 14px'
   }
 }
 
@@ -112,7 +208,103 @@ const darkThemeOverrides: GlobalThemeOverrides = {
     dividerColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: '10px',
     borderRadiusSmall: '6px',
-    fontFamily: "'Manrope', system-ui, -apple-system, sans-serif"
+    fontFamily: "'Manrope', system-ui, -apple-system, sans-serif",
+    fontSize: '13px',
+    fontSizeMedium: '13px',
+    fontSizeSmall: '12px',
+    heightMedium: '34px',
+    heightSmall: '28px'
+  },
+  DataTable: {
+    borderRadius: '14px',
+    thColor: 'rgba(255, 255, 255, 0.015)',
+    thTextColor: 'rgba(255, 255, 255, 0.4)',
+    thFontWeight: '500',
+    tdColor: 'transparent',
+    tdColorHover: 'rgba(255, 255, 255, 0.035)',
+    tdColorStriped: 'rgba(255, 255, 255, 0.015)',
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    paginationMargin: '14px 0 0 0',
+    emptyPadding: '40px 0',
+    thPaddingSmall: '10px 14px',
+    thPaddingMedium: '12px 16px',
+    tdPaddingSmall: '9px 14px',
+    tdPaddingMedium: '11px 16px',
+    fontSizeSmall: '12px',
+    fontSizeMedium: '12.5px'
+  },
+  Pagination: {
+    itemBorderRadius: '6px',
+    itemSize: '28px',
+    itemSizeMedium: '28px',
+    itemMargin: '0 2px 0 0',
+    buttonBorderRadius: '6px',
+    itemFontSize: '12px'
+  },
+  Card: {
+    borderRadius: '14px',
+    paddingMedium: '20px',
+    paddingHuge: '24px',
+    titleFontSizeMedium: '15px',
+    titleFontSizeHuge: '16px',
+    titleFontWeight: '600'
+  },
+  Dialog: {
+    borderRadius: '14px',
+    padding: '24px',
+    titleFontSize: '16px',
+    titleFontWeight: '600',
+    fontSize: '13px'
+  },
+  Input: {
+    borderRadius: '6px',
+    heightMedium: '34px',
+    heightSmall: '28px',
+    fontSizeMedium: '12.5px',
+    fontSizeSmall: '12px',
+    paddingMedium: '0 12px'
+  },
+  Button: {
+    borderRadiusMedium: '6px',
+    borderRadiusSmall: '6px',
+    borderRadiusTiny: '4px',
+    fontSizeMedium: '12.5px',
+    fontSizeSmall: '12px',
+    heightMedium: '34px',
+    heightSmall: '28px',
+    heightTiny: '22px',
+    paddingMedium: '0 16px',
+    paddingSmall: '0 12px',
+    iconMarginMedium: '6px',
+    iconMarginSmall: '4px'
+  },
+  Tag: {
+    borderRadius: '9999px',
+    fontSizeSmall: '10px',
+    fontSizeMedium: '11px',
+    heightSmall: '20px',
+    heightMedium: '24px',
+    padding: '0 10px'
+  },
+  Form: {
+    feedbackFontSizeMedium: '11px',
+    labelFontSizeTopMedium: '12px',
+    blankHeightMedium: '34px'
+  },
+  Tabs: {
+    tabFontSizeMedium: '13px',
+    tabFontSizeSmall: '12px',
+    tabGapMediumLine: '24px',
+    tabPaddingMediumLine: '10px 0',
+    panePaddingMedium: '16px 0 0 0'
+  },
+  Popconfirm: {
+    fontSize: '12.5px'
+  },
+  Popover: {
+    borderRadius: '10px',
+    fontSize: '12px',
+    padding: '8px 14px'
   }
 }
 

@@ -1,22 +1,19 @@
-import { NButton, NFlex, NPopconfirm, NPopover } from 'naive-ui'
+import { NPopconfirm, NPopover } from 'naive-ui'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
-/**
- * 阻止事件冒泡
- * @param {MouseEvent} e 鼠标事件
- */
 const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation()
 }
 
-const btnSizeToFlexSize: { [key: string]: 'small' | 'medium' | 'large' | number } = {
-  tiny: 5,
-  small: 'small',
-  medium: 'medium',
-  large: 'large'
+// NaiveUI type → nebula-action-btn CSS modifier
+const typeToClass: Record<string, string> = {
+  error: 'is-danger',
+  warning: 'is-warning',
+  info: 'is-info',
+  success: 'is-success'
 }
 
-export const handleOperate = (buttons: any[], size = 'medium') => {
+export const handleOperate = (buttons: any[], _size = 'medium') => {
   const operateButtons = buttons.map((button) => {
     const { type, label, icon, disabled, onClick, popconfirm, popconfirmMessage } = button
 
@@ -25,12 +22,17 @@ export const handleOperate = (buttons: any[], size = 'medium') => {
       onClick()
     }
 
-    const buttonProps: any = {
-      size,
-      type,
-      disabled,
-      onClick: !popconfirm ? clickHandler : stopPropagation
-    }
+    const btnClass = ['nebula-action-btn', typeToClass[type] || ''].filter(Boolean)
+    const iconVNode = h(StrixIcon, { icon, size: 16 })
+    const btn = h(
+      'button',
+      {
+        class: btnClass,
+        disabled,
+        onClick: !popconfirm ? clickHandler : stopPropagation
+      },
+      [iconVNode]
+    )
 
     const content = popconfirm
       ? h(
@@ -40,11 +42,11 @@ export const handleOperate = (buttons: any[], size = 'medium') => {
             positiveButtonProps: { type }
           },
           {
-            trigger: () => h(NButton, buttonProps, () => h(StrixIcon, { icon, size: 16 })),
+            trigger: () => btn,
             default: () => popconfirmMessage
           }
         )
-      : h(NButton, buttonProps, () => h(StrixIcon, { icon, size: 16 }))
+      : btn
 
     return label
       ? h(
@@ -58,5 +60,5 @@ export const handleOperate = (buttons: any[], size = 'medium') => {
       : content
   })
 
-  return h(NFlex, { justify: 'center', size: btnSizeToFlexSize[size] }, () => operateButtons)
+  return h('div', { class: 'nebula-action-group' }, operateButtons)
 }
