@@ -7,6 +7,7 @@ const stopPropagation = (e: MouseEvent) => {
 
 // NaiveUI type → nebula-action-btn CSS modifier
 const typeToClass: Record<string, string> = {
+  primary: 'is-primary',
   error: 'is-danger',
   warning: 'is-warning',
   info: 'is-info',
