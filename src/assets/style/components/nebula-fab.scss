@@ -1,0 +1,88 @@
+// ============================================================
+// Nebula Design System — FAB (Floating Action Button)
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-fab {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 48px;
+  height: 48px;
+  z-index: $z-fab;
+  cursor: pointer;
+
+  @media (max-width: 480px) {
+    bottom: 20px;
+    right: 16px;
+  }
+}
+
+// ---- SVG Ring ----
+.nebula-fab__ring {
+  position: absolute;
+  inset: 0;
+}
+
+.nebula-fab__track {
+  fill: none;
+  stroke: var(--strix-border-default);
+  stroke-width: 2.5;
+}
+
+.nebula-fab__progress {
+  fill: none;
+  stroke: var(--strix-text-accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: #{2 * 3.14159265 * 21};
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.12s ease-out;
+  filter: drop-shadow(0 0 4px var(--strix-accent-glow));
+}
+
+// ---- Glass Button ----
+.nebula-fab__btn {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  @include glass;
+  border: 1px solid var(--strix-border-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-accent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
+  0 0 12px var(--strix-accent-glow);
+  transition: all $duration-fast;
+}
+
+.nebula-fab:hover .nebula-fab__btn {
+  border-color: var(--strix-text-accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4),
+  0 0 20px var(--strix-accent-glow);
+  transform: scale(1.08);
+}
+
+// ---- Transition ----
+.nebula-fab-enter-active {
+  transition: opacity 0.3s $ease-out-smooth,
+  transform 0.4s $ease-out-expo;
+}
+
+.nebula-fab-leave-active {
+  transition: opacity 0.2s,
+  transform 0.2s;
+}
+
+.nebula-fab-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+}
+
+.nebula-fab-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+}

@@ -53,6 +53,9 @@
     <!-- 快捷工具栏 -->
     <strix-quick-menu />
 
+    <!-- 回到顶部 + 进度环 -->
+    <StrixBackToTop />
+
     <!-- 水印 -->
     <n-watermark
       :font-size="16"
@@ -77,6 +80,7 @@ import StrixCommandPalette from '@/components/system/StrixCommandPalette.vue'
 import StrixDrawerMenu from '@/components/system/StrixDrawerMenu.vue'
 import StrixShortcutsPanel from '@/components/system/StrixShortcutsPanel.vue'
 import StrixQuickMenu from '@/components/common/StrixQuickMenu.vue'
+import StrixBackToTop from '@/components/common/StrixBackToTop.vue'
 import StrixTabsBar from '@/components/system/StrixTabBar.vue'
 import StrixToolBar from '@/components/system/StrixToolBar.vue'
 import { useCommandPalette } from '@/composables/useCommandPalette'
