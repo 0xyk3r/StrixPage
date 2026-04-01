@@ -135,7 +135,8 @@ const scrollRight = () => {
 }
 
 const handleWheel = (e: WheelEvent) => {
-  scrollRef.value?.scrollBy({ left: e.deltaY > 0 ? 80 : -80 })
+  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+  scrollRef.value?.scrollBy({ left: delta > 0 ? 80 : -80 })
 }
 
 // 滚动到当前活动标签

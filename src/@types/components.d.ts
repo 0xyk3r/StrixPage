@@ -76,6 +76,7 @@ declare module 'vue' {
     StrixBackToTop: typeof import('./../components/common/StrixBackToTop.vue')['default']
     StrixBlock: typeof import('./../components/common/StrixBlock.vue')['default']
     StrixBreadcrumb: typeof import('./../components/system/StrixBreadcrumb.vue')['default']
+    StrixColumnPanel: typeof import('./../components/common/StrixColumnPanel.vue')['default']
     StrixCommandPalette: typeof import('./../components/system/StrixCommandPalette.vue')['default']
     StrixDrawerMenu: typeof import('./../components/system/StrixDrawerMenu.vue')['default']
     StrixEmpty: typeof import('./../components/common/StrixEmpty.vue')['default']

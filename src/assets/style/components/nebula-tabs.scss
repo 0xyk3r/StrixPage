@@ -15,24 +15,31 @@
 
 // ---- 滚动箭头 ----
 .nebula-tabs__arrow {
-  width: 22px;
+  width: 0;
   height: 22px;
   border-radius: $radius-circle;
   background: var(--strix-bg-surface);
-  border: 1px solid var(--strix-border-subtle);
+  border: 1px solid transparent;
   color: var(--strix-text-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all $duration-fast;
+  transition: width $duration-fast,
+  opacity $duration-fast,
+  border-color $duration-fast,
+  background $duration-fast;
   opacity: 0;
   pointer-events: none;
+  overflow: hidden;
+  padding: 0;
 
   &.visible {
+    width: 22px;
     opacity: 1;
     pointer-events: all;
+    border-color: var(--strix-border-subtle);
   }
 
   &:hover {
@@ -59,6 +66,8 @@
   scroll-behavior: smooth;
   @include hide-scrollbar;
   padding: 2px 0;
+  // 作为 offsetParent，确保子元素 offsetLeft 相对于滚动容器计算
+  position: relative;
 }
 
 // ---- 单个标签胶囊 ----

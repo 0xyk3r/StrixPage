@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
     <strix-block cleanable @clear="clearSearch">
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
@@ -10,6 +10,10 @@
             </n-input-group>
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
+            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
+              列配置
+            </n-button>
             <n-button quaternary type="primary" @click="showExportDialog = true">
               <template #icon><strix-icon icon="download" :size="16" /></template>
               导出
@@ -42,7 +46,7 @@
     </strix-block>
 
     <n-data-table
-      :columns="dataColumns"
+      :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
       :pagination="dataPagination"
@@ -58,6 +62,8 @@
       :fetch-all-data="fetchAllData"
       :title="_baseName"
     />
+
+    <strix-column-panel v-model:show="showColumnPanel" />
   </div>
 </template>
 
@@ -69,7 +75,9 @@ import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
 import type { DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
@@ -125,6 +133,10 @@ const dataColumns: DataTableColumns = [
     }
   }
 ]
+
+// 列可见性与排序
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
