@@ -1,85 +1,91 @@
 <template>
-  <div class="nebula-notif-anchor" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
-    <!-- Trigger Button -->
-    <button class="nebula-toolbar__btn nebula-notif-trigger" title="通知">
-      <StrixIcon icon="bell" :size="15" />
-      <span v-if="notificationStore.unreadCount > 0" class="nebula-notif-badge">
-        {{ badgeValue }}
-      </span>
-    </button>
+  <!-- Trigger Button (stays in toolbar) -->
+  <button class="nebula-toolbar__btn nebula-notif-trigger" title="通知" @click="toggle">
+    <StrixIcon icon="bell" :size="15" />
+    <span v-if="notificationStore.unreadCount > 0" class="nebula-notif-badge">
+      {{ badgeValue }}
+    </span>
+  </button>
 
-    <!-- Backdrop (click outside) -->
-    <div v-if="showPanel" class="nebula-notif-backdrop" @click="showPanel = false" />
+  <!-- Drawer (teleported to body) -->
+  <Teleport to="body">
+    <!-- Overlay -->
+    <Transition name="nebula-overlay">
+      <div v-if="showPanel" class="nebula-notif-overlay" @click.self="close" />
+    </Transition>
 
-    <!-- Dropdown Panel -->
-    <Transition name="nebula-notif">
-      <div
-        v-if="showPanel"
-        class="nebula-notif-panel"
-        @mouseenter="handlePanelMouseEnter"
-        @mouseleave="handlePanelMouseLeave"
-      >
-        <!-- Header -->
-        <div class="nebula-notif-header">
-          <div class="nebula-notif-header__left">
-            <span class="nebula-notif-header__id">PANEL::NOTIFICATIONS</span>
-            <span class="nebula-notif-header__title">通知中心</span>
+    <!-- Drawer Panel -->
+    <Transition name="nebula-notif-drawer">
+      <div v-if="showPanel" class="nebula-notif-drawer" @click.stop>
+        <!-- Glass content area -->
+        <div class="nebula-notif-drawer__content">
+          <!-- Header inside content -->
+          <div class="nebula-notif-drawer__header">
+            <StrixIcon icon="bell" :size="16" class="nebula-notif-drawer__header-icon" />
+            <span class="nebula-notif-drawer__title">通知中心</span>
+            <button class="nebula-notif-drawer__close" title="关闭 (ESC)" @click="close">
+              <StrixIcon icon="x" :size="16" />
+            </button>
           </div>
-          <button
-            v-if="notificationStore.unreadCount > 0"
-            class="nebula-notif-header__action"
-            @click="handleMarkAllAsRead"
-          >
-            全部已读
-          </button>
-        </div>
 
-        <!-- Tabs -->
-        <div class="nebula-notif-tabs">
-          <button
-            v-for="tab in tabs"
-            :key="tab.key"
-            :class="['nebula-notif-tab', { 'is-active': activeTab === tab.key }]"
-            @click="switchTab(tab.key)"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
+          <!-- Tabs -->
+          <div class="nebula-notif-tabs">
+            <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              :class="['nebula-notif-tab', { 'is-active': activeTab === tab.key }]"
+              @click="switchTab(tab.key)"
+            >
+              {{ tab.label }}
+              <span v-if="tab.key === 'unread' && notificationStore.unreadCount > 0" class="nebula-notif-tab__badge">
+                {{ badgeValue }}
+              </span>
+            </button>
+          </div>
 
-        <!-- Tab Content -->
-        <StrixNotificationList
-          v-if="activeTab === 'unread'"
-          empty-text="暂无未读通知"
-          :has-more="unreadHasMore"
-          :loading="loading"
-          :notifications="unreadNotifications"
-          @load-more="loadMoreUnread"
-          @mark-as-read="handleMarkAsRead"
-          @item-click="handleItemClick"
-        />
-        <StrixNotificationList
-          v-else-if="activeTab === 'all'"
-          empty-text="暂无通知记录"
-          :has-more="allHasMore"
-          :loading="loading"
-          :notifications="allNotifications"
-          @load-more="loadMoreAll"
-          @mark-as-read="handleMarkAsRead"
-          @item-click="handleItemClick"
-        />
-        <StrixNotificationList
-          v-else
-          empty-text="暂无已失效通知"
-          :has-more="invalidHasMore"
-          :loading="loading"
-          :notifications="invalidNotifications"
-          @load-more="loadMoreInvalid"
-          @mark-as-read="handleMarkAsRead"
-          @item-click="handleItemClick"
-        />
+          <!-- Actions bar (only for unread tab) -->
+          <div v-if="activeTab === 'unread' && notificationStore.unreadCount > 0" class="nebula-notif-actions">
+            <button class="nebula-notif-actions__btn" @click="handleMarkAllAsRead">
+              <StrixIcon icon="check" :size="12" />
+              全部已读
+            </button>
+          </div>
+
+          <!-- Tab Content -->
+          <StrixNotificationList
+            v-if="activeTab === 'unread'"
+            empty-text="暂无未读通知"
+            :has-more="unreadHasMore"
+            :loading="loading"
+            :notifications="unreadNotifications"
+            @load-more="loadMoreUnread"
+            @mark-as-read="handleMarkAsRead"
+            @item-click="handleItemClick"
+          />
+          <StrixNotificationList
+            v-else-if="activeTab === 'all'"
+            empty-text="暂无通知记录"
+            :has-more="allHasMore"
+            :loading="loading"
+            :notifications="allNotifications"
+            @load-more="loadMoreAll"
+            @mark-as-read="handleMarkAsRead"
+            @item-click="handleItemClick"
+          />
+          <StrixNotificationList
+            v-else
+            empty-text="暂无已失效通知"
+            :has-more="invalidHasMore"
+            :loading="loading"
+            :notifications="invalidNotifications"
+            @load-more="loadMoreInvalid"
+            @mark-as-read="handleMarkAsRead"
+            @item-click="handleItemClick"
+          />
+        </div>
       </div>
     </Transition>
-  </div>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
@@ -100,8 +106,6 @@ const tabs = [
 
 // 面板显示状态
 const showPanel = ref(false)
-let hoverTimer: ReturnType<typeof setTimeout> | null = null
-let leaveTimer: ReturnType<typeof setTimeout> | null = null
 
 // 当前激活的标签页
 const activeTab = ref<'unread' | 'all' | 'invalid'>('unread')
@@ -133,48 +137,33 @@ const badgeValue = computed(() => {
   return count > 99 ? '99+' : count
 })
 
+const open = () => {
+  showPanel.value = true
+  loadNotifications()
+}
+
+const close = () => {
+  showPanel.value = false
+}
+
+const toggle = () => {
+  if (showPanel.value) close()
+  else open()
+}
+
+// ESC 关闭
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && showPanel.value) {
+    e.preventDefault()
+    e.stopPropagation()
+    close()
+  }
+}
+
 // 切换标签页
 const switchTab = (tab: 'unread' | 'all' | 'invalid') => {
   activeTab.value = tab
   loadNotifications()
-}
-
-// 鼠标进入触发区域
-const handleMouseEnter = () => {
-  if (leaveTimer) {
-    clearTimeout(leaveTimer)
-    leaveTimer = null
-  }
-  hoverTimer = setTimeout(() => {
-    showPanel.value = true
-    loadNotifications()
-  }, 200)
-}
-
-// 鼠标离开触发区域
-const handleMouseLeave = () => {
-  if (hoverTimer) {
-    clearTimeout(hoverTimer)
-    hoverTimer = null
-  }
-  leaveTimer = setTimeout(() => {
-    showPanel.value = false
-  }, 200)
-}
-
-// 鼠标进入面板区域
-const handlePanelMouseEnter = () => {
-  if (leaveTimer) {
-    clearTimeout(leaveTimer)
-    leaveTimer = null
-  }
-}
-
-// 鼠标离开面板区域
-const handlePanelMouseLeave = () => {
-  leaveTimer = setTimeout(() => {
-    showPanel.value = false
-  }, 200)
 }
 
 // 加载通知列表
@@ -350,34 +339,24 @@ const handleItemClick = async (notification: NotificationItem) => {
         name: notification.jumpTarget,
         state: jumpParams
       })
-      showPanel.value = false
+      close()
     } catch (error) {
       console.error('路由跳转失败:', error)
       createStrixMessage('error', '跳转失败', '路由跳转失败，请检查路由配置')
     }
   } else if (notification.jumpType === 'URL') {
     window.open(notification.jumpTarget, '_blank')
-    showPanel.value = false
+    close()
   }
 }
 
 onMounted(() => {
   notificationStore.startPolling()
+  document.addEventListener('keydown', handleKeydown, true)
 })
 
 onUnmounted(() => {
   notificationStore.stopPolling()
-  if (hoverTimer) clearTimeout(hoverTimer)
-  if (leaveTimer) clearTimeout(leaveTimer)
+  document.removeEventListener('keydown', handleKeydown, true)
 })
 </script>
-
-<style lang="scss" scoped>
-.nebula-notif-enter-active {
-  animation: nebula-notif-enter 0.25s $ease-out-expo both;
-}
-
-.nebula-notif-leave-active {
-  animation: nebula-notif-enter 0.15s $ease-out-expo reverse both;
-}
-</style>

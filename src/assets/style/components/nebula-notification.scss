@@ -1,5 +1,5 @@
 // ============================================================
-// Nebula Design System — Notification Panel (Signal Interceptor)
+// Nebula Design System — Notification Drawer (Signal Interceptor)
 // ============================================================
 @use '../tokens' as *;
 @use '../mixins' as *;
@@ -33,132 +33,197 @@
   animation: nebula-notif-badge-pulse 2s ease-in-out infinite;
 }
 
-// ---- Panel Wrapper (anchor) ----
-.nebula-notif-anchor {
-  position: relative;
-}
-
-// ---- Backdrop ----
-.nebula-notif-backdrop {
+// ---- Overlay ----
+// z-index intentionally below $z-header so the app header remains clickable
+.nebula-notif-overlay {
   position: fixed;
   inset: 0;
-  z-index: 39;
+  z-index: $z-header - 1;
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(3px);
+  clip-path: inset(var(--strix-header-height) 0 0 0);
 }
 
-// ---- Panel ----
-.nebula-notif-panel {
-  position: absolute;
-  top: calc(100% + 10px);
+// ---- Overlay Transition ----
+.nebula-overlay-enter-active,
+.nebula-overlay-leave-active {
+  transition: opacity $duration-slow $ease-out-smooth;
+}
+
+.nebula-overlay-enter-from,
+.nebula-overlay-leave-to {
+  opacity: 0;
+}
+
+// ---- Drawer ----
+.nebula-notif-drawer {
+  position: fixed;
+  top: var(--strix-header-height);
   right: 0;
-  width: 400px;
-  max-height: 560px;
-  z-index: 40;
+  width: 380px;
+  height: calc(100vh - var(--strix-header-height));
+  z-index: $z-drawer;
   display: flex;
   flex-direction: column;
-
-  background: var(--strix-bg-elevated);
-  border: 1px solid var(--strix-border-default);
-  border-radius: $radius-lg;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35),
-  0 0 1px var(--strix-border-accent-hover);
-
-  // Entrance animation
-  animation: nebula-notif-enter 0.25s $ease-out-expo both;
+  padding: 8px 8px 8px 0;
 
   @media (max-width: 480px) {
-    width: calc(100vw - 24px);
-    right: -12px;
+    width: 100vw;
+    padding: 8px;
   }
 }
 
-// ---- Panel Header ----
-.nebula-notif-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px 10px;
-  border-bottom: 1px solid var(--strix-border-default);
+// ---- Drawer Transition ----
+.nebula-notif-drawer-enter-active {
+  transition: transform 0.45s $ease-out-expo,
+  opacity 0.3s $ease-out-smooth;
 }
 
-.nebula-notif-header__left {
+.nebula-notif-drawer-leave-active {
+  transition: transform 0.25s $ease-out-smooth,
+  opacity 0.2s;
+}
+
+.nebula-notif-drawer-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.nebula-notif-drawer-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+// ---- Drawer Glass Content ----
+.nebula-notif-drawer__content {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  @include glass;
+  border-radius: $radius-xl;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25),
+  0 0 1px rgba(99, 226, 183, 0.15);
+  overflow: hidden;
 }
 
-.nebula-notif-header__id {
-  font-family: $font-mono;
-  font-size: 9px;
-  color: var(--strix-text-muted);
-  letter-spacing: 1.5px;
+// ---- Drawer Header (inside content) ----
+.nebula-notif-drawer__header {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--strix-border-subtle);
 }
 
-.nebula-notif-header__title {
-  font-family: $font-display;
-  font-size: $text-sm;
-  font-weight: $weight-semibold;
-  color: var(--strix-text-primary);
-}
-
-.nebula-notif-header__action {
-  font-family: $font-mono;
-  font-size: $text-2xs;
+.nebula-notif-drawer__header-icon {
   color: var(--strix-text-accent);
-  background: none;
-  border: 1px solid var(--strix-border-accent-hover);
-  border-radius: $radius-sm;
-  padding: 3px 10px;
-  cursor: pointer;
+}
+
+.nebula-notif-drawer__title {
+  font-family: $font-display;
+  font-size: $text-md;
+  font-weight: $weight-bold;
+  color: var(--strix-text-primary);
   letter-spacing: 0.5px;
+}
+
+.nebula-notif-drawer__close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--strix-text-muted);
+  border-radius: $radius-md;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all $duration-fast;
 
   &:hover {
-    background: var(--strix-accent-glow-subtle);
-    box-shadow: 0 0 8px var(--strix-accent-glow);
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-primary);
   }
 }
 
 // ---- Tab Selector ----
 .nebula-notif-tabs {
   display: flex;
-  padding: 0 18px;
-  gap: 0;
-  border-bottom: 1px solid var(--strix-border-default);
+  padding: $space-3 $space-4 0;
+  gap: $space-1;
+  flex-shrink: 0;
 }
 
 .nebula-notif-tab {
-  position: relative;
-  font-family: $font-mono;
-  font-size: $text-2xs;
-  color: var(--strix-text-dim);
-  letter-spacing: 0.5px;
-  padding: 10px 14px;
-  background: none;
+  flex: 1;
+  height: 32px;
   border: none;
+  background: transparent;
+  color: var(--strix-text-muted);
+  font-size: $text-sm;
+  font-weight: $weight-medium;
+  border-radius: $radius-md;
   cursor: pointer;
-  transition: color $duration-fast;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 14px;
-    right: 14px;
-    height: 2px;
-    background: transparent;
-    transition: background $duration-fast;
-  }
+  transition: all $duration-fast;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
 
   &:hover {
     color: var(--strix-text-secondary);
+    background: var(--strix-bg-surface);
   }
 
   &.is-active {
     color: var(--strix-text-accent);
+    background: var(--strix-border-accent);
+  }
+}
 
-    &::after {
-      background: var(--strix-text-accent);
-    }
+.nebula-notif-tab__badge {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: $color-error;
+  color: #fff;
+  font-size: 10px;
+  font-weight: $weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  line-height: 1;
+}
+
+// ---- Actions Bar ----
+.nebula-notif-actions {
+  display: flex;
+  align-items: center;
+  padding: $space-2 $space-4;
+  flex-shrink: 0;
+}
+
+.nebula-notif-actions__btn {
+  height: 28px;
+  padding: 0 $space-3;
+  border: 1px solid var(--strix-border-subtle);
+  background: transparent;
+  color: var(--strix-text-secondary);
+  font-size: $text-xs;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $duration-fast;
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+    color: var(--strix-text-accent);
   }
 }
 
@@ -168,25 +233,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   min-height: 0;
-  max-height: 400px;
-
-  // Custom scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--strix-border-default);
-    border-radius: 2px;
-
-    &:hover {
-      background: var(--strix-border-accent-hover);
-    }
-  }
+  @include thin-scrollbar;
 }
 
 // ---- Notification Item ----
@@ -195,7 +242,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 18px;
+  padding: $space-3 $space-4;
   cursor: pointer;
   transition: background $duration-fast;
   border-bottom: 1px solid var(--strix-border-subtle);
@@ -219,6 +266,8 @@
 
   // Unread state
   &.is-unread {
+    background: var(--strix-bg-surface);
+
     &::before {
       background: var(--strix-text-accent);
       box-shadow: 0 0 6px var(--strix-accent-glow);
@@ -347,7 +396,6 @@
 }
 
 .nebula-notif-empty__text {
-  font-family: $font-mono;
   font-size: $text-2xs;
   letter-spacing: 0.5px;
 }
