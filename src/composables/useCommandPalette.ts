@@ -1,6 +1,7 @@
 import { type MenuItem, useHomeMenu } from '@/composables/useHomeMenu'
 import { EventBus } from '@/plugins/event-bus'
 import { useBookmarksStore } from '@/stores/bookmarks'
+import screenfull from 'screenfull'
 
 export interface CommandItem {
   id: string
@@ -69,9 +70,7 @@ export function useCommandPalette() {
       icon: 'expand',
       group: '操作',
       action: () => {
-        import('screenfull').then(({ default: screenfull }) => {
-          if (screenfull.isEnabled) screenfull.toggle()
-        })
+        if (screenfull.isEnabled) screenfull.toggle()
         close()
       }
     }
