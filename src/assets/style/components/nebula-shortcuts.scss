@@ -1,0 +1,155 @@
+// ============================================================
+// Nebula Design System — Shortcuts Panel Styles
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// ---- 遮罩 ----
+.nebula-shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-cmd-palette;
+  background: var(--strix-bg-overlay);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+// ---- 面板容器 ----
+.nebula-shortcuts-panel {
+  width: 480px;
+  max-width: 92vw;
+  border-radius: $radius-xl;
+  @include glass;
+  border: 1px solid var(--strix-border-default);
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+  animation: nebula-scale-in $duration-normal $ease-out-expo;
+}
+
+// ---- 标题栏 ----
+.nebula-shortcuts-header {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-bottom: 1px solid var(--strix-border-subtle);
+
+  &__icon {
+    color: var(--strix-text-accent);
+    flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: $text-lg;
+    font-weight: $weight-semibold;
+    color: var(--strix-text-primary);
+    letter-spacing: $tracking-tight;
+  }
+
+  &__esc {
+    padding: 2px $space-2;
+    border-radius: $radius-xs;
+    background: var(--strix-bg-surface);
+    border: 1px solid var(--strix-border-default);
+    color: var(--strix-text-muted);
+    font-size: $text-2xs;
+    font-family: $font-mono;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all $duration-fast;
+
+    &:hover {
+      color: var(--strix-text-secondary);
+      border-color: var(--strix-border-default);
+    }
+  }
+}
+
+// ---- 内容区域 ----
+.nebula-shortcuts-body {
+  padding: $space-3 $space-4;
+  max-height: 60vh;
+  overflow-y: auto;
+  @include thin-scrollbar;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+// ---- 分组 ----
+.nebula-shortcuts-group {
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-1 $space-2;
+    font-size: $text-2xs;
+    text-transform: uppercase;
+    letter-spacing: $tracking-wider;
+    color: var(--strix-text-muted);
+    font-weight: $weight-bold;
+  }
+
+  &__items {
+    margin-top: $space-1;
+    border-radius: $radius-md;
+    background: var(--strix-bg-surface);
+    border: 1px solid var(--strix-border-subtle);
+    overflow: hidden;
+  }
+}
+
+// ---- 单条快捷键 ----
+.nebula-shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-2 $space-3;
+  transition: background $duration-fast;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--strix-border-subtle);
+  }
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+  }
+
+  &__desc {
+    font-size: $text-sm;
+    color: var(--strix-text-secondary);
+  }
+
+  &__keys {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+  }
+
+  &__sep {
+    font-size: $text-2xs;
+    color: var(--strix-text-muted);
+  }
+
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 $space-2;
+    border-radius: $radius-sm;
+    background: var(--strix-bg-base);
+    border: 1px solid var(--strix-border-default);
+    box-shadow: 0 1px 0 var(--strix-border-default);
+    font-family: $font-mono;
+    font-size: $text-2xs;
+    font-weight: $weight-medium;
+    color: var(--strix-text-primary);
+    line-height: 1;
+  }
+}

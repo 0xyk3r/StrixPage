@@ -87,6 +87,7 @@ declare module 'vue' {
     StrixQuickMenu: typeof import('./../components/common/StrixQuickMenu.vue')['default']
     StrixRedirect: typeof import('./../components/view/StrixRedirect.vue')['default']
     StrixRoleSelector: typeof import('./../components/data/StrixRoleSelector.vue')['default']
+    StrixShortcutsPanel: typeof import('./../components/system/StrixShortcutsPanel.vue')['default']
     StrixSwNotify: typeof import('./../components/system/StrixSwNotify.vue')['default']
     StrixTabBar: typeof import('./../components/system/StrixTabBar.vue')['default']
     StrixTag: typeof import('./../components/common/StrixTag.vue')['default']

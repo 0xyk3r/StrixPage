@@ -43,6 +43,14 @@
         class="nebula-context-menu"
         :style="{ left: contextmenuPosition.x + 'px', top: contextmenuPosition.y + 'px' }"
       >
+        <div
+          v-if="contextmenuView && !contextmenuView.meta?.noBookmark"
+          class="nebula-context-item"
+          @click="handleContextmenuSelect('toggleBookmark')"
+        >
+          <StrixIcon :icon="isContextmenuBookmarked ? 'bookmark-minus' : 'bookmark-plus'" :size="14" />
+          <span>{{ isContextmenuBookmarked ? '取消收藏' : '收藏此页' }}</span>
+        </div>
         <div class="nebula-context-item" @click="handleContextmenuSelect('closeCurrTabs')">
           <StrixIcon icon="x" :size="14" />
           <span>关闭</span>
@@ -92,6 +100,7 @@
 import { EventBus } from '@/plugins/event-bus.ts'
 import { useQuickMenuStore } from '@/stores/quick-menu.ts'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
+import { useBookmarksStore } from '@/stores/bookmarks.ts'
 import { storeToRefs } from 'pinia'
 import { useDraggable } from 'vue-draggable-plus'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
@@ -100,6 +109,7 @@ const route = useRoute()
 const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 const quickMenuStore = useQuickMenuStore()
+const bookmarksStore = useBookmarksStore()
 
 const { visitedRoutes } = storeToRefs(tabsBarStore)
 const tabActive = ref()
@@ -187,24 +197,36 @@ const getRouteKey = (route: any): string => {
 
 // tabs的右击相关逻辑
 const showRightMenu = ref(false)
-let contextmenuRoutesIndex: number | null = null
+const contextmenuRoutesIndex = ref<number | null>(null)
 const contextmenuPosition = ref({ x: 0, y: 0 })
+
+const contextmenuView = computed(() => {
+  if (contextmenuRoutesIndex.value == null) return null
+  return visitedRoutes.value[contextmenuRoutesIndex.value] ?? null
+})
+
+const isContextmenuBookmarked = computed(() => {
+  const view = contextmenuView.value
+  if (!view) return false
+  return bookmarksStore.isBookmarked(view.fullPath || view.path)
+})
 
 const handleTabContextmenu = (e: MouseEvent, index: number): void => {
   showRightMenu.value = true
-  contextmenuRoutesIndex = index
+  contextmenuRoutesIndex.value = index
   contextmenuPosition.value = { x: e.x, y: e.y }
 }
 
 const clearContextmenuSelect = () => {
   showRightMenu.value = false
   setTimeout(() => {
-    contextmenuRoutesIndex = null
+    contextmenuRoutesIndex.value = null
   }, 50)
 }
 
 const handleContextmenuSelect = (key: string) => {
   const actions: Record<string, () => void> = {
+    toggleBookmark,
     reloadRouter,
     reloadAllRouter,
     closeCurrTabs,
@@ -282,9 +304,24 @@ const closeTab = async (tabKey: string) => {
   }
 }
 
+// 收藏/取消收藏
+const toggleBookmark = () => {
+  const view = getContextmenuTagView()
+  if (!view) return
+  const fullPath = view.fullPath || view.path
+  bookmarksStore.toggleBookmark({
+    path: view.path,
+    fullPath,
+    title: view.meta?.title || '',
+    icon: view.meta?.icon,
+    query: view.query,
+    state: tabsBarStore.getRouteState(view.path)
+  })
+}
+
 const reloadRouter = async () => {
   const oldIndex =
-    contextmenuRoutesIndex ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
+    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
   const view: any = visitedRoutes.value[oldIndex]
   if (view) {
     const currentPath = view.fullPath || view.path
@@ -352,7 +389,8 @@ const closeAllTabs = async () => {
 const isActive = (r: any) => route.path === r.path
 const isAffix = (r: any) => r.meta?.fixed
 const getContextmenuTagView = () => {
-  const index = contextmenuRoutesIndex ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
+  const index =
+    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
   return visitedRoutes.value[index]
 }
 </script>

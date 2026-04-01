@@ -57,6 +57,19 @@
                         <StrixIcon v-if="child.iconName" :icon="child.iconName" :size="14" />
                       </span>
                       <span class="nebula-menu-item__text">{{ child.name }}</span>
+                      <span
+                        v-if="child.url"
+                        :class="[
+                          'nebula-menu-item__star',
+                          { 'nebula-menu-item__star--active': bookmarksStore.isPathBookmarked(child.url) }
+                        ]"
+                        @click="toggleMenuBookmark($event, child)"
+                      >
+                        <StrixIcon
+                          :icon="bookmarksStore.isPathBookmarked(child.url) ? 'bookmark-check' : 'bookmark-plus'"
+                          :size="13"
+                        />
+                      </span>
                     </div>
                   </div>
 
@@ -70,6 +83,19 @@
                       <StrixIcon v-if="item.iconName" :icon="item.iconName" :size="14" />
                     </span>
                     <span class="nebula-menu-item__text">{{ item.name }}</span>
+                    <span
+                      v-if="item.url"
+                      :class="[
+                        'nebula-menu-item__star',
+                        { 'nebula-menu-item__star--active': bookmarksStore.isPathBookmarked(item.url) }
+                      ]"
+                      @click="toggleMenuBookmark($event, item)"
+                    >
+                      <StrixIcon
+                        :icon="bookmarksStore.isPathBookmarked(item.url) ? 'bookmark-check' : 'bookmark-plus'"
+                        :size="13"
+                      />
+                    </span>
                   </div>
                 </template>
               </div>
@@ -91,9 +117,22 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useDrawer } from '@/composables/useDrawer'
 import { type MenuItem, useHomeMenu } from '@/composables/useHomeMenu'
 import { EventBus } from '@/plugins/event-bus'
+import { useBookmarksStore } from '@/stores/bookmarks'
 
 const { drawerOpen, close } = useDrawer()
 const { menuLoading, menuList, menuSelected, expandedKeys, toggleExpand, navigateTo } = useHomeMenu()
+const bookmarksStore = useBookmarksStore()
+
+const toggleMenuBookmark = (e: Event, item: MenuItem) => {
+  e.stopPropagation()
+  if (!item.url) return
+  bookmarksStore.toggleByPath({
+    path: item.url,
+    fullPath: item.url,
+    title: item.name,
+    icon: item.iconName
+  })
+}
 
 /**
  * 将扁平菜单按顶级父节点分组
@@ -352,6 +391,33 @@ const openCommandPalette = () => {
     flex: 1;
     min-width: 0;
     @include text-ellipsis;
+  }
+
+  &__star {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: $radius-sm;
+    color: var(--strix-text-muted);
+    opacity: 0;
+    transition: all $duration-fast;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--strix-color-warning);
+    }
+
+    &--active {
+      opacity: 1;
+      color: var(--strix-color-warning);
+    }
+  }
+
+  &:hover &__star {
+    opacity: 1;
   }
 
   &__arrow {

@@ -61,5 +61,10 @@ declare module 'vue-router' {
      * 动态组件名称模板
      */
     dynamicComponentNameTemplate?: string
+
+    /**
+     * 是否禁止收藏此页面
+     */
+    noBookmark?: boolean
   }
 }

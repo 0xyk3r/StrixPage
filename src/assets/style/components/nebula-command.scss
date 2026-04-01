@@ -134,6 +134,34 @@
   @include text-ellipsis;
 }
 
+.nebula-cmd-item__bookmark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: $radius-sm;
+  color: var(--strix-text-muted);
+  opacity: 0;
+  transition: all $duration-fast;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--strix-color-warning);
+  }
+
+  &--active {
+    opacity: 1;
+    color: var(--strix-color-warning);
+  }
+}
+
+.nebula-cmd-item:hover .nebula-cmd-item__bookmark,
+.nebula-cmd-item--active .nebula-cmd-item__bookmark {
+  opacity: 1;
+}
+
 // ---- 空状态 ----
 .nebula-cmd-empty {
   padding: $space-8 $space-4;

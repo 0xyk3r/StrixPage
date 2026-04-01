@@ -1,5 +1,6 @@
 import { type MenuItem, useHomeMenu } from '@/composables/useHomeMenu'
 import { EventBus } from '@/plugins/event-bus'
+import { useBookmarksStore } from '@/stores/bookmarks'
 
 export interface CommandItem {
   id: string
@@ -7,6 +8,8 @@ export interface CommandItem {
   icon?: string
   group: string
   action: () => void
+  bookmarked?: boolean
+  toggleBookmark?: () => void
 }
 
 /**
@@ -18,7 +21,9 @@ const activeIndex = ref(0)
 
 export function useCommandPalette() {
   const router = useRouter()
+  const route = useRoute()
   const { getAllLeafItems } = useHomeMenu()
+  const bookmarksStore = useBookmarksStore()
 
   const open = () => {
     isOpen.value = true
@@ -79,6 +84,17 @@ export function useCommandPalette() {
       label: item.name,
       icon: item.iconName || 'file',
       group: '导航',
+      bookmarked: item.url ? bookmarksStore.isPathBookmarked(item.url) : false,
+      toggleBookmark: item.url
+        ? () => {
+            bookmarksStore.toggleByPath({
+              path: item.url!,
+              fullPath: item.url!,
+              title: item.name,
+              icon: item.iconName
+            })
+          }
+        : undefined,
       action: () => {
         if (item.url) router.push(item.url)
         close()
@@ -86,8 +102,29 @@ export function useCommandPalette() {
     }))
   })
 
+  // 当前页收藏切换命令
+  const bookmarkCommand = computed<CommandItem>(() => {
+    const isCurrentBookmarked = bookmarksStore.isBookmarked(route.fullPath)
+    return {
+      id: 'cmd-bookmark-toggle',
+      label: isCurrentBookmarked ? '取消收藏当前页' : '收藏当前页',
+      icon: isCurrentBookmarked ? 'bookmark-minus' : 'bookmark-plus',
+      group: '操作',
+      action: () => {
+        bookmarksStore.toggleBookmark({
+          path: route.path,
+          fullPath: route.fullPath,
+          title: (route.meta.title as string) || route.name?.toString() || route.path,
+          icon: route.meta.icon as string,
+          query: { ...(route.query as Record<string, any>) }
+        })
+        close()
+      }
+    }
+  })
+
   // 所有命令
-  const allCommands = computed(() => [...menuCommands.value, ...actionCommands])
+  const allCommands = computed(() => [...menuCommands.value, bookmarkCommand.value, ...actionCommands])
 
   // 搜索过滤结果
   const filteredCommands = computed(() => {

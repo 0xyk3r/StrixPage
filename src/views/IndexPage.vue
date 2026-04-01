@@ -77,6 +77,23 @@
       </div>
     </div>
 
+    <!-- Bookmarks -->
+    <template v-if="bookmarks.length">
+      <div class="nebula-index__divider">
+        <span class="nebula-index__divider-label">MY_BOOKMARKS</span>
+        <span class="nebula-index__divider-line"></span>
+      </div>
+      <div class="nebula-index__bookmarks">
+        <div v-for="bm in bookmarks" :key="bm.fullPath" class="nebula-index__bookmark" @click="navigateToBookmark(bm)">
+          <StrixIcon :icon="bm.icon || 'bookmark'" :size="14" />
+          <span class="nebula-index__bookmark-text">{{ bm.title }}</span>
+          <button class="nebula-index__bookmark-remove" @click.stop="removeBookmark(bm.fullPath)">
+            <StrixIcon icon="x" :size="10" />
+          </button>
+        </div>
+      </div>
+    </template>
+
     <!-- Footer: project info + status -->
     <div class="nebula-index__footer">
       <div class="nebula-index__info">
@@ -98,9 +115,11 @@
 <script lang="ts" setup>
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useLoginInfoStore } from '@/stores/login-info'
+import { type BookmarkItem, useBookmarksStore } from '@/stores/bookmarks'
 import { useHomeMenu } from '@/composables/useHomeMenu'
 
 const loginInfoStore = useLoginInfoStore()
+const bookmarksStore = useBookmarksStore()
 const router = useRouter()
 
 const nickname = computed(() => loginInfoStore.loginInfo?.nickname || 'Operator')
@@ -108,6 +127,17 @@ const roleName = computed(() => {
   const t = loginInfoStore.loginInfo?.type
   return t === 1 ? 'SUPER_ADMIN' : 'OPERATOR'
 })
+
+// Bookmarks
+const bookmarks = computed(() => bookmarksStore.bookmarks)
+
+const navigateToBookmark = (bm: BookmarkItem) => {
+  router.push({ path: bm.path, query: bm.query, state: bm.state })
+}
+
+const removeBookmark = (fullPath: string) => {
+  bookmarksStore.removeBookmark(fullPath)
+}
 
 // Live clock — split into chars for individual digit styling
 const clockChars = ref<string[]>([])

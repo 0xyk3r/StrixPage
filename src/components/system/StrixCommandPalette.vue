@@ -36,6 +36,13 @@
                   <StrixIcon :icon="item.icon || 'file'" :size="15" />
                 </span>
                 <span class="nebula-cmd-item__text">{{ item.label }}</span>
+                <span
+                  v-if="item.toggleBookmark"
+                  :class="['nebula-cmd-item__bookmark', { 'nebula-cmd-item__bookmark--active': item.bookmarked }]"
+                  @click.stop="item.toggleBookmark()"
+                >
+                  <StrixIcon :icon="item.bookmarked ? 'bookmark-check' : 'bookmark-plus'" :size="13" />
+                </span>
               </div>
             </div>
           </div>

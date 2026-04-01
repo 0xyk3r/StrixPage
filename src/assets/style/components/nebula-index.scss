@@ -490,3 +490,69 @@ $hud-br: 10px;
   background: var(--strix-text-muted);
   opacity: 0.5;
 }
+
+// ============================================================
+// Bookmarks
+// ============================================================
+.nebula-index__bookmarks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+  animation: nebula-index-up 0.4s $ease-out-expo both;
+  animation-delay: 0.25s;
+}
+
+.nebula-index__bookmark {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  height: 32px;
+  padding: 0 $space-3;
+  border-radius: $radius-pill;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  color: var(--strix-text-secondary);
+  font-size: $text-sm;
+  cursor: pointer;
+  transition: all $duration-fast;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+    color: var(--strix-text-primary);
+    border-color: var(--strix-border-accent);
+
+    .nebula-index__bookmark-remove {
+      opacity: 1;
+      width: 16px;
+    }
+  }
+}
+
+.nebula-index__bookmark-text {
+  @include text-ellipsis;
+  max-width: 160px;
+  line-height: 1;
+}
+
+.nebula-index__bookmark-remove {
+  width: 0;
+  height: 16px;
+  border-radius: $radius-circle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--strix-text-muted);
+  flex-shrink: 0;
+  transition: all $duration-fast;
+  opacity: 0;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  &:hover {
+    color: var(--strix-color-error);
+  }
+}

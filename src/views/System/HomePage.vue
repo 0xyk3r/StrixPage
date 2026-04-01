@@ -47,6 +47,9 @@
     <!-- 命令面板 -->
     <strix-command-palette />
 
+    <!-- 快捷键面板 -->
+    <strix-shortcuts-panel />
+
     <!-- 快捷工具栏 -->
     <strix-quick-menu />
 
@@ -72,11 +75,13 @@ import NebulaBg from '@/components/system/NebulaBg.vue'
 import StrixBreadcrumb from '@/components/system/StrixBreadcrumb.vue'
 import StrixCommandPalette from '@/components/system/StrixCommandPalette.vue'
 import StrixDrawerMenu from '@/components/system/StrixDrawerMenu.vue'
+import StrixShortcutsPanel from '@/components/system/StrixShortcutsPanel.vue'
 import StrixQuickMenu from '@/components/common/StrixQuickMenu.vue'
 import StrixTabsBar from '@/components/system/StrixTabBar.vue'
 import StrixToolBar from '@/components/system/StrixToolBar.vue'
 import { useCommandPalette } from '@/composables/useCommandPalette'
 import { useDrawer } from '@/composables/useDrawer'
+import { useShortcutsPanel } from '@/composables/useShortcutsPanel'
 import { useDynamicComponent } from '@/composables/useDynamicComponent'
 import { useHomeMenu } from '@/composables/useHomeMenu'
 import { useTokenRenewal } from '@/composables/useTokenRenewal'
@@ -101,6 +106,7 @@ const { wrapDynamicComponent } = useDynamicComponent()
 useTokenRenewal()
 const { toggle: toggleDrawer, close: closeDrawer, drawerOpen } = useDrawer()
 const { toggle: toggleCommandPalette, close: closeCommandPalette, isOpen: isCommandPaletteOpen } = useCommandPalette()
+const { toggle: toggleShortcutsPanel, close: closeShortcutsPanel, isOpen: isShortcutsPanelOpen } = useShortcutsPanel()
 
 // 全局点击事件
 const clickContainer = () => {
@@ -138,6 +144,11 @@ const handleKeydown = (e: KeyboardEvent) => {
       closeCommandPalette()
       return
     }
+    if (isShortcutsPanelOpen.value) {
+      e.preventDefault()
+      closeShortcutsPanel()
+      return
+    }
     if (drawerOpen.value) {
       e.preventDefault()
       closeDrawer()
@@ -153,6 +164,13 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.ctrlKey && e.key === 'k') {
     e.preventDefault()
     toggleCommandPalette()
+  }
+  // ? 打开/关闭快捷键帮助面板（非输入框状态下）
+  if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+    const tag = (e.target as HTMLElement)?.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) return
+    e.preventDefault()
+    toggleShortcutsPanel()
   }
 }
 
