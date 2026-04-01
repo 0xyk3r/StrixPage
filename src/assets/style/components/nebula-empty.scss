@@ -1,0 +1,226 @@
+// ============================================================
+// Nebula Design System — Empty State Illustrations
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $space-8 $space-4;
+  color: var(--strix-color-accent);
+
+  &__illustration {
+    width: 88px;
+    height: 88px;
+    margin-bottom: $space-3;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &__description {
+    font-size: 13px;
+    color: var(--strix-text-tertiary);
+    letter-spacing: 0.3px;
+    user-select: none;
+  }
+
+  // ---- Error variant ----
+  &--error {
+    color: var(--strix-color-error);
+  }
+
+  // ---- NO_DATA animations ----
+  &__grid-lines {
+    opacity: 0.25;
+    animation: ne-grid-breathe 4s ease-in-out infinite;
+  }
+
+  &__shimmer {
+    animation: ne-shimmer 3s ease-in-out infinite;
+  }
+
+  &__circle-breathe {
+    animation: ne-circle-breathe 3s ease-in-out infinite;
+  }
+
+  // ---- NO_RESULT animations ----
+  &__scan {
+    animation: ne-scan 2.5s ease-in-out infinite;
+  }
+
+  &__float {
+    animation: ne-float 3s ease-in-out infinite;
+
+    &--d1 {
+      animation-delay: 0.5s;
+    }
+
+    &--d2 {
+      animation-delay: 1s;
+    }
+  }
+
+  // ---- NO_SELECT animations ----
+  &__cursor {
+    animation: ne-blink 1s step-end infinite;
+  }
+
+  &__terminal-lines rect {
+    animation: ne-terminal-type 4s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+  }
+
+  &__pointer {
+    animation: ne-pointer-nudge 2.5s ease-in-out infinite;
+  }
+
+  // ---- ERROR animations ----
+  &__arc {
+    animation: ne-arc-pulse 2s ease-in-out infinite;
+
+    &--d1 {
+      animation-delay: 0.75s;
+    }
+  }
+
+  &__glow {
+    animation: ne-glow 2.5s ease-in-out infinite;
+  }
+}
+
+// ---- Keyframes ----
+
+// Grid lines subtle breathing
+@keyframes ne-grid-breathe {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+// Ghost data shimmer
+@keyframes ne-shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// Dashed circle breathing
+@keyframes ne-circle-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    stroke-dashoffset: 0;
+  }
+
+  50% {
+    opacity: 0.55;
+    stroke-dashoffset: 6;
+  }
+}
+
+// Magnifier scan line
+@keyframes ne-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(48px);
+  }
+}
+
+// Floating particles
+@keyframes ne-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+// Cursor blink
+@keyframes ne-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+// Terminal lines type effect
+@keyframes ne-terminal-type {
+  0%,
+  100% {
+    opacity: inherit;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+}
+
+// Pointer nudge
+@keyframes ne-pointer-nudge {
+  0%,
+  100% {
+    transform: translate(75px, 68px);
+  }
+
+  50% {
+    transform: translate(73px, 66px);
+  }
+}
+
+// Error arc pulse
+@keyframes ne-arc-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// Error glow pulse
+@keyframes ne-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}

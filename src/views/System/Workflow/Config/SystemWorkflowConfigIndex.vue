@@ -36,7 +36,10 @@
               table-layout="fixed"
             >
               <template #empty>
-                <n-empty :description="selectDataId ? '无数据' : '请选择配置'" size="large" />
+                <StrixEmpty
+                  :type="selectDataId ? 'no-data' : 'no-select'"
+                  :description="selectDataId ? '无数据' : '请选择配置'"
+                />
               </template>
             </n-data-table>
           </n-tab-pane>
@@ -52,7 +55,10 @@
               table-layout="fixed"
             >
               <template #empty>
-                <n-empty :description="selectDataId ? '无数据' : '请选择配置'" size="large" />
+                <StrixEmpty
+                  :type="selectDataId ? 'no-data' : 'no-select'"
+                  :description="selectDataId ? '无数据' : '请选择配置'"
+                />
               </template>
             </n-data-table>
           </n-tab-pane>

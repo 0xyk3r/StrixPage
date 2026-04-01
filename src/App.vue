@@ -4,6 +4,7 @@
     :locale="zhCN"
     :theme="currentNaiveTheme"
     :theme-overrides="currentNaiveTheme === null ? lightThemeOverrides : darkThemeOverrides"
+    :component-options="componentOptions"
   >
     <n-loading-bar-provider>
       <n-notification-provider>
@@ -35,11 +36,23 @@ import {
   zhCN
 } from 'naive-ui'
 import StrixSwNotify from './components/system/StrixSwNotify.vue'
+import StrixEmpty from './components/common/StrixEmpty.vue'
 import { EventBus } from './plugins/event-bus'
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
 const themeSetting = ref(globalSettingsStore.theme)
+
+const renderEmpty = () => h(StrixEmpty)
+
+const componentOptions = {
+  DataTable: { renderEmpty },
+  Select: { renderEmpty },
+  Cascader: { renderEmpty },
+  Transfer: { renderEmpty },
+  Tree: { renderEmpty },
+  TreeSelect: { renderEmpty }
+}
 
 // 解析当前实际主题名
 const resolvedTheme = computed(() => {

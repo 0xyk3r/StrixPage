@@ -102,7 +102,10 @@
                 table-layout="fixed"
               >
                 <template #empty>
-                  <n-empty :description="editDataId ? '无数据' : '请选择配置'" size="large" />
+                  <StrixEmpty
+                    :type="editDataId ? 'no-data' : 'no-select'"
+                    :description="editDataId ? '无数据' : '请选择配置'"
+                  />
                 </template>
               </n-data-table>
             </n-card>
@@ -164,7 +167,7 @@
                   </n-tooltip>
                 </div>
               </div>
-              <n-empty v-else description="选择一个配置" size="large" />
+              <StrixEmpty v-else type="no-select" description="选择一个配置" />
             </n-card>
           </n-gi>
         </n-grid>

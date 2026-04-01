@@ -161,7 +161,7 @@
                 autoresize
                 class="strix-charts"
               />
-              <n-empty v-else-if="!loading" description="暂无命令统计数据" style="padding: 60px 0" />
+              <StrixEmpty v-else-if="!loading" description="暂无命令统计数据" />
             </div>
           </n-spin>
         </n-card>
@@ -177,7 +177,7 @@
                 autoresize
                 class="strix-charts"
               />
-              <n-empty v-else-if="!loading" description="暂无内存信息数据" style="padding: 60px 0" />
+              <StrixEmpty v-else-if="!loading" description="暂无内存信息数据" />
             </div>
           </n-spin>
         </n-card>
