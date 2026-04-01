@@ -30,15 +30,17 @@
 
     <!-- 主内容区 -->
     <main class="nebula-main">
-      <div v-if="routerViewShow" class="nebula-content-view">
-        <router-view v-slot="{ Component, route }">
-          <transition name="nebula-page">
-            <keep-alive :include="tabsBarStore.cachedRouteNames">
-              <component :is="wrapDynamicComponent(Component, route)" :key="route.fullPath" />
-            </keep-alive>
-          </transition>
-        </router-view>
-      </div>
+      <strix-error-boundary>
+        <div v-if="routerViewShow" class="nebula-content-view">
+          <router-view v-slot="{ Component, route }">
+            <transition name="nebula-page">
+              <keep-alive :include="tabsBarStore.cachedRouteNames">
+                <component :is="wrapDynamicComponent(Component, route)" :key="route.fullPath" />
+              </keep-alive>
+            </transition>
+          </router-view>
+        </div>
+      </strix-error-boundary>
     </main>
 
     <!-- 抽屉菜单 -->
@@ -81,6 +83,7 @@ import StrixDrawerMenu from '@/components/system/StrixDrawerMenu.vue'
 import StrixShortcutsPanel from '@/components/system/StrixShortcutsPanel.vue'
 import StrixQuickMenu from '@/components/common/StrixQuickMenu.vue'
 import StrixBackToTop from '@/components/common/StrixBackToTop.vue'
+import StrixErrorBoundary from '@/components/common/StrixErrorBoundary.vue'
 import StrixTabsBar from '@/components/system/StrixTabBar.vue'
 import StrixToolBar from '@/components/system/StrixToolBar.vue'
 import { useCommandPalette } from '@/composables/useCommandPalette'

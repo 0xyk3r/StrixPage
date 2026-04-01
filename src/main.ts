@@ -18,6 +18,15 @@ import StrixEmpty from './components/common/StrixEmpty.vue'
 
 const app = createApp(App)
 
+// 全局错误处理 (L3: 兜底捕获未被组件级 ErrorBoundary 处理的错误)
+app.config.errorHandler = (err, instance, info) => {
+  console.error('[Strix] 未捕获的应用错误:', err)
+  console.error('[Strix] 错误来源:', info)
+  if (instance) {
+    console.error('[Strix] 组件:', instance.$options?.name || instance.$options?.__name || '未知')
+  }
+}
+
 app.use(createPinia().use(piniaPluginPersistedstate))
 app.use(router)
 
