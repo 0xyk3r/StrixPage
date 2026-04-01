@@ -116,6 +116,21 @@
   &--dragging {
     opacity: 0.5;
   }
+
+  &--ghost {
+    opacity: 0.35;
+    border-style: dashed;
+    border-color: var(--strix-border-accent);
+  }
+
+  &--chosen {
+    cursor: grabbing;
+  }
+
+  &--drag {
+    opacity: 0.9;
+    box-shadow: $shadow-md;
+  }
 }
 
 // ---- 固定标签标记 ----

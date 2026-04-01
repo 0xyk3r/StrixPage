@@ -93,6 +93,7 @@ import { EventBus } from '@/plugins/event-bus.ts'
 import { useQuickMenuStore } from '@/stores/quick-menu.ts'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 import { storeToRefs } from 'pinia'
+import { useDraggable } from 'vue-draggable-plus'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 const route = useRoute()
@@ -160,6 +161,22 @@ onMounted(() => {
       el.removeEventListener('scroll', checkScroll)
       observer.disconnect()
     })
+  }
+})
+
+// 标签页拖拽排序
+useDraggable(scrollRef, visitedRoutes, {
+  animation: 150,
+  direction: 'horizontal',
+  filter: '.nebula-tab--fixed, .nebula-tab__close',
+  preventOnFilter: true,
+  ghostClass: 'nebula-tab--ghost',
+  chosenClass: 'nebula-tab--chosen',
+  dragClass: 'nebula-tab--drag',
+  onMove: (evt: any) => {
+    if (evt.related?.classList.contains('nebula-tab--fixed')) {
+      return false
+    }
   }
 })
 
