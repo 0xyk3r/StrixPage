@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx'
 import type { DataTableColumn } from 'naive-ui'
 import { http } from '@/plugins/axios'
 import { useDictStore } from '@/stores/dict'
@@ -112,6 +111,7 @@ export async function exportData(data: any[], config: ExportConfig) {
   )
 
   const sheetData = [headers, ...rows]
+  const XLSX = await import('xlsx')
   const ws = XLSX.utils.aoa_to_sheet(sheetData)
 
   // 自动列宽

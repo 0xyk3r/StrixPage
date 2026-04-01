@@ -135,7 +135,20 @@ export default defineConfig({
     }
   },
   build: {
-    target: 'es2015'
+    target: 'es2015',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router', 'pinia', 'pinia-plugin-persistedstate'],
+          'vendor-naive': ['naive-ui'],
+          'vendor-icons': ['lucide-vue-next'],
+          'vendor-echarts': ['echarts', 'vue-echarts'],
+          'vendor-crypto': ['sm-crypto'],
+          'vendor-xlsx': ['xlsx']
+        }
+      }
+    }
   },
   server: {
     host: '0.0.0.0',
