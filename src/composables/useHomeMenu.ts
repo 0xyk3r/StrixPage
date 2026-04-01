@@ -13,36 +13,58 @@ export interface MenuItem {
   [key: string]: any
 }
 
+// ─── 模块级共享状态（单例模式，多组件共享同一份数据） ───
+const menuLoading = ref(false)
+const menuList = ref<MenuItem[]>([])
+const menuSelected = ref('')
+const expandedKeys = ref<Set<string>>(new Set())
+
+// 请求去重：并发调用只发一次请求
+let activeLoadPromise: Promise<void> | null = null
+let initialized = false
+
 /**
- * 首页菜单逻辑 Composable
- * 包含菜单加载、图标处理、选中状态同步
+ * 处理菜单图标字段
+ */
+const handleMenuIconField = (list: MenuItem[]): MenuItem[] => {
+  for (const child of list) {
+    if (child.icon) {
+      child.iconName = child.iconName || kebabCase(child.icon as string)
+    }
+    if (child.children && child.children.length > 0) {
+      handleMenuIconField(child.children)
+    } else {
+      child.children = null
+    }
+  }
+  return list
+}
+
+/**
+ * 获取所有叶子菜单项 (用于命令面板搜索)
+ */
+const getAllLeafItems = computed(() => {
+  const result: MenuItem[] = []
+  const walk = (items: MenuItem[]) => {
+    for (const item of items) {
+      if (item.children && item.children.length > 0) {
+        walk(item.children)
+      } else if (item.url) {
+        result.push(item)
+      }
+    }
+  }
+  walk(menuList.value)
+  return result
+})
+
+/**
+ * 首页菜单逻辑 Composable（单例共享状态）
+ * 多个组件调用只会发一次菜单请求，共享同一份菜单数据
  */
 export function useHomeMenu() {
   const router = useRouter()
   const route = useRoute()
-
-  const menuLoading = ref(false)
-  const menuList = ref<MenuItem[]>([])
-  const menuSelected = ref('')
-  const expandedKeys = ref<Set<string>>(new Set())
-
-  /**
-   * 处理菜单图标字段
-   * 将图标名称转换为 kebab-case 格式供 StrixIcon 使用
-   */
-  const handleMenuIconField = (list: MenuItem[]): MenuItem[] => {
-    for (const child of list) {
-      if (child.icon) {
-        child.iconName = child.iconName || kebabCase(child.icon as string)
-      }
-      if (child.children && child.children.length > 0) {
-        handleMenuIconField(child.children)
-      } else {
-        child.children = null
-      }
-    }
-    return list
-  }
 
   /**
    * 同步当前路由对应的菜单选中状态
@@ -52,7 +74,6 @@ export function useHomeMenu() {
       const currentMenu = deepSearch(menuList.value, route.path, 'url')
       if (currentMenu) {
         menuSelected.value = currentMenu.id
-        // 展开包含当前选中项的父菜单
         expandParentMenus(menuList.value, currentMenu.id)
       }
     }
@@ -97,11 +118,12 @@ export function useHomeMenu() {
   }
 
   /**
-   * 加载系统主菜单
+   * 加载系统主菜单（去重：并发调用复用同一个请求）
    */
   const loadMenuList = () => {
+    if (activeLoadPromise) return activeLoadPromise
     menuLoading.value = true
-    http
+    activeLoadPromise = http
       .get('system/menus', { meta: { operate: '加载系统主菜单' } })
       .then(({ data: res }) => {
         menuList.value = handleMenuIconField(res.data.menuList)
@@ -109,39 +131,41 @@ export function useHomeMenu() {
       })
       .finally(() => {
         menuLoading.value = false
+        activeLoadPromise = null
       })
+    return activeLoadPromise
   }
 
   /**
-   * 获取所有叶子菜单项 (用于命令面板搜索)
+   * 强制重新加载菜单（用于菜单管理页修改后刷新）
    */
-  const getAllLeafItems = computed(() => {
-    const result: MenuItem[] = []
-    const walk = (items: MenuItem[]) => {
-      for (const item of items) {
-        if (item.children && item.children.length > 0) {
-          walk(item.children)
-        } else if (item.url) {
-          result.push(item)
-        }
+  const forceReloadMenuList = () => {
+    activeLoadPromise = null
+    return loadMenuList()
+  }
+
+  // 首个调用者注册全局监听（HomePage 最先调用且永不卸载）
+  if (!initialized) {
+    initialized = true
+
+    watch(() => route.path, syncCurrentSelectMenu, { immediate: true })
+
+    onMounted(() => {
+      loadMenuList()
+      EventBus.on('refresh-menu', forceReloadMenuList)
+    })
+
+    onUnmounted(() => {
+      EventBus.off('refresh-menu', forceReloadMenuList)
+    })
+  } else {
+    // 后续调用者：确保数据已加载
+    onMounted(() => {
+      if (!menuList.value.length) {
+        loadMenuList()
       }
-    }
-    walk(menuList.value)
-    return result
-  })
-
-  // 监听路由变化以同步菜单选中项
-  watch(() => route.path, syncCurrentSelectMenu, { immediate: true })
-
-  // 初始化
-  onMounted(() => {
-    loadMenuList()
-    EventBus.on('refresh-menu', loadMenuList)
-  })
-
-  onUnmounted(() => {
-    EventBus.off('refresh-menu', loadMenuList)
-  })
+    })
+  }
 
   return {
     menuLoading,
@@ -150,7 +174,7 @@ export function useHomeMenu() {
     expandedKeys,
     toggleExpand,
     navigateTo,
-    loadMenuList,
+    loadMenuList: forceReloadMenuList,
     getAllLeafItems
   }
 }
