@@ -374,6 +374,7 @@ const dataColumns: DataTableColumns = [
     title: '账户状态',
     width: 120,
     align: 'center',
+    dictName: 'SystemManagerStatus',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'SystemManagerStatus' })
     }
@@ -383,6 +384,7 @@ const dataColumns: DataTableColumns = [
     title: '账户类型',
     width: 120,
     align: 'center',
+    dictName: 'SystemManagerType',
     render(row: any) {
       return h(StrixTag, { value: row.type, dictName: 'SystemManagerType' })
     }
@@ -392,6 +394,7 @@ const dataColumns: DataTableColumns = [
     title: '所属地区',
     width: 180,
     align: 'center',
+    valueResolver: (val: any) => managerRegionName(val),
     render(row: any) {
       const tagText = managerRegionName(row.regionId)
       return h(

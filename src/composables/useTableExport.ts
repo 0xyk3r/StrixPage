@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx'
 import type { DataTableColumn } from 'naive-ui'
 import { http } from '@/plugins/axios'
+import { useDictStore } from '@/stores/dict'
 
 export type ExportFormat = 'xlsx' | 'csv'
 export type ExportScope = 'current' | 'all' | 'selected'
@@ -9,6 +10,9 @@ export interface ExportableColumn {
   key: string
   title: string
   enabled: boolean
+  dictName?: string
+  valueMap?: Record<string, string>
+  valueResolver?: (val: any, row: any) => string | Promise<string>
 }
 
 export interface ExportConfig {
@@ -27,21 +31,52 @@ export function extractExportableColumns(columns: DataTableColumn[]): Exportable
     .filter((col: any) => {
       if (col.type === 'selection' || col.type === 'expand') return false
       if (col.key === 'actions' || col.key === 'action') return false
+      if (col.exportable === false) return false
       return col.key && col.title
     })
     .map((col: any) => ({
       key: col.key as string,
       title: col.title as string,
-      enabled: true
+      enabled: true,
+      ...(col.dictName ? { dictName: col.dictName } : {}),
+      ...(col.valueMap ? { valueMap: col.valueMap } : {}),
+      ...(col.valueResolver ? { valueResolver: col.valueResolver } : {})
     }))
 }
 
 /**
  * 将表格数据导出为文件
+ * 支持字典解析、静态值映射和自定义解析器（含异步）
  */
-export function exportData(data: any[], config: ExportConfig, dictResolver?: (dictName: string, value: any) => string) {
+export async function exportData(data: any[], config: ExportConfig) {
   const enabledColumns = config.columns.filter((c) => c.enabled)
   if (enabledColumns.length === 0 || data.length === 0) return
+
+  const dictStore = useDictStore()
+
+  // 预解析 valueResolver 列（按唯一值批量解析，避免重复调用）
+  const preResolvedMaps = new Map<string, Map<string, string>>()
+  for (const col of enabledColumns) {
+    if (col.valueResolver) {
+      const uniqueEntries = new Map<string, { val: any; row: any }>()
+      for (const row of data) {
+        const val = row[col.key]
+        const key = val === null || val === undefined ? '\0' : String(val)
+        if (!uniqueEntries.has(key)) uniqueEntries.set(key, { val, row })
+      }
+      const resolvedMap = new Map<string, string>()
+      await Promise.all(
+        [...uniqueEntries.entries()].map(async ([key, { val, row }]) => {
+          try {
+            resolvedMap.set(key, await Promise.resolve(col.valueResolver!(val, row)))
+          } catch {
+            resolvedMap.set(key, val == null ? '' : String(val))
+          }
+        })
+      )
+      preResolvedMaps.set(col.key, resolvedMap)
+    }
+  }
 
   // 构建表头
   const headers = enabledColumns.map((c) => c.title)
@@ -49,7 +84,29 @@ export function exportData(data: any[], config: ExportConfig, dictResolver?: (di
   const rows = data.map((row) =>
     enabledColumns.map((col) => {
       const val = row[col.key]
+
+      // 优先使用预解析结果（valueResolver）
+      if (preResolvedMaps.has(col.key)) {
+        const key = val === null || val === undefined ? '\0' : String(val)
+        return preResolvedMaps.get(col.key)!.get(key) ?? ''
+      }
+
       if (val === null || val === undefined) return ''
+
+      // 静态值映射
+      if (col.valueMap) {
+        return col.valueMap[String(val)] ?? String(val)
+      }
+
+      // 字典解析
+      if (col.dictName) {
+        const dictData = dictStore.dictMap[col.dictName]
+        if (dictData?.dictDataList) {
+          const item = dictData.dictDataList.find((d: any) => d.value === val)
+          if (item) return item.label
+        }
+      }
+
       return String(val)
     })
   )

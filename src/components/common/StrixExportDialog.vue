@@ -160,7 +160,7 @@ const handleExport = async () => {
       return
     }
 
-    exportData(data, config.value)
+    await exportData(data, config.value)
     message.success(`已导出 ${data.length} 条数据`)
     show.value = false
   } catch (e) {

@@ -56,6 +56,7 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
+import { useDictStore } from '@/stores/dict'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
@@ -87,6 +88,18 @@ const dataColumns: DataTableColumns = [
     key: 'workflowId',
     title: '流程模型',
     width: 180,
+    valueResolver: async (val: any) => {
+      if (!val) return ''
+      try {
+        const { data: res } = await http.get('system/common/namefetcher', {
+          params: { dataType: 'workflow', dataId: val },
+          meta: { operate: '数据 ID 映射' }
+        })
+        return res.data?.name || String(val)
+      } catch {
+        return String(val)
+      }
+    },
     render(row: any) {
       return h(StrixNameFetcher, { dataType: 'workflow', dataId: row.workflowId })
     }
@@ -95,6 +108,18 @@ const dataColumns: DataTableColumns = [
     key: 'instanceCreatedBy',
     title: '发起人',
     width: 140,
+    valueResolver: async (val: any) => {
+      if (!val) return ''
+      try {
+        const { data: res } = await http.get('system/common/namefetcher', {
+          params: { dataType: 'systemmanager', dataId: val },
+          meta: { operate: '数据 ID 映射' }
+        })
+        return res.data?.name || String(val)
+      } catch {
+        return String(val)
+      }
+    },
     render(row: any) {
       return h(StrixNameFetcher, { dataType: 'systemmanager', dataId: row.instanceCreatedBy })
     }
@@ -104,6 +129,7 @@ const dataColumns: DataTableColumns = [
     key: 'nodeType',
     title: '操作节点',
     width: 140,
+    dictName: 'WorkflowNodeType',
     render(row: any) {
       return h(StrixTag, {
         value: row.nodeType,
@@ -116,6 +142,15 @@ const dataColumns: DataTableColumns = [
     title: '状态',
     width: 140,
     align: 'center',
+    valueResolver: (val: any) => {
+      if (!val) return '待处理'
+      const dictData = useDictStore().dictMap['WorkflowOperationType']
+      if (dictData?.dictDataList) {
+        const item = dictData.dictDataList.find((d: any) => d.value === val)
+        if (item) return item.label
+      }
+      return String(val)
+    },
     render(row: any) {
       if (!row.operationType) {
         return h(NebulaTag, { type: 'warning' }, () => '待处理')

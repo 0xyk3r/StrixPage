@@ -275,6 +275,7 @@ const dataColumns: DataTableColumns = [
     title: '字典样式预览',
     width: 240,
     align: 'center',
+    exportable: false,
     render(row: any) {
       return h(NebulaTag, { type: row.style || 'default' }, () => row.label)
     }
@@ -284,6 +285,7 @@ const dataColumns: DataTableColumns = [
     title: '字典状态',
     width: 90,
     align: 'center',
+    dictName: 'CommonSwitch',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }

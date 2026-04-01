@@ -268,6 +268,7 @@ const dataColumns: DataTableColumns = [
     title: '字典状态',
     width: 90,
     align: 'center',
+    dictName: 'CommonSwitch',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }
@@ -277,6 +278,7 @@ const dataColumns: DataTableColumns = [
     title: '字典数据类型',
     width: 120,
     align: 'center',
+    dictName: 'DictDataType',
     render(row: any) {
       return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
     }
@@ -286,6 +288,7 @@ const dataColumns: DataTableColumns = [
     title: '是否内置',
     width: 90,
     align: 'center',
+    dictName: 'CommonFlag',
     render(row: any) {
       return h(StrixTag, { value: row.provided, dictName: 'CommonFlag' })
     }

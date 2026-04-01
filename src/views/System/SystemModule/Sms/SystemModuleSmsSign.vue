@@ -111,6 +111,7 @@ const dataColumns: DataTableColumns = [
     title: '状态',
     width: 120,
     align: 'center',
+    dictName: 'SmsSignStatus',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'SmsSignStatus' })
     }

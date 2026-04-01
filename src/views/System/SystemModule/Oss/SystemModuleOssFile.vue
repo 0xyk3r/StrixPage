@@ -105,7 +105,7 @@ const dataColumns: DataTableColumns = [
   { key: 'path', title: '文件路径', width: 360 },
   { key: 'configKey', title: '存储配置 Key', width: 140 },
   { key: 'groupKey', title: '文件组配置 Key', width: 160 },
-  { key: 'size', title: '文件大小', width: 120, render: (row: any) => formatFileSize(row.size) },
+  { key: 'size', title: '文件大小', width: 120, valueResolver: (val: any) => formatFileSize(val), render: (row: any) => formatFileSize(row.size) },
   { key: 'ext', title: '文件拓展名', width: 100 },
   { key: 'createdTime', title: '上传时间', width: 180 },
   {

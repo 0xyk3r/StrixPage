@@ -320,10 +320,11 @@ const {
 const dataColumns: DataTableColumns = [
   { key: 'name', title: '菜单名称', width: 240 },
   {
-    key: 'icon',
+    key: 'type',
     title: '类型',
     align: 'center',
     width: 120,
+    valueMap: { menu: '菜单', permission: '按钮' },
     render(row) {
       return h(NebulaTag, { type: row.type === 'menu' ? 'success' : 'info' }, () =>
         row.type === 'menu' ? '菜单' : '按钮'
@@ -337,6 +338,7 @@ const dataColumns: DataTableColumns = [
     title: '菜单图标',
     align: 'center',
     width: 120,
+    exportable: false,
     render(row: any) {
       return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 })
     }

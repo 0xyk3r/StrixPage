@@ -173,6 +173,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     ellipsis: { tooltip: false },
+    valueResolver: (val: any) => (val ? val + 'ms' : '失败'),
     render(row: any) {
       let type: NTagType
       if (row.operationMethod === 'GET') {

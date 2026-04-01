@@ -248,6 +248,7 @@ const dataColumns: DataTableColumns = [
     title: '错过执行策略',
     width: 120,
     align: 'center',
+    dictName: 'JobMisfire',
     render(row: any) {
       return h(StrixTag, { value: row.misfirePolicy, dictName: 'JobMisfire' })
     }
@@ -257,6 +258,7 @@ const dataColumns: DataTableColumns = [
     title: '并发执行',
     width: 120,
     align: 'center',
+    dictName: 'CommonSwitch',
     render(row: any) {
       return h(StrixTag, { value: row.concurrent, dictName: 'CommonSwitch' })
     }
@@ -266,6 +268,7 @@ const dataColumns: DataTableColumns = [
     title: '状态',
     width: 120,
     align: 'center',
+    dictName: 'JobStatus',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'JobStatus' })
     }

@@ -128,6 +128,7 @@ const dataColumns: DataTableColumns = [
     title: '类型',
     width: 120,
     align: 'center',
+    dictName: 'SmsTemplateType',
     render(row: any) {
       return h(StrixTag, { value: row.type, dictName: 'SmsTemplateType' })
     }
@@ -137,6 +138,7 @@ const dataColumns: DataTableColumns = [
     title: '状态',
     width: 120,
     align: 'center',
+    dictName: 'SmsTemplateStatus',
     render(row: any) {
       return h(StrixTag, { value: row.status, dictName: 'SmsTemplateStatus' })
     }

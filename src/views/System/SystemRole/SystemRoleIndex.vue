@@ -298,6 +298,7 @@ const dataColumns: DataTableColumns = [
     title: '地区权限类型',
     width: 180,
     align: 'center',
+    dictName: 'SystemRoleRegionPermissionType',
     render(row: any) {
       return h(StrixTag, {
         value: row.regionPermissionType,

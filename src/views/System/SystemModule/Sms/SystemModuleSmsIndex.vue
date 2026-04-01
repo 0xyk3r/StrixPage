@@ -407,6 +407,7 @@ const dataColumns: DataTableColumns = [
     title: '平台',
     width: 120,
     align: 'center',
+    dictName: 'SmsPlatform',
     render(row: any) {
       return h(StrixTag, { value: row.platform, dictName: 'SmsPlatform' })
     }

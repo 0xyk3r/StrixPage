@@ -222,6 +222,7 @@ const dataColumns: DataTableColumns = [
     title: '地区层级',
     width: 140,
     align: 'center',
+    valueMap: { '1': '一级地区', '2': '二级地区', '3': '三级地区', '4': '四级地区', '5': '五级地区', '6': '六级地区' },
     render(row: any) {
       const tagTypes = ['default', 'success', 'info', 'warning', 'error', 'default']
       const tagType: NTagType = (tagTypes[row.level] as NTagType) || 'default'

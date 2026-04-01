@@ -348,6 +348,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     title: '平台',
     align: 'center',
+    dictName: 'OssPlatform',
     render(row: any) {
       return h(StrixTag, { value: row.platform, dictName: 'OssPlatform' })
     }
