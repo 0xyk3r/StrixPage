@@ -63,7 +63,7 @@ const retry = () => {
 const goHome = () => {
   hasError.value = false
   errorDetail.value = ''
-  tabsBarStore.removeTab(route.fullPath)
+  tabsBarStore.delVisitedRoute(route)
   router.replace('/')
 }
 </script>
