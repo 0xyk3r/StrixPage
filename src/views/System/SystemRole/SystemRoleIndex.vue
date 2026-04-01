@@ -16,6 +16,12 @@
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
+          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
+            <n-button quaternary type="primary" @click="showExportDialog = true">
+              <template #icon><strix-icon icon="download" :size="16" /></template>
+              导出
+            </n-button>
+          </n-gi>
         </n-grid>
       </template>
     </strix-block>
@@ -28,6 +34,14 @@
       :row-key="dataRowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
+    />
+
+    <strix-export-dialog
+      v-model:show="showExportDialog"
+      :columns="dataColumns"
+      :data="filterDataList || []"
+      :fetch-all-data="fetchAllData"
+      :title="_baseName"
     />
 
     <n-modal
@@ -160,9 +174,14 @@ import {
   NTabs,
   type TreeInst
 } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher('system/role', 'systemRoleList', () => filterDataListParams.value)
 
 // 加载字典
 const systemRoleRegionPermissionTypeRef = useDict('SystemRoleRegionPermissionType')

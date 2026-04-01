@@ -12,6 +12,12 @@
           <n-gi :span="1">
             <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
           </n-gi>
+          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
+            <n-button quaternary type="primary" @click="showExportDialog = true">
+              <template #icon><strix-icon icon="download" :size="16" /></template>
+              导出
+            </n-button>
+          </n-gi>
         </n-grid>
       </template>
       <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
@@ -37,6 +43,14 @@
       :remote="true"
       :row-key="dataRowKey"
       table-layout="fixed"
+    />
+
+    <strix-export-dialog
+      v-model:show="showExportDialog"
+      :columns="dataColumns"
+      :data="dataRef || []"
+      :fetch-all-data="fetchAllData"
+      :title="_baseName"
     />
 
     <n-modal
@@ -176,11 +190,20 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 const route = useRoute()
 
 // 本页面操作提示关键词
 const _baseName = '系统字典数据'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(
+  () => `system/dict/data/${route.params.dictKey}`,
+  'items',
+  () => getDataListParams.value
+)
 
 // 路由参数
 const dictKey = route.params.dictKey

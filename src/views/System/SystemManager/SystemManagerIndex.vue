@@ -25,6 +25,12 @@
           <n-gi :span="2">
             <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
           </n-gi>
+          <n-gi span="12 s:3" class="nebula-export__trigger-gi">
+            <n-button quaternary type="primary" @click="showExportDialog = true">
+              <template #icon><strix-icon icon="download" :size="16" /></template>
+              导出
+            </n-button>
+          </n-gi>
         </n-grid>
       </template>
       <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
@@ -57,6 +63,14 @@
       remote
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
+    />
+
+    <strix-export-dialog
+      v-model:show="showExportDialog"
+      :columns="dataColumns"
+      :data="dataRef || []"
+      :fetch-all-data="fetchAllData"
+      :title="_baseName"
     />
 
     <n-modal
@@ -243,11 +257,16 @@ import {
   NSpin,
   NTreeSelect
 } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 const quickMenuStore = useQuickMenuStore()
 
 // 本页面操作提示关键词
 const _baseName = '系统人员'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher('system/manager', 'systemManagerList', () => getDataListParams.value)
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({

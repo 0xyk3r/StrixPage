@@ -13,6 +13,12 @@
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
+          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
+            <n-button quaternary type="primary" @click="showExportDialog = true">
+              <template #icon><strix-icon icon="download" :size="16" /></template>
+              导出
+            </n-button>
+          </n-gi>
         </n-grid>
       </template>
       <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
@@ -57,6 +63,14 @@
       :row-key="dataRowKey"
       table-layout="fixed"
     />
+
+    <strix-export-dialog
+      v-model:show="showExportDialog"
+      :columns="dataColumns"
+      :data="dataRef || []"
+      :fetch-all-data="fetchAllData"
+      :title="_baseName"
+    />
   </div>
 </template>
 
@@ -66,10 +80,15 @@ import StrixTag from '@/components/common/StrixTag.vue'
 import { http } from '@/plugins/axios'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { type DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '短信模板'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher('system/sms/template', 'templates', () => getDataListParams.value)
 
 // 加载字典
 const smsTemplateTypeRef = useDict('SmsTemplateType')

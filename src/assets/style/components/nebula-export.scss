@@ -1,0 +1,51 @@
+// ============================================================
+// Nebula Design System — Export Dialog
+// ============================================================
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.nebula-export {
+  &__section {
+    margin-bottom: $space-4;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    margin-bottom: $space-2;
+    font-size: 13px;
+    color: var(--strix-text-secondary);
+  }
+
+  &__col-actions {
+    margin-left: auto;
+  }
+
+  &__columns {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    padding: $space-2 $space-3;
+    border: 1px solid var(--strix-border);
+    border-radius: $radius-md;
+  }
+
+  &__col-item {
+    padding: $space-1 0;
+  }
+
+  &__trigger-gi {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  &__ext {
+    font-size: 12px;
+    color: var(--strix-text-tertiary);
+  }
+}
