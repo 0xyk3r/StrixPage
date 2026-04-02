@@ -109,17 +109,14 @@ export function useCrud(config: UseCrudConfig) {
     if (initAddForm) addForm.value = cloneDeep(initAddForm)
     if (initialValues && !(initialValues instanceof Event)) Object.assign(addForm.value, initialValues)
     await hooks?.beforeShowAdd?.()
+    if (draft) await draft.checkAndRestore(addForm, 'add')
     addModal.value = true
-    if (draft) {
-      draft.checkAndRestore(addForm, 'add')
-      draft.startAutoSave(addForm, 'add')
-    }
+    if (draft) draft.startAutoSave(addForm, 'add')
   }
 
   /** 打开编辑弹窗并加载详情 */
   const showEdit = async (id: string) => {
     if (!api?.detail) return
-    editModal.value = true
     editLoading.value = true
     try {
       await hooks?.beforeShowEdit?.(id)
@@ -132,10 +129,9 @@ export function useCrud(config: UseCrudConfig) {
         editForm.value = res.data
       }
       hooks?.afterShowEdit?.(res.data)
-      if (draft) {
-        draft.checkAndRestore(editForm, 'edit', id)
-        draft.startAutoSave(editForm, 'edit', id)
-      }
+      if (draft) await draft.checkAndRestore(editForm, 'edit', id)
+      editModal.value = true
+      if (draft) draft.startAutoSave(editForm, 'edit', id)
     } finally {
       editLoading.value = false
     }

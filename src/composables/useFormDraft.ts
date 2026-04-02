@@ -81,31 +81,41 @@ export function useFormDraft(draftKey: string) {
     debouncedSave = null
   }
 
-  /** 检测草稿并提示恢复 */
-  function checkAndRestore(form: Ref<Record<string, any>>, type: 'add' | 'edit', editId?: string) {
+  /** 检测草稿并提示恢复（在弹窗打开前调用，避免 z-index 层叠问题） */
+  function checkAndRestore(form: Ref<Record<string, any>>, type: 'add' | 'edit', editId?: string): Promise<void> {
     const key = buildKey(draftKey, type, editId)
     const draft = loadDraftFromStorage(key)
-    if (!draft) return
+    if (!draft) return Promise.resolve()
 
     const formKeys = Object.keys(form.value)
     const filteredDraft = pick(draft, formKeys)
 
     if (isEqual(filteredDraft, form.value)) {
       removeDraft(key)
-      return
+      return Promise.resolve()
     }
 
-    dialog.info({
-      title: '发现未提交的草稿',
-      content: '检测到上次编辑未提交的表单数据，是否恢复？',
-      positiveText: '恢复草稿',
-      negativeText: '丢弃',
-      onPositiveClick: () => {
-        Object.assign(form.value, filteredDraft)
-      },
-      onNegativeClick: () => {
-        removeDraft(key)
-      }
+    return new Promise((resolve) => {
+      dialog.info({
+        title: '发现未提交的草稿',
+        content: '检测到上次编辑未提交的表单数据，是否恢复？',
+        positiveText: '恢复草稿',
+        negativeText: '丢弃',
+        onPositiveClick: () => {
+          Object.assign(form.value, filteredDraft)
+          resolve()
+        },
+        onNegativeClick: () => {
+          removeDraft(key)
+          resolve()
+        },
+        onClose: () => {
+          resolve()
+        },
+        onMaskClick: () => {
+          resolve()
+        }
+      })
     })
   }
 
