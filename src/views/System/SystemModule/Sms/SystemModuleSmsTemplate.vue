@@ -84,6 +84,7 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { smsApi } from '@/api/sms'
+import type { SelectDataItem } from '@/api/types'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { useTableColumns } from '@/composables/useTableColumns'
@@ -167,7 +168,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 // 加载短信配置选项
-const smsConfigSelectList = ref([])
+const smsConfigSelectList = ref<SelectDataItem[]>([])
 const getSmsConfigSelectList = () => {
   smsApi.configSelect().then(({ data: res }) => {
     smsConfigSelectList.value = res.data.options

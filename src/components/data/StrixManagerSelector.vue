@@ -25,6 +25,7 @@
 
 <script lang="ts" setup>
 import { managerApi } from '@/api/manager'
+import type { TransferDataItem } from '@/api/types'
 
 const show = defineModel('show', { type: Boolean, default: false })
 
@@ -37,7 +38,7 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const data = ref([])
+const data = ref<TransferDataItem[]>([])
 const dataLoading = ref(true)
 const selectedData = ref<Array<string | number>>([])
 

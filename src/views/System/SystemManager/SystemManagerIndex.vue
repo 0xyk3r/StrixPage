@@ -248,6 +248,7 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import { managerApi } from '@/api/manager'
 import { regionApi } from '@/api/region'
 import { roleApi } from '@/api/role'
+import type { CascaderDataItem, SelectDataItem } from '@/api/types'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
@@ -471,7 +472,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
 }
 
 // 加载所有地区级联选项
-const systemRegionCascaderOptions = ref([])
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
 const getSystemRegionSelectList = () => {
   regionApi.cascader().then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options
@@ -479,7 +480,7 @@ const getSystemRegionSelectList = () => {
 }
 onMounted(getSystemRegionSelectList)
 // 加载所有人员角色选项
-const systemRoleSelectList = ref([])
+const systemRoleSelectList = ref<SelectDataItem[]>([])
 const getSystemRoleSelectList = () => {
   roleApi.select().then(({ data: res }) => {
     systemRoleSelectList.value = res.data.options

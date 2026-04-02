@@ -238,6 +238,7 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { ossApi } from '@/api/oss'
+import type { SelectDataItem } from '@/api/types'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -386,7 +387,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 // 加载存储配置选项
-const ossConfigSelectList = ref([])
+const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
@@ -494,7 +495,7 @@ const showEditDataModal = (id: string) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     // 处理 allowExtension 字段
-    res.data.allowExtension = res.data.allowExtension.split(',')
+    ;(res.data as any).allowExtension = res.data.allowExtension.split(',')
     editDataForm.value = pick(res.data, canUpdateFields)
     editDataFormLoading.value = false
   })

@@ -1,33 +1,104 @@
-import type { RetResult } from './types'
+import type { RetResult, SelectDataResp } from './types'
 import { http } from '@/plugins/axios'
 
 const _n = '短信服务'
 const BASE = 'system/sms'
 
+/** 短信配置列表项 */
+export interface SmsConfigItem {
+  id: string
+  key: string
+  name: string
+  platform: number
+  regionId: string
+  accessKey: string
+  remark: string
+  createdTime: string
+}
+
+/** 短信配置列表响应 */
 export interface SmsListResp {
-  configs: any[]
+  configs: SmsConfigItem[]
   total: number
 }
 
+/** 短信签名项 */
+export interface SmsSignItem {
+  id: string
+  configKey: string
+  name: string
+  status: number
+  createdTime: string
+}
+
+/** 短信模板项 */
+export interface SmsTemplateItem {
+  id: string
+  configKey: string
+  code: string
+  name: string
+  type: number
+  status: number
+  content: string
+  createdTime: string
+}
+
+/** 短信配置详情响应 */
+export interface SmsConfigResp {
+  id: string
+  key: string
+  name: string
+  platform: number
+  regionId: string
+  accessKey: string
+  remark: string
+  createdTime: string
+  signs: SmsSignItem[]
+  templates: SmsTemplateItem[]
+}
+
+/** 短信模板列表响应 */
 export interface SmsTemplateListResp {
-  templates: any[]
+  templates: SmsTemplateItem[]
   total: number
 }
 
+/** 短信签名列表响应 */
 export interface SmsSignListResp {
-  signs: any[]
+  signs: SmsSignItem[]
   total: number
 }
 
+/** 短信日志项 */
+export interface SmsLogItem {
+  id: string
+  configKey: string
+  platform: number
+  phoneNumber: string
+  requesterIp: string
+  signName: string
+  templateCode: string
+  templateParam: string
+  status: number
+  platformResponse: string
+  createdTime: string
+}
+
+/** 短信日志列表响应 */
 export interface SmsLogListResp {
-  logs: any[]
+  logs: SmsLogItem[]
   total: number
 }
 
-export interface SmsDetailResp {
-  signs: any[]
-  templates: any[]
-  [key: string]: any
+/** 短信配置更新请求 */
+export interface SmsConfigUpdateReq {
+  key: string
+  name: string
+  platform: number
+  regionId: string
+  accessKey: string
+  accessSecret: string
+  remark: string
 }
 
 export const smsApi = {
@@ -42,12 +113,12 @@ export const smsApi = {
     http.get<RetResult<SmsListResp>>(BASE, { params, meta: { operate: `加载${_n}列表` } }),
 
   detail: (id: string) =>
-    http.get<RetResult<SmsDetailResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
+    http.get<RetResult<SmsConfigResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
 
-  create: (data: Record<string, any>) =>
+  create: (data: SmsConfigUpdateReq) =>
     http.post<RetResult>(`${BASE}/update`, data, { meta: { operate: `新增${_n}` } }),
 
-  update: (id: string, data: Record<string, any>) =>
+  update: (id: string, data: SmsConfigUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `编辑${_n}` } }),
 
   remove: (id: string) =>
@@ -72,5 +143,5 @@ export const smsApi = {
     }),
 
   configSelect: () =>
-    http.get<RetResult<any>>(`${BASE}/config/select`, { meta: { operate: '加载短信配置下拉列表' } }),
+    http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, { meta: { operate: '加载短信配置下拉列表' } }),
 }

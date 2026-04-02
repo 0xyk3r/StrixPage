@@ -100,6 +100,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
+import type { SelectDataItem } from '@/api/types'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
@@ -166,7 +167,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 // 加载存储配置选项
-const ossConfigSelectList = ref([])
+const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options

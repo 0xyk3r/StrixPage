@@ -3,8 +3,30 @@ import { http } from '@/plugins/axios'
 
 const BASE = 'system/monitor'
 
+/** 系统日志项 */
+export interface SystemLogItem {
+  appId: string
+  appVersion: string
+  operationType: string
+  operationGroup: string
+  operationName: string
+  operationSpend: number
+  operationMethod: string
+  operationUrl: string
+  operationParam: string
+  operationTime: string
+  clientIp: string
+  clientDevice: string
+  clientUser: string
+  clientUsername: string
+  responseCode: number
+  responseMsg: string
+  responseData: string
+}
+
+/** 日志列表响应 */
 export interface MonitorLogListResp {
-  items: any[]
+  items: SystemLogItem[]
   total: number
 }
 

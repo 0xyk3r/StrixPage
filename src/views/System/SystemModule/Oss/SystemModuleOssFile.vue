@@ -70,6 +70,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
+import type { SelectDataItem } from '@/api/types'
 import { commonApi } from '@/api/common'
 import { usePage } from '@/composables/usePage.ts'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
@@ -155,7 +156,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 // 加载存储配置选项
-const ossConfigSelectList = ref([])
+const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
@@ -163,7 +164,7 @@ const getOssConfigSelectList = () => {
 }
 onMounted(getOssConfigSelectList)
 // 加载文件组配置选项
-const ossFileGroupSelectList = ref([])
+const ossFileGroupSelectList = ref<SelectDataItem[]>([])
 const getOssFileGroupSelectList = (configKey?: string) => {
   if (configKey) {
     getDataListParams.value.groupKey = null

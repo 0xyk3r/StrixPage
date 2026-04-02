@@ -1,17 +1,104 @@
-import type { RetResult } from './types'
+import type { RetResult, SelectDataResp } from './types'
 import { http } from '@/plugins/axios'
 
 const BASE = 'system/workflow'
 const CONFIG_BASE = `${BASE}/config`
 
+/** 流程版本配置 */
+export interface WorkflowConfigItem {
+  id: string
+  workflowId: string
+  version: number
+  content: string
+  createdTime: string
+}
+
+/** 流程引擎列表项 */
+export interface WorkflowItem {
+  id: string
+  name: string
+  configs: WorkflowConfigItem[]
+  createdTime: string
+}
+
+/** 流程引擎列表响应 */
 export interface WorkflowConfigListResp {
-  items: any[]
+  items: WorkflowItem[]
   total: number
 }
 
-export interface WorkflowTaskListResp {
-  items: any[]
+/** 流程引擎详情响应 */
+export interface WorkflowResp {
+  id: string
+  name: string
+}
+
+/** 流程绘制数据响应 */
+export interface WorkflowConfigResp {
+  id: string
+  workflowId: string
+  version: number
+  content: string
+  createdTime: string
+}
+
+/** 待处理任务项 */
+export interface UnfinishedTaskItem {
+  id: string
+  workflowId: string
+  instanceId: string
+  workflowConfigId: string
+  nodeId: string
+  nodeType: string
+  operatorId: string
+  operationType: number
+  instanceName: string
+  instanceCreatedByType: number
+  instanceCreatedBy: string
+  instanceCreatedTime: string
+  taskAssignStartTime: string
+}
+
+/** 已处理任务项 */
+export interface FinishedTaskItem {
+  id: string
+  workflowId: string
+  instanceId: string
+  workflowConfigId: string
+  nodeId: string
+  nodeType: string
+  operatorId: string
+  operationType: number
+  instanceName: string
+  instanceCreatedByType: number
+  instanceCreatedBy: string
+  instanceCreatedTime: string
+  taskAssignStartTime: string
+  taskAssignEndTime: string
+  startTime: string
+  endTime: string
+}
+
+/** 待处理任务列表响应 */
+export interface WorkflowTaskUnfinishedListResp {
+  items: UnfinishedTaskItem[]
   total: number
+}
+
+/** 已处理任务列表响应 */
+export interface WorkflowTaskFinishedListResp {
+  items: FinishedTaskItem[]
+  total: number
+}
+
+/** 流程引擎更新请求 */
+export interface WorkflowUpdateReq {
+  name: string
+}
+
+/** 流程绘制更新请求 */
+export interface WorkflowConfigUpdateReq {
+  content: string
 }
 
 export const workflowApi = {
@@ -30,15 +117,15 @@ export const workflowApi = {
     }),
 
   configDetail: (id: string) =>
-    http.get<RetResult>(`${CONFIG_BASE}/${id}`, { meta: { operate: '加载流程引擎信息' } }),
+    http.get<RetResult<WorkflowResp>>(`${CONFIG_BASE}/${id}`, { meta: { operate: '加载流程引擎信息' } }),
 
-  configCreate: (data: Record<string, any>) =>
+  configCreate: (data: WorkflowUpdateReq) =>
     http.post<RetResult>(`${CONFIG_BASE}/update`, data, { meta: { operate: '新增流程引擎' } }),
 
-  configUpdate: (id: string, data: Record<string, any>) =>
+  configUpdate: (id: string, data: WorkflowUpdateReq) =>
     http.post<RetResult>(`${CONFIG_BASE}/update/${id}`, data, { meta: { operate: '编辑流程引擎' } }),
 
-  configUpdateContent: (id: string, data: Record<string, any>) =>
+  configUpdateContent: (id: string, data: WorkflowConfigUpdateReq) =>
     http.post<RetResult>(`${CONFIG_BASE}/update/${id}/config`, data, {
       meta: { operate: '保存流程绘制' },
     }),
@@ -47,33 +134,33 @@ export const workflowApi = {
     http.post<RetResult>(`${CONFIG_BASE}/remove/${id}`, null, { meta: { operate: '删除流程引擎' } }),
 
   configSelect: () =>
-    http.get<RetResult>(`${CONFIG_BASE}/select`, { meta: { operate: '加载流程引擎下拉列表' } }),
+    http.get<RetResult<SelectDataResp>>(`${CONFIG_BASE}/select`, { meta: { operate: '加载流程引擎下拉列表' } }),
 
   configGetConfig: (configId: string) =>
-    http.get<RetResult>(`${CONFIG_BASE}/config/${configId}`, {
+    http.get<RetResult<WorkflowConfigResp>>(`${CONFIG_BASE}/config/${configId}`, {
       meta: { operate: '加载流程绘制数据' },
     }),
 
   unfinishedList: (params: Record<string, any>) =>
-    http.get<RetResult<WorkflowTaskListResp>>(`${BASE}/unfinished`, {
+    http.get<RetResult<WorkflowTaskUnfinishedListResp>>(`${BASE}/unfinished`, {
       params,
       meta: { operate: '加载待处理工作列表' },
     }),
 
   finishedList: (params: Record<string, any>) =>
-    http.get<RetResult<WorkflowTaskListResp>>(`${BASE}/finished`, {
+    http.get<RetResult<WorkflowTaskFinishedListResp>>(`${BASE}/finished`, {
       params,
       meta: { operate: '加载已处理工作列表' },
     }),
 
   initiatedList: (params: Record<string, any>) =>
-    http.get<RetResult>(`${BASE}/initiated`, {
+    http.get<RetResult<WorkflowTaskUnfinishedListResp>>(`${BASE}/initiated`, {
       params,
       meta: { operate: '加载我发起的工作列表' },
     }),
 
   ccList: (params: Record<string, any>) =>
-    http.get<RetResult>(`${BASE}/cc`, {
+    http.get<RetResult<WorkflowTaskUnfinishedListResp>>(`${BASE}/cc`, {
       params,
       meta: { operate: '加载抄送我的工作列表' },
     }),

@@ -160,6 +160,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { regionApi } from '@/api/region'
+import type { CascaderDataItem } from '@/api/types'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -315,7 +316,7 @@ const onDataChildrenLoad = (row: any) => {
 }
 
 // 加载所有地区级联选项
-const systemRegionCascaderOptions = ref([])
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
 const getSystemRegionSelectList = () => {
   regionApi.cascader().then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options

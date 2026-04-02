@@ -255,6 +255,7 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { menuApi } from '@/api/menu'
 import { permissionApi } from '@/api/permission'
+import type { TreeDataItem } from '@/api/types'
 import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -525,7 +526,7 @@ const deleteData = ({ id, type }: { id: string; type: string }) => {
 }
 
 // 树形选择器数据
-const menuTreeRef = ref([])
+const menuTreeRef = ref<TreeDataItem[]>([])
 const getMenuTree = () => {
   menuApi.tree().then(({ data: res }) => {
     menuTreeRef.value = res.data.tree

@@ -26,7 +26,7 @@ export function useTokenRenewal() {
         .renewToken()
         .then(({ data: res }) => {
           loginInfoStore.updateLoginInfo(res)
-          loginInfo.value = res.data.info
+          loginInfo.value = (res.data as any).info
         })
     }
   }
