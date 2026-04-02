@@ -85,6 +85,7 @@ declare module 'vue' {
     StrixEmpty: typeof import('./../components/common/StrixEmpty.vue')['default']
     StrixErrorBoundary: typeof import('./../components/common/StrixErrorBoundary.vue')['default']
     StrixExportDialog: typeof import('./../components/common/StrixExportDialog.vue')['default']
+    StrixForbidden: typeof import('./../components/common/StrixForbidden.vue')['default']
     StrixIcon: typeof import('./../components/icon/StrixIcon.vue')['default']
     StrixImage: typeof import('./../components/common/StrixImage.vue')['default']
     StrixManagerSelector: typeof import('./../components/data/StrixManagerSelector.vue')['default']

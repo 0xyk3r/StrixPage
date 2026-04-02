@@ -66,5 +66,15 @@ declare module 'vue-router' {
      * 是否禁止收藏此页面
      */
     noBookmark?: boolean
+
+    /**
+     * 访问此路由需要的权限标识（精确匹配）
+     */
+    permission?: string
+
+    /**
+     * 是否在导航守卫中忽略此路由（不加入 TabBar 等）
+     */
+    ignore?: boolean
   }
 }

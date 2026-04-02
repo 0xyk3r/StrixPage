@@ -6,6 +6,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const Redirect = () => import('@/components/view/StrixRedirect.vue')
 const NotFound = () => import('@/components/common/StrixNotFound.vue')
+const Forbidden = () => import('@/components/common/StrixForbidden.vue')
 const DynamicWrapper = () => import('@/components/view/DynamicWrapper.vue')
 
 const customRoutes: any[] = []
@@ -70,7 +71,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemManagerIndex',
         component: () => import('@/views/System/SystemManager/SystemManagerIndex.vue'),
         meta: {
-          title: '系统人员管理'
+          title: '系统人员管理',
+          permission: 'system:manager'
         }
       },
       {
@@ -78,7 +80,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemRoleIndex',
         component: () => import('@/views/System/SystemRole/SystemRoleIndex.vue'),
         meta: {
-          title: '系统角色管理'
+          title: '系统角色管理',
+          permission: 'system:role'
         }
       },
       {
@@ -86,7 +89,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemMenuIndex',
         component: () => import('@/views/System/SystemMenu/SystemMenuIndex.vue'),
         meta: {
-          title: '系统菜单管理'
+          title: '系统菜单管理',
+          permission: 'system:menu'
         }
       },
       {
@@ -94,7 +98,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemUserIndex',
         component: () => import('@/views/System/SystemUser/SystemUserIndex.vue'),
         meta: {
-          title: '系统用户管理'
+          title: '系统用户管理',
+          permission: 'system:user'
         }
       },
       {
@@ -102,7 +107,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemRegionIndex',
         component: () => import('@/views/System/SystemRegion/SystemRegionIndex.vue'),
         meta: {
-          title: '系统地区管理'
+          title: '系统地区管理',
+          permission: 'system:region'
         }
       },
       {
@@ -110,7 +116,8 @@ const routes: RouteRecordRaw[] = [
         name: 'SystemDictIndex',
         component: () => import('@/views/System/SystemDict/SystemDictIndex.vue'),
         meta: {
-          title: '系统字典管理'
+          title: '系统字典管理',
+          permission: 'system:dict'
         }
       },
       {
@@ -123,7 +130,8 @@ const routes: RouteRecordRaw[] = [
           parentRouteName: 'SystemDictIndex',
           isDynamicWrapper: true,
           dynamicComponent: () => import('@/views/System/SystemDict/SystemDictData.vue'),
-          dynamicComponentNameTemplate: 'SystemDictData-{dictKey}'
+          dynamicComponentNameTemplate: 'SystemDictData-{dictKey}',
+          permission: 'system:dict:data'
         }
       },
       {
@@ -140,7 +148,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
             meta: {
               title: '系统运行信息',
-              empty: false
+              empty: false,
+              permission: 'system:monitor'
             }
           },
           {
@@ -149,7 +158,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/SystemMonitor/Cache/SystemMonitorCacheIndex.vue'),
             meta: {
               title: '系统缓存信息',
-              empty: false
+              empty: false,
+              permission: 'system:monitor:cache'
             }
           },
           {
@@ -158,7 +168,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/SystemMonitor/Log/SystemMonitorLogIndex.vue'),
             meta: {
               title: '系统日志列表',
-              empty: false
+              empty: false,
+              permission: 'system:monitor:log'
             }
           }
         ]
@@ -167,7 +178,8 @@ const routes: RouteRecordRaw[] = [
         path: 'system/tool',
         name: 'SystemTool',
         meta: {
-          title: '系统工具管理'
+          title: '系统工具管理',
+          permission: 'system:tool'
         },
         children: [
           {
@@ -180,7 +192,8 @@ const routes: RouteRecordRaw[] = [
             name: 'SystemToolPopularity',
             component: () => import('@/views/System/SystemTool/SystemToolPopularity.vue'),
             meta: {
-              title: '热度工具'
+              title: '热度工具',
+              permission: 'system:tool'
             }
           }
         ]
@@ -199,7 +212,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/SystemModule/Job/SystemModuleJobIndex.vue'),
             meta: {
               title: '定时任务列表',
-              empty: false
+              empty: false,
+              permission: 'system:module:job'
             }
           },
           {
@@ -209,7 +223,8 @@ const routes: RouteRecordRaw[] = [
             meta: {
               title: '定时任务日志',
               parentRouteName: 'SystemModuleJobIndex',
-              empty: false
+              empty: false,
+              permission: 'system:module:job'
             }
           },
           {
@@ -226,7 +241,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Sms/SystemModuleSmsIndex.vue'),
                 meta: {
                   title: '短信服务列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:sms:config'
                 }
               },
               {
@@ -235,7 +251,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Sms/SystemModuleSmsLog.vue'),
                 meta: {
                   title: '短信日志列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:sms:log'
                 }
               },
               {
@@ -244,7 +261,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Sms/SystemModuleSmsSign.vue'),
                 meta: {
                   title: '短信签名列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:sms:sign'
                 }
               },
               {
@@ -253,7 +271,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Sms/SystemModuleSmsTemplate.vue'),
                 meta: {
                   title: '短信模板列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:sms:template'
                 }
               }
             ]
@@ -272,7 +291,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssIndex.vue'),
                 meta: {
                   title: '存储服务列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:oss:config'
                 }
               },
               {
@@ -281,7 +301,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssBucket.vue'),
                 meta: {
                   title: '存储空间管理',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:oss:bucket'
                 }
               },
               {
@@ -290,7 +311,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssFileGroup.vue'),
                 meta: {
                   title: '文件分组管理',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:oss:filegroup'
                 }
               },
               {
@@ -299,7 +321,8 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssFile.vue'),
                 meta: {
                   title: '存储文件列表',
-                  empty: false
+                  empty: false,
+                  permission: 'system:module:oss:file'
                 }
               }
             ]
@@ -320,7 +343,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/Config/SystemWorkflowConfigIndex.vue'),
             meta: {
               title: '流程引擎列表',
-              empty: false
+              empty: false,
+              permission: 'system:workflow:config'
             }
           },
           {
@@ -331,7 +355,8 @@ const routes: RouteRecordRaw[] = [
               title: '流程绘制工具',
               empty: false,
               parentRouteName: 'SystemModuleWorkflowIndex',
-              titleTemplate: '流程绘制工具 - {configId}'
+              titleTemplate: '流程绘制工具 - {configId}',
+              permission: 'system:workflow:config'
             }
           },
           {
@@ -340,7 +365,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/SystemWorkflowSubmitList.vue'),
             meta: {
               title: '发起审批',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           },
           {
@@ -349,7 +375,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/SystemWorkflowSubmit.vue'),
             meta: {
               title: '发起审批表单',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           },
           {
@@ -358,7 +385,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskUnfinished.vue'),
             meta: {
               title: '待我处理',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           },
           {
@@ -367,7 +395,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskFinished.vue'),
             meta: {
               title: '已处理的',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           },
           {
@@ -376,7 +405,8 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskInitiated.vue'),
             meta: {
               title: '我发起的',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           },
           {
@@ -385,10 +415,17 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/System/Workflow/List/SystemWorkflowTaskCC.vue'),
             meta: {
               title: '抄送我的',
-              empty: false
+              empty: false,
+              permission: 'system:workflow'
             }
           }
         ]
+      },
+      {
+        path: '/403',
+        name: 'Forbidden',
+        component: Forbidden,
+        meta: { ignore: true }
       },
       { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: { ignore: true } }
     ]
@@ -424,6 +461,19 @@ router.beforeEach((to, form, next) => {
 
   if (to.path === '/login') return next()
   if (!loginToken.value) return next('/login?to=' + to.fullPath)
+
+  // 权限路由守卫：检查当前路由或其匹配的父路由链中是否有 permission 要求
+  const requiredPermission = to.matched
+    .map((record) => record.meta.permission as string | undefined)
+    .filter(Boolean)
+    .pop()
+
+  if (requiredPermission) {
+    const permissions = loginInfoStore.loginInfo.permissionKeys || []
+    if (!permissions.includes('*:*:*') && !permissions.includes(requiredPermission)) {
+      return next({ path: '/403', query: { path: to.fullPath, permission: requiredPermission }, replace: true })
+    }
+  }
 
   return next()
 })
