@@ -59,11 +59,12 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="editModal"
+      :show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
+      @update:show="tryCloseEdit"
       @after-leave="resetForms"
     >
       <n-spin :show="editLoading">
@@ -94,7 +95,7 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editModal = false">取消</n-button>
+          <n-button @click="tryCloseEdit">取消</n-button>
           <n-button type="primary" @click="submitEdit">确定</n-button>
         </n-flex>
       </template>
@@ -137,7 +138,8 @@ const {
   showEdit,
   submitEdit,
   deleteRow,
-  resetForms
+  resetForms,
+  tryCloseEdit
 } = useCrud({
   list: {
     keyword: null,
