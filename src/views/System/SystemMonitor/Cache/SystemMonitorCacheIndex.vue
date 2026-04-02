@@ -188,7 +188,7 @@
 
 <script lang="ts" setup>
 import NebulaTag from '@/components/common/NebulaTag.vue'
-import { http } from '@/plugins/axios'
+import { monitorApi } from '@/api/monitor'
 import type { GaugeSeriesOption, PieSeriesOption } from 'echarts/charts'
 import { GaugeChart, PieChart } from 'echarts/charts'
 import type { TooltipComponentOption } from 'echarts/components'
@@ -238,9 +238,7 @@ const formatTime = () => {
 const getData = async () => {
   try {
     loading.value = true
-    const { data: res } = await http.get('system/monitor/cache', {
-      meta: { operate: '加载系统缓存信息' }
-    })
+    const { data: res } = await monitorApi.cacheInfo()
 
     cacheInfo.value = res.data
     lastUpdateTime.value = formatTime()

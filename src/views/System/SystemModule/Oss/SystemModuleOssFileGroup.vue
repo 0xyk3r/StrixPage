@@ -237,7 +237,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { ossApi } from '@/api/oss'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -255,7 +255,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '文件分组'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/oss/fileGroup', 'fileGroups', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileGroupList, 'fileGroups', () => getDataListParams.value)
 
 const loginInfoStore = useLoginInfoStore()
 const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
@@ -375,11 +375,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/oss/fileGroup', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  ossApi
+    .fileGroupList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.fileGroups
@@ -391,7 +388,7 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+  ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
   })
 }
@@ -457,7 +454,7 @@ const addData = () => {
     const data = cloneDeep(addDataForm.value)
     data.allowExtension = data.allowExtension.join(',')
 
-    http.post('system/oss/fileGroup/update', data, { meta: { operate: `添加${_baseName}` } }).then(() => {
+    ossApi.fileGroupCreate(data).then(() => {
       initDataForm()
       getDataList()
     })
@@ -493,7 +490,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/oss/fileGroup/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  ossApi.fileGroupDetail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     // 处理 allowExtension 字段
@@ -510,11 +507,7 @@ const editData = () => {
     const data = cloneDeep(editDataForm.value)
     data.allowExtension = data.allowExtension.join(',')
 
-    http
-      .post(`system/oss/fileGroup/update/${editDataId.value}`, data, {
-        meta: { operate: `修改${_baseName}` }
-      })
-      .then(() => {
+    ossApi.fileGroupUpdate(editDataId.value, data).then(() => {
         initDataForm()
         getDataList()
       })
@@ -522,7 +515,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/oss/fileGroup/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  ossApi.fileGroupRemove(id).then(() => {
     getDataList()
   })
 }

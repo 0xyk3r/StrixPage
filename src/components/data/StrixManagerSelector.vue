@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios.ts'
+import { managerApi } from '@/api/manager'
 
 const show = defineModel('show', { type: Boolean, default: false })
 
@@ -52,10 +52,8 @@ watch(
 )
 
 onMounted(() => {
-  http
-    .get('system/manager/transfer', {
-      meta: { operate: '加载系统人员穿梭框数据' }
-    })
+  managerApi
+    .transfer()
     .then(({ data: res }) => {
       dataLoading.value = false
       data.value = res.data.transferData

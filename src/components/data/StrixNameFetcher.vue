@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import type { StrixNameFetcherProps } from '@/@types/components/StrixNameFetcher'
 import { callOnce } from '@/utils/strix-cache-call.ts'
-import { http } from '@/plugins/axios.ts'
+import { commonApi } from '@/api/common'
 
 const { dataType, dataId } = defineProps<StrixNameFetcherProps>()
 
@@ -24,11 +24,8 @@ const dataName = ref('加载中...')
 
 async function fetchName(dataType: string, dataId: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    http
-      .get(`system/common/namefetcher`, {
-        params: { dataType, dataId },
-        meta: { operate: '数据 ID 映射' }
-      })
+    commonApi
+      .nameFetcher({ dataType, dataId })
       .then(({ data: res }) => {
         if (!res.data || !res.data.name) {
           reject(new Error('数据 ID 映射失败'))

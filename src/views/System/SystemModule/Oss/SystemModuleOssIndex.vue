@@ -192,7 +192,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { ossApi } from '@/api/oss'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
@@ -209,7 +209,7 @@ import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, N
 // 本页面操作提示关键词
 const _baseName = '存储服务'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/oss', 'configs', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.list, 'configs', () => getDataListParams.value)
 
 // 加载字典
 const ossPlatformRef = useDict('OssPlatform')
@@ -394,11 +394,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/oss', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  ossApi
+    .list(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       // 清除展开行
@@ -416,7 +413,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http.get(`system/oss/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+      ossApi.detail(row.id).then(({ data: res }) => {
         row.buckets = res.data.buckets
         row.fileGroups = res.data.fileGroups
         row.loaded = true
@@ -464,7 +461,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http.post('system/oss/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+    ossApi.create(addDataForm.value).then(() => {
       initDataForm()
       getDataList()
     })
@@ -504,7 +501,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/oss/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  ossApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -515,11 +512,7 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/oss/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
-      .then(() => {
+    ossApi.update(editDataId.value, editDataForm.value).then(() => {
         initDataForm()
         getDataList()
       })
@@ -527,7 +520,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/oss/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  ossApi.remove(id).then(() => {
     getDataList()
   })
 }

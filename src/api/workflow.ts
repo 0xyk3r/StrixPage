@@ -77,4 +77,15 @@ export const workflowApi = {
       params,
       meta: { operate: '加载抄送我的工作列表' },
     }),
+
+  configDataList: (configId: string, params: Record<string, any>) =>
+    http.get<RetResult>(`${CONFIG_BASE}/${configId}/data`, {
+      params,
+      meta: { operate: '加载引擎版本数据列表' },
+    }),
+
+  configDataRemove: (configId: string, dataId: string) =>
+    http.post<RetResult>(`${CONFIG_BASE}/${configId}/data/remove/${dataId}`, null, {
+      meta: { operate: '删除引擎版本数据' },
+    }),
 }

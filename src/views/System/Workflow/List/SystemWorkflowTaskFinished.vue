@@ -45,7 +45,8 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
+import { workflowApi } from '@/api/workflow'
+import { commonApi } from '@/api/common'
 import { usePage } from '@/composables/usePage.ts'
 import { type DataTableColumns } from 'naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
@@ -61,9 +62,8 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
 const _baseName = '我处理的工作列表'
-const _baseApiPrefix = 'system/workflow'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/workflow/finished', 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(workflowApi.urls.finishedList, 'items', () => getDataListParams.value)
 
 // 加载字典
 // const WorkflowNodeTypeRef = useDict('WorkflowNodeType')
@@ -91,11 +91,8 @@ const dataColumns: DataTableColumns = [
     valueResolver: async (val: any) => {
       if (!val) return ''
       try {
-        const { data: res } = await http.get('system/common/namefetcher', {
-          params: { dataType: 'workflow', dataId: val },
-          meta: { operate: '数据 ID 映射' }
-        })
-        return res.data?.name || String(val)
+        const { data: res } = await commonApi.nameFetcher({ dataType: 'workflow', dataId: val })
+        return (res.data as any)?.name || String(val)
       } catch {
         return String(val)
       }
@@ -111,11 +108,8 @@ const dataColumns: DataTableColumns = [
     valueResolver: async (val: any) => {
       if (!val) return ''
       try {
-        const { data: res } = await http.get('system/common/namefetcher', {
-          params: { dataType: 'systemmanager', dataId: val },
-          meta: { operate: '数据 ID 映射' }
-        })
-        return res.data?.name || String(val)
+        const { data: res } = await commonApi.nameFetcher({ dataType: 'systemmanager', dataId: val })
+        return (res.data as any)?.name || String(val)
       } catch {
         return String(val)
       }
@@ -190,11 +184,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}/finished`, {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  workflowApi
+    .finishedList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items

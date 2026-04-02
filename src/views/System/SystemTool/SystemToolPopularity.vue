@@ -177,25 +177,20 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
+import { popularityApi } from '@/api/popularity'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
 import { usePagination } from '@/composables/usePagination.ts'
 
-const _baseName = '热度工具配置'
-const _baseApiPrefix = 'system/tool/popularity'
-
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}`, {
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  popularityApi
+    .list()
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
@@ -206,8 +201,8 @@ onMounted(getDataList)
 const handleSelectDataChanged = () => {
   if (editDataId.value) {
     // 加载编辑前信息
-    http
-      .get(`${_baseApiPrefix}/${editDataId.value}`, { meta: { operate: `加载${_baseName}信息` } })
+    popularityApi
+      .detail(editDataId.value)
       .then(({ data: res }) => {
         const canUpdateFields = Object.keys(initEditDataForm)
         editDataForm.value = pick(res.data, canUpdateFields)
@@ -282,23 +277,20 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`${_baseApiPrefix}/update${editDataId.value ? '/' + editDataId.value : ''}`, editDataForm.value, {
-        meta: { operate: `保存${_baseName}` }
-      })
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
+    const promise = editDataId.value
+      ? popularityApi.update(editDataId.value, editDataForm.value)
+      : popularityApi.create(editDataForm.value)
+    promise.then(() => {
+      initDataForm()
+      getDataList()
+    })
   })
 }
 
 // 删除数据
 const deleteData = (id: string) => {
-  http
-    .post(`${_baseApiPrefix}/remove/${id}`, null, {
-      meta: { operate: `删除${_baseName}` }
-    })
+  popularityApi
+    .remove(id)
     .then(() => {
       getDataList()
     })
@@ -365,11 +357,8 @@ const popularityDataLoading = ref(false)
 const getPopularitDataList = () => {
   if (!editDataId.value) return createStrixMessage('warning', '请先选择配置', '请先选择配置')
   popularityDataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}/${editDataId.value}/data`, {
-      params: getPopularitDataListParams.value,
-      meta: { operate: `加载热度数据列表` }
-    })
+  popularityApi
+    .dataList(editDataId.value, getPopularitDataListParams.value)
     .then(({ data: res }) => {
       popularityDataLoading.value = false
       popularityDataRef.value = res.data.items
@@ -381,12 +370,8 @@ const popularityDataPagination = usePagination(getPopularitDataListParams, getPo
 
 // 修改数据数值
 const updatePopularityDataValue = debounce((id, value) => {
-  http
-    .post(
-      `${_baseApiPrefix}/${editDataId.value}/data/update/${id}`,
-      { originalValue: value },
-      { meta: { operate: '修改热度数据数值' } }
-    )
+  popularityApi
+    .dataUpdate(editDataId.value!, id, { originalValue: value })
     .then(() => {
       getPopularitDataList()
     })
@@ -394,10 +379,8 @@ const updatePopularityDataValue = debounce((id, value) => {
 
 // 删除数据
 const deletePopularitData = (id: string) => {
-  http
-    .post(`${_baseApiPrefix}/${editDataId.value}/data/remove/${id}`, null, {
-      meta: { operate: '删除热度数据' }
-    })
+  popularityApi
+    .dataRemove(editDataId.value!, id)
     .then(() => {
       getPopularitDataList()
     })

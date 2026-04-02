@@ -1,4 +1,4 @@
-import { http } from '@/plugins/axios'
+import { authApi } from '@/api/auth'
 import { EventBus } from '@/plugins/event-bus'
 import { deepSearch } from '@/utils/strix-tools'
 import { kebabCase } from 'lodash-es'
@@ -123,8 +123,8 @@ export function useHomeMenu() {
   const loadMenuList = () => {
     if (activeLoadPromise) return activeLoadPromise
     menuLoading.value = true
-    activeLoadPromise = http
-      .get('system/menus', { meta: { operate: '加载系统主菜单' } })
+    activeLoadPromise = authApi
+      .menus()
       .then(({ data: res }) => {
         menuList.value = handleMenuIconField(res.data.menuList)
         syncCurrentSelectMenu()

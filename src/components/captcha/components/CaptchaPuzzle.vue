@@ -52,9 +52,8 @@
 
 <script lang="ts" setup>
 import StrixIcon from '@/components/icon/StrixIcon.vue'
-import { http } from '@/plugins/axios'
+import { commonApi } from '@/api/common'
 import { sm4Encrypt } from '@/components/captcha/utils/captcha-sm4'
-import type { ApiResponse } from '@/@types/plugins/axios'
 
 // ---- 常量 ----
 const STANDARD_WIDTH = 310
@@ -65,18 +64,6 @@ const ERROR_DELAY = 1000
 const RESET_DURATION = 300
 
 type Status = 'idle' | 'moving' | 'success' | 'error'
-
-interface CaptchaGetData {
-  uuid: string
-  originalImageBase64: string
-  jigsawImageBase64: string
-  secretKey: string
-}
-
-interface CaptchaCheckData {
-  result: boolean
-  captchaVerification: string
-}
 
 const emit = defineEmits<{
   success: [payload: { captchaVerification: string }]
@@ -130,11 +117,7 @@ const fillClass = computed(() => ({
 // ---- API ----
 const fetchCaptcha = async () => {
   try {
-    const { data: res } = await http.post<ApiResponse<CaptchaGetData>>(
-      'system/captcha/get',
-      { captchaType: 'blockPuzzle' },
-      { meta: { operate: '验证码获取', notify: false } }
-    )
+    const { data: res } = await commonApi.captchaGet({ captchaType: 'blockPuzzle' })
     if (res.data) {
       uuid.value = res.data.uuid
       bgImage.value = res.data.originalImageBase64
@@ -155,11 +138,7 @@ const verifyCaptcha = async () => {
   const pointJson = secretKey.value ? sm4Encrypt(JSON.stringify(pointData), secretKey.value) : JSON.stringify(pointData)
 
   try {
-    const { data: res } = await http.post<ApiResponse<CaptchaCheckData>>(
-      'system/captcha/check',
-      { captchaType: 'blockPuzzle', pointJson, uuid: uuid.value },
-      { meta: { operate: '验证码校验', notify: false } }
-    )
+    const { data: res } = await commonApi.captchaCheck({ captchaType: 'blockPuzzle', pointJson, uuid: uuid.value })
     if (res.data?.result) {
       onSuccess(res.data.captchaVerification)
     } else {

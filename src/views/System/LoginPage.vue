@@ -144,7 +144,7 @@
 <script lang="ts" setup>
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import CaptchaContainer from '@/components/captcha/CaptchaContainer.vue'
-import { http } from '@/plugins/axios'
+import { authApi } from '@/api/auth'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
@@ -348,8 +348,8 @@ const login = () => {
   if (!validateAll()) return
 
   isLogging.value = true
-  http
-    .post('system/login', { ...form }, { meta: { operate: '登录', notify: false } })
+  authApi
+    .login({ ...form })
     .then(({ data: res }) => {
       const loginManagerType = res.data.info.type
       loginInfoStore.updateLoginInfo(res)

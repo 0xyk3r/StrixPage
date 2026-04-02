@@ -189,7 +189,7 @@
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { dictApi } from '@/api/dict'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -208,7 +208,7 @@ const route = useRoute()
 const _baseName = '系统字典数据'
 const showExportDialog = ref(false)
 const fetchAllData = createPaginatedFetcher(
-  () => `system/dict/data/${route.params.dictKey}`,
+  () => dictApi.urls.dataList(route.params.dictKey as string),
   'items',
   () => getDataListParams.value
 )
@@ -325,11 +325,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get(`system/dict/data/${dictKey}`, {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  dictApi
+    .dataList(dictKey as string, getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
@@ -363,10 +360,8 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/dict/data/${dictKey}/update`, addDataForm.value, {
-        meta: { operate: `添加${_baseName}` }
-      })
+    dictApi
+      .dataCreate(dictKey as string, addDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -396,7 +391,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/dict/data/${dictKey}/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  dictApi.dataDetail(dictKey as string, id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -407,10 +402,8 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/dict/data/${dictKey}/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
+    dictApi
+      .dataUpdate(dictKey as string, editDataId.value, editDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -419,10 +412,8 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http
-    .post(`system/dict/data/${dictKey}/remove/${id}`, null, {
-      meta: { operate: `删除${_baseName}` }
-    })
+  dictApi
+    .dataRemove(dictKey as string, id)
     .then(() => {
       getDataList()
     })

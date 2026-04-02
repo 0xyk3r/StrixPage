@@ -6,12 +6,9 @@
 
 <script lang="ts" setup>
 import WorkflowContainer from '@/components/workflow/WorkflowContainer.vue'
-import { http } from '@/plugins/axios'
+import { workflowApi } from '@/api/workflow'
 
 const route = useRoute()
-
-const _baseName = '流程绘制工具'
-const _baseApiPrefix = 'system/workflow/config'
 
 // 路由参数
 const workflowId = route.params.workflowId as string
@@ -19,11 +16,9 @@ const configId = route.params.configId as string
 const dataJson = ref('')
 
 const loadConfigData = () => {
-  http
-    .get(`${_baseApiPrefix}/config/${configId}`, { meta: { operate: `加载${_baseName}信息` } })
-    .then(({ data: res }) => {
-      dataJson.value = res.data.content
-    })
+  workflowApi.configGetConfig(configId).then(({ data: res }) => {
+    dataJson.value = (res.data as any).content
+  })
 }
 onMounted(() => {
   if (configId && configId !== 'new') {
@@ -35,11 +30,7 @@ onMounted(() => {
 })
 
 const saveData = (data: any) => {
-  http.post(
-    `${_baseApiPrefix}/update/${workflowId}/config`,
-    { content: JSON.stringify(data) },
-    { meta: { operate: '保存流程数据' } }
-  )
+  workflowApi.configUpdateContent(workflowId, { content: JSON.stringify(data) })
 }
 </script>
 

@@ -2,7 +2,7 @@
   <n-image :src="imageSrc" :width="width" lazy />
 </template>
 <script lang="ts" setup>
-import { http } from '@/plugins/axios.ts'
+import { commonApi } from '@/api/common'
 import { convertBlob } from '@/utils/strix-file-util.ts'
 
 const { value } = defineProps({
@@ -15,11 +15,8 @@ const imageSrc = ref('')
 // 加载图像并创建 blob Url
 const loadObject = () => {
   if (value) {
-    http
-      .get(`system/common/file/${value}`, {
-        responseType: 'blob',
-        meta: { operate: '加载图像' }
-      })
+    commonApi
+      .fileDownload(String(value))
       .then((res) => {
         imageSrc.value = convertBlob(res)
       })

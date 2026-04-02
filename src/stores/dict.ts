@@ -1,4 +1,4 @@
-import { http } from '@/plugins/axios'
+import { commonApi } from '@/api/common'
 import { throttle } from 'lodash-es'
 import { defineStore } from 'pinia'
 
@@ -23,9 +23,7 @@ export const useDictStore = defineStore(
      */
     const refreshVersion = throttle(
       async function refreshVersion() {
-        const { data: res } = await http.get('system/common/dict/_version', {
-          meta: { operate: '刷新字典版本', notify: false }
-        })
+        const { data: res } = await commonApi.dictVersion()
         versionMap.value = res.data.items
       },
       1000,
@@ -36,9 +34,7 @@ export const useDictStore = defineStore(
      * 从服务端加载字典数据
      */
     async function fetchDictData(key: string): Promise<DictItem[]> {
-      const { data: res } = await http.get(`system/common/dict/${key}`, {
-        meta: { operate: '获取字典数据', notify: false }
-      })
+      const { data: res } = await commonApi.dictData(key)
       if (res?.data) {
         dictMap.value[key] = res.data
 

@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios.ts'
+import { authApi } from '@/api/auth'
 import { EventBus } from '@/plugins/event-bus.ts'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { createStrixMessage } from '@/utils/strix-message.ts'
@@ -122,7 +122,7 @@ const handleUserAction = (key: string) => {
 
 // 登出
 const logout = () => {
-  http.post('system/logout', null, { meta: { operate: '登出 ', notify: false } }).finally(() => {
+  authApi.logout().finally(() => {
     loginInfoStore.clearLoginInfo()
     router.push('/login')
   })

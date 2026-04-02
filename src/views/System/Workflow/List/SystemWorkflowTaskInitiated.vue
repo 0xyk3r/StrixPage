@@ -46,7 +46,7 @@
 
 <script lang="ts" setup>
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { workflowApi } from '@/api/workflow'
 import { usePage } from '@/composables/usePage.ts'
 import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -57,10 +57,9 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
 const _baseName = '工作流程列表'
-const _baseApiPrefix = 'system/workflow'
 const showExportDialog = ref(false)
 const fetchAllData = createPaginatedFetcher(
-  'system/workflow/initiated',
+  workflowApi.urls.initiatedList,
   'systemUserList',
   () => getDataListParams.value
 )
@@ -106,15 +105,12 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}/initiated`, {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  workflowApi
+    .initiatedList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
-      dataRef.value = res.data.systemUserList
-      dataPagination.itemCount = res.data.total
+      dataRef.value = (res.data as any).systemUserList
+      dataPagination.itemCount = (res.data as any).total
     })
 }
 onMounted(getDataList)

@@ -245,7 +245,9 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import NebulaTag from '@/components/common/NebulaTag.vue'
-import { http } from '@/plugins/axios'
+import { managerApi } from '@/api/manager'
+import { regionApi } from '@/api/region'
+import { roleApi } from '@/api/role'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
@@ -274,7 +276,7 @@ const quickMenuStore = useQuickMenuStore()
 // 本页面操作提示关键词
 const _baseName = '系统人员'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/manager', 'systemManagerList', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => getDataListParams.value)
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({
@@ -442,11 +444,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/manager', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  managerApi
+    .list(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       // 清除展开行
@@ -464,7 +463,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http.get(`system/manager/${row.id}`, { meta: { operate: '加载角色详细信息' } }).then(({ data: res }) => {
+      managerApi.detail(row.id).then(({ data: res }) => {
         row.roleIdArray = res.data.roleIds?.split(',')
       })
     }
@@ -474,7 +473,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  http.get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } }).then(({ data: res }) => {
+  regionApi.cascader().then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options
   })
 }
@@ -482,7 +481,7 @@ onMounted(getSystemRegionSelectList)
 // 加载所有人员角色选项
 const systemRoleSelectList = ref([])
 const getSystemRoleSelectList = () => {
-  http.get('system/role/select', { meta: { operate: '加载系统角色下拉列表' } }).then(({ data: res }) => {
+  roleApi.select().then(({ data: res }) => {
     systemRoleSelectList.value = res.data.options
   })
 }
@@ -495,15 +494,11 @@ const managerRegionName = (regionId: string) => {
 // 更改系统人员角色
 const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string | number>) => {
   const row = find(dataRef.value, { id: systemManagerId })
-  http
-    .post(
-      `system/manager/modify/${systemManagerId}`,
-      {
-        field: 'role',
-        value: roles.join(',')
-      },
-      { meta: { operate: `更变${_baseName}角色` } }
-    )
+  managerApi
+    .modify(systemManagerId, {
+      field: 'role',
+      value: roles.join(',')
+    })
     .then(({ data: res }) => {
       row.roleIdArray = res.data.roleIds?.split(',')
     })
@@ -546,7 +541,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http.post('system/manager/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+    managerApi.create(addDataForm.value).then(() => {
       initDataForm()
       getDataList()
     })
@@ -586,7 +581,7 @@ const showEditDataModal = (id: string) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  http.get(`system/manager/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  managerApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -597,11 +592,7 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/manager/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
-      .then(() => {
+    managerApi.update(editDataId.value, editDataForm.value).then(() => {
         initDataForm()
         getDataList()
       })
@@ -609,7 +600,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/manager/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  managerApi.remove(id).then(() => {
     getDataList()
   })
 }

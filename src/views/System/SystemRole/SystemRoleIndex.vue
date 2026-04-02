@@ -460,7 +460,7 @@ const handleEditSuccessResponse = (row: any, data: any) => {
   row.loaded = true
 }
 
-const systemMenuTreeData = ref([])
+const systemMenuTreeData = ref<any[]>([])
 const getSystemMenuTreeData = () => {
   menuApi.list().then(({ data: res }) => {
     systemMenuTreeData.value = res.data.systemMenuList

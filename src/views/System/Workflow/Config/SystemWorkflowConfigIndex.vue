@@ -127,7 +127,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios'
+import { workflowApi } from '@/api/workflow'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -138,7 +138,6 @@ import { usePagination } from '@/composables/usePagination.ts'
 const router = useRouter()
 
 const _baseName = '流程引擎'
-const _baseApiPrefix = 'system/workflow/config'
 
 const {
   getDataListParams,
@@ -226,11 +225,8 @@ const dataRef = ref()
 const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}`, {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  workflowApi
+    .configList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
@@ -252,10 +248,8 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`${_baseApiPrefix}/update`, addDataForm.value, {
-        meta: { operate: `添加${_baseName}` }
-      })
+    workflowApi
+      .configCreate(addDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -273,7 +267,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`${_baseApiPrefix}/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  workflowApi.configDetail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -284,10 +278,8 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`${_baseApiPrefix}/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
+    workflowApi
+      .configUpdate(editDataId.value, editDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -297,7 +289,7 @@ const editData = () => {
 
 // 删除数据
 const deleteData = (id: string) => {
-  http.post(`${_baseApiPrefix}/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  workflowApi.configRemove(id).then(() => {
     getDataList()
   })
 }
@@ -358,11 +350,8 @@ const workflowInstanceDataLoading = ref(false)
 const getWorkflowInstanceDataList = () => {
   if (!selectDataId.value) return createStrixMessage('warning', '请先选择配置', '请先选择配置')
   workflowInstanceDataLoading.value = true
-  http
-    .get(`${_baseApiPrefix}/${selectDataId.value}/data`, {
-      params: getWorkflowInstanceDataListParams.value,
-      meta: { operate: `加载引擎版本数据列表` }
-    })
+  workflowApi
+    .configDataList(selectDataId.value, getWorkflowInstanceDataListParams.value)
     .then(({ data: res }) => {
       workflowInstanceDataLoading.value = false
       workflowInstanceDataRef.value = res.data.items
@@ -374,10 +363,8 @@ const workflowInstanceDataPagination = usePagination(getWorkflowInstanceDataList
 
 // 删除数据
 const deleteWorkflowInstanceData = (id: string) => {
-  http
-    .post(`${_baseApiPrefix}/${editDataId.value}/data/remove/${id}`, null, {
-      meta: { operate: '删除引擎版本数据' }
-    })
+  workflowApi
+    .configDataRemove(editDataId.value, id)
     .then(() => {
       getWorkflowInstanceDataList()
     })

@@ -69,7 +69,8 @@
 
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { http } from '@/plugins/axios'
+import { ossApi } from '@/api/oss'
+import { commonApi } from '@/api/common'
 import { usePage } from '@/composables/usePage.ts'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -83,7 +84,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储文件'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/oss/file', 'files', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => getDataListParams.value)
 
 const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
   {
@@ -143,11 +144,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/oss/file', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  ossApi
+    .fileList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.files
@@ -159,7 +157,7 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+  ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
   })
 }
@@ -171,22 +169,20 @@ const getOssFileGroupSelectList = (configKey?: string) => {
     getDataListParams.value.groupKey = null
     getDataList()
   }
-  const ck = configKey ? '/' + configKey : ''
-  http
-    .get(`system/oss/fileGroup/select${ck}`, { meta: { operate: '加载文件组配置下拉列表' } })
-    .then(({ data: res }) => {
-      ossFileGroupSelectList.value = res.data.options
-    })
+  const request = configKey ? ossApi.fileGroupSelectByConfig(configKey) : ossApi.fileGroupSelect()
+  request.then(({ data: res }) => {
+    ossFileGroupSelectList.value = res.data.options
+  })
 }
 onMounted(getOssFileGroupSelectList)
 
 const downloadFile = (id: string) => {
-  http.get(`system/common/file/${id}`, { responseType: 'blob', meta: { operate: '下载文件' } }).then((res) => {
+  commonApi.fileDownload(id).then((res) => {
     downloadBlob(res, id)
   })
 }
 const deleteFile = (id: string) => {
-  http.post(`system/oss/file/remove/${id}`, null, { meta: { operate: `删除文件` } }).then(() => {
+  ossApi.fileRemove(id).then(() => {
     getDataList()
   })
 }

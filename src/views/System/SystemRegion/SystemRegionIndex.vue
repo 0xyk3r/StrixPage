@@ -159,7 +159,7 @@
 import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { http } from '@/plugins/axios'
+import { regionApi } from '@/api/region'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -174,7 +174,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '系统地区'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/region', 'systemRegionList', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => getDataListParams.value)
 
 const {
   getDataListParams,
@@ -289,11 +289,8 @@ const getDataList = () => {
   dataLoading.value = true
   // 清除展开行
   dataExpandedRowKeys.value = []
-  http
-    .get('system/region', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  regionApi
+    .list(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemRegionList
@@ -305,8 +302,8 @@ onMounted(getDataList)
 const dataExpandedRowKeys = ref([])
 const onDataChildrenLoad = (row: any) => {
   return new Promise<void>((resolve) => {
-    http
-      .get(`system/region/${row.id}/children`, { meta: { operate: `加载${_baseName}子级列表` } })
+    regionApi
+      .children(row.id)
       .then(({ data: res }) => {
         const children = res.data.children
         handleAddIsLeaf(children)
@@ -320,7 +317,7 @@ const onDataChildrenLoad = (row: any) => {
 // 加载所有地区级联选项
 const systemRegionCascaderOptions = ref([])
 const getSystemRegionSelectList = () => {
-  http.get('system/region/cascader', { meta: { operate: `加载${_baseName}下拉列表` } }).then(({ data: res }) => {
+  regionApi.cascader().then(({ data: res }) => {
     systemRegionCascaderOptions.value = res.data.options
   })
 }
@@ -337,7 +334,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http.post('system/region/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+    regionApi.create(addDataForm.value).then(() => {
       initDataForm()
       getDataList()
     })
@@ -352,7 +349,7 @@ const showEditDataModal = (id: string) => {
   editDataFormLoading.value = true
   getSystemRegionSelectList()
   // 加载编辑前信息
-  http.get(`system/region/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  regionApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -363,10 +360,8 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/region/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
+    regionApi
+      .update(editDataId.value, editDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -375,7 +370,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/region/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  regionApi.remove(id).then(() => {
     getDataList()
   })
 }

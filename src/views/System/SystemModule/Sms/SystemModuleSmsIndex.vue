@@ -182,7 +182,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { smsApi } from '@/api/sms'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -198,7 +198,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '短信服务'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/sms', 'configs', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(smsApi.urls.list, 'configs', () => getDataListParams.value)
 
 // 加载字典
 const smsPlatformRef = useDict('SmsPlatform')
@@ -451,11 +451,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/sms', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  smsApi
+    .list(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       // 清除展开行
@@ -473,7 +470,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http.get(`system/sms/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+      smsApi.detail(row.id).then(({ data: res }) => {
         row.signs = res.data.signs
         row.templates = res.data.templates
         row.loaded = true
@@ -513,7 +510,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http.post('system/sms/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+    smsApi.create(addDataForm.value).then(() => {
       initDataForm()
       getDataList()
     })
@@ -545,7 +542,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/sms/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  smsApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -556,10 +553,8 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/sms/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
+    smsApi
+      .update(editDataId.value, editDataForm.value)
       .then(() => {
         initDataForm()
         getDataList()
@@ -568,7 +563,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/sms/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  smsApi.remove(id).then(() => {
     getDataList()
   })
 }

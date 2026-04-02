@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { http } from '@/plugins/axios.ts'
+import { roleApi } from '@/api/role'
 
 const show = defineModel('show', { type: Boolean, default: false })
 
@@ -52,10 +52,8 @@ watch(
 )
 
 onMounted(() => {
-  http
-    .get('system/role/transfer', {
-      meta: { operate: '加载系统角色穿梭框数据' }
-    })
+  roleApi
+    .transfer()
     .then(({ data: res }) => {
       dataLoading.value = false
       data.value = res.data.transferData

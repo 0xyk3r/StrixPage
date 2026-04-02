@@ -70,7 +70,7 @@
 import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { http } from '@/plugins/axios'
+import { monitorApi } from '@/api/monitor'
 import { useDict } from '@/composables/useDict.ts'
 import { cloneDeep } from 'lodash-es'
 import { type DataTableColumns } from 'naive-ui'
@@ -84,7 +84,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '系统日志'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/monitor/log', 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(monitorApi.urls.logList, 'items', () => getDataListParams.value)
 
 // 加载字典
 const systemLogOperTypeRef = useDict('SystemLogOperType')
@@ -250,11 +250,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/monitor/log', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  monitorApi
+    .logList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items

@@ -1,4 +1,4 @@
-import { http } from '@/plugins/axios'
+import { notificationApi } from '@/api/notification'
 import type { ListNotificationReq, NotificationListResp } from '@/@types/components/notification'
 import { defineStore } from 'pinia'
 
@@ -11,11 +11,9 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   async function fetchUnreadCount() {
     try {
-      const { data: res } = await http.get('system/common/notification/unread-count', {
-        meta: { notify: false, operate: '获取未读通知数量' }
-      })
+      const { data: res } = await notificationApi.unreadCount()
       if (res.data) {
-        unreadCount.value = res.data.unreadCount
+        unreadCount.value = (res.data as any).unreadCount
       }
     } catch (error) {
       console.error('获取未读通知数量失败:', error)
@@ -27,9 +25,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   async function fetchNotifications(params: ListNotificationReq) {
     try {
-      const { data: res } = await http.post('system/common/notification', params, {
-        meta: { notify: false, operate: '获取通知列表' }
-      })
+      const { data: res } = await notificationApi.list(params)
       return res.data as NotificationListResp
     } catch (error) {
       console.error('获取通知列表失败:', error)
@@ -42,9 +38,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   async function markAsRead(notificationId: string) {
     try {
-      await http.post(`system/common/notification/${notificationId}/read`, null, {
-        meta: { notify: false, operate: '标记单个通知为已读' }
-      })
+      await notificationApi.markRead(notificationId)
       // 刷新未读数量
       await fetchUnreadCount()
     } catch (error) {
@@ -58,9 +52,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   async function markAllAsRead() {
     try {
-      await http.post('system/common/notification/read-all', null, {
-        meta: { notify: false, operate: '标记全部通知为已读' }
-      })
+      await notificationApi.markAllRead()
       // 刷新未读数量
       unreadCount.value = 0
     } catch (error) {

@@ -24,6 +24,12 @@ export interface SmsLogListResp {
   total: number
 }
 
+export interface SmsDetailResp {
+  signs: any[]
+  templates: any[]
+  [key: string]: any
+}
+
 export const smsApi = {
   urls: {
     list: BASE,
@@ -36,7 +42,7 @@ export const smsApi = {
     http.get<RetResult<SmsListResp>>(BASE, { params, meta: { operate: `加载${_n}列表` } }),
 
   detail: (id: string) =>
-    http.get<RetResult>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
+    http.get<RetResult<SmsDetailResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
 
   create: (data: Record<string, any>) =>
     http.post<RetResult>(`${BASE}/update`, data, { meta: { operate: `新增${_n}` } }),
@@ -66,5 +72,5 @@ export const smsApi = {
     }),
 
   configSelect: () =>
-    http.get<RetResult>(`${BASE}/config/select`, { meta: { operate: '加载短信配置下拉列表' } }),
+    http.get<RetResult<any>>(`${BASE}/config/select`, { meta: { operate: '加载短信配置下拉列表' } }),
 }

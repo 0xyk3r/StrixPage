@@ -83,7 +83,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { smsApi } from '@/api/sms'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { useTableColumns } from '@/composables/useTableColumns'
@@ -96,7 +96,7 @@ import { type DataTableColumns } from 'naive-ui'
 // 本页面操作提示关键词
 const _baseName = '短信模板'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/sms/template', 'templates', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(smsApi.urls.templateList, 'templates', () => getDataListParams.value)
 
 // 加载字典
 const smsTemplateTypeRef = useDict('SmsTemplateType')
@@ -156,11 +156,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/sms/template', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  smsApi
+    .templateList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.templates
@@ -172,7 +169,7 @@ onMounted(getDataList)
 // 加载短信配置选项
 const smsConfigSelectList = ref([])
 const getSmsConfigSelectList = () => {
-  http.get('system/sms/config/select', { meta: { operate: '加载短信配置下拉列表' } }).then(({ data: res }) => {
+  smsApi.configSelect().then(({ data: res }) => {
     smsConfigSelectList.value = res.data.options
   })
 }

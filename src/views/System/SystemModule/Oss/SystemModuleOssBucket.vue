@@ -99,7 +99,7 @@
 
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { http } from '@/plugins/axios'
+import { ossApi } from '@/api/oss'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
@@ -112,7 +112,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储空间'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/oss/bucket', 'buckets', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => getDataListParams.value)
 
 const {
   getDataListParams,
@@ -155,11 +155,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/oss/bucket', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  ossApi
+    .bucketList(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.buckets
@@ -171,7 +168,7 @@ onMounted(getDataList)
 // 加载存储配置选项
 const ossConfigSelectList = ref([])
 const getOssConfigSelectList = () => {
-  http.get('system/oss/config/select', { meta: { operate: '加载存储配置下拉列表' } }).then(({ data: res }) => {
+  ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
   })
 }
@@ -191,11 +188,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post('system/oss/bucket/update', addDataForm.value, {
-        meta: { operate: `添加${_baseName}` }
-      })
-      .then(() => {
+    ossApi.bucketCreate(addDataForm.value).then(() => {
         initDataForm()
         getDataList()
       })

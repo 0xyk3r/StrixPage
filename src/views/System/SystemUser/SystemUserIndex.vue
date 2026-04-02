@@ -110,7 +110,7 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
-import { http } from '@/plugins/axios'
+import { userApi } from '@/api/user'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -121,7 +121,7 @@ import { type DataTableColumns, type FormRules } from 'naive-ui' // 本页面操
 // 本页面操作提示关键词
 const _baseName = '系统用户'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/user', 'systemUserList', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => getDataListParams.value)
 
 // 加载字典
 const systemUserStatusRef = useDict('SystemUserStatus')
@@ -205,11 +205,8 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/user', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
+  userApi
+    .list(getDataListParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemUserList
@@ -225,7 +222,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/user/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  userApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -236,11 +233,7 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/user/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
-      .then(() => {
+    userApi.update(editDataId.value, editDataForm.value).then(() => {
         initDataForm()
         getDataList()
       })
@@ -248,7 +241,7 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/user/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  userApi.remove(id).then(() => {
     getDataList()
   })
 }

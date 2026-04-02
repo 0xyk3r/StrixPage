@@ -1,4 +1,4 @@
-import { http } from '@/plugins/axios'
+import { authApi } from '@/api/auth'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { storeToRefs } from 'pinia'
 
@@ -22,10 +22,8 @@ export function useTokenRenewal() {
     const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000
 
     if (expireTime - currentTime < thirtyDaysInMs) {
-      http
-        .post('system/renewToken', null, {
-          meta: { operate: '续期 Token', notify: false }
-        })
+      authApi
+        .renewToken()
         .then(({ data: res }) => {
           loginInfoStore.updateLoginInfo(res)
           loginInfo.value = res.data.info
