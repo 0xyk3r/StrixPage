@@ -10,7 +10,7 @@ component library, and Pinia for state management. All UI text is in Chinese.
 ## Commands
 
 ```bash
-pnpm dev          # Start dev server (0.0.0.0:19889)
+pnpm dev          # Start dev server (0.0.0.0:19889), However, it needs to be accessed through the Nginx reverse proxy address `http://localhost:13232/`
 pnpm build        # Type-check (vue-tsc) + Vite build in parallel
 pnpm preview      # Preview production build
 pnpm lint         # Run oxlint + eslint --fix
@@ -19,6 +19,7 @@ pnpm type-check   # vue-tsc type checking only
 ```
 
 Node requirement: ^20.19.0 or >=22.12.0
+Package manager is **pnpm**. No test framework is configured.
 
 ## Architecture
 
@@ -52,9 +53,6 @@ Node requirement: ^20.19.0 or >=22.12.0
 
 All API requests go through `/api/` and are encrypted/signed:
 
-- **Request encryption:** SM4 encrypts body (random key per request), SM2 encrypts the SM4 key with server's public key
-- **Request signing:** SM3 hash of `(params/body + url + timestamp)`
-- **Response decryption:** Reverse SM2+SM4 decryption
 - **Config meta:** `meta.operate` (logging label), `meta.notify` (success toast), `meta.requestGroup` (cancellation
   group)
 - **Error handling:** 401 → clear auth & redirect to login; 429 → rate limit with retry-after
@@ -85,12 +83,16 @@ List views follow a consistent structure:
 - Dark/Light mode with OS detection, switchable via event bus
 - Theme overrides configured in `App.vue`
 
-### PWA Support
-The app supports PWA via `vite-plugin-pwa` with prompt-based updates. Service worker registration is handled
-automatically.
-
 ## Code Style
 
 - **Formatting:** Prettier — no semicolons, single quotes, 120 char width, no trailing commas
-- **Linting:** ESLint + OXLint; `@typescript-eslint/no-explicit-any` is disabled
+- **Linting:** ESLint + OXLint
 - **SCSS:** Global styles in `src/assets/style/`, component styles use `<style lang="scss" scoped>`
+
+### Other notes
+
+- Do not use Sass syntax that is deprecated in newer versions, such as `@import`.
+- The development environment of this project can be accessed or tested via the address `http://localhost:13232/` after
+  being reverse proxied by Nginx.
+- In the development environment, the API documentation can be accessed via
+  `http://localhost:13232/api/v3/api-docs/swagger-config` and `http://localhost:13232/api/v3/api-docs/default`.
