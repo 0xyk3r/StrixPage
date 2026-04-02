@@ -253,7 +253,8 @@
 <script lang="ts" setup>
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { http } from '@/plugins/axios'
+import { menuApi } from '@/api/menu'
+import { permissionApi } from '@/api/permission'
 import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -269,7 +270,7 @@ import { useTableColumns } from '@/composables/useTableColumns'
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/menu', 'systemMenuList', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => getDataListParams.value)
 
 const {
   getDataListParams,
@@ -386,12 +387,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http
-    .get('system/menu', {
-      params: getDataListParams.value,
-      meta: { operate: `加载${_baseName}列表` }
-    })
-    .then(({ data: res }) => {
+  menuApi.list(getDataListParams.value).then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemMenuList
     })
@@ -434,7 +430,7 @@ const addData = () => {
     addDataFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      http.post('system/menu/update', addDataForm.value, { meta: { operate: `添加${_baseName}` } }).then(() => {
+      menuApi.create(addDataForm.value).then(() => {
         initDataForm()
         getDataList()
         EventBus.emit('refresh-menu')
@@ -444,11 +440,7 @@ const addData = () => {
     addPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      http
-        .post('system/permission/update', addPermissionForm.value, {
-          meta: { operate: `添加系统权限` }
-        })
-        .then(() => {
+      permissionApi.create(addPermissionForm.value).then(() => {
           initDataForm()
           getDataList()
         })
@@ -481,14 +473,14 @@ const showEditDataModal = (row: any) => {
   editDataFormLoading.value = true
   // 加载编辑前信息
   if (row.type === 'menu') {
-    http.get(`system/menu/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+    menuApi.detail(row.id).then(({ data: res }) => {
       editDataId.value = row.id
       const canUpdateFields = Object.keys(initEditDataForm)
       editDataForm.value = pick(res.data, canUpdateFields)
       editDataFormLoading.value = false
     })
   } else {
-    http.get(`system/permission/${row.id}`, { meta: { operate: `加载权限信息信息` } }).then(({ data: res }) => {
+    permissionApi.detail(row.id).then(({ data: res }) => {
       editDataId.value = row.id
       const canUpdateFields = Object.keys(initEditPermissionForm)
       editPermissionForm.value = pick(res.data, canUpdateFields)
@@ -501,11 +493,7 @@ const editData = () => {
     editDataFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      http
-        .post(`system/menu/update/${editDataId.value}`, editDataForm.value, {
-          meta: { operate: `修改${_baseName}` }
-        })
-        .then(() => {
+      menuApi.update(editDataId.value, editDataForm.value).then(() => {
           initDataForm()
           getDataList()
           EventBus.emit('refresh-menu')
@@ -515,11 +503,7 @@ const editData = () => {
     editPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      http
-        .post(`system/permission/update/${editDataId.value}`, editPermissionForm.value, {
-          meta: { operate: `修改系统权限` }
-        })
-        .then(() => {
+      permissionApi.update(editDataId.value, editPermissionForm.value).then(() => {
           initDataForm()
           getDataList()
         })
@@ -529,12 +513,12 @@ const editData = () => {
 
 const deleteData = ({ id, type }: { id: string; type: string }) => {
   if (type === 'menu') {
-    http.post(`system/menu/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+    menuApi.remove(id).then(() => {
       getDataList()
       EventBus.emit('refresh-menu')
     })
   } else {
-    http.post(`system/permission/remove/${id}`, null, { meta: { operate: `删除系统权限` } }).then(() => {
+    permissionApi.remove(id).then(() => {
       getDataList()
     })
   }
@@ -543,7 +527,7 @@ const deleteData = ({ id, type }: { id: string; type: string }) => {
 // 树形选择器数据
 const menuTreeRef = ref([])
 const getMenuTree = () => {
-  http.get('system/menu/tree', { meta: { operate: `加载${_baseName}树形列表` } }).then(({ data: res }) => {
+  menuApi.tree().then(({ data: res }) => {
     menuTreeRef.value = res.data.tree
   })
 }

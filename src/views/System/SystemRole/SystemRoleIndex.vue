@@ -160,7 +160,8 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { http } from '@/plugins/axios'
+import { roleApi } from '@/api/role'
+import { menuApi } from '@/api/menu'
 import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
@@ -189,7 +190,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '系统角色'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher('system/role', 'systemRoleList', () => filterDataListParams.value)
+const fetchAllData = createPaginatedFetcher(roleApi.urls.list, 'systemRoleList', () => filterDataListParams.value)
 
 // 加载字典
 const systemRoleRegionPermissionTypeRef = useDict('SystemRoleRegionPermissionType')
@@ -350,7 +351,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  http.get('system/role', { meta: { operate: `加载${_baseName}列表` } }).then(({ data: res }) => {
+  roleApi.list({}).then(({ data: res }) => {
     dataLoading.value = false
     // 清除展开行
     dataExpandedRowKeys.value = []
@@ -382,7 +383,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   diffs.forEach((diff) => {
     const row = find(dataRef.value, { id: diff })
     if (row) {
-      http.get(`system/role/${row.id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+      roleApi.detail(row.id).then(({ data: res }) => {
         handleEditSuccessResponse(row, res.data)
       })
     }
@@ -402,7 +403,7 @@ const addData = () => {
   addDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http.post('system/role/update', addDataForm.value, { meta: { operate: `修改${_baseName}` } }).then(() => {
+    roleApi.create(addDataForm.value).then(() => {
       initDataForm()
       getDataList()
     })
@@ -419,7 +420,7 @@ const showEditDataModal = (id: string) => {
   editDataModalShow.value = true
   editDataFormLoading.value = true
   // 加载编辑前信息
-  http.get(`system/role/${id}`, { meta: { operate: `加载${_baseName}信息` } }).then(({ data: res }) => {
+  roleApi.detail(id).then(({ data: res }) => {
     editDataId.value = id
     const canUpdateFields = Object.keys(initEditDataForm)
     editDataForm.value = pick(res.data, canUpdateFields)
@@ -430,11 +431,7 @@ const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    http
-      .post(`system/role/update/${editDataId.value}`, editDataForm.value, {
-        meta: { operate: `修改${_baseName}` }
-      })
-      .then(() => {
+    roleApi.update(editDataId.value, editDataForm.value).then(() => {
         initDataForm()
         getDataList()
       })
@@ -442,27 +439,19 @@ const editData = () => {
 }
 
 const deleteData = (id: string) => {
-  http.post(`system/role/remove/${id}`, null, { meta: { operate: `删除${_baseName}` } }).then(() => {
+  roleApi.remove(id).then(() => {
     getDataList()
   })
 }
 
 const removeRoleMenu = (row: any, menuId: string) => {
-  http
-    .post(`system/role/remove/${row.id}/menu/${menuId}`, null, {
-      meta: { operate: '移除角色菜单权限' }
-    })
-    .then(({ data: res }) => {
+  roleApi.removeMenu(row.id, menuId).then(({ data: res }) => {
       handleEditSuccessResponse(row, res.data)
       EventBus.emit('refresh-menu')
     })
 }
 const removeRolePermission = (row: any, permissionId: string) => {
-  http
-    .post(`system/role/remove/${row.id}/permission/${permissionId}`, null, {
-      meta: { operate: '移除角色系统权限' }
-    })
-    .then(({ data: res }) => {
+  roleApi.removePermission(row.id, permissionId).then(({ data: res }) => {
       handleEditSuccessResponse(row, res.data)
     })
 }
@@ -473,7 +462,7 @@ const handleEditSuccessResponse = (row: any, data: any) => {
 
 const systemMenuTreeData = ref([])
 const getSystemMenuTreeData = () => {
-  http.get('system/menu', { meta: { operate: `加载系统菜单树` } }).then(({ data: res }) => {
+  menuApi.list().then(({ data: res }) => {
     systemMenuTreeData.value = res.data.systemMenuList
   })
 }
@@ -495,7 +484,7 @@ const showEditRoleMenusModal = (roleRow: any) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
   // 加载编辑前信息
-  http.get(`system/role/${roleRow.id}`, { meta: { operate: `加载${_baseName}菜单信息` } }).then(({ data: res }) => {
+  roleApi.detail(roleRow.id).then(({ data: res }) => {
     editRoleMenusRoleId = res.data.id
     editRoleMenusRoleRow = roleRow
     editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
@@ -525,15 +514,11 @@ const editRoleMenus = () => {
     }
   })
 
-  http
-    .post(
-      `system/role/update/${editRoleMenusRoleId}/menu`,
-      {
-        menuIds: menuIds.join(','),
-        permissionIds: permissionIds.join(',')
-      },
-      { meta: { operate: `更改${_baseName}菜单权限` } }
-    )
+  roleApi
+    .updateMenu(editRoleMenusRoleId, {
+      menuIds: menuIds.join(','),
+      permissionIds: permissionIds.join(',')
+    })
     .then(({ data: res }) => {
       editRoleMenusModalShow.value = false
       handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
