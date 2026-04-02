@@ -242,7 +242,8 @@ const {
     create: (data: any) => dictApi.dataCreate(dictKey, data),
     update: (id: string, data: any) => dictApi.dataUpdate(dictKey, id, data),
     remove: (id: string) => dictApi.dataRemove(dictKey, id)
-  }
+  },
+  draftKey: 'SystemDictData'
 })
 
 const fetchAllData = createPaginatedFetcher(

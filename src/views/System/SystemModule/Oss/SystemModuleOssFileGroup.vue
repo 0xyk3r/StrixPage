@@ -329,7 +329,8 @@ const {
     afterShowEdit: (detail: any) => {
       editForm.value.allowExtension = detail.allowExtension.split(',')
     }
-  }
+  },
+  draftKey: 'ModuleOssFileGroup'
 })
 
 // 展示列信息

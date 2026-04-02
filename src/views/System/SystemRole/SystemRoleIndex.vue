@@ -216,7 +216,8 @@ const {
   fetchList: () => getDataList(),
   addForm: { name: null, regionPermissionType: null },
   editForm: { name: null, regionPermissionType: null },
-  api: roleApi
+  api: roleApi,
+  draftKey: 'SystemRole'
 })
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']

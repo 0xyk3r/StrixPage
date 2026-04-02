@@ -256,7 +256,8 @@ const {
     status: null,
     remark: null
   },
-  api: dictApi
+  api: dictApi,
+  draftKey: 'SystemDict'
 })
 
 // 展示列信息

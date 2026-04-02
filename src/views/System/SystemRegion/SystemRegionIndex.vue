@@ -210,7 +210,8 @@ const {
   hooks: {
     beforeShowAdd: () => getSystemRegionSelectList(),
     beforeShowEdit: () => getSystemRegionSelectList()
-  }
+  },
+  draftKey: 'SystemRegion'
 })
 
 const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)

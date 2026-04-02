@@ -139,7 +139,8 @@ const {
   api: {
     create: (data: any) => ossApi.bucketCreate(data),
     remove: (id: string) => ossApi.bucketRemove(id)
-  }
+  },
+  draftKey: 'ModuleOssBucket'
 })
 
 const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)

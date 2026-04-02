@@ -175,7 +175,8 @@ const {
     create: (data: any) => workflowApi.configCreate(data),
     update: (id: string, data: any) => workflowApi.configUpdate(id, data),
     remove: (id: string) => workflowApi.configRemove(id)
-  }
+  },
+  draftKey: 'WorkflowConfig'
 })
 
 const dataColumns: DataTableColumns = [

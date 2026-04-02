@@ -236,7 +236,8 @@ const {
     concurrent: null,
     status: null
   },
-  api: jobApi
+  api: jobApi,
+  draftKey: 'ModuleJob'
 })
 
 // 展示列信息

@@ -346,7 +346,8 @@ const {
   hooks: {
     beforeShowAdd: () => getSystemRegionSelectList(),
     beforeShowEdit: () => getSystemRegionSelectList()
-  }
+  },
+  draftKey: 'SystemManager'
 })
 
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)

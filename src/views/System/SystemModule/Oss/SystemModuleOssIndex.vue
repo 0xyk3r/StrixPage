@@ -261,7 +261,8 @@ const {
     accessSecret: null,
     remark: null
   },
-  api: ossApi
+  api: ossApi,
+  draftKey: 'ModuleOss'
 })
 
 // 展示列信息

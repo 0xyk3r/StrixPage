@@ -314,7 +314,8 @@ const {
       addPermissionForm.value = cloneDeep(initAddPermissionForm)
       editPermissionForm.value = cloneDeep(initEditPermissionForm)
     }
-  }
+  },
+  draftKey: 'SystemMenu'
 })
 
 const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)

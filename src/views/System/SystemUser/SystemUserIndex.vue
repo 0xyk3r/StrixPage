@@ -151,7 +151,8 @@ const {
     status: null,
     phoneNumber: null
   },
-  api: userApi
+  api: userApi,
+  draftKey: 'SystemUser'
 })
 
 // 展示列信息

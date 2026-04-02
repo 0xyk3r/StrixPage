@@ -246,7 +246,8 @@ const {
     accessSecret: null,
     remark: null
   },
-  api: smsApi
+  api: smsApi,
+  draftKey: 'ModuleSms'
 })
 
 // 展示列信息
