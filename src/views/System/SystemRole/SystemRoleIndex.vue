@@ -61,7 +61,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="addFormRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -98,7 +98,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="editFormRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -187,6 +187,7 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import { textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
@@ -386,18 +387,12 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入角色名称', trigger: 'blur' },
-    { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
-  ]
+const addFormRules: FormRules = {
+  name: textField('角色名称', { min: 2, max: 12 })
 }
 
-const editDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入角色名称', trigger: 'blur' },
-    { min: 2, max: 16, message: '角色名称长度需在2-16之间', trigger: 'blur' }
-  ]
+const editFormRules: FormRules = {
+  name: textField('角色名称', { min: 2, max: 16 })
 }
 
 const removeRoleMenu = (row: any, menuId: string) => {

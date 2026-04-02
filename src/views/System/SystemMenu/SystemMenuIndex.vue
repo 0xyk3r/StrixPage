@@ -59,7 +59,7 @@
           <n-form
             ref="addFormRef"
             :model="addForm"
-            :rules="addDataRules"
+            :rules="menuFormRules"
             label-placement="left"
             label-width="auto"
             require-mark-placement="right-hanging"
@@ -98,7 +98,7 @@
           <n-form
             ref="addPermissionFormRef"
             :model="addPermissionForm"
-            :rules="addPermissionRules"
+            :rules="permissionFormRules"
             label-placement="left"
             label-width="auto"
             require-mark-placement="right-hanging"
@@ -160,7 +160,7 @@
             <n-form
               ref="editFormRef"
               :model="editForm"
-              :rules="editDataRules"
+              :rules="menuFormRules"
               label-placement="left"
               label-width="auto"
               require-mark-placement="right-hanging"
@@ -199,7 +199,7 @@
             <n-form
               ref="editPermissionFormRef"
               :model="editPermissionForm"
-              :rules="editPermissionRules"
+              :rules="permissionFormRules"
               label-placement="left"
               label-width="auto"
               require-mark-placement="right-hanging"
@@ -262,6 +262,7 @@ import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, kebabCase, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
+import { lengthRange, numberField, requiredInput, textField } from '@/utils/form-rules'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -396,23 +397,11 @@ const getDataList = () => {
 onMounted(getDataList)
 
 const addDataModalType = ref('menu')
-const addDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入菜单名称', trigger: 'blur' },
-    { min: 2, max: 10, message: '菜单名称需为 2-10 字符', trigger: 'blur' }
-  ],
-  key: [
-    { required: true, message: '请输入权限标识', trigger: 'blur' },
-    { min: 2, max: 32, message: '权限标识需为 2-32 字符', trigger: 'blur' }
-  ],
-  url: [
-    { required: true, message: '请输入菜单路由' },
-    { min: 1, max: 128, message: '权限标识需为 1-128 字符', trigger: 'blur' }
-  ],
-  sortValue: [
-    { type: 'number', required: true, message: '请输入菜单排序值', trigger: 'change' },
-    { type: 'number', min: 0, max: 99999, message: '请输入有效排序值 (1-99999)', trigger: 'change' }
-  ]
+const menuFormRules: FormRules = {
+  name: textField('菜单名称', { min: 2, max: 10 }),
+  key: textField('权限标识', { min: 2, max: 32 }),
+  url: [requiredInput('菜单路由'), lengthRange('菜单路由', 1, 128)],
+  sortValue: numberField('菜单排序值', { min: 0, max: 99999 })
 }
 const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
   if (id) {
@@ -450,24 +439,6 @@ const addData = () => {
 }
 
 const editDataModalType = ref('menu')
-const editDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入菜单名称', trigger: 'blur' },
-    { min: 2, max: 10, message: '菜单名称需为 2-10 字符', trigger: 'blur' }
-  ],
-  key: [
-    { required: true, message: '请输入权限标识', trigger: 'blur' },
-    { min: 2, max: 32, message: '权限标识需为 2-32 字符', trigger: 'blur' }
-  ],
-  url: [
-    { required: true, message: '请输入菜单路由' },
-    { min: 1, max: 128, message: '权限标识需为 1-128 字符', trigger: 'blur' }
-  ],
-  sortValue: [
-    { type: 'number', required: true, message: '请输入菜单排序值', trigger: 'change' },
-    { type: 'number', min: 0, max: 99999, message: '请输入有效排序值 (1-99999)', trigger: 'change' }
-  ]
-}
 const showEditDataModal = (row: any) => {
   editModal.value = true
   editDataModalType.value = row.type
@@ -542,17 +513,11 @@ const initAddPermissionForm = {
 }
 const addPermissionForm = ref<any>(cloneDeep(initAddPermissionForm))
 const addPermissionFormRef = ref<FormInst | null>(null)
-const addPermissionRules = {
-  name: [
-    { required: true, message: '请输入权限名称', trigger: 'blur' },
-    { min: 2, max: 12, message: '系统权限名称长度需在2-12之间', trigger: 'blur' }
-  ],
-  key: [
-    { required: true, message: '请输入权限标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '权限标识长度需在2-64之间', trigger: 'blur' }
-  ],
+const permissionFormRules: FormRules = {
+  name: textField('权限名称', { min: 2, max: 12 }),
+  key: textField('权限标识', { min: 2, max: 64 }),
   menuId: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
-  description: [{ max: 128, message: '权限介绍长度需在128字符以内', trigger: 'blur' }]
+  description: textField('权限介绍', { required: false, max: 128 })
 }
 
 const initEditPermissionForm = {
@@ -563,18 +528,6 @@ const initEditPermissionForm = {
 }
 const editPermissionForm = ref<any>(cloneDeep(initEditPermissionForm))
 const editPermissionFormRef = ref<FormInst | null>(null)
-const editPermissionRules = {
-  name: [
-    { required: true, message: '请输入权限名称', trigger: 'blur' },
-    { min: 2, max: 12, message: '系统权限名称长度需在2-12之间', trigger: 'blur' }
-  ],
-  key: [
-    { required: true, message: '请输入权限标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '权限标识长度需在2-64之间', trigger: 'blur' }
-  ],
-  menuId: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
-  description: [{ max: 128, message: '权限介绍长度需在128字符以内', trigger: 'blur' }]
-}
 </script>
 
 <style lang="scss" scoped></style>

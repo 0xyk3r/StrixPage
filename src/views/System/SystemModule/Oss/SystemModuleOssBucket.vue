@@ -70,7 +70,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="addFormRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -102,6 +102,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
+import { textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -177,12 +178,9 @@ const getOssConfigSelectList = () => {
 }
 onMounted(getOssConfigSelectList)
 
-const addDataRules: FormRules = {
+const addFormRules: FormRules = {
   configKey: [{ required: true, message: '请选择存储配置 Key', trigger: 'change' }],
-  name: [
-    { required: true, message: '请输入 Bucket 名称', trigger: 'blur' },
-    { min: 1, max: 64, message: 'Bucket 名称需在 1 - 64 字之内', trigger: 'blur' }
-  ]
+  name: textField('Bucket 名称', { min: 1, max: 64 })
 }
 </script>
 

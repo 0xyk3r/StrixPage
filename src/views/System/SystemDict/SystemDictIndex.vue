@@ -79,7 +79,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -138,7 +138,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -195,6 +195,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField, remarkField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -350,32 +351,12 @@ onMounted(getDataList)
 const viewDictData = (key: string) => {
   router.push({ path: `/system/dict/${key}` })
 }
-const addDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入字典标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  name: [
-    { required: true, message: '请输入字典名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '字典名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  dataType: [{ type: 'number', required: true, message: '请选择字典数据类型', trigger: 'change' }],
-  status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
-}
-
-const editDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入字典标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  name: [
-    { required: true, message: '请输入字典名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '字典名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  dataType: [{ type: 'number', required: true, message: '请选择字典数据类型', trigger: 'change' }],
-  status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
+const formRules: FormRules = {
+  key: textField('字典标识', { min: 2, max: 64 }),
+  name: textField('字典名称', { min: 2, max: 32 }),
+  dataType: selectField('字典数据类型'),
+  status: selectField('字典状态'),
+  remark: remarkField()
 }
 
 </script>

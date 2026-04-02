@@ -70,7 +70,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -132,7 +132,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -193,6 +193,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField, remarkField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -320,42 +321,14 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const addDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入字典标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  value: [
-    { required: true, message: '请输入字典值', trigger: 'blur' },
-    { min: 1, max: 64, message: '字典值长度需在 1 - 64 字之内', trigger: 'blur' }
-  ],
-  label: [
-    { required: true, message: '请输入字典标签', trigger: 'blur' },
-    { min: 1, max: 64, message: '字典标签长度需在 1 - 64 字之内', trigger: 'blur' }
-  ],
-  sort: [{ type: 'number', required: true, message: '请选择字典排序值', trigger: 'change' }],
-  style: [{ max: 32, message: '字典样式长度需在 32 字之内', trigger: 'blur' }],
-  status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
-}
-
-const editDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入字典标识', trigger: 'blur' },
-    { min: 2, max: 64, message: '字典标识长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  value: [
-    { required: true, message: '请输入字典值', trigger: 'blur' },
-    { min: 1, max: 64, message: '字典值长度需在 1 - 64 字之内', trigger: 'blur' }
-  ],
-  label: [
-    { required: true, message: '请输入字典标签', trigger: 'blur' },
-    { min: 1, max: 64, message: '字典标签长度需在 1 - 64 字之内', trigger: 'blur' }
-  ],
-  sort: [{ type: 'number', required: true, message: '请选择字典排序值', trigger: 'change' }],
-  style: [{ max: 32, message: '字典样式长度需在 32 字之内', trigger: 'blur' }],
-  status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
+const formRules: FormRules = {
+  key: textField('字典标识', { min: 2, max: 64 }),
+  value: textField('字典值', { min: 1, max: 64 }),
+  label: textField('字典标签', { min: 1, max: 64 }),
+  sort: selectField('字典排序值'),
+  style: textField('字典样式', { required: false, max: 32 }),
+  status: selectField('字典状态'),
+  remark: remarkField()
 }
 </script>
 

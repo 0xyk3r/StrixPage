@@ -90,7 +90,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="addFormRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -170,7 +170,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="editFormRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -253,6 +253,7 @@ import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField } from '@/utils/form-rules'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual } from 'lodash-es'
 import {
@@ -491,63 +492,37 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
     })
 }
 
-const addDataRules: FormRules = {
-  nickname: [
-    { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
-    { min: 2, max: 20, message: '管理人员昵称长度需在2-20之间', trigger: 'blur' }
-  ],
-  loginName: [
-    { required: true, message: '请输入登录账号', trigger: 'blur' },
-    { min: 4, max: 20, message: '登录账号长度需在4-20之间', trigger: 'blur' }
-  ],
-  loginPassword: [
-    { required: true, message: '请输入登录密码', trigger: 'blur' },
-    { min: 8, max: 32, message: '登录密码长度需在8-32之间', trigger: 'blur' },
-    {
-      validator: (_rule: any, value: string) => {
-        if (!value) return true
-        let categories = 0
-        if (/[A-Z]/.test(value)) categories++
-        if (/[a-z]/.test(value)) categories++
-        if (/\d/.test(value)) categories++
-        if (/[^A-Za-z0-9]/.test(value)) categories++
-        return categories >= 3
-      },
-      message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
-      trigger: 'blur'
-    }
-  ],
-  status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
-  type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
+const passwordComplexityValidator = {
+  validator: (_rule: any, value: string) => {
+    if (!value) return true
+    let categories = 0
+    if (/[A-Z]/.test(value)) categories++
+    if (/[a-z]/.test(value)) categories++
+    if (/\d/.test(value)) categories++
+    if (/[^A-Za-z0-9]/.test(value)) categories++
+    return categories >= 3
+  },
+  message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
+  trigger: 'blur'
 }
 
-const editDataRules: FormRules = {
-  nickname: [
-    { required: true, message: '请输入管理人员昵称', trigger: 'blur' },
-    { min: 2, max: 20, message: '管理人员昵称长度需在2-20之间', trigger: 'blur' }
-  ],
-  loginName: [
-    { required: true, message: '请输入登录账号', trigger: 'blur' },
-    { min: 4, max: 20, message: '登录账号长度需在4-20之间', trigger: 'blur' }
-  ],
+const addFormRules: FormRules = {
+  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
+  loginName: textField('登录账号', { min: 4, max: 20 }),
+  loginPassword: [...textField('登录密码', { min: 8, max: 32 }), passwordComplexityValidator],
+  status: selectField('管理人员状态'),
+  type: selectField('管理人员类型')
+}
+
+const editFormRules: FormRules = {
+  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
+  loginName: textField('登录账号', { min: 4, max: 20 }),
   loginPassword: [
-    { min: 8, max: 32, message: '登录密码长度需在8-32之间', trigger: 'blur' },
-    {
-      validator: (_rule: any, value: string) => {
-        if (!value) return true
-        let categories = 0
-        if (/[A-Z]/.test(value)) categories++
-        if (/[a-z]/.test(value)) categories++
-        if (/\d/.test(value)) categories++
-        if (/[^A-Za-z0-9]/.test(value)) categories++
-        return categories >= 3
-      },
-      message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
-      trigger: 'blur'
-    }
+    ...textField('登录密码', { required: false, min: 8, max: 32 }),
+    passwordComplexityValidator
   ],
-  status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
-  type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
+  status: selectField('管理人员状态'),
+  type: selectField('管理人员类型')
 }
 </script>
 

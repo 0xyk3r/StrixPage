@@ -77,7 +77,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -106,7 +106,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -132,6 +132,7 @@ import type { WorkflowConfigItem } from '@/api/workflow'
 import { useCrud } from '@/composables/useCrud'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules, NFlex, NSpin } from 'naive-ui'
 import { usePagination } from '@/composables/usePagination.ts'
 
@@ -243,18 +244,8 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const addDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入流程名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ]
-}
-
-const editDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入流程名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ]
+const formRules: FormRules = {
+  name: textField('流程名称', { min: 2, max: 32 })
 }
 
 const workflowConfigDataRef = ref<WorkflowConfigItem[]>([])

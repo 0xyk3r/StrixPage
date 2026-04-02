@@ -70,7 +70,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -114,7 +114,8 @@ import { userApi } from '@/api/user'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { type DataTableColumns, type FormRules } from 'naive-ui' // 本页面操作提示关键词
+import { textField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -212,8 +213,8 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const editDataRules: FormRules = {
-  nickname: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }]
+const formRules: FormRules = {
+  nickname: textField('用户昵称')
 }
 
 </script>

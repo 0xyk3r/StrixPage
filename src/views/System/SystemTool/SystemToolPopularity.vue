@@ -36,7 +36,7 @@
                 <n-form
                   ref="editDataFormRef"
                   :model="editDataForm"
-                  :rules="editDataRules"
+                  :rules="formRules"
                   label-placement="left"
                   label-width="auto"
                   require-mark-placement="right-hanging"
@@ -179,6 +179,7 @@
 <script lang="ts" setup>
 import { popularityApi } from '@/api/popularity'
 import { createStrixMessage } from '@/utils/strix-message'
+import { textField, numberField } from '@/utils/form-rules'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
@@ -260,18 +261,12 @@ const initEditDataForm = {
 }
 const editDataForm = ref<any>(cloneDeep(initEditDataForm))
 const editDataFormRef = ref<FormInst | null>(null)
-const editDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入配置名称', trigger: 'blur' },
-    { min: 1, max: 32, message: '配置名称长度需在 1 - 32 字之内', trigger: 'blur' }
-  ],
-  configKey: [
-    { required: true, message: '请输入配置Key', trigger: 'blur' },
-    { min: 1, max: 32, message: '配置Key长度需在 1 - 32 字之内', trigger: 'blur' }
-  ],
-  initialValue: [{ type: 'number', required: true, message: '请输入初始值', trigger: 'change' }],
-  extraValue: [{ type: 'number', required: true, message: '请输入附加值', trigger: 'change' }],
-  magValue: [{ type: 'number', required: true, message: '请输入倍率', trigger: 'change' }]
+const formRules: FormRules = {
+  name: textField('配置名称', { min: 1, max: 32 }),
+  configKey: textField('配置Key', { min: 1, max: 32 }),
+  initialValue: numberField('初始值'),
+  extraValue: numberField('附加值'),
+  magValue: numberField('倍率')
 }
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {

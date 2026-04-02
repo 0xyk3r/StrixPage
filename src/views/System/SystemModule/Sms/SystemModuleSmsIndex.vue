@@ -62,7 +62,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="addFormRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -122,7 +122,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="editFormRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -193,6 +193,7 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import { remarkField, selectField, textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词
 const _baseName = '短信服务'
@@ -480,51 +481,24 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入配置 Key', trigger: 'blur' },
-    { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  name: [
-    { required: true, message: '请输入配置名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  platform: [{ type: 'number', required: true, message: '请选择平台', trigger: 'change' }],
-  regionId: [
-    { required: true, message: '请输入区域', trigger: 'blur' },
-    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
-  ],
-  accessKey: [
-    { required: true, message: '请输入 AccessKey', trigger: 'blur' },
-    { max: 64, message: 'AccessKey 长度需在 64 字之内', trigger: 'blur' }
-  ],
-  accessSecret: [
-    { required: true, message: '请输入 AccessSecret', trigger: 'blur' },
-    { max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }
-  ],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
+const addFormRules: FormRules = {
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  name: textField('配置名称', { min: 2, max: 32 }),
+  platform: selectField('平台'),
+  regionId: textField('区域', { min: 1, max: 32 }),
+  accessKey: textField('AccessKey', { max: 64 }),
+  accessSecret: textField('AccessSecret', { max: 64 }),
+  remark: remarkField()
 }
 
-const editDataRules: FormRules = {
-  key: [
-    { required: true, message: '请输入配置 Key', trigger: 'blur' },
-    { min: 2, max: 32, message: '配置 Key 长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  name: [
-    { required: true, message: '请输入配置名称', trigger: 'blur' },
-    { min: 2, max: 32, message: '配置名称长度需在 2 - 32 字之内', trigger: 'blur' }
-  ],
-  platform: [{ type: 'number', required: true, message: '请选择平台', trigger: 'change' }],
-  regionId: [
-    { required: true, message: '请输入区域', trigger: 'blur' },
-    { min: 1, max: 32, message: '区域长度需在 1 - 32 字之内', trigger: 'blur' }
-  ],
-  accessKey: [
-    { required: true, message: '请输入 AccessKey', trigger: 'blur' },
-    { max: 64, message: 'AccessKey 长度需在 64 字之内', trigger: 'blur' }
-  ],
-  accessSecret: [{ max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }],
-  remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
+const editFormRules: FormRules = {
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  name: textField('配置名称', { min: 2, max: 32 }),
+  platform: selectField('平台'),
+  regionId: textField('区域', { min: 1, max: 32 }),
+  accessKey: textField('AccessKey', { max: 64 }),
+  accessSecret: textField('AccessSecret', { required: false, max: 64 }),
+  remark: remarkField()
 }
 </script>
 

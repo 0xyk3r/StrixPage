@@ -60,7 +60,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -112,7 +112,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -163,6 +163,7 @@ import { regionApi } from '@/api/region'
 import type { CascaderDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -315,12 +316,8 @@ const onDataChildrenLoad = (row: any) => {
   })
 }
 
-const addDataRules: FormRules = {
-  name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
-}
-
-const editDataRules: FormRules = {
-  name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
+const formRules: FormRules = {
+  name: textField('地区名称')
 }
 </script>
 

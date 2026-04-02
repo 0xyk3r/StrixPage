@@ -56,7 +56,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addDataRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -118,7 +118,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editDataRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -175,6 +175,7 @@ import { jobApi } from '@/api/job'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -323,40 +324,13 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const addDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入任务名称', trigger: 'blur' },
-    { min: 2, max: 64, message: '任务名称长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  invokeTarget: [
-    { required: true, message: '请输入调用目标', trigger: 'blur' },
-    { min: 5, max: 512, message: '调用目标需在 5 - 512 字之内', trigger: 'blur' }
-  ],
-  cronExpression: [
-    { required: true, message: '请输入 Cron 表达式', trigger: 'blur' },
-    { min: 5, max: 128, message: 'Cron 表达式 长度需在 5 - 128 字之内', trigger: 'blur' }
-  ],
-  misfirePolicy: [{ type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }],
-  concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
-  status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
-}
-
-const editDataRules: FormRules = {
-  name: [
-    { required: true, message: '请输入任务名称', trigger: 'blur' },
-    { min: 2, max: 64, message: '任务名称长度需在 2 - 64 字之内', trigger: 'blur' }
-  ],
-  invokeTarget: [
-    { required: true, message: '请输入调用目标', trigger: 'blur' },
-    { min: 5, max: 512, message: '调用目标需在 5 - 512 字之内', trigger: 'blur' }
-  ],
-  cronExpression: [
-    { required: true, message: '请输入 Cron 表达式', trigger: 'blur' },
-    { min: 5, max: 128, message: 'Cron 表达式 长度需在 5 - 128 字之内', trigger: 'blur' }
-  ],
-  misfirePolicy: [{ type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }],
-  concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
-  status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
+const formRules: FormRules = {
+  name: textField('任务名称', { min: 2, max: 64 }),
+  invokeTarget: textField('调用目标', { min: 5, max: 512 }),
+  cronExpression: textField('Cron 表达式', { min: 5, max: 128 }),
+  misfirePolicy: selectField('计划错误策略'),
+  concurrent: selectField('是否并发执行'),
+  status: selectField('任务状态')
 }
 
 const runJob = (id: string) => {
