@@ -107,7 +107,7 @@ export function useCrud(config: UseCrudConfig) {
   /** 打开新增弹窗 */
   const showAdd = async (initialValues?: Record<string, any>) => {
     if (initAddForm) addForm.value = cloneDeep(initAddForm)
-    if (initialValues) Object.assign(addForm.value, initialValues)
+    if (initialValues && !(initialValues instanceof Event)) Object.assign(addForm.value, initialValues)
     await hooks?.beforeShowAdd?.()
     addModal.value = true
     if (draft) {

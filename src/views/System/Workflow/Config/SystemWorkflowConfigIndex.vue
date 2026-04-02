@@ -8,7 +8,7 @@
               <n-text type="info">流程引擎列表</n-text>
             </n-h3>
             <n-flex justify="center">
-              <n-button size="small" type="primary" @click="showAdd"> 添加流程</n-button>
+              <n-button size="small" type="primary" @click="showAdd()"> 添加流程</n-button>
               <n-button size="small" type="info" @click="getDataList"> 刷新列表</n-button>
             </n-flex>
           </n-flex>

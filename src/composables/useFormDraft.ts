@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { debounce, isEqual } from 'lodash-es'
+import { debounce, isEqual, pick } from 'lodash-es'
 
 interface DraftEntry {
   data: Record<string, any>
@@ -56,17 +56,25 @@ export function useFormDraft(draftKey: string) {
 
   let stopWatcher: (() => void) | null = null
   let debouncedSave: ReturnType<typeof debounce> | null = null
+  let draftCleared = false
+  let savedFormKeys: string[] = []
 
   /** 开始自动保存（监听表单变化，3 秒防抖写入 localStorage） */
   function startAutoSave(form: Ref<Record<string, any>>, type: 'add' | 'edit', editId?: string) {
     stopAutoSave()
+    draftCleared = false
     const key = buildKey(draftKey, type, editId)
-    debouncedSave = debounce(() => saveDraftToStorage(key, form.value), DRAFT_DEBOUNCE_MS)
+    savedFormKeys = Object.keys(form.value)
+    debouncedSave = debounce(
+      () => saveDraftToStorage(key, pick(form.value, savedFormKeys)),
+      DRAFT_DEBOUNCE_MS
+    )
     stopWatcher = watch(form, debouncedSave, { deep: true })
   }
 
-  /** 停止自动保存 */
+  /** 停止自动保存，未提交的更改会立即写入草稿 */
   function stopAutoSave() {
+    if (!draftCleared) debouncedSave?.flush()
     debouncedSave?.cancel()
     stopWatcher?.()
     stopWatcher = null
@@ -79,7 +87,10 @@ export function useFormDraft(draftKey: string) {
     const draft = loadDraftFromStorage(key)
     if (!draft) return
 
-    if (isEqual(draft, form.value)) {
+    const formKeys = Object.keys(form.value)
+    const filteredDraft = pick(draft, formKeys)
+
+    if (isEqual(filteredDraft, form.value)) {
       removeDraft(key)
       return
     }
@@ -90,7 +101,7 @@ export function useFormDraft(draftKey: string) {
       positiveText: '恢复草稿',
       negativeText: '丢弃',
       onPositiveClick: () => {
-        Object.assign(form.value, draft)
+        Object.assign(form.value, filteredDraft)
       },
       onNegativeClick: () => {
         removeDraft(key)
@@ -98,8 +109,9 @@ export function useFormDraft(draftKey: string) {
     })
   }
 
-  /** 清除指定草稿 */
+  /** 清除指定草稿（成功提交后调用，阻止 stopAutoSave 的 flush） */
   function clearDraft(type: 'add' | 'edit', editId?: string) {
+    draftCleared = true
     removeDraft(buildKey(draftKey, type, editId))
   }
 
