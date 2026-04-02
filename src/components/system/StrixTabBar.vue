@@ -274,7 +274,7 @@ watch(() => route.path, setupTabs, { immediate: true })
 
 // 点击标签页
 const handleTabClick = (tabKey: string) => {
-  const r = visitedRoutes.value.find((item) => getRouteKey(item) === tabKey)
+  const r = visitedRoutes.value.find((item: any) => getRouteKey(item) === tabKey)
   if (r?.path !== route.path) {
     const state = tabsBarStore.getRouteState(r.path)
     router.push({ path: r.path, query: r.query, state })

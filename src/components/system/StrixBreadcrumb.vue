@@ -40,7 +40,7 @@ watch(isSmallWindow, () => {
   getBreadcrumbList()
 })
 
-const breadcrumbList = ref<any[]>([])
+const breadcrumbList = ref<RouteLocationMatched[]>([])
 
 // 处理动态路由标题
 const handleRouteDynamicTitle = (item: RouteLocationMatched) => {
@@ -65,7 +65,9 @@ const getBreadcrumbList = () => {
     handleRouteDynamicTitle(item)
   })
 
-  breadcrumbList.value = isSmallWindow.value ? [matchedRoutes[matchedRoutes.length - 1]] : matchedRoutes
+  breadcrumbList.value = isSmallWindow.value
+    ? [matchedRoutes[matchedRoutes.length - 1]].filter(Boolean) as RouteLocationMatched[]
+    : matchedRoutes
 }
 
 const jumpRoute = (item: RouteLocationMatched) => {

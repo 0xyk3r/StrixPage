@@ -1,10 +1,12 @@
+import type { LoginManagerInfo } from '@/api/auth'
+import type { RetResult } from '@/api/types'
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
 
 export interface LoginInfoStore {
   loginToken: Ref<string>
   loginTokenExpire: Ref<string>
-  loginInfo: Ref<any>
+  loginInfo: Ref<LoginManagerInfo>
 }
 
 export const useLoginInfoStore = defineStore(
@@ -12,18 +14,20 @@ export const useLoginInfoStore = defineStore(
   () => {
     const loginToken = ref('')
     const loginTokenExpire = ref('')
-    const loginInfo = ref<any>({})
+    const loginInfo = ref<LoginManagerInfo>({} as LoginManagerInfo)
 
-    function updateLoginInfo(loginResult: any) {
+    function updateLoginInfo(loginResult: RetResult<{ token: string; tokenExpire: string; info?: LoginManagerInfo }>) {
       loginToken.value = loginResult.data.token
       loginTokenExpire.value = loginResult.data.tokenExpire
-      loginInfo.value = loginResult.data.info
+      if (loginResult.data.info) {
+        loginInfo.value = loginResult.data.info
+      }
     }
 
     function clearLoginInfo() {
       loginToken.value = ''
       loginTokenExpire.value = ''
-      loginInfo.value = {}
+      loginInfo.value = {} as LoginManagerInfo
     }
 
     return {

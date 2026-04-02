@@ -161,14 +161,16 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { roleApi } from '@/api/role'
+import type { SystemRoleItem } from '@/api/role'
 import { menuApi } from '@/api/menu'
+import type { SystemMenuManageItem } from '@/api/menu'
 import { EventBus } from '@/plugins/event-bus'
 import { usePage } from '@/composables/usePage.ts'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
-import { differenceWith, find, isEqual, pick } from 'lodash-es'
+import { differenceWith, isEqual, pick } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,
@@ -346,7 +348,7 @@ const dataColumns: DataTableColumns = [
 const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref<any[]>([])
+const dataRef = ref<SystemRoleItem[]>([])
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
@@ -381,7 +383,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
   dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff })
+    const row = dataRef.value.find((r) => r.id === diff)
     if (row) {
       roleApi.detail(row.id).then(({ data: res }) => {
         handleEditSuccessResponse(row, res.data)
@@ -460,7 +462,7 @@ const handleEditSuccessResponse = (row: any, data: any) => {
   row.loaded = true
 }
 
-const systemMenuTreeData = ref<any[]>([])
+const systemMenuTreeData = ref<SystemMenuManageItem[]>([])
 const getSystemMenuTreeData = () => {
   menuApi.list().then(({ data: res }) => {
     systemMenuTreeData.value = res.data.systemMenuList
@@ -479,7 +481,7 @@ const editRoleMenusModalShow = ref(false)
 const editRoleMenusLoading = ref(false)
 let editRoleMenusRoleId = ''
 let editRoleMenusRoleRow: any = null
-const editRoleMenusCheckedKeys = ref<any[]>([])
+const editRoleMenusCheckedKeys = ref<string[]>([])
 const showEditRoleMenusModal = (roleRow: any) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
@@ -487,8 +489,8 @@ const showEditRoleMenusModal = (roleRow: any) => {
   roleApi.detail(roleRow.id).then(({ data: res }) => {
     editRoleMenusRoleId = res.data.id
     editRoleMenusRoleRow = roleRow
-    editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id')
-    editRoleMenusCheckedKeys.value.push(...deepMap(res.data.permissions, 'id'))
+    editRoleMenusCheckedKeys.value = deepMap(res.data.menus, 'id') as string[]
+    editRoleMenusCheckedKeys.value.push(...(deepMap(res.data.permissions, 'id') as string[]))
     editRoleMenusLoading.value = false
   })
 }

@@ -300,7 +300,7 @@ const getDataList = () => {
     })
 }
 onMounted(getDataList)
-const dataExpandedRowKeys = ref([])
+const dataExpandedRowKeys = ref<string[]>([])
 const onDataChildrenLoad = (row: any) => {
   return new Promise<void>((resolve) => {
     regionApi

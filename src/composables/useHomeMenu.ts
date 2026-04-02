@@ -10,7 +10,6 @@ export interface MenuItem {
   icon?: string
   iconName?: string
   children?: MenuItem[] | null
-  [key: string]: any
 }
 
 // ─── 模块级共享状态（单例模式，多组件共享同一份数据） ───

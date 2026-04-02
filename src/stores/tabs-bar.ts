@@ -29,7 +29,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
   // 存储每个路由路径对应的用户自定义 history.state
   const routeHistoryStateMap = new Map<string, HistoryState>()
 
-  const cachedRouteNames = computed(() => {
+  const cachedRouteNames = computed((): string[] => {
     return visitedRoutes.value
       .filter((route) => !route.meta.noKeepAlive)
       .map((route) => {
@@ -168,7 +168,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * @param newTitle 新标题
    */
   function updateVisitedRouteTitle(fullPath: string, newTitle: string) {
-    const index = visitedRoutes.value.findIndex((item) => item.fullPath === fullPath)
+    const index = visitedRoutes.value.findIndex((item: any) => item.fullPath === fullPath)
     if (index !== -1 && visitedRoutes.value[index].meta) {
       const oldTitle = visitedRoutes.value[index].meta.title
 

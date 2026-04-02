@@ -1,9 +1,11 @@
+import type { AxiosResponse } from 'axios'
+
 /**
  * 下载图像文件
  * @param {object} res 通过 axios 请求得到的 blob 响应结果
  * @param {string} fileName 下载的文件名
  */
-export const downloadBlob = (res: any, fileName: string) => {
+export const downloadBlob = (res: AxiosResponse<Blob>, fileName: string) => {
   const blobURL = convertBlob(res)
   // 创建 a 标签，用于跳转至下载链接
   const tempLink = document.createElement('a')
@@ -28,7 +30,7 @@ export const downloadBlob = (res: any, fileName: string) => {
  * @param {object} res 通过 axios 请求得到的 blob 响应结果
  * @returns {string} blob url
  */
-export const convertBlob = (res: any) => {
+export const convertBlob = (res: AxiosResponse<Blob>) => {
   const blob = new Blob([res.data], { type: res.headers['content-type'] })
   // 创建新的 URL 并指向 File 对象或 Blob 对象的地址
   return window.URL.createObjectURL(blob)

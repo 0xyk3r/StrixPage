@@ -6,7 +6,12 @@
  * @param {string} sub - 子节点的键名，默认为 `children`
  * @returns {Object} - 返回搜索到的节点或false
  */
-export const deepSearch = (data: any[], value: string, key: string = 'id', sub: string = 'children'): any => {
+export const deepSearch = <T extends Record<string, any>>(
+  data: T[],
+  value: string,
+  key: string = 'id',
+  sub: string = 'children'
+): T | false | null => {
   if (!value || !data) {
     return false
   }
@@ -14,7 +19,7 @@ export const deepSearch = (data: any[], value: string, key: string = 'id', sub: 
     if (node[key] === value) {
       return node
     }
-    const found = deepSearch(node[sub], value, key, sub)
+    const found = deepSearch<T>(node[sub], value, key, sub)
     if (found) {
       return found
     }
@@ -29,13 +34,17 @@ export const deepSearch = (data: any[], value: string, key: string = 'id', sub: 
  * @param {string} sub - 子节点的键名，默认为 `children`
  * @returns {Array} - 返回映射后的数组
  */
-export const deepMap = (data: any[], key: string = 'id', sub: string = 'children'): Array<any> => {
+export const deepMap = <T extends Record<string, any>>(
+  data: T[],
+  key: string = 'id',
+  sub: string = 'children'
+): any[] => {
   if (!data) return []
-  const results: any[] = data.flatMap((d) => [d[key], ...(d[sub] ? deepMap(d[sub], key, sub) : [])])
+  const results = data.flatMap((d) => [d[key], ...(d[sub] ? deepMap(d[sub], key, sub) : [])])
   return results.filter(Boolean)
 }
 
-export const flatTree = (data: any[], sub = 'children', res: any[] = []) => {
+export const flatTree = <T extends Record<string, any>>(data: T[], sub = 'children', res: T[] = []): T[] => {
   data.forEach((item) => {
     res.push(item)
     if (item[sub] && item[sub].length > 0) {

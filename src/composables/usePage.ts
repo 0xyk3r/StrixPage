@@ -12,7 +12,7 @@ import { usePagination } from '@/composables/usePagination.ts'
  * @returns
  */
 export function usePage(
-  initGetDataListParams: any,
+  initGetDataListParams: Record<string, any>,
   getDataListFunc: () => void,
   initAddDataForm: any,
   initEditDataForm: any,

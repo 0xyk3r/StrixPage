@@ -1,18 +1,24 @@
 import { commonApi } from '@/api/common'
+import type { DictVersionItem, CommonDictDataItem, CommonDictResp } from '@/api/common'
 import { throttle } from 'lodash-es'
 import { defineStore } from 'pinia'
 
 export interface DictItem {
+  id: string
+  key: string
   label: string
   value: string | number | boolean
-  [key: string]: any
+  sort: number
+  style: string
+  status: number
+  remark: string
 }
 
 export const useDictStore = defineStore(
   'dict',
   () => {
-    const versionMap = ref<any>([])
-    const dictMap = ref<Record<string, any>>({})
+    const versionMap = ref<DictVersionItem[]>([])
+    const dictMap = ref<Record<string, CommonDictResp>>({})
 
     // 请求去重 Map，避免并发重复请求
     const pendingMap = new Map<string, Promise<DictItem[]>>()
@@ -38,9 +44,9 @@ export const useDictStore = defineStore(
       if (res?.data) {
         dictMap.value[key] = res.data
 
-        res.data.dictDataList.forEach((item: any) => {
+        res.data.dictDataList.forEach((item: CommonDictDataItem) => {
           if (item.value != null) {
-            item.value = convertType(item.value, res.data.dataType)
+            ;(item as Record<string, any>).value = convertType(item.value, res.data.dataType)
           }
         })
 
@@ -56,8 +62,8 @@ export const useDictStore = defineStore(
       if (!dictMap.value[key]) return false
       await refreshVersion()
       const cache = dictMap.value[key]
-      const version = versionMap.value.find((item: any) => item.key === key)
-      return version && version.version === cache.version
+      const version = versionMap.value.find((item) => item.key === key)
+      return !!version && version.version === cache.version
     }
 
     /**
@@ -68,7 +74,7 @@ export const useDictStore = defineStore(
     async function getDictData(key: string): Promise<DictItem[]> {
       // 检查缓存是否有效
       if (await isCacheValid(key)) {
-        return dictMap.value[key].dictDataList
+        return dictMap.value[key]!.dictDataList
       }
 
       // 如果已有相同 key 的请求在进行中，复用该 Promise
@@ -100,7 +106,7 @@ export const useDictStore = defineStore(
   }
 )
 
-function convertType(value: string, typeName: any) {
+function convertType(value: string, typeName: number) {
   switch (typeName) {
     case 1:
       return String(value)

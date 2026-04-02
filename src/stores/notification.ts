@@ -1,5 +1,6 @@
 import { notificationApi } from '@/api/notification'
-import type { ListNotificationReq, NotificationListResp } from '@/@types/components/notification'
+import type { ListNotificationReq } from '@/api/notification'
+import type { NotificationListResp } from '@/@types/components/notification'
 import { defineStore } from 'pinia'
 
 export const useNotificationStore = defineStore('notification', () => {
@@ -13,7 +14,7 @@ export const useNotificationStore = defineStore('notification', () => {
     try {
       const { data: res } = await notificationApi.unreadCount()
       if (res.data) {
-        unreadCount.value = (res.data as any).unreadCount
+        unreadCount.value = res.data.unreadCount
       }
     } catch (error) {
       console.error('获取未读通知数量失败:', error)

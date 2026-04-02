@@ -8,7 +8,7 @@ import { storeToRefs } from 'pinia'
  */
 export function useTokenRenewal() {
   const loginInfoStore = useLoginInfoStore()
-  const { loginInfo, loginTokenExpire } = storeToRefs(loginInfoStore)
+  const { loginTokenExpire } = storeToRefs(loginInfoStore)
 
   /**
    * 检查并续期 Token
@@ -26,7 +26,6 @@ export function useTokenRenewal() {
         .renewToken()
         .then(({ data: res }) => {
           loginInfoStore.updateLoginInfo(res)
-          loginInfo.value = (res.data as any).info
         })
     }
   }

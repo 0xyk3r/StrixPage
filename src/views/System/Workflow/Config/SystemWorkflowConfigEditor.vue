@@ -17,7 +17,7 @@ const dataJson = ref('')
 
 const loadConfigData = () => {
   workflowApi.configGetConfig(configId).then(({ data: res }) => {
-    dataJson.value = (res.data as any).content
+    dataJson.value = res.data.content
   })
 }
 onMounted(() => {

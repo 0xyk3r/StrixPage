@@ -1,6 +1,8 @@
-let dialog: any = null
+import { type DialogApiInjection } from 'naive-ui/es/dialog/src/DialogProvider'
 
-export const initStrixDialog = (naiveDialog: any) => {
+let dialog: DialogApiInjection | null = null
+
+export const initStrixDialog = (naiveDialog: DialogApiInjection) => {
   if (!dialog && naiveDialog) {
     dialog = naiveDialog
   }
@@ -13,7 +15,8 @@ export const createStrixDialog = (
   duration: number
 ) => {
   if (dialog) {
-    dialog[type]({
+    const fn = (dialog as unknown as Record<string, (opts: Record<string, any>) => void>)[type]
+    fn?.({
       title: title || '提示',
       content: content || '发生错误',
       duration: duration ?? 3000

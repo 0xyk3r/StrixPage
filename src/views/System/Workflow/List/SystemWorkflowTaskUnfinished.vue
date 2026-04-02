@@ -92,7 +92,7 @@ const dataColumns: DataTableColumns = [
       if (!val) return ''
       try {
         const { data: res } = await commonApi.nameFetcher({ dataType: 'workflow', dataId: val })
-        return (res.data as any)?.name || String(val)
+        return res.data?.name || String(val)
       } catch {
         return String(val)
       }
@@ -109,7 +109,7 @@ const dataColumns: DataTableColumns = [
       if (!val) return ''
       try {
         const { data: res } = await commonApi.nameFetcher({ dataType: 'systemmanager', dataId: val })
-        return (res.data as any)?.name || String(val)
+        return res.data?.name || String(val)
       } catch {
         return String(val)
       }

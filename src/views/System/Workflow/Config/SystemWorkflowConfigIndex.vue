@@ -128,6 +128,7 @@
 
 <script lang="ts" setup>
 import { workflowApi } from '@/api/workflow'
+import type { WorkflowConfigItem } from '@/api/workflow'
 import { usePage } from '@/composables/usePage.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -216,7 +217,7 @@ const dataColumns: DataTableColumns = [
   }
 ]
 const selectDataId = ref()
-const checkedRowKeys = ref([])
+const checkedRowKeys = ref<string[]>([])
 watch(checkedRowKeys, (newVal) => {
   selectDataId.value = newVal[0]
   getWorkflowConfigData()
@@ -294,7 +295,7 @@ const deleteData = (id: string) => {
   })
 }
 
-const workflowConfigDataRef = ref([])
+const workflowConfigDataRef = ref<WorkflowConfigItem[]>([])
 const workflowConfigDataRowKey = (row: any) => row.id
 // 流程版本展示列信息
 const workflowConfigDataColumns: DataTableColumns = [

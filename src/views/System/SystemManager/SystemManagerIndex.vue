@@ -488,8 +488,8 @@ const getSystemRoleSelectList = () => {
 }
 onMounted(getSystemRoleSelectList)
 const managerRegionName = (regionId: string) => {
-  const regionName = deepSearch(systemRegionCascaderOptions.value, regionId, 'value')?.label
-  return regionName || '未设置'
+  const result = deepSearch(systemRegionCascaderOptions.value, regionId, 'value')
+  return result ? result.label : '未设置'
 }
 
 // 更改系统人员角色

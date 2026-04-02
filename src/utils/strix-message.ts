@@ -1,6 +1,7 @@
-import { type MessageType, NAlert, useMessage } from 'naive-ui'
+import { type MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider'
+import { type MessageType, NAlert } from 'naive-ui'
 
-let message: any = null
+let message: MessageApiInjection | null = null
 
 export const initStrixMessage = () => {
   if (!message) {
@@ -15,7 +16,7 @@ export const createStrixMessage = (
   duration: number = 3000
 ) => {
   initStrixMessage()
-  message[type](content, {
+  ;(message as any)[type](content, {
     duration,
     render: (props: any) => {
       const { type, closable, onClose, content } = props
