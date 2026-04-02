@@ -52,14 +52,14 @@
 </template>
 
 <script lang="ts" setup>
-import { Home, ArrowLeft, ShieldAlert } from 'lucide-vue-next'
+import { ArrowLeft, Home, ShieldAlert } from 'lucide-vue-next'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 
 const route = useRoute()
 const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 
-const countDown = ref(5)
+const countDown = ref(10)
 const canGoBack = ref(window.history.length > 1)
 
 const displayPath = computed(() => {
@@ -149,8 +149,12 @@ onUnmounted(() => {
 }
 
 @keyframes twinkle {
-  from { opacity: 0.1; }
-  to { opacity: 0.7; }
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 0.7;
+  }
 }
 
 // 盾牌
@@ -197,8 +201,13 @@ onUnmounted(() => {
 }
 
 @keyframes shield-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(3deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(3deg);
+  }
 }
 
 @keyframes pulse-ring {

@@ -48,14 +48,14 @@
 </template>
 
 <script lang="ts" setup>
-import { Home, ArrowLeft } from 'lucide-vue-next'
+import { ArrowLeft, Home } from 'lucide-vue-next'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 
 const route = useRoute()
 const router = useRouter()
 const tabsBarStore = useTabsBarStore()
 
-const countDown = ref(5)
+const countDown = ref(10)
 const canGoBack = ref(window.history.length > 1)
 
 const displayPath = computed(() => {
@@ -66,8 +66,8 @@ const displayPath = computed(() => {
 // 星星随机样式
 const starStyle = (i: number) => {
   const seed = i * 7919
-  const x = ((seed * 13) % 100)
-  const y = ((seed * 17) % 100)
+  const x = (seed * 13) % 100
+  const y = (seed * 17) % 100
   const size = 1 + (seed % 3)
   const delay = (seed % 4000) / 1000
   const duration = 2 + (seed % 3000) / 1000
@@ -142,8 +142,12 @@ onUnmounted(() => {
 }
 
 @keyframes twinkle {
-  from { opacity: 0.1; }
-  to { opacity: 0.7; }
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 0.7;
+  }
 }
 
 // 星球
@@ -167,7 +171,9 @@ onUnmounted(() => {
   height: 100%;
   border-radius: 50%;
   background: linear-gradient(135deg, #4a3f6b, #2d2548, #1a1530);
-  box-shadow: inset -8px -6px 16px rgba(0, 0, 0, 0.5), 0 0 40px rgba(124, 106, 239, 0.15);
+  box-shadow:
+    inset -8px -6px 16px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(124, 106, 239, 0.15);
   animation: planet-float 6s ease-in-out infinite;
 }
 
@@ -205,13 +211,22 @@ onUnmounted(() => {
 }
 
 @keyframes planet-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes orbit-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 // 主内容
