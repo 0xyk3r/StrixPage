@@ -122,8 +122,8 @@ const canScrollRight = ref(false)
 const checkScroll = () => {
   const el = scrollRef.value
   if (!el) return
-  canScrollLeft.value = el.scrollLeft > 2
-  canScrollRight.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 2
+  canScrollLeft.value = el.scrollLeft > 1
+  canScrollRight.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
 }
 
 const scrollLeft = () => {
@@ -135,8 +135,12 @@ const scrollRight = () => {
 }
 
 const handleWheel = (e: WheelEvent) => {
+  const el = scrollRef.value
+  if (!el) return
   const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY
-  scrollRef.value?.scrollBy({ left: delta > 0 ? 80 : -80 })
+  if (delta === 0) return
+  el.scrollLeft += delta
+  checkScroll()
 }
 
 // 滚动到当前活动标签

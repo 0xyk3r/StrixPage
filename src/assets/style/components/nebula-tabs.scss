@@ -63,7 +63,6 @@
   align-items: center;
   justify-content: flex-start;
   gap: $space-1;
-  scroll-behavior: smooth;
   @include hide-scrollbar;
   padding: 2px 0;
   // 作为 offsetParent，确保子元素 offsetLeft 相对于滚动容器计算
