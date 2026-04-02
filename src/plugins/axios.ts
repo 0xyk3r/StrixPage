@@ -29,6 +29,8 @@ function initStore() {
 
 // HTTP请求根路径
 axios.defaults.baseURL = useBaseURL()
+// 请求超时时间
+axios.defaults.timeout = 60000
 
 const serverSm2PublicKey = import.meta.env.VITE_APP_SERVER_SM2_PUBLIC_KEY
 const clientSm2PrivateKey = import.meta.env.VITE_APP_CLIENT_SM2_PRIVATE_KEY
@@ -134,7 +136,23 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    createStrixMessage('error', '网络请求失败', '服务正在维护中, 请稍后再试. (' + error.message + ')')
+    // 请求被主动取消
+    if (axios.isCancel(error)) return
+
+    if (!navigator.onLine || error.code === 'ERR_NETWORK') {
+      createStrixMessage('error', '网络连接异常', '请检查您的网络连接后重试')
+    } else if (error.code === 'ECONNABORTED') {
+      createStrixMessage('error', '请求超时', '服务器响应时间过长, 请稍后重试')
+    } else if (error.response) {
+      const status = error.response.status
+      if (status >= 500) {
+        createStrixMessage('error', '服务器错误', `服务器内部异常 (${status}), 请稍后重试`)
+      } else {
+        createStrixMessage('error', '请求失败', error.message)
+      }
+    } else {
+      createStrixMessage('error', '网络请求失败', '服务正在维护中, 请稍后再试. (' + error.message + ')')
+    }
   }
 )
 

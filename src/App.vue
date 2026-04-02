@@ -10,6 +10,7 @@
       <n-notification-provider>
         <n-message-provider>
           <n-dialog-provider>
+            <StrixNetworkStatus />
             <StrixSwNotify />
             <router-view />
           </n-dialog-provider>
@@ -35,6 +36,7 @@ import {
   useOsTheme,
   zhCN
 } from 'naive-ui'
+import StrixNetworkStatus from './components/system/StrixNetworkStatus.vue'
 import StrixSwNotify from './components/system/StrixSwNotify.vue'
 import StrixEmpty from './components/common/StrixEmpty.vue'
 import { EventBus } from './plugins/event-bus'

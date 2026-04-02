@@ -89,6 +89,7 @@ declare module 'vue' {
     StrixImage: typeof import('./../components/common/StrixImage.vue')['default']
     StrixManagerSelector: typeof import('./../components/data/StrixManagerSelector.vue')['default']
     StrixNameFetcher: typeof import('./../components/data/StrixNameFetcher.vue')['default']
+    StrixNetworkStatus: typeof import('./../components/system/StrixNetworkStatus.vue')['default']
     StrixNotFound: typeof import('./../components/common/StrixNotFound.vue')['default']
     StrixNotification: typeof import('./../components/notification/StrixNotification.vue')['default']
     StrixNotificationItem: typeof import('./../components/notification/StrixNotificationItem.vue')['default']
