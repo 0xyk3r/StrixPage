@@ -2,6 +2,7 @@ import type { AxiosResponse } from 'axios'
 import { cloneDeep, pick } from 'lodash-es'
 import type { FormInst } from 'naive-ui'
 import type { RetResult } from '@/api/types'
+import { useFormDraft } from '@/composables/useFormDraft'
 import { usePagination } from '@/composables/usePagination'
 import { createStrixMessage } from '@/utils/strix-message'
 
@@ -49,6 +50,8 @@ export interface UseCrudConfig {
   api?: CrudApi
   /** 生命周期钩子 */
   hooks?: UseCrudHooks
+  /** 草稿缓存标识（传入即启用表单草稿自动保存） */
+  draftKey?: string
 }
 
 const VALIDATION_FAIL_TITLE = '表单校验失败'
@@ -84,8 +87,12 @@ export function useCrud(config: UseCrudConfig) {
   const editForm = ref(initEditForm ? cloneDeep(initEditForm) : {})
   const editFormRef = ref<FormInst | null>(null)
 
+  // ===== 草稿自动保存 =====
+  const draft = config.draftKey ? useFormDraft(config.draftKey) : null
+
   // ===== 重置 =====
   const resetForms = () => {
+    draft?.stopAutoSave()
     addModal.value = false
     editModal.value = false
     editLoading.value = false
@@ -103,6 +110,10 @@ export function useCrud(config: UseCrudConfig) {
     if (initialValues) Object.assign(addForm.value, initialValues)
     await hooks?.beforeShowAdd?.()
     addModal.value = true
+    if (draft) {
+      draft.checkAndRestore(addForm, 'add')
+      draft.startAutoSave(addForm, 'add')
+    }
   }
 
   /** 打开编辑弹窗并加载详情 */
@@ -121,6 +132,10 @@ export function useCrud(config: UseCrudConfig) {
         editForm.value = res.data
       }
       hooks?.afterShowEdit?.(res.data)
+      if (draft) {
+        draft.checkAndRestore(editForm, 'edit', id)
+        draft.startAutoSave(editForm, 'edit', id)
+      }
     } finally {
       editLoading.value = false
     }
@@ -137,6 +152,7 @@ export function useCrud(config: UseCrudConfig) {
     }
     const data = hooks?.transformAdd?.(cloneDeep(addForm.value)) ?? addForm.value
     await api.create(data)
+    draft?.clearDraft('add')
     resetForms()
     fetchList()
     hooks?.afterAdd?.()
@@ -153,6 +169,7 @@ export function useCrud(config: UseCrudConfig) {
     }
     const data = hooks?.transformEdit?.(cloneDeep(editForm.value)) ?? editForm.value
     await api.update(editId.value, data)
+    draft?.clearDraft('edit', editId.value)
     resetForms()
     fetchList()
     hooks?.afterEdit?.()
