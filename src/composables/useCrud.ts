@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios'
-import { cloneDeep, pick } from 'lodash-es'
+import { cloneDeep, isEqual, pick } from 'lodash-es'
 import type { FormInst } from 'naive-ui'
 import type { RetResult } from '@/api/types'
 import { useFormDraft } from '@/composables/useFormDraft'
@@ -87,6 +87,10 @@ export function useCrud(config: UseCrudConfig) {
   const editForm = ref(initEditForm ? cloneDeep(initEditForm) : {})
   const editFormRef = ref<FormInst | null>(null)
 
+  // ===== 表单快照（用于脏检测） =====
+  const addFormSnapshot = ref<Record<string, any>>({})
+  const editFormSnapshot = ref<Record<string, any>>({})
+
   // ===== 草稿自动保存 =====
   const draft = config.draftKey ? useFormDraft(config.draftKey) : null
 
@@ -102,6 +106,44 @@ export function useCrud(config: UseCrudConfig) {
     hooks?.onReset?.()
   }
 
+  // ===== 未保存离开提示 =====
+  const dialog = useDialog()
+
+  const confirmLeave = (hasDraft: boolean): Promise<boolean> => {
+    return new Promise((resolve) => {
+      dialog.warning({
+        title: '确认离开',
+        content: hasDraft
+          ? '表单数据已自动暂存，下次打开时可以恢复。确定要离开吗？'
+          : '你有未保存的更改，离开后将丢失。确定要离开吗？',
+        positiveText: '离开',
+        negativeText: '继续编辑',
+        onPositiveClick: () => resolve(true),
+        onNegativeClick: () => resolve(false),
+        onClose: () => resolve(false),
+        onMaskClick: () => resolve(false)
+      })
+    })
+  }
+
+  /** 尝试关闭新增弹窗（有未保存更改时弹出确认） */
+  const tryCloseAdd = async () => {
+    if (!isEqual(addForm.value, addFormSnapshot.value)) {
+      const confirmed = await confirmLeave(!!draft)
+      if (!confirmed) return
+    }
+    addModal.value = false
+  }
+
+  /** 尝试关闭编辑弹窗（有未保存更改时弹出确认） */
+  const tryCloseEdit = async () => {
+    if (!isEqual(editForm.value, editFormSnapshot.value)) {
+      const confirmed = await confirmLeave(!!draft)
+      if (!confirmed) return
+    }
+    editModal.value = false
+  }
+
   // ===== 自动 CRUD 方法 =====
 
   /** 打开新增弹窗 */
@@ -110,6 +152,7 @@ export function useCrud(config: UseCrudConfig) {
     if (initialValues && !(initialValues instanceof Event)) Object.assign(addForm.value, initialValues)
     await hooks?.beforeShowAdd?.()
     if (draft) await draft.checkAndRestore(addForm, 'add')
+    addFormSnapshot.value = cloneDeep(addForm.value)
     addModal.value = true
     if (draft) draft.startAutoSave(addForm, 'add')
   }
@@ -130,6 +173,7 @@ export function useCrud(config: UseCrudConfig) {
       }
       hooks?.afterShowEdit?.(res.data)
       if (draft) await draft.checkAndRestore(editForm, 'edit', id)
+      editFormSnapshot.value = cloneDeep(editForm.value)
       editModal.value = true
       if (draft) draft.startAutoSave(editForm, 'edit', id)
     } finally {
@@ -202,6 +246,8 @@ export function useCrud(config: UseCrudConfig) {
     submitEdit,
     deleteRow,
     resetForms,
+    tryCloseAdd,
+    tryCloseEdit,
     // 工具（用于 pick 字段等场景）
     initEditForm
   }
