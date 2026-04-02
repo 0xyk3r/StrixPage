@@ -5,12 +5,12 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（任务名称）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（任务名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -30,8 +30,8 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
-      :row-key="dataRowKey"
+      :pagination="pagination"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -46,28 +46,28 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="任务名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入任务名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入任务名称" />
         </n-form-item>
         <n-form-item label="调用目标" path="invokeTarget">
           <n-popover placement="bottom-start" trigger="focus">
             <template #trigger>
-              <n-input v-model:value="addDataForm.invokeTarget" clearable placeholder="请输入调用目标" />
+              <n-input v-model:value="addForm.invokeTarget" clearable placeholder="请输入调用目标" />
             </template>
             <p>请输入 组件名称.方法名称() 或 组件名称.方法名称(...参数列表)</p>
             <p>其中组件名称为 @Component 注解的值，参数列表可选、数量不限</p>
@@ -76,11 +76,11 @@
           </n-popover>
         </n-form-item>
         <n-form-item label="Cron 表达式" path="cronExpression">
-          <n-input v-model:value="addDataForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
+          <n-input v-model:value="addForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
         </n-form-item>
         <n-form-item label="计划错误策略" path="misfirePolicy">
           <n-select
-            v-model:value="addDataForm.misfirePolicy"
+            v-model:value="addForm.misfirePolicy"
             :options="jobMisfireRef"
             clearable
             placeholder="请选择计划错误策略"
@@ -88,53 +88,53 @@
         </n-form-item>
         <n-form-item label="是否并发执行" path="concurrent">
           <n-select
-            v-model:value="addDataForm.concurrent"
+            v-model:value="addForm.concurrent"
             :options="commonSwitchRef"
             clearable
             placeholder="请选择是否并发执行"
           />
         </n-form-item>
         <n-form-item label="任务状态" path="status">
-          <n-select v-model:value="addDataForm.status" :options="jobStatusRef" clearable placeholder="请选择任务状态" />
+          <n-select v-model:value="addForm.status" :options="jobStatusRef" clearable placeholder="请选择任务状态" />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="任务名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入任务名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入任务名称" />
           </n-form-item>
           <n-form-item label="调用目标" path="invokeTarget">
-            <n-input v-model:value="editDataForm.invokeTarget" clearable placeholder="请输入调用目标" />
+            <n-input v-model:value="editForm.invokeTarget" clearable placeholder="请输入调用目标" />
           </n-form-item>
           <n-form-item label="Cron 表达式" path="cronExpression">
-            <n-input v-model:value="editDataForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
+            <n-input v-model:value="editForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
           </n-form-item>
           <n-form-item label="计划错误策略" path="misfirePolicy">
             <n-select
-              v-model:value="editDataForm.misfirePolicy"
+              v-model:value="editForm.misfirePolicy"
               :options="jobMisfireRef"
               clearable
               placeholder="请选择计划错误策略"
@@ -142,7 +142,7 @@
           </n-form-item>
           <n-form-item label="是否并发执行" path="concurrent">
             <n-select
-              v-model:value="editDataForm.concurrent"
+              v-model:value="editForm.concurrent"
               :options="commonSwitchRef"
               clearable
               placeholder="请选择是否并发执行"
@@ -150,7 +150,7 @@
           </n-form-item>
           <n-form-item label="任务状态" path="status">
             <n-select
-              v-model:value="editDataForm.status"
+              v-model:value="editForm.status"
               :options="jobStatusRef"
               clearable
               placeholder="请选择任务状态"
@@ -160,8 +160,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -172,11 +172,9 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { jobApi } from '@/api/job'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -187,7 +185,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '定时任务'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(jobApi.urls.list, 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(jobApi.urls.list, 'items', () => listParams.value)
 
 // 加载字典
 const commonSwitchRef = useDict('CommonSwitch')
@@ -195,30 +193,31 @@ const jobMisfireRef = useDict('JobMisfire')
 const jobStatusRef = useDict('JobStatus')
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     name: null,
     group: 'DEFAULT',
     invokeTarget: null,
@@ -227,7 +226,7 @@ const {
     concurrent: null,
     status: null
   },
-  {
+  editForm: {
     name: null,
     group: 'DEFAULT',
     invokeTarget: null,
@@ -235,8 +234,9 @@ const {
     misfirePolicy: null,
     concurrent: null,
     status: null
-  }
-)
+  },
+  api: jobApi
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -290,13 +290,13 @@ const dataColumns: DataTableColumns = [
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -315,7 +315,7 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   jobApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
@@ -340,19 +340,6 @@ const addDataRules: FormRules = {
   concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
   status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    jobApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   name: [
@@ -370,33 +357,6 @@ const editDataRules: FormRules = {
   misfirePolicy: [{ type: 'number', required: true, message: '请选择计划错误策略', trigger: 'change' }],
   concurrent: [{ type: 'number', required: true, message: '请选择是否并发执行', trigger: 'change' }],
   status: [{ type: 'number', required: true, message: '请选择任务状态', trigger: 'change' }]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  jobApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    jobApi.update(editDataId.value, editDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  jobApi.remove(id).then(() => {
-    getDataList()
-  })
 }
 
 const runJob = (id: string) => {

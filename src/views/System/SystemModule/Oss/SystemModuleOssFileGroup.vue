@@ -5,12 +5,12 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按名称搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -27,11 +27,11 @@
           文件分组与文件属于强绑定模式，所以文件组创建后不建议进行修改或删除操作，删除会导致该文件组下所有文件无法获取。
         </n-alert>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.configKey"
+              v-model:value="listParams.configKey"
               :options="ossConfigSelectList"
               clearable
               placeholder="请选择存储配置 Key"
@@ -46,9 +46,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -63,69 +63,69 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="文件组配置 Key" path="key">
-          <n-input v-model:value="addDataForm.key" clearable placeholder="请输入文件组配置 Key" />
+          <n-input v-model:value="addForm.key" clearable placeholder="请输入文件组配置 Key" />
         </n-form-item>
         <n-form-item label="存储配置 Key" path="configKey">
           <n-select
-            v-model:value="addDataForm.configKey"
+            v-model:value="addForm.configKey"
             :options="ossConfigSelectList"
             clearable
             placeholder="请选择存储配置 Key"
           />
         </n-form-item>
         <n-form-item label="文件组名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入文件组名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入文件组名称" />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="bucketName">
-          <n-input v-model:value="addDataForm.bucketName" clearable placeholder="请输入存储空间 (Bucket) 名称" />
+          <n-input v-model:value="addForm.bucketName" clearable placeholder="请输入存储空间 (Bucket) 名称" />
         </n-form-item>
         <n-form-item label="Bucket 域名" path="bucketDomain">
-          <n-input v-model:value="addDataForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
+          <n-input v-model:value="addForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
           <n-input
-            v-model:value="addDataForm.baseDir"
+            v-model:value="addForm.baseDir"
             clearable
             placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
           />
         </n-form-item>
         <n-form-item label="允许的扩展名" path="allowExtension">
           <n-dynamic-tags
-            v-model:value="addDataForm.allowExtension"
+            v-model:value="addForm.allowExtension"
             type="primary"
             @create="handleAllowExtensionCreate"
           />
         </n-form-item>
         <n-form-item label="查看权限类型" path="secretType">
           <n-select
-            v-model:value="addDataForm.secretType"
+            v-model:value="addForm.secretType"
             :options="ossFileGroupSecretTypeRef"
             clearable
             placeholder="请选择查看权限类型"
           />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
-          <n-input-number v-model:value="addDataForm.secretLevel" clearable placeholder="请输入查看权限等级" />
+          <n-input-number v-model:value="addForm.secretLevel" clearable placeholder="请输入查看权限等级" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
-            v-model:value="addDataForm.remark"
+            v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
               maxRows: 5
@@ -137,63 +137,63 @@
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="文件组名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入文件组名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入文件组名称" />
           </n-form-item>
           <n-form-item label="Bucket 域名" path="bucketDomain">
-            <n-input v-model:value="editDataForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
+            <n-input v-model:value="editForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
             <n-input
-              v-model:value="editDataForm.baseDir"
+              v-model:value="editForm.baseDir"
               clearable
               placeholder="请输入基础路径，即文件相对于存储空间的路径，无需/开头"
             />
           </n-form-item>
           <n-form-item label="允许的扩展名" path="allowExtension">
             <n-dynamic-tags
-              v-model:value="editDataForm.allowExtension"
+              v-model:value="editForm.allowExtension"
               type="primary"
               @create="handleAllowExtensionCreate"
             />
           </n-form-item>
           <n-form-item label="查看权限类型" path="secretType">
             <n-select
-              v-model:value="editDataForm.secretType"
+              v-model:value="editForm.secretType"
               :options="ossFileGroupSecretTypeRef"
               clearable
               placeholder="请选择查看权限类型"
             />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
-            <n-input-number v-model:value="editDataForm.secretLevel" clearable placeholder="请输入查看权限等级" />
+            <n-input-number v-model:value="editForm.secretLevel" clearable placeholder="请输入查看权限等级" />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
-              v-model:value="editDataForm.remark"
+              v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
@@ -206,8 +206,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -239,11 +239,10 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { cloneDeep, pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { storeToRefs } from 'pinia'
@@ -256,7 +255,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '文件分组'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(ossApi.urls.fileGroupList, 'fileGroups', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileGroupList, 'fileGroups', () => listParams.value)
 
 const loginInfoStore = useLoginInfoStore()
 const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
@@ -265,31 +264,32 @@ const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
 const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     configKey: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     key: null,
     configKey: null,
     name: null,
@@ -301,7 +301,7 @@ const {
     secretLevel: 1,
     remark: null
   },
-  {
+  editForm: {
     name: null,
     bucketDomain: null,
     baseDir: null,
@@ -309,8 +309,27 @@ const {
     secretType: null,
     secretLevel: null,
     remark: null
+  },
+  api: {
+    detail: (id: string) => ossApi.fileGroupDetail(id),
+    create: (data: any) => ossApi.fileGroupCreate(data),
+    update: (id: string, data: any) => ossApi.fileGroupUpdate(id, data),
+    remove: (id: string) => ossApi.fileGroupRemove(id)
+  },
+  hooks: {
+    transformAdd: (form: any) => {
+      form.allowExtension = form.allowExtension.join(',')
+      return form
+    },
+    transformEdit: (form: any) => {
+      form.allowExtension = form.allowExtension.join(',')
+      return form
+    },
+    afterShowEdit: (detail: any) => {
+      editForm.value.allowExtension = detail.allowExtension.split(',')
+    }
   }
-)
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -352,13 +371,13 @@ const dataColumns: DataTableColumns = [
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 删除后会导致该文件组下的所有文件无法访问！ 且该操作不可恢复!'
         }
@@ -377,11 +396,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   ossApi
-    .fileGroupList(getDataListParams.value)
+    .fileGroupList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.fileGroups
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -444,23 +463,6 @@ const addDataRules: FormRules = {
   ],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    // 克隆 addDataForm 然后处理allowExtension
-    const data = cloneDeep(addDataForm.value)
-    data.allowExtension = data.allowExtension.join(',')
-
-    ossApi.fileGroupCreate(data).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   key: [
@@ -487,39 +489,6 @@ const editDataRules: FormRules = {
   accessSecret: [{ max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  ossApi.fileGroupDetail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    // 处理 allowExtension 字段
-    ;(res.data as any).allowExtension = res.data.allowExtension.split(',')
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    // 克隆 editDataForm 然后处理allowExtension
-    const data = cloneDeep(editDataForm.value)
-    data.allowExtension = data.allowExtension.join(',')
-
-    ossApi.fileGroupUpdate(editDataId.value, data).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  ossApi.fileGroupRemove(id).then(() => {
-    getDataList()
-  })
-}
 
 // 移除 allowExtension 中的错误项
 const removeErrorAllowExtension = (allowExtension: string[]) => {
@@ -528,11 +497,11 @@ const removeErrorAllowExtension = (allowExtension: string[]) => {
   }
 }
 watch(
-  () => addDataForm.value.allowExtension,
+  () => addForm.value.allowExtension,
   (val) => removeErrorAllowExtension(val)
 )
 watch(
-  () => editDataForm.value.allowExtension,
+  () => editForm.value.allowExtension,
   (val) => removeErrorAllowExtension(val)
 )
 </script>

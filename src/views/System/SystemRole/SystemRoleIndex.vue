@@ -14,7 +14,7 @@
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -35,7 +35,7 @@
       :data="filterDataList"
       :expanded-row-keys="dataExpandedRowKeys"
       :loading="dataLoading"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
@@ -51,27 +51,27 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="角色名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入角色名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入角色名称" />
         </n-form-item>
         <n-form-item label="地区权限类型" path="regionPermissionType">
           <n-select
-            v-model:value="addDataForm.regionPermissionType"
+            v-model:value="addForm.regionPermissionType"
             :options="systemRoleRegionPermissionTypeRef"
             clearable
             placeholder="请选择地区权限类型"
@@ -80,35 +80,35 @@
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="角色名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入角色名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入角色名称" />
           </n-form-item>
           <n-form-item label="地区权限类型" path="regionPermissionType">
             <n-select
-              v-model:value="editDataForm.regionPermissionType"
+              v-model:value="editForm.regionPermissionType"
               :options="systemRoleRegionPermissionTypeRef"
               clearable
               placeholder="请选择地区权限类型"
@@ -118,8 +118,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -165,12 +165,11 @@ import type { SystemRoleItem } from '@/api/role'
 import { menuApi } from '@/api/menu'
 import type { SystemMenuManageItem } from '@/api/menu'
 import { EventBus } from '@/plugins/event-bus'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
-import { differenceWith, isEqual, pick } from 'lodash-es'
+import { differenceWith, isEqual } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,
@@ -198,30 +197,26 @@ const fetchAllData = createPaginatedFetcher(roleApi.urls.list, 'systemRoleList',
 const systemRoleRegionPermissionTypeRef = useDict('SystemRoleRegionPermissionType')
 
 const {
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {},
-  () => {
-    getDataList()
-  },
-  {
-    name: null,
-    regionPermissionType: null
-  },
-  {
-    name: null,
-    regionPermissionType: null
-  }
-)
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  rowKey,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  fetchList: () => getDataList(),
+  addForm: { name: null, regionPermissionType: null },
+  editForm: { name: null, regionPermissionType: null },
+  api: roleApi
+})
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']
 const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) => {
@@ -328,14 +323,14 @@ const dataColumns: DataTableColumns = [
           label: '编辑',
           icon: 'square-pen',
           disabled: row.builtin === 1,
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
           disabled: row.builtin === 1,
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -376,7 +371,6 @@ const filterDataList = computed(() =>
   })
 )
 
-const dataRowKey = (row: any) => row.id
 const dataExpandedRowKeys = ref<Array<string | number>>([])
 const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   // 只获取新展开的
@@ -398,52 +392,12 @@ const addDataRules: FormRules = {
     { min: 2, max: 12, message: '角色名称长度需在2-12之间', trigger: 'blur' }
   ]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    roleApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入角色名称', trigger: 'blur' },
     { min: 2, max: 16, message: '角色名称长度需在2-16之间', trigger: 'blur' }
   ]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  roleApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    roleApi.update(editDataId.value, editDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  roleApi.remove(id).then(() => {
-    getDataList()
-  })
 }
 
 const removeRoleMenu = (row: any, menuId: string) => {

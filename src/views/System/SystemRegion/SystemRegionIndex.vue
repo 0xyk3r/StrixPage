@@ -5,12 +5,12 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（名称）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（名称）" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -32,9 +32,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
       @load="onDataChildrenLoad"
     />
@@ -50,27 +50,27 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="地区名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入地区名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入地区名称" />
         </n-form-item>
         <n-form-item label="父级地区" path="parentId">
           <n-tree-select
-            v-model:value="addDataForm.parentId"
+            v-model:value="addForm.parentId"
             :options="systemRegionCascaderOptions"
             cascade
             clearable
@@ -81,7 +81,7 @@
         </n-form-item>
         <n-form-item label="备注信息" path="remarks">
           <n-input
-            v-model:value="addDataForm.remarks"
+            v-model:value="addForm.remarks"
             :autosize="{
               minRows: 3,
               maxRows: 5
@@ -94,35 +94,35 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData">确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="地区名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入地区名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入地区名称" />
           </n-form-item>
           <n-form-item label="父级地区" path="parentId">
             <n-tree-select
-              v-model:value="editDataForm.parentId"
+              v-model:value="editForm.parentId"
               :options="systemRegionCascaderOptions"
               cascade
               clearable
@@ -133,7 +133,7 @@
           </n-form-item>
           <n-form-item label="备注信息" path="remarks">
             <n-input
-              v-model:value="editDataForm.remarks"
+              v-model:value="editForm.remarks"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
@@ -147,8 +147,8 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData">确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -161,10 +161,8 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { regionApi } from '@/api/region'
 import type { CascaderDataItem } from '@/api/types'
-import { usePage } from '@/composables/usePage.ts'
-import { createStrixMessage } from '@/utils/strix-message'
+import { useCrud } from '@/composables/useCrud'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -175,44 +173,46 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '系统地区'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => getDataListParams.value)
+
+// 加载所有地区级联选项
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
+const getSystemRegionSelectList = () => {
+  regionApi.cascader().then(({ data: res }) => {
+    systemRegionCascaderOptions.value = res.data.options
+  })
+}
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
-    keyword: null,
-    parentId: null,
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  {
-    name: null,
-    parentId: null,
-    remarks: null
-  },
-  {
-    name: null,
-    parentId: null,
-    remarks: null
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: { keyword: null, parentId: null, pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList(),
+  addForm: { name: null, parentId: null, remarks: null },
+  editForm: { name: null, parentId: null, remarks: null },
+  api: regionApi,
+  hooks: {
+    beforeShowAdd: () => getSystemRegionSelectList(),
+    beforeShowEdit: () => getSystemRegionSelectList()
   }
-)
+})
+
+const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -252,19 +252,19 @@ const dataColumns: DataTableColumns = [
           type: 'info',
           label: '添加子项',
           icon: 'plus',
-          onClick: () => showAddDataModal(row.id)
+          onClick: () => showAdd({ parentId: row.id || '' })
         },
         {
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -291,11 +291,11 @@ const getDataList = () => {
   // 清除展开行
   dataExpandedRowKeys.value = []
   regionApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemRegionList
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
       handleAddIsLeaf(dataRef.value)
     })
 }
@@ -315,65 +315,12 @@ const onDataChildrenLoad = (row: any) => {
   })
 }
 
-// 加载所有地区级联选项
-const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
-const getSystemRegionSelectList = () => {
-  regionApi.cascader().then(({ data: res }) => {
-    systemRegionCascaderOptions.value = res.data.options
-  })
-}
-
 const addDataRules: FormRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
-}
-const showAddDataModal = (id?: string) => {
-  getSystemRegionSelectList()
-  addDataForm.value.parentId = id || ''
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    regionApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
 }
 
 const editDataRules: FormRules = {
   name: [{ required: true, message: '请输入地区名称', trigger: 'blur' }]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  getSystemRegionSelectList()
-  // 加载编辑前信息
-  regionApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    regionApi
-      .update(editDataId.value, editDataForm.value)
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  regionApi.remove(id).then(() => {
-    getDataList()
-  })
 }
 </script>
 

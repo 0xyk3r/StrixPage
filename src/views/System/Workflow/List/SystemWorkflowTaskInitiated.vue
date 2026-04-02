@@ -5,7 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.workflowId" clearable placeholder="请输入搜索条件" />
+              <n-input v-model:value="listParams.workflowId" clearable placeholder="请输入搜索条件" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -26,9 +26,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import StrixTag from '@/components/common/StrixTag.vue'
 import { workflowApi } from '@/api/workflow'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -61,24 +61,16 @@ const showExportDialog = ref(false)
 const fetchAllData = createPaginatedFetcher(
   workflowApi.urls.initiatedList,
   'systemUserList',
-  () => getDataListParams.value
+  () => listParams.value
 )
 
 // 加载字典
 // const systemUserStatusRef = useDict('SystemUserStatus')
 
-const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
-  {
-    workflowId: '',
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  null,
-  null
-)
+const { listParams, clearSearch, pagination, rowKey } = useCrud({
+  list: { workflowId: '', pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList()
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -106,11 +98,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   workflowApi
-    .initiatedList(getDataListParams.value)
+    .initiatedList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = (res.data as any).systemUserList
-      dataPagination.itemCount = (res.data as any).total
+      pagination.itemCount = (res.data as any).total
     })
 }
 onMounted(getDataList)

@@ -5,15 +5,15 @@
         <n-grid :cols="12" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="4">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi span="3">
-            <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+            <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
               <n-form-item-gi label="人员角色" path="roleId">
                 <n-select
-                  v-model:value="getDataListParams.roleId"
+                  v-model:value="listParams.roleId"
                   :options="systemRoleSelectList"
                   clearable
                   placeholder="请选择人员角色"
@@ -23,7 +23,7 @@
             </n-form>
           </n-gi>
           <n-gi :span="2">
-            <n-button type="primary" @click="showAddDataModal()"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="12 s:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -37,18 +37,18 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="人员状态" path="status" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.status"
+              v-model:value="listParams.status"
               :options="systemManagerStatusRef"
               placeholder="请选择人员状态"
             />
           </n-form-item-gi>
           <n-form-item-gi label="人员类型" path="type" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.type"
+              v-model:value="listParams.type"
               :options="systemManagerTypeRef"
               placeholder="请选择人员类型"
             />
@@ -62,8 +62,8 @@
       :data="dataRef"
       :expanded-row-keys="dataExpandedRowKeys"
       :loading="dataLoading"
-      :pagination="dataPagination"
-      :row-key="dataRowKey"
+      :pagination="pagination"
+      :row-key="rowKey"
       remote
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
@@ -80,16 +80,16 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
@@ -97,7 +97,7 @@
       >
         <n-form-item label="管理人员昵称" path="nickname">
           <n-input
-            v-model:value="addDataForm.nickname"
+            v-model:value="addForm.nickname"
             :maxlength="20"
             clearable
             placeholder="请输入管理人员昵称"
@@ -106,7 +106,7 @@
         </n-form-item>
         <n-form-item label="登录账号" path="loginName">
           <n-input
-            v-model:value="addDataForm.loginName"
+            v-model:value="addForm.loginName"
             :maxlength="20"
             clearable
             placeholder="请输入登录账号"
@@ -115,7 +115,7 @@
         </n-form-item>
         <n-form-item label="登录密码" path="loginPassword">
           <n-input
-            v-model:value="addDataForm.loginPassword"
+            v-model:value="addForm.loginPassword"
             type="password"
             show-password-on="click"
             clearable
@@ -124,7 +124,7 @@
         </n-form-item>
         <n-form-item label="管理人员状态" path="status">
           <n-select
-            v-model:value="addDataForm.status"
+            v-model:value="addForm.status"
             :options="systemManagerStatusRef"
             clearable
             placeholder="请选择管理人员状态"
@@ -132,7 +132,7 @@
         </n-form-item>
         <n-form-item label="管理人员类型" path="type">
           <n-select
-            v-model:value="addDataForm.type"
+            v-model:value="addForm.type"
             :options="systemManagerTypeRef"
             clearable
             placeholder="请选择管理人员类型"
@@ -140,7 +140,7 @@
         </n-form-item>
         <n-form-item label="所属地区" path="regionId">
           <n-tree-select
-            v-model:value="addDataForm.regionId"
+            v-model:value="addForm.regionId"
             :options="systemRegionCascaderOptions"
             cascade
             clearable
@@ -152,24 +152,24 @@
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
@@ -177,7 +177,7 @@
         >
           <n-form-item label="管理人员昵称" path="nickname">
             <n-input
-              v-model:value="editDataForm.nickname"
+              v-model:value="editForm.nickname"
               :maxlength="20"
               clearable
               placeholder="请输入管理人员昵称"
@@ -186,7 +186,7 @@
           </n-form-item>
           <n-form-item label="登录账号" path="loginName">
             <n-input
-              v-model:value="editDataForm.loginName"
+              v-model:value="editForm.loginName"
               :maxlength="20"
               clearable
               placeholder="请输入登录账号"
@@ -195,7 +195,7 @@
           </n-form-item>
           <n-form-item label="登录密码" path="loginPassword">
             <n-input
-              v-model:value="editDataForm.loginPassword"
+              v-model:value="editForm.loginPassword"
               type="password"
               show-password-on="click"
               clearable
@@ -204,7 +204,7 @@
           </n-form-item>
           <n-form-item label="管理人员状态" path="status">
             <n-select
-              v-model:value="editDataForm.status"
+              v-model:value="editForm.status"
               :options="systemManagerStatusRef"
               clearable
               placeholder="请选择管理人员状态"
@@ -212,7 +212,7 @@
           </n-form-item>
           <n-form-item label="管理人员类型" path="type">
             <n-select
-              v-model:value="editDataForm.type"
+              v-model:value="editForm.type"
               :options="systemManagerTypeRef"
               clearable
               placeholder="请选择管理人员类型"
@@ -220,7 +220,7 @@
           </n-form-item>
           <n-form-item label="所属地区" path="regionId">
             <n-tree-select
-              v-model:value="editDataForm.regionId"
+              v-model:value="editForm.regionId"
               :options="systemRegionCascaderOptions"
               cascade
               clearable
@@ -233,8 +233,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -250,12 +250,11 @@ import { regionApi } from '@/api/region'
 import { roleApi } from '@/api/role'
 import type { CascaderDataItem, SelectDataItem } from '@/api/types'
 import { useQuickMenuStore } from '@/stores/quick-menu'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
-import { differenceWith, find, isEqual, pick } from 'lodash-es'
+import { differenceWith, find, isEqual } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,
@@ -263,8 +262,7 @@ import {
   NCheckboxGroup,
   NFlex,
   NH6,
-  NSpin,
-  NTreeSelect
+  NSpin
 } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -277,7 +275,6 @@ const quickMenuStore = useQuickMenuStore()
 // 本页面操作提示关键词
 const _baseName = '系统人员'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => getDataListParams.value)
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({
@@ -303,50 +300,55 @@ onDeactivated(() => {
 const systemManagerStatusRef = useDict('SystemManagerStatus')
 const systemManagerTypeRef = useDict('SystemManagerType')
 
+// 加载所有地区级联选项
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
+const getSystemRegionSelectList = () => {
+  regionApi.cascader().then(({ data: res }) => {
+    systemRegionCascaderOptions.value = res.data.options
+  })
+}
+onMounted(getSystemRegionSelectList)
+
+// 加载所有人员角色选项
+const systemRoleSelectList = ref<SelectDataItem[]>([])
+const getSystemRoleSelectList = () => {
+  roleApi.select().then(({ data: res }) => {
+    systemRoleSelectList.value = res.data.options
+  })
+}
+onMounted(getSystemRoleSelectList)
+
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
-    keyword: null,
-    status: null,
-    type: null,
-    roleId: null,
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  {
-    nickname: null,
-    loginName: null,
-    loginPassword: null,
-    status: 1,
-    type: 1,
-    regionId: null
-  },
-  {
-    nickname: null,
-    loginName: null,
-    loginPassword: null,
-    status: null,
-    type: null,
-    regionId: null
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: { keyword: null, status: null, type: null, roleId: null, pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList(),
+  addForm: { nickname: null, loginName: null, loginPassword: null, status: 1, type: 1, regionId: null },
+  editForm: { nickname: null, loginName: null, loginPassword: null, status: null, type: null, regionId: null },
+  api: managerApi,
+  hooks: {
+    beforeShowAdd: () => getSystemRegionSelectList(),
+    beforeShowEdit: () => getSystemRegionSelectList()
   }
-)
+})
+
+const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -421,13 +423,13 @@ const dataColumns: DataTableColumns = [
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -446,13 +448,13 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   managerApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       // 清除展开行
       dataExpandedRowKeys.value = []
       dataRef.value = res.data.systemManagerList
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -471,22 +473,6 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-// 加载所有地区级联选项
-const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
-const getSystemRegionSelectList = () => {
-  regionApi.cascader().then(({ data: res }) => {
-    systemRegionCascaderOptions.value = res.data.options
-  })
-}
-onMounted(getSystemRegionSelectList)
-// 加载所有人员角色选项
-const systemRoleSelectList = ref<SelectDataItem[]>([])
-const getSystemRoleSelectList = () => {
-  roleApi.select().then(({ data: res }) => {
-    systemRoleSelectList.value = res.data.options
-  })
-}
-onMounted(getSystemRoleSelectList)
 const managerRegionName = (regionId: string) => {
   const result = deepSearch(systemRegionCascaderOptions.value, regionId, 'value')
   return result ? result.label : '未设置'
@@ -534,20 +520,6 @@ const addDataRules: FormRules = {
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
 }
-const showAddDataModal = () => {
-  getSystemRegionSelectList()
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    managerApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   nickname: [
@@ -576,34 +548,6 @@ const editDataRules: FormRules = {
   ],
   status: [{ type: 'number', required: true, message: '请选择管理人员状态', trigger: 'change' }],
   type: [{ type: 'number', required: true, message: '请选择管理人员类型', trigger: 'change' }]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  getSystemRegionSelectList()
-  // 加载编辑前信息
-  managerApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    managerApi.update(editDataId.value, editDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  managerApi.remove(id).then(() => {
-    getDataList()
-  })
 }
 </script>
 

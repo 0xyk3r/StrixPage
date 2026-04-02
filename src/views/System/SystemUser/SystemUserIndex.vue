@@ -6,7 +6,7 @@
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
-                v-model:value="getDataListParams.keyword"
+                v-model:value="listParams.keyword"
                 clearable
                 placeholder="请输入搜索条件（昵称、手机号码）"
               />
@@ -25,11 +25,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="用户状态" path="status" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.status"
+              v-model:value="listParams.status"
               :options="systemUserStatusRef"
               clearable
               placeholder="请选择用户状态"
@@ -42,9 +42,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -59,31 +59,31 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="用户昵称" path="nickname">
-            <n-input v-model:value="editDataForm.nickname" clearable placeholder="请输入用户昵称" />
+            <n-input v-model:value="editForm.nickname" clearable placeholder="请输入用户昵称" />
           </n-form-item>
           <n-form-item label="手机号码" path="phoneNumber">
-            <n-input v-model:value="editDataForm.phoneNumber" clearable placeholder="请输入手机号码" />
+            <n-input v-model:value="editForm.phoneNumber" clearable placeholder="请输入手机号码" />
           </n-form-item>
           <n-form-item label="用户状态" path="status">
             <n-select
-              v-model:value="editDataForm.status"
+              v-model:value="editForm.status"
               :options="systemUserStatusRef"
               clearable
               placeholder="请选择用户状态"
@@ -94,8 +94,8 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData">确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -111,50 +111,47 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { userApi } from '@/api/user'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui' // 本页面操作提示关键词
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => listParams.value)
 
 // 加载字典
 const systemUserStatusRef = useDict('SystemUserStatus')
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showEdit,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     status: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  null,
-  {
+  fetchList: () => getDataList(),
+  editForm: {
     nickname: null,
     status: null,
     phoneNumber: null
-  }
-)
+  },
+  api: userApi
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -181,13 +178,13 @@ const dataColumns: DataTableColumns = [
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -206,11 +203,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   userApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemUserList
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -218,33 +215,7 @@ onMounted(getDataList)
 const editDataRules: FormRules = {
   nickname: [{ required: true, message: '请输入用户昵称', trigger: 'blur' }]
 }
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  userApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    userApi.update(editDataId.value, editDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  userApi.remove(id).then(() => {
-    getDataList()
-  })
-}
 </script>
 
 <style lang="scss" scoped></style>

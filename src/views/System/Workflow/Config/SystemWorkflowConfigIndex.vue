@@ -8,7 +8,7 @@
               <n-text type="info">流程引擎列表</n-text>
             </n-h3>
             <n-flex justify="center">
-              <n-button size="small" type="primary" @click="showAddDataModal"> 添加流程</n-button>
+              <n-button size="small" type="primary" @click="showAdd"> 添加流程</n-button>
               <n-button size="small" type="info" @click="getDataList"> 刷新列表</n-button>
             </n-flex>
           </n-flex>
@@ -18,9 +18,9 @@
               :columns="dataColumns"
               :data="dataRef"
               :loading="dataLoading"
-              :pagination="dataPagination"
+              :pagination="pagination"
               :remote="true"
-              :row-key="dataRowKey"
+              :row-key="rowKey"
               table-layout="fixed"
             />
           </n-spin>
@@ -67,59 +67,59 @@
     </n-grid>
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="配置名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入配置名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="配置名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入配置名称" />
           </n-form-item>
         </n-form>
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -129,10 +129,9 @@
 <script lang="ts" setup>
 import { workflowApi } from '@/api/workflow'
 import type { WorkflowConfigItem } from '@/api/workflow'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NFlex, NSpin } from 'naive-ui'
 import { usePagination } from '@/composables/usePagination.ts'
 
@@ -141,34 +140,42 @@ const router = useRouter()
 const _baseName = '流程引擎'
 
 const {
-  getDataListParams,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  listParams,
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editId,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     name: null
   },
-  {
+  editForm: {
     name: null
+  },
+  api: {
+    detail: (id: string) => workflowApi.configDetail(id),
+    create: (data: any) => workflowApi.configCreate(data),
+    update: (id: string, data: any) => workflowApi.configUpdate(id, data),
+    remove: (id: string) => workflowApi.configRemove(id)
   }
-)
+})
 
 const dataColumns: DataTableColumns = [
   {
@@ -200,13 +207,13 @@ const dataColumns: DataTableColumns = [
             type: 'warning',
             label: '编辑',
             icon: 'square-pen',
-            onClick: () => showEditDataModal(row.id)
+            onClick: () => showEdit(row.id)
           },
           {
             type: 'error',
             label: '删除',
             icon: 'trash',
-            onClick: () => deleteData(row.id),
+            onClick: () => deleteRow(row.id),
             popconfirm: true,
             popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
           }
@@ -227,11 +234,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   workflowApi
-    .configList(getDataListParams.value)
+    .configList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -242,57 +249,12 @@ const addDataRules: FormRules = {
     { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
   ]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    workflowApi
-      .configCreate(addDataForm.value)
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
 
 const editDataRules: FormRules = {
   name: [
     { required: true, message: '请输入流程名称', trigger: 'blur' },
     { min: 2, max: 32, message: '流程名称长度需在 2 - 32 字之内', trigger: 'blur' }
   ]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  workflowApi.configDetail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    workflowApi
-      .configUpdate(editDataId.value, editDataForm.value)
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-// 删除数据
-const deleteData = (id: string) => {
-  workflowApi.configRemove(id).then(() => {
-    getDataList()
-  })
 }
 
 const workflowConfigDataRef = ref<WorkflowConfigItem[]>([])
@@ -365,7 +327,7 @@ const workflowInstanceDataPagination = usePagination(getWorkflowInstanceDataList
 // 删除数据
 const deleteWorkflowInstanceData = (id: string) => {
   workflowApi
-    .configDataRemove(editDataId.value, id)
+    .configDataRemove(editId.value, id)
     .then(() => {
       getWorkflowInstanceDataList()
     })

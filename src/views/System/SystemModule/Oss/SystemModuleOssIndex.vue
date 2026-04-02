@@ -6,7 +6,7 @@
           <n-gi span="6 s:3 m:2">
             <n-input-group>
               <n-input
-                v-model:value="getDataListParams.keyword"
+                v-model:value="listParams.keyword"
                 clearable
                 placeholder="请输入搜索条件（配置Key、名称）"
               />
@@ -14,7 +14,7 @@
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -35,8 +35,8 @@
       :data="dataRef"
       :expanded-row-keys="dataExpandedRowKeys"
       :loading="dataLoading"
-      :pagination="dataPagination"
-      :row-key="dataRowKey"
+      :pagination="pagination"
+      :row-key="rowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
     />
@@ -52,53 +52,53 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="配置 Key" path="key">
-          <n-input v-model:value="addDataForm.key" clearable placeholder="请输入配置 Key" />
+          <n-input v-model:value="addForm.key" clearable placeholder="请输入配置 Key" />
         </n-form-item>
         <n-form-item label="配置名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入配置名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
         <n-form-item label="存储平台" path="platform">
           <n-select
-            v-model:value="addDataForm.platform"
+            v-model:value="addForm.platform"
             :options="ossPlatformRef"
             clearable
             placeholder="请选择存储平台"
           />
         </n-form-item>
         <n-form-item label="存储地域" path="region">
-          <n-input v-model:value="addDataForm.region" clearable placeholder="请输入存储地域" />
+          <n-input v-model:value="addForm.region" clearable placeholder="请输入存储地域" />
         </n-form-item>
         <n-form-item label="公网节点" path="publicEndpoint">
-          <n-input v-model:value="addDataForm.publicEndpoint" clearable placeholder="请输入公网节点" />
+          <n-input v-model:value="addForm.publicEndpoint" clearable placeholder="请输入公网节点" />
         </n-form-item>
         <n-form-item label="内网节点" path="privateEndpoint">
-          <n-input v-model:value="addDataForm.privateEndpoint" clearable placeholder="请输入内网节点" />
+          <n-input v-model:value="addForm.privateEndpoint" clearable placeholder="请输入内网节点" />
         </n-form-item>
         <n-form-item label="AccessKey" path="accessKey">
-          <n-input v-model:value="addDataForm.accessKey" clearable placeholder="请输入AccessKey" />
+          <n-input v-model:value="addForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input v-model:value="addDataForm.accessSecret" clearable placeholder="请输入AccessSecret" />
+          <n-input v-model:value="addForm.accessSecret" clearable placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
-            v-model:value="addDataForm.remark"
+            v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
               maxRows: 5
@@ -110,65 +110,65 @@
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="配置 Key" path="key">
-            <n-input v-model:value="editDataForm.key" clearable placeholder="请输入配置 Key" />
+            <n-input v-model:value="editForm.key" clearable placeholder="请输入配置 Key" />
           </n-form-item>
           <n-form-item label="配置名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入配置名称" />
           </n-form-item>
           <n-form-item label="存储平台" path="platform">
             <n-select
-              v-model:value="editDataForm.platform"
+              v-model:value="editForm.platform"
               :options="ossPlatformRef"
               clearable
               placeholder="请选择存储平台"
             />
           </n-form-item>
           <n-form-item label="存储地域" path="region">
-            <n-input v-model:value="editDataForm.region" clearable placeholder="请输入存储地域" />
+            <n-input v-model:value="editForm.region" clearable placeholder="请输入存储地域" />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
-            <n-input v-model:value="editDataForm.publicEndpoint" clearable placeholder="请输入公网节点" />
+            <n-input v-model:value="editForm.publicEndpoint" clearable placeholder="请输入公网节点" />
           </n-form-item>
           <n-form-item label="内网节点" path="privateEndpoint">
-            <n-input v-model:value="editDataForm.privateEndpoint" clearable placeholder="请输入内网节点" />
+            <n-input v-model:value="editForm.privateEndpoint" clearable placeholder="请输入内网节点" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
-            <n-input v-model:value="editDataForm.accessKey" clearable placeholder="请输入AccessKey" />
+            <n-input v-model:value="editForm.accessKey" clearable placeholder="请输入AccessKey" />
           </n-form-item>
           <n-form-item label="AccessSecret" path="accessSecret">
             <n-input
-              v-model:value="editDataForm.accessSecret"
+              v-model:value="editForm.accessSecret"
               clearable
               placeholder="请输入新的AccessSecret (不输入则不改变)"
             />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
-              v-model:value="editDataForm.remark"
+              v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
@@ -181,8 +181,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -194,12 +194,11 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { ossApi } from '@/api/oss'
 import NebulaTag from '@/components/common/NebulaTag.vue'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { useTableColumns } from '@/composables/useTableColumns'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { differenceWith, find, isEqual, pick } from 'lodash-es'
+import { differenceWith, find, isEqual } from 'lodash-es'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
@@ -209,36 +208,37 @@ import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, N
 // 本页面操作提示关键词
 const _baseName = '存储服务'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(ossApi.urls.list, 'configs', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.list, 'configs', () => listParams.value)
 
 // 加载字典
 const ossPlatformRef = useDict('OssPlatform')
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     key: null,
     name: null,
     platform: null,
@@ -249,7 +249,7 @@ const {
     accessSecret: null,
     remark: null
   },
-  {
+  editForm: {
     key: null,
     name: null,
     platform: null,
@@ -259,8 +259,9 @@ const {
     accessKey: null,
     accessSecret: null,
     remark: null
-  }
-)
+  },
+  api: ossApi
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -370,13 +371,13 @@ const dataColumns: DataTableColumns = [
           type: 'warning',
           label: '编辑',
           icon: 'square-pen',
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
         }
@@ -395,7 +396,7 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   ossApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       // 清除展开行
@@ -454,19 +455,6 @@ const addDataRules: FormRules = {
   ],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    ossApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   key: [
@@ -496,33 +484,6 @@ const editDataRules: FormRules = {
   ],
   accessSecret: [{ max: 64, message: 'AccessSecret 长度需在 64 字之内', trigger: 'blur' }],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
-}
-const showEditDataModal = (id: string) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  ossApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    ossApi.update(editDataId.value, editDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: string) => {
-  ossApi.remove(id).then(() => {
-    getDataList()
-  })
 }
 </script>
 

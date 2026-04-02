@@ -5,7 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按签名搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按签名搜索" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -21,11 +21,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.configKey"
+              v-model:value="listParams.configKey"
               :options="smsConfigSelectList"
               clearable
               placeholder="请选择短信配置 Key"
@@ -34,7 +34,7 @@
           </n-form-item-gi>
           <n-form-item-gi label="状态" path="status" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.status"
+              v-model:value="listParams.status"
               :options="smsSignStatusRef"
               clearable
               placeholder="请选择状态"
@@ -49,9 +49,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -72,7 +72,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { smsApi } from '@/api/sms'
 import type { SelectDataItem } from '@/api/types'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -84,25 +84,15 @@ import { type DataTableColumns } from 'naive-ui'
 // 本页面操作提示关键词
 const _baseName = '短信签名'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(smsApi.urls.signList, 'signs', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(smsApi.urls.signList, 'signs', () => listParams.value)
 
 // 加载字典
 const smsSignStatusRef = useDict('SmsSignStatus')
 
-const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
-  {
-    keyword: null,
-    configKey: null,
-    status: null,
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  null,
-  null
-)
+const { listParams, clearSearch, pagination, rowKey } = useCrud({
+  list: { keyword: null, configKey: null, status: null, pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList()
+})
 // 展示列信息
 const dataColumns: DataTableColumns = [
   { key: 'configKey', title: '短信配置 Key', width: 180 },
@@ -128,11 +118,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   smsApi
-    .signList(getDataListParams.value)
+    .signList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.signs
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)

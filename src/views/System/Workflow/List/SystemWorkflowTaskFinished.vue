@@ -5,7 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.workflowId" clearable placeholder="请输入搜索条件" />
+              <n-input v-model:value="listParams.workflowId" clearable placeholder="请输入搜索条件" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -26,9 +26,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import { workflowApi } from '@/api/workflow'
 import { commonApi } from '@/api/common'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { type DataTableColumns } from 'naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixNameFetcher from '@/components/data/StrixNameFetcher.vue'
@@ -63,23 +63,15 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '我处理的工作列表'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(workflowApi.urls.finishedList, 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(workflowApi.urls.finishedList, 'items', () => listParams.value)
 
 // 加载字典
 // const WorkflowNodeTypeRef = useDict('WorkflowNodeType')
 
-const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
-  {
-    workflowId: '',
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  null,
-  null
-)
+const { listParams, clearSearch, pagination, rowKey } = useCrud({
+  list: { workflowId: '', pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList()
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -185,11 +177,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   workflowApi
-    .finishedList(getDataListParams.value)
+    .finishedList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)

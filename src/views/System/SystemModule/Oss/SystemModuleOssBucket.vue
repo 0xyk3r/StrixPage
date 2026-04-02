@@ -5,12 +5,12 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按名称搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -24,11 +24,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.configKey"
+              v-model:value="listParams.configKey"
               :options="ossConfigSelectList"
               clearable
               placeholder="请选择存储配置 Key"
@@ -43,9 +43,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -60,16 +60,16 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
@@ -77,20 +77,20 @@
       >
         <n-form-item label="存储配置 Key" path="configKey">
           <n-select
-            v-model:value="addDataForm.configKey"
+            v-model:value="addForm.configKey"
             :options="ossConfigSelectList"
             clearable
             placeholder="请选择存储配置 Key"
           />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入 Bucket 名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入 Bucket 名称" />
         </n-form-item>
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -101,8 +101,7 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
-import { usePage } from '@/composables/usePage.ts'
-import { createStrixMessage } from '@/utils/strix-message'
+import { useCrud } from '@/composables/useCrud'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -113,33 +112,36 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储空间'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => getDataListParams.value)
-
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  showAdd,
+  submitAdd,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     configKey: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     configKey: null,
     name: null
   },
-  null
-)
+  api: {
+    create: (data: any) => ossApi.bucketCreate(data),
+    remove: (id: string) => ossApi.bucketRemove(id)
+  }
+})
+
+const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -157,11 +159,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   ossApi
-    .bucketList(getDataListParams.value)
+    .bucketList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.buckets
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -181,19 +183,6 @@ const addDataRules: FormRules = {
     { required: true, message: '请输入 Bucket 名称', trigger: 'blur' },
     { min: 1, max: 64, message: 'Bucket 名称需在 1 - 64 字之内', trigger: 'blur' }
   ]
-}
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    ossApi.bucketCreate(addDataForm.value).then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
 }
 </script>
 

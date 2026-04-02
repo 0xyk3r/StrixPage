@@ -5,7 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按文件名搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按文件名搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -21,11 +21,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.configKey"
+              v-model:value="listParams.configKey"
               :options="ossConfigSelectList"
               clearable
               placeholder="请选择存储配置 Key"
@@ -34,7 +34,7 @@
           </n-form-item-gi>
           <n-form-item-gi label="文件组 Key" path="groupKey" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.groupKey"
+              v-model:value="listParams.groupKey"
               :options="ossFileGroupSelectList"
               clearable
               placeholder="请选择文件组 Key"
@@ -49,9 +49,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -72,7 +72,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { commonApi } from '@/api/common'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { downloadBlob, formatFileSize } from '@/utils/strix-file-util'
 import { handleOperate } from '@/utils/strix-table-tool'
 import type { DataTableColumns } from 'naive-ui'
@@ -85,22 +85,12 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储文件'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => listParams.value)
 
-const { getDataListParams, clearSearch, dataPagination, dataRowKey } = usePage(
-  {
-    keyword: null,
-    configKey: null,
-    groupKey: null,
-    pageIndex: 1,
-    pageSize: 10
-  },
-  () => {
-    getDataList()
-  },
-  null,
-  null
-)
+const { listParams, clearSearch, pagination, rowKey } = useCrud({
+  list: { keyword: null, configKey: null, groupKey: null, pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList()
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -146,11 +136,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   ossApi
-    .fileList(getDataListParams.value)
+    .fileList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.files
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -167,7 +157,7 @@ onMounted(getOssConfigSelectList)
 const ossFileGroupSelectList = ref<SelectDataItem[]>([])
 const getOssFileGroupSelectList = (configKey?: string) => {
   if (configKey) {
-    getDataListParams.value.groupKey = null
+    listParams.value.groupKey = null
     getDataList()
   }
   const request = configKey ? ossApi.fileGroupSelectByConfig(configKey) : ossApi.fileGroupSelect()

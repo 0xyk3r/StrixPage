@@ -32,7 +32,7 @@
       :data="dataRef"
       :loading="dataLoading"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -47,18 +47,18 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-tabs v-model:value="addDataModalType" :animated="true" type="segment">
         <n-tab-pane name="menu" tab="菜单">
           <n-form
-            ref="addDataFormRef"
-            :model="addDataForm"
+            ref="addFormRef"
+            :model="addForm"
             :rules="addDataRules"
             label-placement="left"
             label-width="auto"
@@ -66,11 +66,11 @@
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
               <n-form-item-gi label="菜单名称" path="name" span="2 s:1">
-                <n-input v-model:value="addDataForm.name" clearable placeholder="请输入菜单名称" />
+                <n-input v-model:value="addForm.name" clearable placeholder="请输入菜单名称" />
               </n-form-item-gi>
               <n-form-item-gi label="父级菜单" path="parentId" span="2 s:1">
                 <n-tree-select
-                  v-model:value="addDataForm.parentId"
+                  v-model:value="addForm.parentId"
                   :options="menuTreeRef"
                   cascade
                   clearable
@@ -80,16 +80,16 @@
                 />
               </n-form-item-gi>
               <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                <n-input v-model:value="addDataForm.key" clearable placeholder="请输入权限标识" />
+                <n-input v-model:value="addForm.key" clearable placeholder="请输入权限标识" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单路由" path="url" span="2 s:2">
-                <n-input v-model:value="addDataForm.url" clearable placeholder="请输入菜单路由" />
+                <n-input v-model:value="addForm.url" clearable placeholder="请输入菜单路由" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单图标" path="icon" span="2 s:1">
-                <n-input v-model:value="addDataForm.icon" clearable placeholder="请输入菜单图标" />
+                <n-input v-model:value="addForm.icon" clearable placeholder="请输入菜单图标" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                <n-input-number v-model:value="addDataForm.sortValue" clearable placeholder="请输入菜单排序" />
+                <n-input-number v-model:value="addForm.sortValue" clearable placeholder="请输入菜单排序" />
               </n-form-item-gi>
             </n-grid>
           </n-form>
@@ -140,26 +140,26 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
+          <n-button @click="addModal = false">取消</n-button>
           <n-button type="primary" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-tabs v-model:value="editDataModalType" :animated="true" type="segment">
           <n-tab-pane disabled name="menu" tab="菜单">
             <n-form
-              ref="editDataFormRef"
-              :model="editDataForm"
+              ref="editFormRef"
+              :model="editForm"
               :rules="editDataRules"
               label-placement="left"
               label-width="auto"
@@ -167,11 +167,11 @@
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
                 <n-form-item-gi label="菜单名称" path="name" span="2 s:1">
-                  <n-input v-model:value="editDataForm.name" clearable placeholder="请输入菜单名称" />
+                  <n-input v-model:value="editForm.name" clearable placeholder="请输入菜单名称" />
                 </n-form-item-gi>
                 <n-form-item-gi label="父级菜单" path="parentId" span="2 s:1">
                   <n-tree-select
-                    v-model:value="editDataForm.parentId"
+                    v-model:value="editForm.parentId"
                     :options="menuTreeRef"
                     cascade
                     clearable
@@ -181,16 +181,16 @@
                   />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                  <n-input v-model:value="editDataForm.key" clearable placeholder="请输入权限标识" />
+                  <n-input v-model:value="editForm.key" clearable placeholder="请输入权限标识" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单路由" path="url" span="2 s:2">
-                  <n-input v-model:value="editDataForm.url" clearable placeholder="请输入菜单路由" />
+                  <n-input v-model:value="editForm.url" clearable placeholder="请输入菜单路由" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单图标" path="icon" span="2 s:1">
-                  <n-input v-model:value="editDataForm.icon" clearable placeholder="请输入菜单图标" />
+                  <n-input v-model:value="editForm.icon" clearable placeholder="请输入菜单图标" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                  <n-input-number v-model:value="editDataForm.sortValue" clearable placeholder="请输入菜单排序" />
+                  <n-input-number v-model:value="editForm.sortValue" clearable placeholder="请输入菜单排序" />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
@@ -242,7 +242,7 @@
 
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
+          <n-button @click="editModal = false">取消</n-button>
           <n-button type="primary" @click="editData">确定</n-button>
         </n-flex>
       </template>
@@ -257,7 +257,7 @@ import { menuApi } from '@/api/menu'
 import { permissionApi } from '@/api/permission'
 import type { TreeDataItem } from '@/api/types'
 import { EventBus } from '@/plugins/event-bus'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, kebabCase, pick } from 'lodash-es'
@@ -271,30 +271,26 @@ import { useTableColumns } from '@/composables/useTableColumns'
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => getDataListParams.value)
-
 const {
-  getDataListParams,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  listParams,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editId,
+  initEditForm,
+  editForm,
+  editFormRef,
+  resetForms
+} = useCrud({
+  list: {
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     name: null,
     key: null,
     url: '/',
@@ -302,7 +298,7 @@ const {
     parentId: null,
     sortValue: 0
   },
-  {
+  editForm: {
     name: null,
     key: null,
     url: null,
@@ -310,13 +306,17 @@ const {
     parentId: null,
     sortValue: null
   },
-  () => {
-    addDataModalType.value = 'menu'
-    editDataModalType.value = 'menu'
-    addPermissionForm.value = cloneDeep(initAddPermissionForm)
-    editPermissionForm.value = cloneDeep(initEditPermissionForm)
+  hooks: {
+    onReset: () => {
+      addDataModalType.value = 'menu'
+      editDataModalType.value = 'menu'
+      addPermissionForm.value = cloneDeep(initAddPermissionForm)
+      editPermissionForm.value = cloneDeep(initEditPermissionForm)
+    }
   }
-)
+})
+
+const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -388,7 +388,7 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  menuApi.list(getDataListParams.value).then(({ data: res }) => {
+  menuApi.list(listParams.value).then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.systemMenuList
     })
@@ -416,23 +416,23 @@ const addDataRules: FormRules = {
 }
 const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
   if (id) {
-    addDataForm.value.parentId = id
-    addDataForm.value.key = key + ':'
+    addForm.value.parentId = id
+    addForm.value.key = key + ':'
   }
   if (key) {
     addPermissionForm.value.menuId = id
     addPermissionForm.value.key = key + ':'
   }
 
-  addDataModalShow.value = true
+  addModal.value = true
 }
 const addData = () => {
   if (addDataModalType.value === 'menu') {
-    addDataFormRef.value?.validate((errors) => {
+    addFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      menuApi.create(addDataForm.value).then(() => {
-        initDataForm()
+      menuApi.create(addForm.value as any).then(() => {
+        resetForms()
         getDataList()
         EventBus.emit('refresh-menu')
       })
@@ -442,7 +442,7 @@ const addData = () => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       permissionApi.create(addPermissionForm.value).then(() => {
-          initDataForm()
+          resetForms()
           getDataList()
         })
     })
@@ -469,33 +469,33 @@ const editDataRules: FormRules = {
   ]
 }
 const showEditDataModal = (row: any) => {
-  editDataModalShow.value = true
+  editModal.value = true
   editDataModalType.value = row.type
-  editDataFormLoading.value = true
+  editLoading.value = true
   // 加载编辑前信息
   if (row.type === 'menu') {
     menuApi.detail(row.id).then(({ data: res }) => {
-      editDataId.value = row.id
-      const canUpdateFields = Object.keys(initEditDataForm)
-      editDataForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
+      editId.value = row.id
+      const canUpdateFields = Object.keys(initEditForm!)
+      editForm.value = pick(res.data, canUpdateFields)
+      editLoading.value = false
     })
   } else {
     permissionApi.detail(row.id).then(({ data: res }) => {
-      editDataId.value = row.id
+      editId.value = row.id
       const canUpdateFields = Object.keys(initEditPermissionForm)
       editPermissionForm.value = pick(res.data, canUpdateFields)
-      editDataFormLoading.value = false
+      editLoading.value = false
     })
   }
 }
 const editData = () => {
   if (editDataModalType.value === 'menu') {
-    editDataFormRef.value?.validate((errors) => {
+    editFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      menuApi.update(editDataId.value, editDataForm.value).then(() => {
-          initDataForm()
+      menuApi.update(editId.value, editForm.value as any).then(() => {
+          resetForms()
           getDataList()
           EventBus.emit('refresh-menu')
         })
@@ -504,8 +504,8 @@ const editData = () => {
     editPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-      permissionApi.update(editDataId.value, editPermissionForm.value).then(() => {
-          initDataForm()
+      permissionApi.update(editId.value, editPermissionForm.value).then(() => {
+          resetForms()
           getDataList()
         })
     })

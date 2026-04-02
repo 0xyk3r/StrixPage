@@ -5,7 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按操作名称搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按操作名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -21,11 +21,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="操作类型" path="operationType" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.operationType"
+              v-model:value="listParams.operationType"
               :options="systemLogOperTypeRef"
               clearable
               placeholder="请选择操作类型"
@@ -33,11 +33,11 @@
             />
           </n-form-item-gi>
           <!-- <n-form-item-gi span="6 s:3 m:2" label="操作分组" path="operationGroup">
-            <n-select v-model:value="getDataListParams.operationGroup" :options="smsSignStatusOptions"
+            <n-select v-model:value="listParams.operationGroup" :options="smsSignStatusOptions"
               placeholder="请选择操作分组" clearable @update:value="getDataList" />
           </n-form-item-gi>
           <n-form-item-gi span="6 s:3 m:2" label="响应状态码" path="responseCode">
-            <n-select v-model:value="getDataListParams.responseCode" :options="smsSignStatusOptions"
+            <n-select v-model:value="listParams.responseCode" :options="smsSignStatusOptions"
               placeholder="请选择响应状态码" clearable @update:value="getDataList" />
           </n-form-item-gi> -->
         </n-grid>
@@ -48,9 +48,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -72,9 +72,8 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { monitorApi } from '@/api/monitor'
 import { useDict } from '@/composables/useDict.ts'
-import { cloneDeep } from 'lodash-es'
+import { useCrud } from '@/composables/useCrud'
 import { type DataTableColumns } from 'naive-ui'
-import { usePagination } from '@/composables/usePagination.ts'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -84,25 +83,15 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '系统日志'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(monitorApi.urls.logList, 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(monitorApi.urls.logList, 'items', () => listParams.value)
 
 // 加载字典
 const systemLogOperTypeRef = useDict('SystemLogOperType')
 
-// 获取列表请求参数
-const initGetDataListParams = {
-  keyword: null,
-  operationType: null,
-  operationGroup: null,
-  responseCode: null,
-  pageIndex: 1,
-  pageSize: 10
-}
-const getDataListParams = ref(cloneDeep(initGetDataListParams))
-const clearSearch = () => {
-  getDataListParams.value = cloneDeep(initGetDataListParams)
-  getDataList()
-}
+const { listParams, clearSearch, pagination, rowKey } = useCrud({
+  list: { keyword: null, operationType: null, operationGroup: null, responseCode: null, pageIndex: 1, pageSize: 10 },
+  fetchList: () => getDataList()
+})
 // 展示列信息
 const dataColumns: DataTableColumns = [
   { key: 'operationGroup', title: '操作模块', width: 140, ellipsis: { tooltip: true } },
@@ -240,10 +229,6 @@ const dataColumns: DataTableColumns = [
 
 // 列可见性与排序
 const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
-// 分页配置
-const dataPagination = usePagination(getDataListParams, () => {
-  getDataList()
-})
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
@@ -251,15 +236,14 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   monitorApi
-    .logList(getDataListParams.value)
+    .logList(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
-const dataRowKey = (row: any) => row.id
 </script>
 
 <style lang="scss" scoped></style>

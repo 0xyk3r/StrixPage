@@ -5,12 +5,12 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="getDataListParams.keyword" clearable placeholder="按字典标识或名称搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按字典标识或名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi :span="1">
-            <n-button type="primary" @click="showAddDataModal"> 添加{{ _baseName }}</n-button>
+            <n-button type="primary" @click="showAdd"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -24,11 +24,11 @@
           </n-gi>
         </n-grid>
       </template>
-      <n-form :model="getDataListParams" :show-feedback="false" label-placement="left" label-width="auto">
+      <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.status"
+              v-model:value="listParams.status"
               :options="commonSwitchRef"
               clearable
               placeholder="请选择字典状态"
@@ -37,7 +37,7 @@
           </n-form-item-gi>
           <n-form-item-gi label="是否内置" path="provided" span="6 s:3 m:2">
             <n-select
-              v-model:value="getDataListParams.provided"
+              v-model:value="listParams.provided"
               :options="commonFlagRef"
               clearable
               placeholder="请选择字典是否内置"
@@ -52,9 +52,9 @@
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
-      :pagination="dataPagination"
+      :pagination="pagination"
       :remote="true"
-      :row-key="dataRowKey"
+      :row-key="rowKey"
       table-layout="fixed"
     />
 
@@ -69,30 +69,30 @@
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
-      v-model:show="addDataModalShow"
+      v-model:show="addModal"
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
       <n-form
-        ref="addDataFormRef"
-        :model="addDataForm"
+        ref="addFormRef"
+        :model="addForm"
         :rules="addDataRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
         <n-form-item label="字典标识" path="key">
-          <n-input v-model:value="addDataForm.key" clearable placeholder="请输入字典标识" />
+          <n-input v-model:value="addForm.key" clearable placeholder="请输入字典标识" />
         </n-form-item>
         <n-form-item label="字典名称" path="name">
-          <n-input v-model:value="addDataForm.name" clearable placeholder="请输入字典名称" />
+          <n-input v-model:value="addForm.name" clearable placeholder="请输入字典名称" />
         </n-form-item>
         <n-form-item label="数据类型" path="dataType">
           <n-select
-            v-model:value="addDataForm.dataType"
+            v-model:value="addForm.dataType"
             :options="dictDataTypeRef"
             clearable
             placeholder="请选择字典数据类型"
@@ -100,7 +100,7 @@
         </n-form-item>
         <n-form-item label="字典状态" path="status">
           <n-select
-            v-model:value="addDataForm.status"
+            v-model:value="addForm.status"
             :options="commonSwitchRef"
             clearable
             placeholder="请选择字典状态"
@@ -108,7 +108,7 @@
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
-            v-model:value="addDataForm.remark"
+            v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
               maxRows: 5
@@ -120,38 +120,38 @@
       </n-form>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="addDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button @click="addModal = false">取消</n-button>
+          <n-button type="primary" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
 
     <n-modal
-      v-model:show="editDataModalShow"
+      v-model:show="editModal"
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
       size="huge"
-      @after-leave="initDataForm"
+      @after-leave="resetForms"
     >
-      <n-spin :show="editDataFormLoading">
+      <n-spin :show="editLoading">
         <n-form
-          ref="editDataFormRef"
-          :model="editDataForm"
+          ref="editFormRef"
+          :model="editForm"
           :rules="editDataRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
         >
           <n-form-item label="字典标识" path="key">
-            <n-input v-model:value="editDataForm.key" clearable placeholder="请输入字典标识" />
+            <n-input v-model:value="editForm.key" clearable placeholder="请输入字典标识" />
           </n-form-item>
           <n-form-item label="字典名称" path="name">
-            <n-input v-model:value="editDataForm.name" clearable placeholder="请输入字典名称" />
+            <n-input v-model:value="editForm.name" clearable placeholder="请输入字典名称" />
           </n-form-item>
           <n-form-item label="数据类型" path="dataType">
             <n-select
-              v-model:value="editDataForm.dataType"
+              v-model:value="editForm.dataType"
               :options="dictDataTypeRef"
               clearable
               placeholder="请选择字典数据类型"
@@ -159,7 +159,7 @@
           </n-form-item>
           <n-form-item label="字典状态" path="status">
             <n-select
-              v-model:value="editDataForm.status"
+              v-model:value="editForm.status"
               :options="commonSwitchRef"
               clearable
               placeholder="请选择字典状态"
@@ -167,7 +167,7 @@
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
-              v-model:value="editDataForm.remark"
+              v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
                 maxRows: 5
@@ -180,8 +180,8 @@
       </n-spin>
       <template #footer>
         <n-flex justify="end">
-          <n-button @click="editDataModalShow = false">取消</n-button>
-          <n-button type="primary" @click="editData"> 确定</n-button>
+          <n-button @click="editModal = false">取消</n-button>
+          <n-button type="primary" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -192,11 +192,9 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import { dictApi } from '@/api/dict'
-import { usePage } from '@/composables/usePage.ts'
+import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
-import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { pick } from 'lodash-es'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -209,7 +207,7 @@ const router = useRouter()
 // 本页面操作提示关键词
 const _baseName = '系统字典'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(dictApi.urls.list, 'items', () => getDataListParams.value)
+const fetchAllData = createPaginatedFetcher(dictApi.urls.list, 'items', () => listParams.value)
 
 // 加载字典
 const commonFlagRef = useDict('CommonFlag')
@@ -217,46 +215,48 @@ const commonSwitchRef = useDict('CommonSwitch')
 const dictDataTypeRef = useDict('DictDataType')
 
 const {
-  getDataListParams,
+  listParams,
   clearSearch,
-  dataPagination,
-  dataRowKey,
-  addDataModalShow,
-  addDataForm,
-  addDataFormRef,
-  editDataModalShow,
-  editDataFormLoading,
-  editDataId,
-  initEditDataForm,
-  editDataForm,
-  editDataFormRef,
-  initDataForm
-} = usePage(
-  {
+  pagination,
+  rowKey,
+  addModal,
+  addForm,
+  addFormRef,
+  editModal,
+  editLoading,
+  editForm,
+  editFormRef,
+  showAdd,
+  showEdit,
+  submitAdd,
+  submitEdit,
+  deleteRow,
+  resetForms
+} = useCrud({
+  list: {
     keyword: null,
     status: null,
     provided: null,
     pageIndex: 1,
     pageSize: 10
   },
-  () => {
-    getDataList()
-  },
-  {
+  fetchList: () => getDataList(),
+  addForm: {
     key: null,
     name: null,
     dataType: 2,
     status: 1,
     remark: null
   },
-  {
+  editForm: {
     key: null,
     name: null,
     dataType: null,
     status: null,
     remark: null
-  }
-)
+  },
+  api: dictApi
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -312,14 +312,14 @@ const dataColumns: DataTableColumns = [
           label: '编辑',
           icon: 'square-pen',
           disabled: row.provided === 1,
-          onClick: () => showEditDataModal(row.id)
+          onClick: () => showEdit(row.id)
         },
         {
           type: 'error',
           label: '删除',
           icon: 'trash',
           disabled: row.provided === 1,
-          onClick: () => deleteData(row.id),
+          onClick: () => deleteRow(row.id),
           popconfirm: true,
           popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
         }
@@ -338,11 +338,11 @@ const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
   dictApi
-    .list(getDataListParams.value)
+    .list(listParams.value)
     .then(({ data: res }) => {
       dataLoading.value = false
       dataRef.value = res.data.items
-      dataPagination.itemCount = res.data.total
+      pagination.itemCount = res.data.total
     })
 }
 onMounted(getDataList)
@@ -363,19 +363,6 @@ const addDataRules: FormRules = {
   status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
-const showAddDataModal = () => {
-  addDataModalShow.value = true
-}
-const addData = () => {
-  addDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
-
-    dictApi.create(addDataForm.value).then(() => {
-      initDataForm()
-      getDataList()
-    })
-  })
-}
 
 const editDataRules: FormRules = {
   key: [
@@ -390,35 +377,7 @@ const editDataRules: FormRules = {
   status: [{ type: 'number', required: true, message: '请选择字典状态', trigger: 'change' }],
   remark: [{ max: 255, message: '备注长度需在 255 字之内', trigger: 'blur' }]
 }
-const showEditDataModal = (id: any) => {
-  editDataModalShow.value = true
-  editDataFormLoading.value = true
-  // 加载编辑前信息
-  dictApi.detail(id).then(({ data: res }) => {
-    editDataId.value = id
-    const canUpdateFields = Object.keys(initEditDataForm)
-    editDataForm.value = pick(res.data, canUpdateFields)
-    editDataFormLoading.value = false
-  })
-}
-const editData = () => {
-  editDataFormRef.value?.validate((errors) => {
-    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
-    dictApi
-      .update(editDataId.value, editDataForm.value)
-      .then(() => {
-        initDataForm()
-        getDataList()
-      })
-  })
-}
-
-const deleteData = (id: any) => {
-  dictApi.remove(id).then(() => {
-    getDataList()
-  })
-}
 </script>
 
 <style lang="scss" scoped></style>
