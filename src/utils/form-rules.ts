@@ -7,9 +7,18 @@ export function requiredInput(label: string): FormItemRule {
   return { required: true, message: `请输入${label}`, trigger: 'blur' }
 }
 
-/** 必选字段（下拉框、单选等） */
+/** 必选字段（下拉框、单选等），兼容 string/number/boolean 类型的选项值 */
 export function requiredSelect(label: string): FormItemRule {
-  return { type: 'number', required: true, message: `请选择${label}`, trigger: 'change' }
+  return {
+    required: true,
+    trigger: 'change',
+    validator(_rule, value) {
+      if (value === null || value === undefined || value === '') {
+        return new Error(`请选择${label}`)
+      }
+      return true
+    }
+  }
 }
 
 /** 字符串长度范围限制 */
