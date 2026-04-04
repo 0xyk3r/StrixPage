@@ -82,65 +82,6 @@ function addNodeToBranch(branchId: string, branchIdx: number, type: NodeType) {
 }
 </script>
 
-<style lang="scss" scoped>
-.wf-branch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  &__top-line, &__bottom-line {
-    width: 2px;
-    height: 16px;
-    background: #cacdd1;
-  }
-
-  &__container {
-    position: relative;
-    border-top: 2px solid #b0b3b8;
-    border-bottom: 2px solid #b0b3b8;
-  }
-
-  &__add {
-    position: absolute;
-    top: -16px;
-    right: 0;
-    z-index: 1;
-  }
-
-  &__lanes {
-    display: flex;
-  }
-
-  &__lane {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 260px;
-    padding: 0 20px;
-    position: relative;
-
-    &:not(:last-child) {
-      border-right: 2px solid #b0b3b8;
-    }
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 8px 0;
-  }
-
-  &__label { font-size: 12px; color: #606266; font-weight: 500; }
-  &__line-down { width: 2px; height: 12px; background: #b0b3b8; }
-
-  &__children {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 40px;
-  }
-
-  &__empty { padding: 8px 0; }
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

@@ -121,40 +121,6 @@ async function handlePublish() {
 }
 </script>
 
-<style lang="scss" scoped>
-.wf-designer {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  &__toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: #fff;
-    border-bottom: 1px solid #e4e7ed;
-    flex-shrink: 0;
-
-    &-left, &-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-  }
-
-  &__title {
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  &__content {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    background: #f7f8fa;
-  }
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

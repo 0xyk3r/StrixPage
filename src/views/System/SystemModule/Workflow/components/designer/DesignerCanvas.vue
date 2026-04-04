@@ -78,26 +78,6 @@ const RenderNode = defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
-.wf-canvas {
-  width: 100%;
-  min-height: 400px;
-  overflow: auto;
-  padding: 40px 20px;
-  background: #f7f8fa;
-  border-radius: 8px;
-
-  &__flow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: fit-content;
-  }
-}
-
-:deep(.wf-canvas__node-wrapper) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

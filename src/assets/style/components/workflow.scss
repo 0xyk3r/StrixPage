@@ -1,101 +1,407 @@
-.wf-node {
+// ============================================================
+// Nebula Design System — Workflow Designer
+// ============================================================
+// 工作流设计器全局样式 & CSS Custom Properties
+// 使用 [data-theme] 选择器实现暗色/亮色主题切换
+
+@use '../tokens' as *;
+
+// ============================================================
+// Workflow CSS Custom Properties
+// ============================================================
+
+// Dark theme (default)
+[data-theme='dark'], :root {
+  // Node type colors
+  --wf-color-start: #63e2b7;
+  --wf-color-end: rgba(255, 255, 255, 0.35);
+  --wf-color-approval: #70c0e8;
+  --wf-color-cc: #f2c97d;
+  --wf-color-condition: #e6a07c;
+  --wf-color-parallel: #c0a0e0;
+  --wf-color-delay: #e88080;
+  --wf-color-trigger: #b088e0;
+  --wf-color-jump: #4ecdc4;
+  --wf-color-sub-process: rgba(255, 255, 255, 0.45);
+
+  // Node chrome
+  --wf-node-bg: rgba(255, 255, 255, 0.03);
+  --wf-node-border: rgba(255, 255, 255, 0.06);
+  --wf-node-border-hover: rgba(255, 255, 255, 0.12);
+  --wf-canvas-bg: var(--strix-bg-base);
+  --wf-connector-color: rgba(255, 255, 255, 0.08);
+  --wf-add-btn-bg: rgba(255, 255, 255, 0.04);
+  --wf-add-btn-border: rgba(255, 255, 255, 0.08);
+
+  // Per-type header backgrounds (type color @ low opacity)
+  --wf-header-bg-start: rgba(99, 226, 183, 0.1);
+  --wf-header-bg-end: rgba(255, 255, 255, 0.04);
+  --wf-header-bg-approval: rgba(112, 192, 232, 0.08);
+  --wf-header-bg-cc: rgba(242, 201, 125, 0.08);
+  --wf-header-bg-condition: rgba(230, 160, 124, 0.08);
+  --wf-header-bg-parallel: rgba(192, 160, 224, 0.08);
+  --wf-header-bg-delay: rgba(232, 128, 128, 0.08);
+  --wf-header-bg-trigger: rgba(176, 136, 224, 0.08);
+  --wf-header-bg-jump: rgba(78, 205, 196, 0.08);
+  --wf-header-bg-sub-process: rgba(255, 255, 255, 0.04);
+
+  // Selected glow
+  --wf-selected-shadow: 0 0 0 1px rgba(99, 226, 183, 0.3), 0 0 16px rgba(99, 226, 183, 0.08);
+  --wf-hover-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+
+  // Toolbar / Designer
+  --wf-toolbar-bg: var(--strix-bg-elevated);
+  --wf-toolbar-border: var(--strix-border-default);
+}
+
+// Light theme
+[data-theme='light'] {
+  --wf-color-start: #2db48c;
+  --wf-color-end: rgba(0, 0, 0, 0.3);
+  --wf-color-approval: #2080f0;
+  --wf-color-cc: #d4930d;
+  --wf-color-condition: #d07030;
+  --wf-color-parallel: #7c4dba;
+  --wf-color-delay: #d03050;
+  --wf-color-trigger: #9040c0;
+  --wf-color-jump: #0d9488;
+  --wf-color-sub-process: rgba(0, 0, 0, 0.4);
+
+  --wf-node-bg: #ffffff;
+  --wf-node-border: rgba(0, 0, 0, 0.09);
+  --wf-node-border-hover: rgba(0, 0, 0, 0.18);
+  --wf-canvas-bg: var(--strix-bg-base);
+  --wf-connector-color: rgba(0, 0, 0, 0.1);
+  --wf-add-btn-bg: rgba(0, 0, 0, 0.03);
+  --wf-add-btn-border: rgba(0, 0, 0, 0.08);
+
+  --wf-header-bg-start: rgba(45, 180, 140, 0.1);
+  --wf-header-bg-end: rgba(0, 0, 0, 0.04);
+  --wf-header-bg-approval: rgba(32, 128, 240, 0.08);
+  --wf-header-bg-cc: rgba(212, 147, 13, 0.08);
+  --wf-header-bg-condition: rgba(208, 112, 48, 0.08);
+  --wf-header-bg-parallel: rgba(124, 77, 186, 0.08);
+  --wf-header-bg-delay: rgba(208, 48, 80, 0.08);
+  --wf-header-bg-trigger: rgba(144, 64, 192, 0.08);
+  --wf-header-bg-jump: rgba(13, 148, 136, 0.08);
+  --wf-header-bg-sub-process: rgba(0, 0, 0, 0.03);
+
+  --wf-selected-shadow: 0 0 0 1px rgba(45, 180, 140, 0.35), 0 2px 12px rgba(45, 180, 140, 0.1);
+  --wf-hover-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+  --wf-toolbar-bg: var(--strix-bg-elevated);
+  --wf-toolbar-border: var(--strix-border-default);
+}
+
+// ============================================================
+// Canvas
+// ============================================================
+.wf-canvas {
+  width: 100%;
+  min-height: 400px;
+  overflow: auto;
+  padding: $space-10 $space-5;
+  background: var(--wf-canvas-bg);
+  border-radius: $radius-md;
+
+  &__flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: fit-content;
+  }
+
+  &__node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+// ============================================================
+// Node Card
+// ============================================================
+.wf-node-card {
+  width: 220px;
+  border-radius: $radius-md;
+  border: 1.5px solid var(--wf-node-border);
+  background: var(--wf-node-bg);
+  cursor: pointer;
+  transition: border-color $duration-fast $ease-out-smooth,
+              box-shadow $duration-normal $ease-out-smooth;
+  user-select: none;
+  backdrop-filter: blur(8px);
+
+  &:hover {
+    border-color: var(--wf-node-border-hover);
+    box-shadow: var(--wf-hover-shadow);
+  }
+
+  &--selected {
+    box-shadow: var(--wf-selected-shadow);
+  }
+
+  // Per-type border + header bg
+  @each $type in start, end, approval, cc, condition, condition_group, parallel, delay, trigger, jump, sub_process {
+    $color-key: $type;
+    @if $type == condition_group { $color-key: condition; }
+
+    &--#{$type} {
+      border-color: var(--wf-color-#{$color-key});
+
+      .wf-node-card__header {
+        background: var(--wf-header-bg-#{$color-key});
+      }
+
+      .wf-node-card__icon { color: var(--wf-color-#{$color-key}); }
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: $space-2 $space-3;
+    border-radius: calc(#{$radius-md} - 2px) calc(#{$radius-md} - 2px) 0 0;
+    gap: $space-2;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: $text-xs;
+    font-weight: $weight-semibold;
+    color: var(--strix-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-1;
+  }
+
+  &__body {
+    padding: $space-2 $space-3;
+  }
+
+  &__desc {
+    font-size: $text-2xs;
+    color: var(--strix-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+}
+
+// ============================================================
+// Connector
+// ============================================================
+.wf-connector {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
+  position: relative;
 
-  .wf-node-main {
-    // flex: 1;
-    width: 300px;
+  &__line {
+    width: 2px;
+    height: 16px;
+    background: var(--wf-connector-color);
+  }
+}
+
+// ============================================================
+// Add-Node Menu
+// ============================================================
+.wf-add-btn {
+  display: flex;
+  justify-content: center;
+  padding: $space-1 0;
+}
+
+.wf-add-menu {
+  width: 280px;
+
+  &__title {
+    font-size: $text-xs;
+    font-weight: $weight-semibold;
+    margin-bottom: $space-2;
+    color: var(--strix-text-primary);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-2;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-2;
+    border-radius: $radius-sm;
     cursor: pointer;
+    transition: background $duration-fast $ease-out-smooth;
+    font-size: $text-2xs;
+    color: var(--strix-text-secondary);
 
     &:hover {
-      border-color: var(--n-primary-color);
-    }
-
-    &.node-end {
-      width: 140px;
-      height: 30px;
-      line-height: 30px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      text-align: center;
-      border-radius: 10px;
-      background-color: var(--clear-color);
-    }
-
-    .node-header {
-      padding: 3px 10px;
-      height: 28px;
-      border-radius: 2px 2px 0 0;
-      background-color: var(--clear-color);
-      color: var(--text-color-1);
-
-      &.node-approval {
-        background-color: var(--primary-color-suppl);
-      }
-
-      &.node-task {
-        background-color: var(--warning-color-suppl);
-      }
-
-      &.node-cc {
-        background-color: var(--info-color-suppl);
-      }
-
-      .node-header-content {
-        font-size: 14px;
-        line-height: 14px;
-        display: flex;
-        align-items: stretch;
-
-        .n-icon {
-          margin-right: 5px;
-        }
-      }
-    }
-
-    .node-content {
-      padding: 20px;
-      font-size: 16px;
-      color: var(--n-text-color);
-      min-height: 60px;
-
-      .node-body-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .n-icon {
-          margin-right: 5px;
-        }
-      }
+      background: var(--strix-bg-surface-hover);
     }
   }
 
-  .wf-node-footer {
-    width: 34px;
-    margin: 0 auto;
+  &__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Per-type icon backgrounds
+    &--approval { background: var(--wf-color-approval); }
+    &--cc { background: var(--wf-color-cc); }
+    &--condition { background: var(--wf-color-condition); }
+    &--parallel { background: var(--wf-color-parallel); }
+    &--delay { background: var(--wf-color-delay); }
+    &--trigger { background: var(--wf-color-trigger); }
+    &--jump { background: var(--wf-color-jump); }
+    &--sub-process { background: var(--wf-color-sub-process); }
+  }
+}
+
+// ============================================================
+// Branch (Condition & Parallel)
+// ============================================================
+.wf-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__top-line, &__bottom-line {
+    width: 2px;
+    height: 16px;
+    background: var(--wf-connector-color);
+  }
+
+  &__container {
+    position: relative;
+    border-top: 2px solid var(--wf-connector-color);
+    border-bottom: 2px solid var(--wf-connector-color);
+  }
+
+  &__add {
+    position: absolute;
+    top: -16px;
+    right: 0;
+    z-index: $z-base;
+  }
+
+  &__lanes {
+    display: flex;
+  }
+
+  &__lane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 260px;
+    padding: 0 $space-5;
     position: relative;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 0;
-      margin: auto;
-      width: 2px;
-      height: 100%;
-      background-color: var(--n-text-color);
-      opacity: 0.1;
-    }
-
-    .wf-node-btn {
-      z-index: 1;
-      margin: 20px auto;
+    &:not(:last-child) {
+      border-right: 2px solid var(--wf-connector-color);
     }
   }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-2 0;
+  }
+
+  &__label {
+    font-size: $text-2xs;
+    color: var(--strix-text-secondary);
+    font-weight: $weight-medium;
+  }
+
+  &__line-down {
+    width: 2px;
+    height: 12px;
+    background: var(--wf-connector-color);
+  }
+
+  &__children {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  &__empty {
+    padding: $space-2 0;
+  }
+}
+
+// ============================================================
+// Designer (top-level layout)
+// ============================================================
+.wf-designer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-2 $space-4;
+    background: var(--wf-toolbar-bg);
+    border-bottom: 1px solid var(--wf-toolbar-border);
+    flex-shrink: 0;
+
+    &-left, &-right {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+    }
+  }
+
+  &__title {
+    font-size: $text-md;
+    font-weight: $weight-semibold;
+    color: var(--strix-text-primary);
+  }
+
+  &__content {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    padding: $space-5;
+    background: var(--wf-canvas-bg);
+  }
+}
+
+// ============================================================
+// Instance Timeline
+// ============================================================
+.timeline-action {
+  font-weight: $weight-semibold;
+  font-size: $text-xs;
+  color: var(--strix-text-primary);
+}
+
+.timeline-operator {
+  font-size: $text-2xs;
+  color: var(--strix-text-secondary);
 }

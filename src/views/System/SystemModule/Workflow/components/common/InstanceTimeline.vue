@@ -63,13 +63,6 @@ function getLogType(action: string): 'default' | 'info' | 'success' | 'warning' 
 }
 </script>
 
-<style lang="scss" scoped>
-.timeline-action {
-  font-weight: 600;
-  font-size: 13px;
-}
-.timeline-operator {
-  font-size: 12px;
-  color: #909399;
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

@@ -94,52 +94,6 @@ function handleClick() {
 }
 </script>
 
-<style lang="scss" scoped>
-.wf-node-card {
-  width: 220px;
-  border-radius: 8px;
-  border: 2px solid #e4e7ed;
-  background: #fff;
-  cursor: pointer;
-  transition: all 0.2s;
-  user-select: none;
-
-  &:hover { border-color: #409eff; box-shadow: 0 2px 12px rgba(64, 158, 255, 0.15); }
-  &--selected { border-color: #409eff; box-shadow: 0 2px 12px rgba(64, 158, 255, 0.3); }
-
-  &--start { border-color: #67c23a; .wf-node-card__header { background: #f0f9eb; } }
-  &--end { border-color: #909399; .wf-node-card__header { background: #f4f4f5; } }
-  &--approval { border-color: #409eff; .wf-node-card__header { background: #ecf5ff; } }
-  &--cc { border-color: #e6a23c; .wf-node-card__header { background: #fdf6ec; } }
-  &--condition, &--condition_group { border-color: #e6a23c; .wf-node-card__header { background: #fdf6ec; } }
-  &--parallel { border-color: #909399; .wf-node-card__header { background: #f4f4f5; } }
-  &--delay { border-color: #f56c6c; .wf-node-card__header { background: #fef0f0; } }
-  &--trigger { border-color: #9b59b6; .wf-node-card__header { background: #f3e8ff; } }
-  &--jump { border-color: #00b894; .wf-node-card__header { background: #e8fff8; } }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 6px 6px 0 0;
-    gap: 8px;
-  }
-
-  &__icon { display: flex; align-items: center; }
-  &__title { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  &__actions { display: flex; gap: 4px; }
-
-  &__body {
-    padding: 8px 12px;
-  }
-
-  &__desc {
-    font-size: 12px;
-    color: #909399;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: block;
-  }
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

@@ -17,7 +17,7 @@
           class="wf-add-menu__item"
           @click="handleSelect(item.type)"
         >
-          <div class="wf-add-menu__icon" :style="{ background: item.color }">
+          <div class="wf-add-menu__icon" :class="`wf-add-menu__icon--${item.type.toLowerCase().replace('_', '-')}`">
             <component :is="item.icon" :size="16" color="#fff" />
           </div>
           <span>{{ item.label }}</span>
@@ -42,14 +42,14 @@ const emit = defineEmits<{
 const showMenu = ref(false)
 
 const nodeOptions = [
-  { type: 'APPROVAL' as NodeType, label: '审批', icon: UserCheck, color: '#409eff' },
-  { type: 'CC' as NodeType, label: '抄送', icon: Send, color: '#e6a23c' },
-  { type: 'CONDITION_GROUP' as NodeType, label: '条件分支', icon: GitBranch, color: '#e6a23c' },
-  { type: 'PARALLEL' as NodeType, label: '并行分支', icon: GitFork, color: '#909399' },
-  { type: 'DELAY' as NodeType, label: '延迟', icon: Clock, color: '#f56c6c' },
-  { type: 'TRIGGER' as NodeType, label: '触发器', icon: Zap, color: '#9b59b6' },
-  { type: 'JUMP' as NodeType, label: '跳转', icon: CornerUpRight, color: '#00b894' },
-  { type: 'SUB_PROCESS' as NodeType, label: '子流程', icon: Workflow, color: '#3498db' }
+  { type: 'APPROVAL' as NodeType, label: '审批', icon: UserCheck },
+  { type: 'CC' as NodeType, label: '抄送', icon: Send },
+  { type: 'CONDITION_GROUP' as NodeType, label: '条件分支', icon: GitBranch },
+  { type: 'PARALLEL' as NodeType, label: '并行分支', icon: GitFork },
+  { type: 'DELAY' as NodeType, label: '延迟', icon: Clock },
+  { type: 'TRIGGER' as NodeType, label: '触发器', icon: Zap },
+  { type: 'JUMP' as NodeType, label: '跳转', icon: CornerUpRight },
+  { type: 'SUB_PROCESS' as NodeType, label: '子流程', icon: Workflow }
 ]
 
 function handleSelect(type: NodeType) {
@@ -58,51 +58,6 @@ function handleSelect(type: NodeType) {
 }
 </script>
 
-<style lang="scss" scoped>
-.wf-add-btn {
-  display: flex;
-  justify-content: center;
-  padding: 4px 0;
-}
-
-.wf-add-menu {
-  width: 280px;
-
-  &__title {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #303133;
-  }
-
-  &__grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-
-  &__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 12px;
-    color: #606266;
-
-    &:hover { background: #f5f7fa; }
-  }
-
-  &__icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>

@@ -20,17 +20,6 @@ const emit = defineEmits<{
 }>()
 </script>
 
-<style lang="scss" scoped>
-.wf-connector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-
-  &__line {
-    width: 2px;
-    height: 16px;
-    background: #cacdd1;
-  }
-}
+<style lang="scss">
+// Styles provided by global workflow.scss — no scoped overrides needed
 </style>
