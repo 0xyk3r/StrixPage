@@ -76,6 +76,7 @@ const goHome = () => {
   justify-content: center;
   min-height: 400px;
   padding: 40px 20px;
+  user-select: text;
 }
 
 .strix-error-boundary__detail {

@@ -67,11 +67,11 @@ async function searchManagers(query: string) {
   if (!query || query.length < 1) return
   managerLoading.value = true
   try {
-    const { data: res } = await http.get<RetResult<{ items: any[]; total: number }>>('system/manager', {
+    const { data: res } = await http.get<RetResult<{ systemManagerList: any[]; total: number }>>('system/manager', {
       params: { keyword: query, pageIndex: 1, pageSize: 20 }
     })
-    managerOptions.value = res.data.items.map((m: any) => ({
-      label: m.realName || m.managerName,
+    managerOptions.value = (res.data?.systemManagerList || []).map((m: any) => ({
+      label: m.nickname || m.loginName,
       value: m.id
     }))
   } finally {
@@ -86,10 +86,8 @@ const roleLoading = ref(false)
 async function loadRoles() {
   roleLoading.value = true
   try {
-    const { data: res } = await http.get<RetResult<{ items: any[]; total: number }>>('system/role', {
-      params: { pageIndex: 1, pageSize: 100 }
-    })
-    roleOptions.value = res.data.items.map((r: any) => ({
+    const { data: res } = await http.get<RetResult<{ systemRoleList: any[] }>>('system/role')
+    roleOptions.value = (res.data?.systemRoleList || []).map((r: any) => ({
       label: r.name,
       value: r.id
     }))
