@@ -21,6 +21,7 @@
     "dexie": "^4.2.1",
     "echarts": "^6.0.0",
     "element-resize-detector": "^1.2.4",
+    "highlight.js": "^11.11.1",
     "lodash-es": "^4.17.23",
     "lucide-vue-next": "^0.563.0",
     "mitt": "^3.0.1",

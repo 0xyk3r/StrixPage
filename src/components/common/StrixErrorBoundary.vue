@@ -17,7 +17,7 @@
 
     <n-collapse v-if="errorDetail" class="strix-error-boundary__detail">
       <n-collapse-item title="错误详情" name="detail">
-        <n-code :code="errorDetail" language="text" word-wrap />
+        <n-code :code="errorDetail" language="javascript" word-wrap />
       </n-collapse-item>
     </n-collapse>
   </div>

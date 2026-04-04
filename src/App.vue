@@ -5,6 +5,7 @@
     :theme="currentNaiveTheme"
     :theme-overrides="currentNaiveTheme === null ? lightThemeOverrides : darkThemeOverrides"
     :component-options="componentOptions"
+    :hljs="hljs"
   >
     <n-loading-bar-provider>
       <n-notification-provider>
@@ -40,6 +41,10 @@ import StrixNetworkStatus from './components/system/StrixNetworkStatus.vue'
 import StrixSwNotify from './components/system/StrixSwNotify.vue'
 import StrixEmpty from './components/common/StrixEmpty.vue'
 import { EventBus } from './plugins/event-bus'
+import hljs from 'highlight.js/lib/core'
+import javascript from 'highlight.js/lib/languages/javascript'
+
+hljs.registerLanguage('javascript', javascript)
 
 const globalSettingsStore = useStrixSettingsStore()
 const osTheme = useOsTheme()
