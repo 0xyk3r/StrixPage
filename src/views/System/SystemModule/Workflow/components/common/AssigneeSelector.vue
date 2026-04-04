@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { SelectOption } from 'naive-ui'
 import { http } from '@/plugins/axios'
 import type { RetResult } from '@/api/types'
@@ -56,8 +56,18 @@ const emit = defineEmits<{
 const localType = ref(props.assigneeType || 'MANAGER')
 const localIds = ref<string[]>(props.assigneeIds || [])
 
-watch(() => props.assigneeType, v => { localType.value = v })
-watch(() => props.assigneeIds, v => { localIds.value = v || [] })
+watch(
+  () => props.assigneeType,
+  (v) => {
+    localType.value = v
+  }
+)
+watch(
+  () => props.assigneeIds,
+  (v) => {
+    localIds.value = v || []
+  }
+)
 
 // Manager search
 const managerOptions = ref<SelectOption[]>([])
