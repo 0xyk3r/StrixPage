@@ -51,7 +51,7 @@ const emit = defineEmits<{
 
 const store = useWorkflowStore()
 const isSelected = computed(() => store.selectedNodeId === props.node.id)
-const canDelete = computed(() => !props.readonly && props.node.type !== 'START' && props.node.type !== 'END')
+const canDelete = computed(() => !props.readonly && !['START', 'END', 'CONDITION'].includes(props.node.type))
 const showActions = computed(() => !props.readonly && props.node.type !== 'START' && props.node.type !== 'END')
 
 const iconMap: Record<NodeType, any> = {
