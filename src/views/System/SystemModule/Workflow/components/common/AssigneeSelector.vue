@@ -5,7 +5,6 @@
         <n-radio value="MANAGER">指定人员</n-radio>
         <n-radio value="ROLE">指定角色</n-radio>
         <n-radio value="INITIATOR">发起人</n-radio>
-        <n-radio value="INITIATOR_DEPT_LEADER">发起人部门主管</n-radio>
       </n-radio-group>
     </n-form-item>
 

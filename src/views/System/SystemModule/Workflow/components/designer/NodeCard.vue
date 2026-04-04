@@ -72,15 +72,24 @@ const nodeIcon = computed(() => iconMap[props.node.type] || Workflow)
 
 const description = computed(() => {
   const c = props.node.config
+  const assigneeLabel = (cfg: any) => {
+    const typeMap: Record<string, string> = {
+      MANAGER: `${cfg.assigneeIds?.length || 0} 人`,
+      ROLE: `${cfg.assigneeIds?.length || 0} 个角色`,
+      INITIATOR: '发起人本人'
+    }
+    return typeMap[cfg.assigneeType] || '未配置'
+  }
+  const unitMap: Record<string, string> = { MINUTES: '分钟', HOURS: '小时', DAYS: '天' }
   switch (props.node.type) {
     case 'START': return '流程开始'
     case 'END': return '流程结束'
     case 'APPROVAL': {
       const modeMap: Record<string, string> = { ANY: '任一审批', ALL: '会签', SEQUENTIAL: '顺序审批' }
-      return modeMap[c.approvalMode] || '审批'
+      return `${modeMap[c.approvalMode] || '审批'} · ${assigneeLabel(c)}`
     }
-    case 'CC': return `抄送 ${c.ccIds?.length || 0} 人`
-    case 'DELAY': return `等待 ${c.delayTime || 0} ${c.delayUnit || '分钟'}`
+    case 'CC': return `抄送 · ${assigneeLabel(c)}`
+    case 'DELAY': return `等待 ${c.delayValue || 0} ${unitMap[c.delayUnit] || c.delayUnit || '小时'}`
     case 'TRIGGER': return c.triggerKey || '未配置'
     case 'JUMP': return c.targetNodeId ? '跳转到指定节点' : '未配置'
     case 'CONDITION_GROUP': return `${props.node.branches?.length || 0} 个条件分支`
