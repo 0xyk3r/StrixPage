@@ -278,6 +278,95 @@ const routes: RouteRecordRaw[] = [
             ]
           },
           {
+            path: 'workflow',
+            name: 'SystemModuleWorkflow',
+            meta: { title: '工作流管理', empty: true },
+            children: [
+              {
+                path: 'definition',
+                name: 'WorkflowDefinitionIndex',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowDefinitionIndex.vue'),
+                meta: {
+                  title: '流程定义',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'designer/:definitionId',
+                name: 'WorkflowDesigner',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowDesigner.vue'),
+                meta: {
+                  title: '流程设计器',
+                  empty: false,
+                  parentRouteName: 'WorkflowDefinitionIndex',
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'task/mine',
+                name: 'WorkflowTaskMine',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowTaskMine.vue'),
+                meta: {
+                  title: '我的待办',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'task/done',
+                name: 'WorkflowTaskDone',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowTaskDone.vue'),
+                meta: {
+                  title: '已处理',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'task/initiated',
+                name: 'WorkflowTaskInitiated',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowTaskInitiated.vue'),
+                meta: {
+                  title: '我发起的',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'instance/:id',
+                name: 'WorkflowInstanceDetail',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowInstanceDetail.vue'),
+                meta: {
+                  title: '流程详情',
+                  empty: false,
+                  parentRouteName: 'WorkflowTaskMine',
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'monitor',
+                name: 'WorkflowMonitor',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowMonitor.vue'),
+                meta: {
+                  title: '流程监控',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              },
+              {
+                path: 'delegation',
+                name: 'WorkflowDelegation',
+                component: () => import('@/views/System/SystemModule/Workflow/WorkflowDelegation.vue'),
+                meta: {
+                  title: '审批代理',
+                  empty: false,
+                  permission: 'system:module:workflow'
+                }
+              }
+            ]
+          },
+          {
             path: 'oss',
             name: 'SystemModuleOss',
             meta: {
