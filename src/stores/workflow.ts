@@ -102,11 +102,12 @@ export const useWorkflowStore = defineStore('workflow', () => {
     const node = findNode(tree.value, nodeId)
     if (node && node.branches) {
       const idx = node.branches.length
+      const isCondition = node.type === 'CONDITION_GROUP'
       node.branches.push({
         id: crypto.randomUUID(),
-        name: node.type === 'CONDITION_GROUP' ? `条件 ${idx + 1}` : `分支 ${idx + 1}`,
+        name: isCondition ? `条件 ${idx + 1}` : `分支 ${idx + 1}`,
         sortOrder: idx,
-        children: []
+        children: isCondition ? [createNode('CONDITION')] : []
       })
     }
   }

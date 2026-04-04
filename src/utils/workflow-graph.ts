@@ -317,18 +317,26 @@ export function createNode(type: NodeType): DesignerTreeNode {
   }
 
   const def = defaults[type]
-  return {
+  const node: DesignerTreeNode = {
     id: uuid(),
     type,
     name: def.name,
     config: { ...def.config },
     branches: (type === 'CONDITION_GROUP' || type === 'PARALLEL')
       ? [
-          { id: uuid(), name: type === 'CONDITION_GROUP' ? '条件 1' : '分支 1', sortOrder: 0, children: [] },
+          {
+            id: uuid(),
+            name: type === 'CONDITION_GROUP' ? '条件 1' : '分支 1',
+            sortOrder: 0,
+            children: type === 'CONDITION_GROUP'
+              ? [createNode('CONDITION')]
+              : []
+          },
           { id: uuid(), name: type === 'CONDITION_GROUP' ? '默认' : '分支 2', sortOrder: 1, children: [] }
         ]
       : undefined
   }
+  return node
 }
 
 /**

@@ -13,7 +13,6 @@
         v-model:value="localIds"
         multiple
         filterable
-        remote
         :options="managerOptions"
         :loading="managerLoading"
         placeholder="搜索并选择人员"
@@ -73,11 +72,10 @@ const managerOptions = ref<SelectOption[]>([])
 const managerLoading = ref(false)
 
 async function searchManagers(query: string) {
-  if (!query || query.length < 1) return
   managerLoading.value = true
   try {
     const { data: res } = await http.get<RetResult<{ systemManagerList: any[]; total: number }>>('system/manager', {
-      params: { keyword: query, pageIndex: 1, pageSize: 20 }
+      params: { keyword: query || undefined, pageIndex: 1, pageSize: 50 }
     })
     managerOptions.value = (res.data?.systemManagerList || []).map((m: any) => ({
       label: m.nickname || m.loginName,
@@ -105,7 +103,10 @@ async function loadRoles() {
   }
 }
 
-onMounted(loadRoles)
+onMounted(() => {
+  loadRoles()
+  searchManagers('')
+})
 
 function handleTypeChange(value: string) {
   localIds.value = []
