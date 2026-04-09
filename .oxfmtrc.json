@@ -6,5 +6,8 @@
   "printWidth": 120,
   "trailingComma": "none",
   "sortPackageJson": false,
-  "ignorePatterns": ["components.d.ts"]
+  "ignorePatterns": [
+    "components.d.ts",
+    "auto-imports.d.ts"
+  ]
 }
