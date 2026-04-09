@@ -8,52 +8,51 @@
 </template>
 
 <script lang="ts" setup>
-import { h, defineComponent } from 'vue'
-import type { DesignerTreeNode, NodeType } from '@/api/workflow'
-import { useWorkflowStore } from '@/stores/workflow'
-import NodeCard from './NodeCard.vue'
-import NodeConnector from './NodeConnector.vue'
-import ConditionBranch from './ConditionBranch.vue'
-import ParallelBranch from './ParallelBranch.vue'
+import { h, defineComponent } from "vue";
+import type { DesignerTreeNode, NodeType } from "@/api/workflow";
+import { useWorkflowStore } from "@/stores/workflow";
+import NodeCard from "./NodeCard.vue";
+import NodeConnector from "./NodeConnector.vue";
+import ConditionBranch from "./ConditionBranch.vue";
+import ParallelBranch from "./ParallelBranch.vue";
 
 defineProps<{
-  readonly?: boolean
-}>()
+  readonly?: boolean;
+}>();
 
-const store = useWorkflowStore()
+const store = useWorkflowStore();
 
 // Recursive render component
 const RenderNode = defineComponent({
-  name: 'RenderNode',
+  name: "RenderNode",
   props: {
     node: { type: Object as () => DesignerTreeNode, required: true },
-    readonly: { type: Boolean, default: false }
+    readonly: { type: Boolean, default: false },
   },
   setup(props) {
     return () => {
-      const elements: any[] = []
+      const elements: any[] = [];
 
       // 1. Render the node card
       elements.push(
         h(NodeCard, {
           node: props.node,
           readonly: props.readonly,
-          onDelete: (id: string) => store.deleteNode(id)
-        })
-      )
+          onDelete: (id: string) => store.deleteNode(id),
+        }),
+      );
 
       // 2. If branches exist (CONDITION_GROUP or PARALLEL)
       if (props.node.branches && props.node.branches.length > 0) {
-        const BranchComponent = props.node.type === 'CONDITION_GROUP'
-          ? ConditionBranch
-          : ParallelBranch
+        const BranchComponent =
+          props.node.type === "CONDITION_GROUP" ? ConditionBranch : ParallelBranch;
 
         elements.push(
           h(BranchComponent, {
             node: props.node,
-            readonly: props.readonly
-          })
-        )
+            readonly: props.readonly,
+          }),
+        );
       }
 
       // 3. Connector + next node
@@ -61,21 +60,21 @@ const RenderNode = defineComponent({
         elements.push(
           h(NodeConnector, {
             readonly: props.readonly,
-            onAddNode: (type: NodeType) => store.addNode(props.node.id, type)
-          })
-        )
+            onAddNode: (type: NodeType) => store.addNode(props.node.id, type),
+          }),
+        );
         elements.push(
           h(RenderNode, {
             node: props.node.next,
-            readonly: props.readonly
-          })
-        )
+            readonly: props.readonly,
+          }),
+        );
       }
 
-      return h('div', { class: 'wf-canvas__node-wrapper' }, elements)
-    }
-  }
-})
+      return h("div", { class: "wf-canvas__node-wrapper" }, elements);
+    };
+  },
+});
 </script>
 
 <style lang="scss">

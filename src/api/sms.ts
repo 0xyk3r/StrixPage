@@ -127,21 +127,23 @@ export const smsApi = {
   templateList: (params: Record<string, any>) =>
     http.get<RetResult<SmsTemplateListResp>>(`${BASE}/template`, {
       params,
-      meta: { operate: '加载短信模板列表' },
+      meta: { operate: "加载短信模板列表" },
     }),
 
   signList: (params: Record<string, any>) =>
     http.get<RetResult<SmsSignListResp>>(`${BASE}/sign`, {
       params,
-      meta: { operate: '加载短信签名列表' },
+      meta: { operate: "加载短信签名列表" },
     }),
 
   logList: (params: Record<string, any>) =>
     http.get<RetResult<SmsLogListResp>>(`${BASE}/log`, {
       params,
-      meta: { operate: '加载短信日志列表' },
+      meta: { operate: "加载短信日志列表" },
     }),
 
   configSelect: () =>
-    http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, { meta: { operate: '加载短信配置下拉列表' } }),
-}
+    http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, {
+      meta: { operate: "加载短信配置下拉列表" },
+    }),
+};

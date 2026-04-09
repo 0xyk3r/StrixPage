@@ -104,27 +104,31 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from '@/components/common/StrixBlock.vue'
-import StrixTag from '@/components/common/StrixTag.vue'
-import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
-import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
-import StrixIcon from '@/components/icon/StrixIcon.vue'
-import { useTableColumns } from '@/composables/useTableColumns'
-import { createPaginatedFetcher } from '@/composables/useTableExport'
-import { userApi } from '@/api/user'
-import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
-import { handleOperate } from '@/utils/strix-table-tool'
-import { textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixBlock from "@/components/common/StrixBlock.vue";
+import StrixTag from "@/components/common/StrixTag.vue";
+import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
+import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
+import StrixIcon from "@/components/icon/StrixIcon.vue";
+import { useTableColumns } from "@/composables/useTableColumns";
+import { createPaginatedFetcher } from "@/composables/useTableExport";
+import { userApi } from "@/api/user";
+import { useCrud } from "@/composables/useCrud";
+import { useDict } from "@/composables/useDict.ts";
+import { handleOperate } from "@/utils/strix-table-tool";
+import { textField } from "@/utils/form-rules";
+import { type DataTableColumns, type FormRules } from "naive-ui";
 
 // 本页面操作提示关键词
-const _baseName = '系统用户'
-const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => listParams.value)
+const _baseName = "系统用户";
+const showExportDialog = ref(false);
+const fetchAllData = createPaginatedFetcher(
+  userApi.urls.list,
+  "systemUserList",
+  () => listParams.value,
+);
 
 // 加载字典
-const systemUserStatusRef = useDict('SystemUserStatus')
+const systemUserStatusRef = useDict("SystemUserStatus");
 
 const {
   listParams,
@@ -139,87 +143,84 @@ const {
   submitEdit,
   deleteRow,
   resetForms,
-  tryCloseEdit
+  tryCloseEdit,
 } = useCrud({
   list: {
     keyword: null,
     status: null,
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 10,
   },
   fetchList: () => getDataList(),
   editForm: {
     nickname: null,
     status: null,
-    phoneNumber: null
+    phoneNumber: null,
   },
   api: userApi,
-  draftKey: 'SystemUser'
-})
+  draftKey: "SystemUser",
+});
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'nickname', title: '用户昵称', width: 200 },
-  { key: 'phoneNumber', title: '手机号码', width: 200 },
+  { key: "nickname", title: "用户昵称", width: 200 },
+  { key: "phoneNumber", title: "手机号码", width: 200 },
   {
-    key: 'status',
-    title: '用户状态',
+    key: "status",
+    title: "用户状态",
     width: 140,
-    align: 'center',
-    dictName: 'SystemUserStatus',
+    align: "center",
+    dictName: "SystemUserStatus",
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'SystemUserStatus' })
-    }
+      return h(StrixTag, { value: row.status, dictName: "SystemUserStatus" });
+    },
   },
   {
-    key: 'actions',
-    title: '操作',
+    key: "actions",
+    title: "操作",
     width: 130,
-    align: 'center',
+    align: "center",
     render(row: any) {
       return handleOperate([
         {
-          type: 'warning',
-          label: '编辑',
-          icon: 'square-pen',
-          onClick: () => showEdit(row.id)
+          type: "warning",
+          label: "编辑",
+          icon: "square-pen",
+          onClick: () => showEdit(row.id),
         },
         {
-          type: 'error',
-          label: '删除',
-          icon: 'trash',
+          type: "error",
+          label: "删除",
+          icon: "trash",
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
-        }
-      ])
-    }
-  }
-]
+          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
+        },
+      ]);
+    },
+  },
+];
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
 
 // 加载列表
-const dataRef = ref()
-const dataLoading = ref(true)
+const dataRef = ref();
+const dataLoading = ref(true);
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true
-  userApi
-    .list(listParams.value)
-    .then(({ data: res }) => {
-      dataLoading.value = false
-      dataRef.value = res.data.systemUserList
-      pagination.itemCount = res.data.total
-    })
-}
-onMounted(getDataList)
+  dataLoading.value = true;
+  userApi.list(listParams.value).then(({ data: res }) => {
+    dataLoading.value = false;
+    dataRef.value = res.data.systemUserList;
+    pagination.itemCount = res.data.total;
+  });
+};
+onMounted(getDataList);
 
 const formRules: FormRules = {
-  nickname: textField('用户昵称')
-}
-
+  nickname: textField("用户昵称"),
+};
 </script>
 
 <style lang="scss" scoped></style>

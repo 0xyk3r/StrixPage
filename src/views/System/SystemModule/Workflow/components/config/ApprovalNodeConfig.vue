@@ -15,8 +15,18 @@
     <assignee-selector
       :assignee-type="config.assigneeType"
       :assignee-ids="config.assigneeIds"
-      @update:assignee-type="v => { config.assigneeType = v; emitUpdate() }"
-      @update:assignee-ids="v => { config.assigneeIds = v; emitUpdate() }"
+      @update:assignee-type="
+        (v) => {
+          config.assigneeType = v;
+          emitUpdate();
+        }
+      "
+      @update:assignee-ids="
+        (v) => {
+          config.assigneeIds = v;
+          emitUpdate();
+        }
+      "
     />
 
     <n-divider />
@@ -37,47 +47,55 @@
     <n-divider />
 
     <n-form-item label="超时(小时)">
-      <n-input-number v-model:value="config.timeoutHours" :min="0" :max="720" @update:value="emitUpdate" />
+      <n-input-number
+        v-model:value="config.timeoutHours"
+        :min="0"
+        :max="720"
+        @update:value="emitUpdate"
+      />
     </n-form-item>
   </n-form>
 </template>
 
 <script lang="ts" setup>
-import { reactive, watch } from 'vue'
-import type { DesignerTreeNode } from '@/api/workflow'
-import AssigneeSelector from '../common/AssigneeSelector.vue'
+import { reactive, watch } from "vue";
+import type { DesignerTreeNode } from "@/api/workflow";
+import AssigneeSelector from "../common/AssigneeSelector.vue";
 
-const props = defineProps<{ node: DesignerTreeNode }>()
-const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>()
+const props = defineProps<{ node: DesignerTreeNode }>();
+const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>();
 
 const config = reactive({
   name: props.node.name,
-  approvalMode: props.node.config.approvalMode || 'ANY',
-  assigneeType: props.node.config.assigneeType || 'MANAGER',
+  approvalMode: props.node.config.approvalMode || "ANY",
+  assigneeType: props.node.config.assigneeType || "MANAGER",
   assigneeIds: props.node.config.assigneeIds || [],
   allowDelegate: props.node.config.allowDelegate ?? true,
   allowReturn: props.node.config.allowReturn ?? true,
   allowCountersign: props.node.config.allowCountersign ?? true,
   allowWithdraw: props.node.config.allowWithdraw ?? true,
-  timeoutHours: props.node.config.timeoutHours ?? 0
-})
+  timeoutHours: props.node.config.timeoutHours ?? 0,
+});
 
-watch(() => props.node.id, () => {
-  Object.assign(config, {
-    name: props.node.name,
-    approvalMode: props.node.config.approvalMode || 'ANY',
-    assigneeType: props.node.config.assigneeType || 'MANAGER',
-    assigneeIds: props.node.config.assigneeIds || [],
-    allowDelegate: props.node.config.allowDelegate ?? true,
-    allowReturn: props.node.config.allowReturn ?? true,
-    allowCountersign: props.node.config.allowCountersign ?? true,
-    allowWithdraw: props.node.config.allowWithdraw ?? true,
-    timeoutHours: props.node.config.timeoutHours ?? 0
-  })
-})
+watch(
+  () => props.node.id,
+  () => {
+    Object.assign(config, {
+      name: props.node.name,
+      approvalMode: props.node.config.approvalMode || "ANY",
+      assigneeType: props.node.config.assigneeType || "MANAGER",
+      assigneeIds: props.node.config.assigneeIds || [],
+      allowDelegate: props.node.config.allowDelegate ?? true,
+      allowReturn: props.node.config.allowReturn ?? true,
+      allowCountersign: props.node.config.allowCountersign ?? true,
+      allowWithdraw: props.node.config.allowWithdraw ?? true,
+      timeoutHours: props.node.config.timeoutHours ?? 0,
+    });
+  },
+);
 
 function emitUpdate() {
-  const { name, ...rest } = config
-  emit('update', rest, name)
+  const { name, ...rest } = config;
+  emit("update", rest, name);
 }
 </script>

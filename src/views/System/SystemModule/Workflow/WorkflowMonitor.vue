@@ -30,80 +30,83 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, h } from 'vue'
-import { useRouter } from 'vue-router'
-import { workflowApi } from '@/api/workflow'
-import type { WfStatsResp, WfInstance } from '@/api/workflow'
-import { handleOperate } from '@/utils/strix-table-tool'
-import { Layers, Play, CheckCircle, Clock } from 'lucide-vue-next'
-import { type DataTableColumns, NTag } from 'naive-ui'
+import { ref, computed, onMounted, h } from "vue";
+import { useRouter } from "vue-router";
+import { workflowApi } from "@/api/workflow";
+import type { WfStatsResp, WfInstance } from "@/api/workflow";
+import { handleOperate } from "@/utils/strix-table-tool";
+import { Layers, Play, CheckCircle, Clock } from "lucide-vue-next";
+import { type DataTableColumns, NTag } from "naive-ui";
 
-const router = useRouter()
+const router = useRouter();
 const stats = ref<WfStatsResp>({
-  totalDefinitions: 0, activeDefinitions: 0,
-  runningInstances: 0, completedToday: 0,
-  pendingTasks: 0, avgCompletionTime: 0
-})
-const instances = ref<WfInstance[]>([])
-const loading = ref(true)
+  totalDefinitions: 0,
+  activeDefinitions: 0,
+  runningInstances: 0,
+  completedToday: 0,
+  pendingTasks: 0,
+  avgCompletionTime: 0,
+});
+const instances = ref<WfInstance[]>([]);
+const loading = ref(true);
 
 const statsCards = computed(() => [
-  { label: '流程定义', value: stats.value.totalDefinitions, icon: Layers, color: '#409eff' },
-  { label: '运行中实例', value: stats.value.runningInstances, icon: Play, color: '#e6a23c' },
-  { label: '今日完成', value: stats.value.completedToday, icon: CheckCircle, color: '#67c23a' },
-  { label: '待办任务', value: stats.value.pendingTasks, icon: Clock, color: '#f56c6c' }
-])
+  { label: "流程定义", value: stats.value.totalDefinitions, icon: Layers, color: "#409eff" },
+  { label: "运行中实例", value: stats.value.runningInstances, icon: Play, color: "#e6a23c" },
+  { label: "今日完成", value: stats.value.completedToday, icon: CheckCircle, color: "#67c23a" },
+  { label: "待办任务", value: stats.value.pendingTasks, icon: Clock, color: "#f56c6c" },
+]);
 
 const columns: DataTableColumns = [
-  { key: 'title', title: '流程名称', width: 200 },
-  { key: 'initiatorName', title: '发起人', width: 120 },
+  { key: "title", title: "流程名称", width: 200 },
+  { key: "initiatorName", title: "发起人", width: 120 },
   {
-    key: 'status',
-    title: '状态',
+    key: "status",
+    title: "状态",
     width: 100,
     render(row: any) {
       const map: Record<number, { label: string; type: string }> = {
-        1: { label: '运行中', type: 'info' },
-        2: { label: '已完成', type: 'success' },
-        3: { label: '已拒绝', type: 'error' },
-        4: { label: '已撤销', type: 'warning' },
-        5: { label: '已挂起', type: 'default' }
-      }
-      const s = map[row.status] || { label: '未知', type: 'default' }
-      return h(NTag, { type: s.type as any, size: 'small' }, () => s.label)
-    }
+        1: { label: "运行中", type: "info" },
+        2: { label: "已完成", type: "success" },
+        3: { label: "已拒绝", type: "error" },
+        4: { label: "已撤销", type: "warning" },
+        5: { label: "已挂起", type: "default" },
+      };
+      const s = map[row.status] || { label: "未知", type: "default" };
+      return h(NTag, { type: s.type as any, size: "small" }, () => s.label);
+    },
   },
-  { key: 'startTime', title: '发起时间', width: 180 },
+  { key: "startTime", title: "发起时间", width: 180 },
   {
-    key: 'actions',
-    title: '操作',
+    key: "actions",
+    title: "操作",
     width: 120,
     render(row: any) {
       return handleOperate([
         {
-          type: 'primary',
-          label: '详情',
-          icon: 'eye',
-          onClick: () => router.push({ name: 'WorkflowInstanceDetail', params: { id: row.id } })
-        }
-      ])
-    }
-  }
-]
+          type: "primary",
+          label: "详情",
+          icon: "eye",
+          onClick: () => router.push({ name: "WorkflowInstanceDetail", params: { id: row.id } }),
+        },
+      ]);
+    },
+  },
+];
 
 onMounted(async () => {
-  loading.value = true
+  loading.value = true;
   try {
     const [statsRes, instancesRes] = await Promise.all([
       workflowApi.stats(),
-      workflowApi.instanceList({ pageIndex: 1, pageSize: 20, status: 1 })
-    ])
-    stats.value = statsRes.data.data
-    instances.value = instancesRes.data.data.items
+      workflowApi.instanceList({ pageIndex: 1, pageSize: 20, status: 1 }),
+    ]);
+    stats.value = statsRes.data.data;
+    instances.value = instancesRes.data.data.items;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 </script>
 
 <style lang="scss" scoped>

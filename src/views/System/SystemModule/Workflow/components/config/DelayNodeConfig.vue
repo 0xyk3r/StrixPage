@@ -11,7 +11,12 @@
     </n-form-item>
     <n-form-item v-if="config.delayType === 'FIXED'" label="延迟时长">
       <n-input-group>
-        <n-input-number v-model:value="config.delayValue" :min="1" style="width: 60%" @update:value="emitUpdate" />
+        <n-input-number
+          v-model:value="config.delayValue"
+          :min="1"
+          style="width: 60%"
+          @update:value="emitUpdate"
+        />
         <n-select
           v-model:value="config.delayUnit"
           :options="unitOptions"
@@ -24,36 +29,39 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, watch } from 'vue'
-import type { DesignerTreeNode } from '@/api/workflow'
+import { reactive, watch } from "vue";
+import type { DesignerTreeNode } from "@/api/workflow";
 
-const props = defineProps<{ node: DesignerTreeNode }>()
-const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>()
+const props = defineProps<{ node: DesignerTreeNode }>();
+const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>();
 
 const unitOptions = [
-  { label: '分钟', value: 'MINUTES' },
-  { label: '小时', value: 'HOURS' },
-  { label: '天', value: 'DAYS' }
-]
+  { label: "分钟", value: "MINUTES" },
+  { label: "小时", value: "HOURS" },
+  { label: "天", value: "DAYS" },
+];
 
 const config = reactive({
   name: props.node.name,
-  delayType: props.node.config.delayType || 'FIXED',
+  delayType: props.node.config.delayType || "FIXED",
   delayValue: props.node.config.delayValue ?? 1,
-  delayUnit: props.node.config.delayUnit || 'HOURS'
-})
+  delayUnit: props.node.config.delayUnit || "HOURS",
+});
 
-watch(() => props.node.id, () => {
-  Object.assign(config, {
-    name: props.node.name,
-    delayType: props.node.config.delayType || 'FIXED',
-    delayValue: props.node.config.delayValue ?? 1,
-    delayUnit: props.node.config.delayUnit || 'HOURS'
-  })
-})
+watch(
+  () => props.node.id,
+  () => {
+    Object.assign(config, {
+      name: props.node.name,
+      delayType: props.node.config.delayType || "FIXED",
+      delayValue: props.node.config.delayValue ?? 1,
+      delayUnit: props.node.config.delayUnit || "HOURS",
+    });
+  },
+);
 
 function emitUpdate() {
-  const { name, ...rest } = config
-  emit('update', rest, name)
+  const { name, ...rest } = config;
+  emit("update", rest, name);
 }
 </script>

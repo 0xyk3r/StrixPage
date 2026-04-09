@@ -90,7 +90,11 @@
                 <n-input v-model:value="addForm.icon" clearable placeholder="请输入菜单图标" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                <n-input-number v-model:value="addForm.sortValue" clearable placeholder="请输入菜单排序" />
+                <n-input-number
+                  v-model:value="addForm.sortValue"
+                  clearable
+                  placeholder="请输入菜单排序"
+                />
               </n-form-item-gi>
             </n-grid>
           </n-form>
@@ -106,7 +110,11 @@
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
               <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                <n-input v-model:value="addPermissionForm.name" clearable placeholder="请输入权限名称" />
+                <n-input
+                  v-model:value="addPermissionForm.name"
+                  clearable
+                  placeholder="请输入权限名称"
+                />
               </n-form-item-gi>
               <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                 <n-tree-select
@@ -120,14 +128,18 @@
                 />
               </n-form-item-gi>
               <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                <n-input v-model:value="addPermissionForm.key" clearable placeholder="请输入权限标识" />
+                <n-input
+                  v-model:value="addPermissionForm.key"
+                  clearable
+                  placeholder="请输入权限标识"
+                />
               </n-form-item-gi>
               <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                 <n-input
                   v-model:value="addPermissionForm.description"
                   :autosize="{
                     minRows: 1,
-                    maxRows: 5
+                    maxRows: 5,
                   }"
                   clearable
                   placeholder="请输入权限介绍"
@@ -192,7 +204,11 @@
                   <n-input v-model:value="editForm.icon" clearable placeholder="请输入菜单图标" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                  <n-input-number v-model:value="editForm.sortValue" clearable placeholder="请输入菜单排序" />
+                  <n-input-number
+                    v-model:value="editForm.sortValue"
+                    clearable
+                    placeholder="请输入菜单排序"
+                  />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
@@ -208,7 +224,11 @@
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
                 <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                  <n-input v-model:value="editPermissionForm.name" clearable placeholder="请输入权限名称" />
+                  <n-input
+                    v-model:value="editPermissionForm.name"
+                    clearable
+                    placeholder="请输入权限名称"
+                  />
                 </n-form-item-gi>
                 <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                   <n-tree-select
@@ -222,14 +242,18 @@
                   />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                  <n-input v-model:value="editPermissionForm.key" clearable placeholder="请输入权限标识" />
+                  <n-input
+                    v-model:value="editPermissionForm.key"
+                    clearable
+                    placeholder="请输入权限标识"
+                  />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                   <n-input
                     v-model:value="editPermissionForm.description"
                     :autosize="{
                       minRows: 1,
-                      maxRows: 5
+                      maxRows: 5,
                     }"
                     clearable
                     placeholder="请输入权限介绍"
@@ -253,27 +277,27 @@
 </template>
 
 <script lang="ts" setup>
-import NebulaTag from '@/components/common/NebulaTag.vue'
-import StrixBlock from '@/components/common/StrixBlock.vue'
-import { menuApi } from '@/api/menu'
-import { permissionApi } from '@/api/permission'
-import type { TreeDataItem } from '@/api/types'
-import { EventBus } from '@/plugins/event-bus'
-import { useCrud } from '@/composables/useCrud'
-import { createStrixMessage } from '@/utils/strix-message'
-import { handleOperate } from '@/utils/strix-table-tool'
-import { cloneDeep, kebabCase, pick } from 'lodash-es'
-import { type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
-import { lengthRange, numberField, requiredInput, textField } from '@/utils/form-rules'
-import StrixIcon from '@/components/icon/StrixIcon.vue'
-import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
-import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
-import { createPaginatedFetcher } from '@/composables/useTableExport'
-import { useTableColumns } from '@/composables/useTableColumns'
+import NebulaTag from "@/components/common/NebulaTag.vue";
+import StrixBlock from "@/components/common/StrixBlock.vue";
+import { menuApi } from "@/api/menu";
+import { permissionApi } from "@/api/permission";
+import type { TreeDataItem } from "@/api/types";
+import { EventBus } from "@/plugins/event-bus";
+import { useCrud } from "@/composables/useCrud";
+import { createStrixMessage } from "@/utils/strix-message";
+import { handleOperate } from "@/utils/strix-table-tool";
+import { cloneDeep, kebabCase, pick } from "lodash-es";
+import { type DataTableColumns, type FormInst, type FormRules } from "naive-ui";
+import { lengthRange, numberField, requiredInput, textField } from "@/utils/form-rules";
+import StrixIcon from "@/components/icon/StrixIcon.vue";
+import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
+import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
+import { createPaginatedFetcher } from "@/composables/useTableExport";
+import { useTableColumns } from "@/composables/useTableColumns";
 
 // 本页面操作提示关键词
-const _baseName = '系统菜单'
-const showExportDialog = ref(false)
+const _baseName = "系统菜单";
+const showExportDialog = ref(false);
 const {
   listParams,
   rowKey,
@@ -288,20 +312,20 @@ const {
   editFormRef,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
 } = useCrud({
   list: {
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 10,
   },
   fetchList: () => getDataList(),
   addForm: {
     name: null,
     key: null,
-    url: '/',
+    url: "/",
     icon: null,
     parentId: null,
-    sortValue: 0
+    sortValue: 0,
   },
   editForm: {
     name: null,
@@ -309,230 +333,238 @@ const {
     url: null,
     icon: null,
     parentId: null,
-    sortValue: null
+    sortValue: null,
   },
   hooks: {
     onReset: () => {
-      addDataModalType.value = 'menu'
-      editDataModalType.value = 'menu'
-      addPermissionForm.value = cloneDeep(initAddPermissionForm)
-      editPermissionForm.value = cloneDeep(initEditPermissionForm)
-    }
+      addDataModalType.value = "menu";
+      editDataModalType.value = "menu";
+      addPermissionForm.value = cloneDeep(initAddPermissionForm);
+      editPermissionForm.value = cloneDeep(initEditPermissionForm);
+    },
   },
-  draftKey: 'SystemMenu'
-})
+  draftKey: "SystemMenu",
+});
 
-const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)
+const fetchAllData = createPaginatedFetcher(
+  menuApi.urls.list,
+  "systemMenuList",
+  () => listParams.value,
+);
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'name', title: '菜单名称', width: 240 },
+  { key: "name", title: "菜单名称", width: 240 },
   {
-    key: 'type',
-    title: '类型',
-    align: 'center',
+    key: "type",
+    title: "类型",
+    align: "center",
     width: 120,
-    valueMap: { menu: '菜单', permission: '按钮' },
+    valueMap: { menu: "菜单", permission: "按钮" },
     render(row) {
-      return h(NebulaTag, { type: row.type === 'menu' ? 'success' : 'info' }, () =>
-        row.type === 'menu' ? '菜单' : '按钮'
-      )
-    }
+      return h(NebulaTag, { type: row.type === "menu" ? "success" : "info" }, () =>
+        row.type === "menu" ? "菜单" : "按钮",
+      );
+    },
   },
-  { key: 'key', title: '权限标识', width: 240 },
-  { key: 'url', title: '菜单路由', width: 320 },
+  { key: "key", title: "权限标识", width: 240 },
+  { key: "url", title: "菜单路由", width: 320 },
   {
-    key: 'icon',
-    title: '菜单图标',
-    align: 'center',
+    key: "icon",
+    title: "菜单图标",
+    align: "center",
     width: 120,
     exportable: false,
     render(row: any) {
-      return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 })
-    }
+      return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 });
+    },
   },
-  { key: 'sortValue', title: '菜单排序', width: 120, align: 'center' },
+  { key: "sortValue", title: "菜单排序", width: 120, align: "center" },
   {
-    key: 'actions',
-    title: '操作',
+    key: "actions",
+    title: "操作",
     width: 180,
-    align: 'center',
+    align: "center",
     render(row: any) {
       return handleOperate([
         {
-          type: 'info',
-          label: '添加',
-          icon: 'plus',
-          disabled: row.type === 'permission',
-          onClick: () => showAddDataModal(row)
+          type: "info",
+          label: "添加",
+          icon: "plus",
+          disabled: row.type === "permission",
+          onClick: () => showAddDataModal(row),
         },
         {
-          type: 'warning',
-          label: '编辑',
-          icon: 'square-pen',
-          onClick: () => showEditDataModal(row)
+          type: "warning",
+          label: "编辑",
+          icon: "square-pen",
+          onClick: () => showEditDataModal(row),
         },
         {
-          type: 'error',
-          label: '删除',
-          icon: 'trash',
+          type: "error",
+          label: "删除",
+          icon: "trash",
           onClick: () => deleteData(row),
           popconfirm: true,
-          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
-        }
-      ])
-    }
-  }
-]
+          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
+        },
+      ]);
+    },
+  },
+];
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
 
 // 加载列表
-const dataRef = ref()
-const dataLoading = ref(true)
+const dataRef = ref();
+const dataLoading = ref(true);
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true
+  dataLoading.value = true;
   menuApi.list(listParams.value).then(({ data: res }) => {
-      dataLoading.value = false
-      dataRef.value = res.data.systemMenuList
-    })
-}
-onMounted(getDataList)
+    dataLoading.value = false;
+    dataRef.value = res.data.systemMenuList;
+  });
+};
+onMounted(getDataList);
 
-const addDataModalType = ref('menu')
+const addDataModalType = ref("menu");
 const menuFormRules: FormRules = {
-  name: textField('菜单名称', { min: 2, max: 10 }),
-  key: textField('权限标识', { min: 2, max: 32 }),
-  url: [requiredInput('菜单路由'), lengthRange('菜单路由', 1, 128)],
-  sortValue: numberField('菜单排序值', { min: 0, max: 99999 })
-}
+  name: textField("菜单名称", { min: 2, max: 10 }),
+  key: textField("权限标识", { min: 2, max: 32 }),
+  url: [requiredInput("菜单路由"), lengthRange("菜单路由", 1, 128)],
+  sortValue: numberField("菜单排序值", { min: 0, max: 99999 }),
+};
 const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
   if (id) {
-    addForm.value.parentId = id
-    addForm.value.key = key + ':'
+    addForm.value.parentId = id;
+    addForm.value.key = key + ":";
   }
   if (key) {
-    addPermissionForm.value.menuId = id
-    addPermissionForm.value.key = key + ':'
+    addPermissionForm.value.menuId = id;
+    addPermissionForm.value.key = key + ":";
   }
 
-  addModal.value = true
-}
+  addModal.value = true;
+};
 const addData = () => {
-  if (addDataModalType.value === 'menu') {
+  if (addDataModalType.value === "menu") {
     addFormRef.value?.validate((errors) => {
-      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors)
+        return createStrixMessage("warning", "表单校验失败", "请检查表单中的错误，并根据提示修改");
 
       menuApi.create(addForm.value as any).then(() => {
-        resetForms()
-        getDataList()
-        EventBus.emit('refresh-menu')
-      })
-    })
+        resetForms();
+        getDataList();
+        EventBus.emit("refresh-menu");
+      });
+    });
   } else {
     addPermissionFormRef.value?.validate((errors) => {
-      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors)
+        return createStrixMessage("warning", "表单校验失败", "请检查表单中的错误，并根据提示修改");
 
       permissionApi.create(addPermissionForm.value).then(() => {
-          resetForms()
-          getDataList()
-        })
-    })
+        resetForms();
+        getDataList();
+      });
+    });
   }
-}
+};
 
-const editDataModalType = ref('menu')
+const editDataModalType = ref("menu");
 const showEditDataModal = (row: any) => {
-  editModal.value = true
-  editDataModalType.value = row.type
-  editLoading.value = true
+  editModal.value = true;
+  editDataModalType.value = row.type;
+  editLoading.value = true;
   // 加载编辑前信息
-  if (row.type === 'menu') {
+  if (row.type === "menu") {
     menuApi.detail(row.id).then(({ data: res }) => {
-      editId.value = row.id
-      const canUpdateFields = Object.keys(initEditForm!)
-      editForm.value = pick(res.data, canUpdateFields)
-      editLoading.value = false
-    })
+      editId.value = row.id;
+      const canUpdateFields = Object.keys(initEditForm!);
+      editForm.value = pick(res.data, canUpdateFields);
+      editLoading.value = false;
+    });
   } else {
     permissionApi.detail(row.id).then(({ data: res }) => {
-      editId.value = row.id
-      const canUpdateFields = Object.keys(initEditPermissionForm)
-      editPermissionForm.value = pick(res.data, canUpdateFields)
-      editLoading.value = false
-    })
+      editId.value = row.id;
+      const canUpdateFields = Object.keys(initEditPermissionForm);
+      editPermissionForm.value = pick(res.data, canUpdateFields);
+      editLoading.value = false;
+    });
   }
-}
+};
 const editData = () => {
-  if (editDataModalType.value === 'menu') {
+  if (editDataModalType.value === "menu") {
     editFormRef.value?.validate((errors) => {
-      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors)
+        return createStrixMessage("warning", "表单校验失败", "请检查表单中的错误，并根据提示修改");
 
       menuApi.update(editId.value, editForm.value as any).then(() => {
-          resetForms()
-          getDataList()
-          EventBus.emit('refresh-menu')
-        })
-    })
+        resetForms();
+        getDataList();
+        EventBus.emit("refresh-menu");
+      });
+    });
   } else {
     editPermissionFormRef.value?.validate((errors) => {
-      if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
+      if (errors)
+        return createStrixMessage("warning", "表单校验失败", "请检查表单中的错误，并根据提示修改");
 
       permissionApi.update(editId.value, editPermissionForm.value).then(() => {
-          resetForms()
-          getDataList()
-        })
-    })
+        resetForms();
+        getDataList();
+      });
+    });
   }
-}
+};
 
 const deleteData = ({ id, type }: { id: string; type: string }) => {
-  if (type === 'menu') {
+  if (type === "menu") {
     menuApi.remove(id).then(() => {
-      getDataList()
-      EventBus.emit('refresh-menu')
-    })
+      getDataList();
+      EventBus.emit("refresh-menu");
+    });
   } else {
     permissionApi.remove(id).then(() => {
-      getDataList()
-    })
+      getDataList();
+    });
   }
-}
+};
 
 // 树形选择器数据
-const menuTreeRef = ref<TreeDataItem[]>([])
+const menuTreeRef = ref<TreeDataItem[]>([]);
 const getMenuTree = () => {
   menuApi.tree().then(({ data: res }) => {
-    menuTreeRef.value = res.data.tree
-  })
-}
-onMounted(getMenuTree)
+    menuTreeRef.value = res.data.tree;
+  });
+};
+onMounted(getMenuTree);
 
 const initAddPermissionForm = {
   name: null,
   key: null,
   menuId: null,
-  description: null
-}
-const addPermissionForm = ref<any>(cloneDeep(initAddPermissionForm))
-const addPermissionFormRef = ref<FormInst | null>(null)
+  description: null,
+};
+const addPermissionForm = ref<any>(cloneDeep(initAddPermissionForm));
+const addPermissionFormRef = ref<FormInst | null>(null);
 const permissionFormRules: FormRules = {
-  name: textField('权限名称', { min: 2, max: 12 }),
-  key: textField('权限标识', { min: 2, max: 64 }),
-  menuId: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
-  description: textField('权限介绍', { required: false, max: 128 })
-}
+  name: textField("权限名称", { min: 2, max: 12 }),
+  key: textField("权限标识", { min: 2, max: 64 }),
+  menuId: [{ required: true, message: "请选择父级菜单", trigger: "change" }],
+  description: textField("权限介绍", { required: false, max: 128 }),
+};
 
 const initEditPermissionForm = {
   name: null,
   key: null,
   menuId: null,
-  description: null
-}
-const editPermissionForm = ref<any>(cloneDeep(initEditPermissionForm))
-const editPermissionFormRef = ref<FormInst | null>(null)
+  description: null,
+};
+const editPermissionForm = ref<any>(cloneDeep(initEditPermissionForm));
+const editPermissionFormRef = ref<FormInst | null>(null);
 </script>
 
 <style lang="scss" scoped></style>

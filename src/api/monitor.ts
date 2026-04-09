@@ -36,12 +36,10 @@ export const monitorApi = {
   logList: (params: Record<string, any>) =>
     http.get<RetResult<MonitorLogListResp>>(`${BASE}/log`, {
       params,
-      meta: { operate: '加载系统日志列表' },
+      meta: { operate: "加载系统日志列表" },
     }),
 
-  cacheInfo: () =>
-    http.get<RetResult>(`${BASE}/cache`, { meta: { operate: '加载缓存信息' } }),
+  cacheInfo: () => http.get<RetResult>(`${BASE}/cache`, { meta: { operate: "加载缓存信息" } }),
 
-  serverInfo: () =>
-    http.get<RetResult>(`${BASE}/server`, { meta: { operate: '加载服务器信息' } }),
-}
+  serverInfo: () => http.get<RetResult>(`${BASE}/server`, { meta: { operate: "加载服务器信息" } }),
+};

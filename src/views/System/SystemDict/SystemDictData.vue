@@ -106,7 +106,7 @@
             v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
-              maxRows: 5
+              maxRows: 5,
             }"
             placeholder="在此输入备注信息"
             type="textarea"
@@ -169,7 +169,7 @@
               v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
-                maxRows: 5
+                maxRows: 5,
               }"
               placeholder="在此输入备注信息"
               type="textarea"
@@ -188,33 +188,33 @@
 </template>
 
 <script lang="ts" setup>
-import NebulaTag from '@/components/common/NebulaTag.vue'
-import StrixBlock from '@/components/common/StrixBlock.vue'
-import StrixTag from '@/components/common/StrixTag.vue'
-import { dictApi } from '@/api/dict'
-import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
-import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField, remarkField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
-import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
-import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
-import { createPaginatedFetcher } from '@/composables/useTableExport'
-import { useTableColumns } from '@/composables/useTableColumns'
-import StrixIcon from '@/components/icon/StrixIcon.vue'
+import NebulaTag from "@/components/common/NebulaTag.vue";
+import StrixBlock from "@/components/common/StrixBlock.vue";
+import StrixTag from "@/components/common/StrixTag.vue";
+import { dictApi } from "@/api/dict";
+import { useCrud } from "@/composables/useCrud";
+import { useDict } from "@/composables/useDict.ts";
+import { handleOperate } from "@/utils/strix-table-tool";
+import { textField, selectField, remarkField } from "@/utils/form-rules";
+import { type DataTableColumns, type FormRules } from "naive-ui";
+import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
+import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
+import { createPaginatedFetcher } from "@/composables/useTableExport";
+import { useTableColumns } from "@/composables/useTableColumns";
+import StrixIcon from "@/components/icon/StrixIcon.vue";
 
-const route = useRoute()
+const route = useRoute();
 
 // 本页面操作提示关键词
-const _baseName = '系统字典数据'
-const showExportDialog = ref(false)
+const _baseName = "系统字典数据";
+const showExportDialog = ref(false);
 
 // 路由参数
-const dictKey = route.params.dictKey as string
+const dictKey = route.params.dictKey as string;
 
 // 加载字典
-const dictDataStyleRef = useDict('DictDataStyle')
-const commonSwitchRef = useDict('CommonSwitch')
+const dictDataStyleRef = useDict("DictDataStyle");
+const commonSwitchRef = useDict("CommonSwitch");
 
 const {
   listParams,
@@ -235,106 +235,112 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
 } = useCrud({
   list: { pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
-  addForm: { key: null, value: null, label: null, sort: null, style: '', status: 1, remark: null },
-  editForm: { key: null, value: null, label: null, sort: null, style: '', status: null, remark: null },
+  addForm: { key: null, value: null, label: null, sort: null, style: "", status: 1, remark: null },
+  editForm: {
+    key: null,
+    value: null,
+    label: null,
+    sort: null,
+    style: "",
+    status: null,
+    remark: null,
+  },
   api: {
     detail: (id: string) => dictApi.dataDetail(dictKey, id),
     create: (data: any) => dictApi.dataCreate(dictKey, data),
     update: (id: string, data: any) => dictApi.dataUpdate(dictKey, id, data),
-    remove: (id: string) => dictApi.dataRemove(dictKey, id)
+    remove: (id: string) => dictApi.dataRemove(dictKey, id),
   },
-  draftKey: 'SystemDictData'
-})
+  draftKey: "SystemDictData",
+});
 
 const fetchAllData = createPaginatedFetcher(
   () => dictApi.urls.dataList(dictKey),
-  'items',
-  () => listParams.value
-)
+  "items",
+  () => listParams.value,
+);
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: 'value', title: '字典值', width: 240 },
-  { key: 'label', title: '字典标签', width: 240 },
-  { key: 'sort', title: '字典排序', width: 90, align: 'center' },
+  { key: "value", title: "字典值", width: 240 },
+  { key: "label", title: "字典标签", width: 240 },
+  { key: "sort", title: "字典排序", width: 90, align: "center" },
   {
-    key: 'style',
-    title: '字典样式预览',
+    key: "style",
+    title: "字典样式预览",
     width: 240,
-    align: 'center',
+    align: "center",
     exportable: false,
     render(row: any) {
-      return h(NebulaTag, { type: row.style || 'default' }, () => row.label)
-    }
+      return h(NebulaTag, { type: row.style || "default" }, () => row.label);
+    },
   },
   {
-    key: 'status',
-    title: '字典状态',
+    key: "status",
+    title: "字典状态",
     width: 90,
-    align: 'center',
-    dictName: 'CommonSwitch',
+    align: "center",
+    dictName: "CommonSwitch",
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
-    }
+      return h(StrixTag, { value: row.status, dictName: "CommonSwitch" });
+    },
   },
-  { key: 'remark', title: '备注', width: 180 },
+  { key: "remark", title: "备注", width: 180 },
   {
-    key: 'actions',
-    title: '操作',
+    key: "actions",
+    title: "操作",
     width: 130,
-    align: 'center',
+    align: "center",
     render(row: any) {
       return handleOperate([
         {
-          type: 'warning',
-          label: '编辑',
-          icon: 'square-pen',
-          onClick: () => showEdit(row.id)
+          type: "warning",
+          label: "编辑",
+          icon: "square-pen",
+          onClick: () => showEdit(row.id),
         },
         {
-          type: 'error',
-          label: '删除',
-          icon: 'trash',
+          type: "error",
+          label: "删除",
+          icon: "trash",
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
-        }
-      ])
-    }
-  }
-]
+          popconfirmMessage: "是否确认删除这条数据? 且该操作不可恢复!",
+        },
+      ]);
+    },
+  },
+];
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
 // 加载列表
-const dataRef = ref()
-const dataLoading = ref(true)
+const dataRef = ref();
+const dataLoading = ref(true);
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true
-  dictApi
-    .dataList(dictKey, listParams.value)
-    .then(({ data: res }) => {
-      dataLoading.value = false
-      dataRef.value = res.data.items
-      pagination.itemCount = res.data.total
-    })
-}
-onMounted(getDataList)
+  dataLoading.value = true;
+  dictApi.dataList(dictKey, listParams.value).then(({ data: res }) => {
+    dataLoading.value = false;
+    dataRef.value = res.data.items;
+    pagination.itemCount = res.data.total;
+  });
+};
+onMounted(getDataList);
 
 const formRules: FormRules = {
-  key: textField('字典标识', { min: 2, max: 64 }),
-  value: textField('字典值', { min: 1, max: 64 }),
-  label: textField('字典标签', { min: 1, max: 64 }),
-  sort: selectField('字典排序值'),
-  style: textField('字典样式', { required: false, max: 32 }),
-  status: selectField('字典状态'),
-  remark: remarkField()
-}
+  key: textField("字典标识", { min: 2, max: 64 }),
+  value: textField("字典值", { min: 1, max: 64 }),
+  label: textField("字典标签", { min: 1, max: 64 }),
+  sort: selectField("字典排序值"),
+  style: textField("字典样式", { required: false, max: 32 }),
+  status: selectField("字典状态"),
+  remark: remarkField(),
+};
 </script>
 
 <style lang="scss" scoped></style>

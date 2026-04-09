@@ -168,55 +168,69 @@ export const ossApi = {
     http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   configSelect: () =>
-    http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, { meta: { operate: '加载存储配置下拉列表' } }),
+    http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, {
+      meta: { operate: "加载存储配置下拉列表" },
+    }),
 
   fileList: (params: Record<string, any>) =>
     http.get<RetResult<OssFileListResp>>(`${BASE}/file`, {
       params,
-      meta: { operate: '加载存储文件列表' },
+      meta: { operate: "加载存储文件列表" },
     }),
 
   fileRemove: (id: string) =>
-    http.post<RetResult>(`${BASE}/file/remove/${id}`, null, { meta: { operate: '删除存储文件' } }),
+    http.post<RetResult>(`${BASE}/file/remove/${id}`, null, { meta: { operate: "删除存储文件" } }),
 
   fileGroupList: (params: Record<string, any>) =>
     http.get<RetResult<OssFileGroupListResp>>(`${BASE}/fileGroup`, {
       params,
-      meta: { operate: '加载文件分组列表' },
+      meta: { operate: "加载文件分组列表" },
     }),
 
   fileGroupDetail: (id: string) =>
-    http.get<RetResult<OssFileGroupResp>>(`${BASE}/fileGroup/${id}`, { meta: { operate: '加载文件分组信息' } }),
+    http.get<RetResult<OssFileGroupResp>>(`${BASE}/fileGroup/${id}`, {
+      meta: { operate: "加载文件分组信息" },
+    }),
 
   fileGroupCreate: (data: OssFileGroupUpdateReq) =>
-    http.post<RetResult>(`${BASE}/fileGroup/update`, data, { meta: { operate: '新增文件分组' } }),
+    http.post<RetResult>(`${BASE}/fileGroup/update`, data, { meta: { operate: "新增文件分组" } }),
 
   fileGroupUpdate: (id: string, data: OssFileGroupUpdateReq) =>
-    http.post<RetResult>(`${BASE}/fileGroup/update/${id}`, data, { meta: { operate: '编辑文件分组' } }),
+    http.post<RetResult>(`${BASE}/fileGroup/update/${id}`, data, {
+      meta: { operate: "编辑文件分组" },
+    }),
 
   fileGroupRemove: (id: string) =>
-    http.post<RetResult>(`${BASE}/fileGroup/remove/${id}`, null, { meta: { operate: '删除文件分组' } }),
+    http.post<RetResult>(`${BASE}/fileGroup/remove/${id}`, null, {
+      meta: { operate: "删除文件分组" },
+    }),
 
   fileGroupSelect: () =>
-    http.get<RetResult<SelectDataResp>>(`${BASE}/fileGroup/select`, { meta: { operate: '加载文件分组下拉列表' } }),
+    http.get<RetResult<SelectDataResp>>(`${BASE}/fileGroup/select`, {
+      meta: { operate: "加载文件分组下拉列表" },
+    }),
 
   fileGroupSelectByConfig: (configKey: string) =>
     http.get<RetResult<SelectDataResp>>(`${BASE}/fileGroup/select/${configKey}`, {
-      meta: { operate: '加载指定配置的文件分组' },
+      meta: { operate: "加载指定配置的文件分组" },
     }),
 
   bucketList: (params: Record<string, any>) =>
     http.get<RetResult<OssBucketListResp>>(`${BASE}/bucket`, {
       params,
-      meta: { operate: '加载存储空间列表' },
+      meta: { operate: "加载存储空间列表" },
     }),
 
   bucketCreate: (data: OssBucketUpdateReq) =>
-    http.post<RetResult>(`${BASE}/bucket/update`, data, { meta: { operate: '新增存储空间' } }),
+    http.post<RetResult>(`${BASE}/bucket/update`, data, { meta: { operate: "新增存储空间" } }),
 
   bucketUpdate: (id: string, data: OssBucketUpdateReq) =>
-    http.post<RetResult>(`${BASE}/bucket/update/${id}`, data, { meta: { operate: '编辑存储空间' } }),
+    http.post<RetResult>(`${BASE}/bucket/update/${id}`, data, {
+      meta: { operate: "编辑存储空间" },
+    }),
 
   bucketRemove: (id: string) =>
-    http.post<RetResult>(`${BASE}/bucket/remove/${id}`, null, { meta: { operate: '删除存储空间' } }),
-}
+    http.post<RetResult>(`${BASE}/bucket/remove/${id}`, null, {
+      meta: { operate: "删除存储空间" },
+    }),
+};

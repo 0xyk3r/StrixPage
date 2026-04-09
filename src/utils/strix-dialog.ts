@@ -12,14 +12,14 @@ export const createStrixDialog = (
   type: string,
   title: string,
   content: string,
-  duration: number
+  duration: number,
 ) => {
   if (dialog) {
-    const fn = (dialog as unknown as Record<string, (opts: Record<string, any>) => void>)[type]
+    const fn = (dialog as unknown as Record<string, (opts: Record<string, any>) => void>)[type];
     fn?.({
-      title: title || '提示',
-      content: content || '发生错误',
-      duration: duration ?? 3000
-    })
+      title: title || "提示",
+      content: content || "发生错误",
+      duration: duration ?? 3000,
+    });
   }
-}
+};

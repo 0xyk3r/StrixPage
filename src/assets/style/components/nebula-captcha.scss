@@ -34,10 +34,14 @@ $captcha-cut: 16px;
   background: var(--strix-bg-overlay);
   backdrop-filter: blur(40px) saturate(130%);
   clip-path: polygon(
-      0 $captcha-cut, $captcha-cut 0,
-      calc(100% - #{$captcha-cut}) 0, 100% $captcha-cut,
-      100% calc(100% - #{$captcha-cut}), calc(100% - #{$captcha-cut}) 100%,
-      $captcha-cut 100%, 0 calc(100% - #{$captcha-cut})
+    0 $captcha-cut,
+    $captcha-cut 0,
+    calc(100% - #{$captcha-cut}) 0,
+    100% $captcha-cut,
+    100% calc(100% - #{$captcha-cut}),
+    calc(100% - #{$captcha-cut}) 100%,
+    $captcha-cut 100%,
+    0 calc(100% - #{$captcha-cut})
   );
   overflow: hidden;
 }
@@ -306,7 +310,10 @@ $captcha-cut: 16px;
   z-index: 10;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color $duration-fast, color $duration-fast, box-shadow $duration-fast, background $duration-fast;
+  transition: border-color $duration-fast,
+  color $duration-fast,
+  box-shadow $duration-fast,
+  background $duration-fast;
 
   &:hover {
     border-color: var(--strix-text-accent);

@@ -23,9 +23,4 @@ $glass-saturate: saturate(1.5);
 
 // ---- 光带效果 (顶部装饰线) ----
 // 使用时通过 ::after 伪元素实现
-$light-ridge-gradient: linear-gradient(
-    to right,
-    transparent,
-    rgba(99, 226, 183, 0.25),
-    transparent
-);
+$light-ridge-gradient: linear-gradient(to right, transparent, rgba(99, 226, 183, 0.25), transparent);

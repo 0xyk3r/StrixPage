@@ -1,8 +1,12 @@
 import { v4 as uuid } from 'uuid'
 import type {
-  WorkflowGraph, WorkflowNode, WorkflowEdge,
-  DesignerTreeNode, DesignerBranch, NodeType
-} from '@/api/workflow'
+  WorkflowGraph,
+  WorkflowNode,
+  WorkflowEdge,
+  DesignerTreeNode,
+  DesignerBranch,
+  NodeType,
+} from "@/api/workflow";
 
 /**
  * Convert flat graph (backend) → tree (designer rendering).
@@ -11,25 +15,25 @@ import type {
  */
 export function graphToTree(graph: WorkflowGraph): DesignerTreeNode {
   const nodeMap = new Map<string, WorkflowNode>()
-  graph.nodes.forEach(n => nodeMap.set(n.id, n))
+  graph.nodes.forEach((n) => nodeMap.set(n.id, n));
 
   // Build adjacency: sourceId → sorted target edges
   const edgesBySource = new Map<string, WorkflowEdge[]>()
-  graph.edges.forEach(e => {
-    const list = edgesBySource.get(e.sourceNodeId) || []
-    list.push(e)
-    edgesBySource.set(e.sourceNodeId, list)
-  })
+  graph.edges.forEach((e) => {
+    const list = edgesBySource.get(e.sourceNodeId) || [];
+    list.push(e);
+    edgesBySource.set(e.sourceNodeId, list);
+  });
   // Sort edges by sortOrder
-  edgesBySource.forEach(edges => edges.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)))
+  edgesBySource.forEach((edges) => edges.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
 
-  const startNode = graph.nodes.find(n => n.type === 'START')
+  const startNode = graph.nodes.find((n) => n.type === "START");
   if (!startNode) {
     return createDefaultTree()
   }
 
   // Find the END node so we know where branches reconverge
-  const endNodeId = graph.nodes.find(n => n.type === 'END')?.id
+  const endNodeId = graph.nodes.find((n) => n.type === "END")?.id;
 
   return buildSubtree(startNode.id, endNodeId)
 
@@ -56,13 +60,16 @@ export function graphToTree(graph: WorkflowGraph): DesignerTreeNode {
       treeNode.branches = outEdges.map((edge, idx) => {
         const branch: DesignerBranch = {
           id: edge.id,
-          name: node.type === 'CONDITION_GROUP'
-            ? (edge.conditionExpression ? `条件 ${idx + 1}` : '默认')
-            : `分支 ${idx + 1}`,
+          name:
+            node.type === "CONDITION_GROUP"
+              ? edge.conditionExpression
+                ? `条件 ${idx + 1}`
+                : "默认"
+              : `分支 ${idx + 1}`,
           conditionExpression: edge.conditionExpression,
           sortOrder: edge.sortOrder ?? idx,
-          children: []
-        }
+          children: [],
+        };
 
         // Build chain from this edge target to reconvergence point
         let currentId: string | undefined = edge.targetNodeId
@@ -151,7 +158,7 @@ export function treeToGraph(tree: DesignerTreeNode): WorkflowGraph {
 
       // Store reconverge reference in config
       if (reconvergeId) {
-        const nodeIdx = nodes.findIndex(n => n.id === treeNode.id)
+        const nodeIdx = nodes.findIndex((n) => n.id === treeNode.id);
         const foundNode = nodes[nodeIdx]
         if (foundNode) {
           foundNode.config = { ...foundNode.config, reconvergeNodeId: reconvergeId }
@@ -322,20 +329,24 @@ export function createNode(type: NodeType): DesignerTreeNode {
     type,
     name: def.name,
     config: { ...def.config },
-    branches: (type === 'CONDITION_GROUP' || type === 'PARALLEL')
-      ? [
-          {
-            id: uuid(),
-            name: type === 'CONDITION_GROUP' ? '条件 1' : '分支 1',
-            sortOrder: 0,
-            children: type === 'CONDITION_GROUP'
-              ? [createNode('CONDITION')]
-              : []
-          },
-          { id: uuid(), name: type === 'CONDITION_GROUP' ? '默认' : '分支 2', sortOrder: 1, children: [] }
-        ]
-      : undefined
-  }
+    branches:
+      type === "CONDITION_GROUP" || type === "PARALLEL"
+        ? [
+            {
+              id: uuid(),
+              name: type === "CONDITION_GROUP" ? "条件 1" : "分支 1",
+              sortOrder: 0,
+              children: type === "CONDITION_GROUP" ? [createNode("CONDITION")] : [],
+            },
+            {
+              id: uuid(),
+              name: type === "CONDITION_GROUP" ? "默认" : "分支 2",
+              sortOrder: 1,
+              children: [],
+            },
+          ]
+        : undefined,
+  };
   return node
 }
 

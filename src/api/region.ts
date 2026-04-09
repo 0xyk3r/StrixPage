@@ -76,11 +76,15 @@ export const regionApi = {
     http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   children: (id: string) =>
-    http.get<RetResult<SystemRegionChildrenListResp>>(`${BASE}/${id}/children`, { meta: { operate: '加载子地区' } }),
+    http.get<RetResult<SystemRegionChildrenListResp>>(`${BASE}/${id}/children`, {
+      meta: { operate: "加载子地区" },
+    }),
 
   tree: () =>
     http.get<RetResult<TreeDataResp>>(`${BASE}/tree`, { meta: { operate: `加载${_n}树` } }),
 
   cascader: () =>
-    http.get<RetResult<CascaderDataResp>>(`${BASE}/cascader`, { meta: { operate: `加载${_n}级联选择` } }),
-}
+    http.get<RetResult<CascaderDataResp>>(`${BASE}/cascader`, {
+      meta: { operate: `加载${_n}级联选择` },
+    }),
+};

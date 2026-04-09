@@ -2,22 +2,22 @@
 <template>
   <div class="wf-connector">
     <div class="wf-connector__line"></div>
-    <add-node-menu v-if="!readonly" @select="type => emit('addNode', type)" />
+    <add-node-menu v-if="!readonly" @select="(type) => emit('addNode', type)" />
     <div class="wf-connector__line"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import AddNodeMenu from './AddNodeMenu.vue'
-import type { NodeType } from '@/api/workflow'
+import AddNodeMenu from "./AddNodeMenu.vue";
+import type { NodeType } from "@/api/workflow";
 
 defineProps<{
-  readonly?: boolean
-}>()
+  readonly?: boolean;
+}>();
 
 const emit = defineEmits<{
-  addNode: [type: NodeType]
-}>()
+  addNode: [type: NodeType];
+}>();
 </script>
 
 <style lang="scss">

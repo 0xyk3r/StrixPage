@@ -22,11 +22,9 @@ export function useTokenRenewal() {
     const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000
 
     if (expireTime - currentTime < thirtyDaysInMs) {
-      authApi
-        .renewToken()
-        .then(({ data: res }) => {
-          loginInfoStore.updateLoginInfo(res)
-        })
+      authApi.renewToken().then(({ data: res }) => {
+        loginInfoStore.updateLoginInfo(res);
+      });
     }
   }
 

@@ -19,11 +19,18 @@
 
     <!-- Add delegation modal -->
     <n-modal v-model:show="showAddModal" preset="card" title="设置审批代理" size="medium">
-      <n-form ref="formRef" :model="form" :rules="formRules" label-placement="left" label-width="auto">
+      <n-form
+        ref="formRef"
+        :model="form"
+        :rules="formRules"
+        label-placement="left"
+        label-width="auto"
+      >
         <n-form-item label="代理人" path="delegateId">
           <n-select
             v-model:value="form.delegateId"
-            filterable remote
+            filterable
+            remote
             :options="managerOptions"
             :loading="managerLoading"
             placeholder="搜索选择代理人"
@@ -39,10 +46,22 @@
           />
         </n-form-item>
         <n-form-item label="开始时间" path="startTime">
-          <n-date-picker v-model:formatted-value="form.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" clearable style="width:100%" />
+          <n-date-picker
+            v-model:formatted-value="form.startTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            clearable
+            style="width: 100%"
+          />
         </n-form-item>
         <n-form-item label="结束时间" path="endTime">
-          <n-date-picker v-model:formatted-value="form.endTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" clearable style="width:100%" />
+          <n-date-picker
+            v-model:formatted-value="form.endTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            clearable
+            style="width: 100%"
+          />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -56,129 +75,136 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, h } from 'vue'
-import StrixBlock from '@/components/common/StrixBlock.vue'
-import { workflowApi } from '@/api/workflow'
-import type { WfDelegation } from '@/api/workflow'
-import { handleOperate } from '@/utils/strix-table-tool'
-import { http } from '@/plugins/axios'
-import type { RetResult } from '@/api/types'
-import { type DataTableColumns, type FormRules, useMessage } from 'naive-ui'
+import { ref, reactive, onMounted, h } from "vue";
+import StrixBlock from "@/components/common/StrixBlock.vue";
+import { workflowApi } from "@/api/workflow";
+import type { WfDelegation } from "@/api/workflow";
+import { handleOperate } from "@/utils/strix-table-tool";
+import { http } from "@/plugins/axios";
+import type { RetResult } from "@/api/types";
+import { type DataTableColumns, type FormRules, useMessage } from "naive-ui";
 
-const message = useMessage()
-const delegations = ref<WfDelegation[]>([])
-const loading = ref(true)
+const message = useMessage();
+const delegations = ref<WfDelegation[]>([]);
+const loading = ref(true);
 
-const showAddModal = ref(false)
-const submitting = ref(false)
-const formRef = ref()
+const showAddModal = ref(false);
+const submitting = ref(false);
+const formRef = ref();
 
 const form = reactive({
   delegateId: null as string | null,
   definitionId: null as string | null,
-  startTime: '',
-  endTime: ''
-})
+  startTime: "",
+  endTime: "",
+});
 
 const formRules: FormRules = {
-  delegateId: { required: true, message: '请选择代理人', trigger: 'change' },
-  startTime: { required: true, message: '请选择开始时间', trigger: 'change' },
-  endTime: { required: true, message: '请选择结束时间', trigger: 'change' }
-}
+  delegateId: { required: true, message: "请选择代理人", trigger: "change" },
+  startTime: { required: true, message: "请选择开始时间", trigger: "change" },
+  endTime: { required: true, message: "请选择结束时间", trigger: "change" },
+};
 
 // Manager search
-const managerOptions = ref<Array<{ label: string; value: string }>>([])
-const managerLoading = ref(false)
+const managerOptions = ref<Array<{ label: string; value: string }>>([]);
+const managerLoading = ref(false);
 
 async function searchManagers(query: string) {
-  if (!query) return
-  managerLoading.value = true
+  if (!query) return;
+  managerLoading.value = true;
   try {
-    const { data: res } = await http.get<RetResult<{ items: any[] }>>('system/manager', {
-      params: { keyword: query, pageIndex: 1, pageSize: 20 }
-    })
+    const { data: res } = await http.get<RetResult<{ items: any[] }>>("system/manager", {
+      params: { keyword: query, pageIndex: 1, pageSize: 20 },
+    });
     managerOptions.value = res.data.items.map((m: any) => ({
       label: m.realName || m.managerName,
-      value: m.id
-    }))
+      value: m.id,
+    }));
   } finally {
-    managerLoading.value = false
+    managerLoading.value = false;
   }
 }
 
 // Definition options
-const definitionOptions = ref<Array<{ label: string; value: string }>>([])
+const definitionOptions = ref<Array<{ label: string; value: string }>>([]);
 
 async function loadDefinitions() {
   try {
-    const { data: res } = await workflowApi.definitionList({ pageIndex: 1, pageSize: 100 })
-    definitionOptions.value = res.data.items.map(d => ({ label: d.name, value: d.id }))
+    const { data: res } = await workflowApi.definitionList({ pageIndex: 1, pageSize: 100 });
+    definitionOptions.value = res.data.items.map((d) => ({ label: d.name, value: d.id }));
   } catch {}
 }
 
 const columns: DataTableColumns = [
-  { key: 'delegatorId', title: '委托人', width: 150 },
-  { key: 'delegateId', title: '代理人', width: 150 },
-  { key: 'definitionId', title: '流程范围', width: 200, render: (row: any) => row.definitionId || '全部流程' },
-  { key: 'startTime', title: '开始时间', width: 180 },
-  { key: 'endTime', title: '结束时间', width: 180 },
+  { key: "delegatorId", title: "委托人", width: 150 },
+  { key: "delegateId", title: "代理人", width: 150 },
   {
-    key: 'actions',
-    title: '操作',
+    key: "definitionId",
+    title: "流程范围",
+    width: 200,
+    render: (row: any) => row.definitionId || "全部流程",
+  },
+  { key: "startTime", title: "开始时间", width: 180 },
+  { key: "endTime", title: "结束时间", width: 180 },
+  {
+    key: "actions",
+    title: "操作",
     width: 100,
     render(row: any) {
       return handleOperate([
         {
-          type: 'error',
-          label: '撤销',
-          icon: 'trash',
+          type: "error",
+          label: "撤销",
+          icon: "trash",
           onClick: () => removeDelegation(row.id),
-          popconfirm: true
-        }
-      ])
-    }
-  }
-]
+          popconfirm: true,
+        },
+      ]);
+    },
+  },
+];
 
 async function loadDelegations() {
-  loading.value = true
+  loading.value = true;
   try {
-    const { data: res } = await workflowApi.delegationList()
-    delegations.value = res.data
+    const { data: res } = await workflowApi.delegationList();
+    delegations.value = res.data;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function submitDelegation() {
   try {
-    await formRef.value?.validate()
-  } catch { return }
+    await formRef.value?.validate();
+  } catch {
+    return;
+  }
 
-  submitting.value = true
+  submitting.value = true;
   try {
     await workflowApi.delegationCreate({
       delegateId: form.delegateId!,
       definitionId: form.definitionId || undefined,
       startTime: form.startTime,
-      endTime: form.endTime
-    })
-    message.success('代理设置成功')
-    showAddModal.value = false
-    loadDelegations()
+      endTime: form.endTime,
+    });
+    message.success("代理设置成功");
+    showAddModal.value = false;
+    loadDelegations();
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
 }
 
 async function removeDelegation(id: string) {
-  await workflowApi.delegationRemove(id)
-  message.success('已撤销')
-  loadDelegations()
+  await workflowApi.delegationRemove(id);
+  message.success("已撤销");
+  loadDelegations();
 }
 
 onMounted(() => {
-  loadDelegations()
-  loadDefinitions()
-})
+  loadDelegations();
+  loadDefinitions();
+});
 </script>

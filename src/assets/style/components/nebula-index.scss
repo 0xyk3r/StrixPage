@@ -85,7 +85,8 @@
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: nebula-index-up 0.6s $ease-out-expo 0.15s both, nebula-logo-shimmer 6s ease-in-out infinite;
+  animation: nebula-index-up 0.6s $ease-out-expo 0.15s both,
+  nebula-logo-shimmer 6s ease-in-out infinite;
   filter: drop-shadow(0 0 20px var(--strix-accent-glow-subtle));
 
   @media (max-width: 600px) {
@@ -317,11 +318,11 @@ $hud-br: 10px;
   height: 100%;
   pointer-events: none;
   background: linear-gradient(
-      90deg,
-      transparent,
-      var(--strix-accent-glow-subtle) 40%,
-      var(--strix-accent-glow-subtle) 60%,
-      transparent
+    90deg,
+    transparent,
+    var(--strix-accent-glow-subtle) 40%,
+    var(--strix-accent-glow-subtle) 60%,
+    transparent
   );
   opacity: 0;
 

@@ -25,7 +25,8 @@
 @mixin surface {
   background: var(--strix-bg-surface);
   border: 1px solid var(--strix-border-subtle);
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s,
+  background 0.2s;
 
   &:hover {
     border-color: var(--strix-border-default);
@@ -37,7 +38,8 @@
 @mixin surface-accent {
   background: var(--strix-bg-surface);
   border: 1px solid var(--strix-border-accent);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s,
+  box-shadow 0.2s;
 
   &:hover {
     border-color: var(--strix-border-accent-hover);

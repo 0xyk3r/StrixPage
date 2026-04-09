@@ -29,7 +29,13 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.02) 2px, rgba(0, 0, 0, 0.02) 4px);
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.02) 2px,
+    rgba(0, 0, 0, 0.02) 4px
+  );
 }
 
 // ---- HUD 四角装饰 ----
@@ -174,19 +180,27 @@ $cut-sm: 14px;
   background: var(--strix-bg-overlay);
   backdrop-filter: blur(40px) saturate(130%);
   clip-path: polygon(
-      0 $cut, $cut 0,
-      calc(100% - #{$cut}) 0, 100% $cut,
-      100% calc(100% - #{$cut}), calc(100% - #{$cut}) 100%,
-      $cut 100%, 0 calc(100% - #{$cut})
+    0 $cut,
+    $cut 0,
+    calc(100% - #{$cut}) 0,
+    100% $cut,
+    100% calc(100% - #{$cut}),
+    calc(100% - #{$cut}) 100%,
+    $cut 100%,
+    0 calc(100% - #{$cut})
   );
 
   @media (max-width: 500px) {
     padding: 40px 28px 36px;
     clip-path: polygon(
-        0 $cut-sm, $cut-sm 0,
-        calc(100% - #{$cut-sm}) 0, 100% $cut-sm,
-        100% calc(100% - #{$cut-sm}), calc(100% - #{$cut-sm}) 100%,
-        $cut-sm 100%, 0 calc(100% - #{$cut-sm})
+      0 $cut-sm,
+      $cut-sm 0,
+      calc(100% - #{$cut-sm}) 0,
+      100% $cut-sm,
+      100% calc(100% - #{$cut-sm}),
+      calc(100% - #{$cut-sm}) 100%,
+      $cut-sm 100%,
+      0 calc(100% - #{$cut-sm})
     );
   }
 }
@@ -537,7 +551,8 @@ $cut-sm: 14px;
 
   &:hover:not(:disabled) {
     border-color: var(--strix-text-accent);
-    box-shadow: 0 0 20px var(--strix-accent-glow-subtle), inset 0 0 20px rgba(99, 226, 183, 0.02);
+    box-shadow: 0 0 20px var(--strix-accent-glow-subtle),
+    inset 0 0 20px rgba(99, 226, 183, 0.02);
 
     &::before {
       width: 100%;

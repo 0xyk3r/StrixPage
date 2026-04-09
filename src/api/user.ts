@@ -53,4 +53,4 @@ export const userApi = {
 
   modify: (id: string, data: { field: string; value: string }) =>
     http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } }),
-}
+};

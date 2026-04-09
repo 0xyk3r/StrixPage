@@ -81,22 +81,28 @@ export const roleApi = {
 
   updateMenu: (roleId: string, data: SystemRoleUpdateMenuReq) =>
     http.post<RetResult>(`${BASE}/update/${roleId}/menu`, data, {
-      meta: { operate: '编辑角色菜单' },
+      meta: { operate: "编辑角色菜单" },
     }),
 
   removePermission: (roleId: string, permissionId: string) =>
     http.post<RetResult>(`${BASE}/remove/${roleId}/permission/${permissionId}`, null, {
-      meta: { operate: '移除角色权限' },
+      meta: { operate: "移除角色权限" },
     }),
 
   removeMenu: (roleId: string, menuId: string) =>
     http.post<RetResult>(`${BASE}/remove/${roleId}/menu/${menuId}`, null, {
-      meta: { operate: '移除角色菜单' },
+      meta: { operate: "移除角色菜单" },
     }),
 
   select: (params?: Record<string, any>) =>
-    http.get<RetResult<SelectDataResp>>(`${BASE}/select`, { params, meta: { operate: `加载${_n}下拉列表` } }),
+    http.get<RetResult<SelectDataResp>>(`${BASE}/select`, {
+      params,
+      meta: { operate: `加载${_n}下拉列表` },
+    }),
 
   transfer: (params?: Record<string, any>) =>
-    http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, { params, meta: { operate: `加载${_n}穿梭框` } }),
-}
+    http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
+      params,
+      meta: { operate: `加载${_n}穿梭框` },
+    }),
+};

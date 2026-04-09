@@ -3,9 +3,14 @@ import { ref, computed } from 'vue'
 import type { DesignerTreeNode, WfDefinition, WfDefinitionVersion } from '@/api/workflow'
 import { workflowApi } from '@/api/workflow'
 import {
-  createDefaultTree, graphToTree, treeToGraph,
-  createNode, insertNodeAfter, removeNode, findNode
-} from '@/utils/workflow-graph'
+  createDefaultTree,
+  graphToTree,
+  treeToGraph,
+  createNode,
+  insertNodeAfter,
+  removeNode,
+  findNode,
+} from "@/utils/workflow-graph";
 import type { NodeType, WorkflowGraph } from '@/api/workflow'
 
 const MAX_UNDO_STEPS = 50
@@ -116,7 +121,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
     pushUndoState()
     const node = findNode(tree.value, nodeId)
     if (node && node.branches && node.branches.length > 2) {
-      node.branches = node.branches.filter(b => b.id !== branchId)
+      node.branches = node.branches.filter((b) => b.id !== branchId);
     }
   }
 
@@ -177,11 +182,26 @@ export const useWorkflowStore = defineStore('workflow', () => {
   }
 
   return {
-    currentDefinition, currentVersion, tree, selectedNodeId, isDirty,
-    canUndo, canRedo, selectedNode,
-    undo, redo,
-    addNode, deleteNode, updateNodeConfig, updateNodeName, selectNode,
-    addBranch, removeBranch,
-    loadDefinition, saveVersion, publishVersion, resetDesigner
-  }
+    currentDefinition,
+    currentVersion,
+    tree,
+    selectedNodeId,
+    isDirty,
+    canUndo,
+    canRedo,
+    selectedNode,
+    undo,
+    redo,
+    addNode,
+    deleteNode,
+    updateNodeConfig,
+    updateNodeName,
+    selectNode,
+    addBranch,
+    removeBranch,
+    loadDefinition,
+    saveVersion,
+    publishVersion,
+    resetDesigner,
+  };
 })

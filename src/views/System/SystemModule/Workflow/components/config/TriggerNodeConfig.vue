@@ -26,50 +26,55 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, watch, onMounted } from 'vue'
-import type { DesignerTreeNode, TriggerItem } from '@/api/workflow'
-import { workflowApi } from '@/api/workflow'
+import { ref, reactive, watch, onMounted } from "vue";
+import type { DesignerTreeNode, TriggerItem } from "@/api/workflow";
+import { workflowApi } from "@/api/workflow";
 
-const props = defineProps<{ node: DesignerTreeNode }>()
-const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>()
+const props = defineProps<{ node: DesignerTreeNode }>();
+const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>();
 
-const loading = ref(false)
-const triggerOptions = ref<Array<{ label: string; value: string }>>([])
+const loading = ref(false);
+const triggerOptions = ref<Array<{ label: string; value: string }>>([]);
 
 const config = reactive({
   name: props.node.name,
-  triggerKey: props.node.config.triggerKey || ''
-})
+  triggerKey: props.node.config.triggerKey || "",
+});
 
-const paramsJson = ref(JSON.stringify(props.node.config.triggerParams || {}, null, 2))
+const paramsJson = ref(JSON.stringify(props.node.config.triggerParams || {}, null, 2));
 
 onMounted(async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const { data: res } = await workflowApi.triggerList()
+    const { data: res } = await workflowApi.triggerList();
     triggerOptions.value = res.data.items.map((t: TriggerItem) => ({
       label: `${t.name} (${t.key})`,
-      value: t.key
-    }))
+      value: t.key,
+    }));
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 
-watch(() => props.node.id, () => {
-  config.name = props.node.name
-  config.triggerKey = props.node.config.triggerKey || ''
-  paramsJson.value = JSON.stringify(props.node.config.triggerParams || {}, null, 2)
-})
+watch(
+  () => props.node.id,
+  () => {
+    config.name = props.node.name;
+    config.triggerKey = props.node.config.triggerKey || "";
+    paramsJson.value = JSON.stringify(props.node.config.triggerParams || {}, null, 2);
+  },
+);
 
 function handleParamsChange(value: string) {
-  paramsJson.value = value
-  emitUpdate()
+  paramsJson.value = value;
+  emitUpdate();
 }
 
 function emitUpdate() {
-  let triggerParams = {}
-  try { triggerParams = JSON.parse(paramsJson.value) } catch {}
-  emit('update', { triggerKey: config.triggerKey, triggerParams }, config.name)
+  let triggerParams = {};
+  try {
+    triggerParams = JSON.parse(paramsJson.value);
+  } catch {}
+  emit("update", { triggerKey: config.triggerKey, triggerParams }, config.name);
 }
 </script>

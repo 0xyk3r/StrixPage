@@ -66,5 +66,8 @@ export const managerApi = {
     http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } }),
 
   transfer: (params?: Record<string, any>) =>
-    http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, { params, meta: { operate: `加载${_n}穿梭框` } }),
-}
+    http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
+      params,
+      meta: { operate: `加载${_n}穿梭框` },
+    }),
+};

@@ -203,7 +203,8 @@
   transition: opacity $duration-normal $ease-out-expo;
 
   .nebula-cmd-panel {
-    transition: transform $duration-normal $ease-out-expo, opacity $duration-normal $ease-out-expo;
+    transition: transform $duration-normal $ease-out-expo,
+    opacity $duration-normal $ease-out-expo;
   }
 }
 
@@ -211,7 +212,8 @@
   transition: opacity $duration-normal $ease-out-smooth;
 
   .nebula-cmd-panel {
-    transition: transform $duration-normal $ease-out-smooth, opacity $duration-fast $ease-out-smooth;
+    transition: transform $duration-normal $ease-out-smooth,
+    opacity $duration-fast $ease-out-smooth;
   }
 }
 

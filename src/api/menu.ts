@@ -67,4 +67,4 @@ export const menuApi = {
 
   tree: () =>
     http.get<RetResult<TreeDataResp>>(`${BASE}/tree`, { meta: { operate: `加载${_n}树` } }),
-}
+};

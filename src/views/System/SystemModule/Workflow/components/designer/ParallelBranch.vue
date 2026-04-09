@@ -9,16 +9,14 @@
       </div>
 
       <div class="wf-branch__lanes">
-        <div
-          v-for="(branch, idx) in node.branches"
-          :key="branch.id"
-          class="wf-branch__lane"
-        >
+        <div v-for="(branch, idx) in node.branches" :key="branch.id" class="wf-branch__lane">
           <div class="wf-branch__header">
             <span class="wf-branch__label">{{ branch.name }}</span>
             <n-button
               v-if="!readonly && node.branches!.length > 2"
-              text type="error" size="tiny"
+              text
+              type="error"
+              size="tiny"
               @click="store.removeBranch(node.id, branch.id)"
             >
               <template #icon><X :size="12" /></template>
@@ -33,17 +31,20 @@
                 <node-card
                   :node="child"
                   :readonly="readonly"
-                  @delete="id => store.deleteNode(id)"
+                  @delete="(id) => store.deleteNode(id)"
                 />
                 <node-connector
                   v-if="ci < branch.children.length - 1"
                   :readonly="readonly"
-                  @add-node="type => store.addNode(child.id, type)"
+                  @add-node="(type) => store.addNode(child.id, type)"
                 />
               </template>
             </template>
             <div v-else class="wf-branch__empty">
-              <add-node-menu v-if="!readonly" @select="type => addNodeToBranch(branch.id, idx, type)" />
+              <add-node-menu
+                v-if="!readonly"
+                @select="(type) => addNodeToBranch(branch.id, idx, type)"
+              />
             </div>
           </div>
 
@@ -57,27 +58,27 @@
 </template>
 
 <script lang="ts" setup>
-import type { DesignerTreeNode, NodeType } from '@/api/workflow'
-import { useWorkflowStore } from '@/stores/workflow'
-import { createNode } from '@/utils/workflow-graph'
-import NodeCard from './NodeCard.vue'
-import NodeConnector from './NodeConnector.vue'
-import AddNodeMenu from './AddNodeMenu.vue'
-import { X } from 'lucide-vue-next'
+import type { DesignerTreeNode, NodeType } from "@/api/workflow";
+import { useWorkflowStore } from "@/stores/workflow";
+import { createNode } from "@/utils/workflow-graph";
+import NodeCard from "./NodeCard.vue";
+import NodeConnector from "./NodeConnector.vue";
+import AddNodeMenu from "./AddNodeMenu.vue";
+import { X } from "lucide-vue-next";
 
 const props = defineProps<{
-  node: DesignerTreeNode
-  readonly?: boolean
-}>()
+  node: DesignerTreeNode;
+  readonly?: boolean;
+}>();
 
-const store = useWorkflowStore()
+const store = useWorkflowStore();
 
 function addNodeToBranch(branchId: string, branchIdx: number, type: NodeType) {
-  const branch = props.node.branches?.find(b => b.id === branchId)
+  const branch = props.node.branches?.find((b) => b.id === branchId);
   if (branch) {
-    const newNode = createNode(type)
-    branch.children.push(newNode)
-    store.selectNode(newNode.id)
+    const newNode = createNode(type);
+    branch.children.push(newNode);
+    store.selectNode(newNode.id);
   }
 }
 </script>

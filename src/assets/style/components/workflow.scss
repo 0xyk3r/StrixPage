@@ -11,7 +11,8 @@
 // ============================================================
 
 // Dark theme (default)
-[data-theme='dark'], :root {
+[data-theme='dark'],
+:root {
   // Node type colors
   --wf-color-start: #63e2b7;
   --wf-color-end: rgba(255, 255, 255, 0.35);
@@ -128,7 +129,7 @@
   background: var(--wf-node-bg);
   cursor: pointer;
   transition: border-color $duration-fast $ease-out-smooth,
-              box-shadow $duration-normal $ease-out-smooth;
+  box-shadow $duration-normal $ease-out-smooth;
   user-select: none;
   backdrop-filter: blur(8px);
 
@@ -144,7 +145,9 @@
   // Per-type border + header bg
   @each $type in start, end, approval, cc, condition, condition_group, parallel, delay, trigger, jump, sub_process {
     $color-key: $type;
-    @if $type == condition_group { $color-key: condition; }
+    @if $type == condition_group {
+      $color-key: condition;
+    }
 
     &--#{$type} {
       border-color: var(--wf-color-#{$color-key});
@@ -153,7 +156,9 @@
         background: var(--wf-header-bg-#{$color-key});
       }
 
-      .wf-node-card__icon { color: var(--wf-color-#{$color-key}); }
+      .wf-node-card__icon {
+        color: var(--wf-color-#{$color-key});
+      }
     }
   }
 
@@ -266,14 +271,37 @@
     justify-content: center;
 
     // Per-type icon backgrounds
-    &--approval { background: var(--wf-color-approval); }
-    &--cc { background: var(--wf-color-cc); }
-    &--condition { background: var(--wf-color-condition); }
-    &--parallel { background: var(--wf-color-parallel); }
-    &--delay { background: var(--wf-color-delay); }
-    &--trigger { background: var(--wf-color-trigger); }
-    &--jump { background: var(--wf-color-jump); }
-    &--sub-process { background: var(--wf-color-sub-process); }
+    &--approval {
+      background: var(--wf-color-approval);
+    }
+
+    &--cc {
+      background: var(--wf-color-cc);
+    }
+
+    &--condition {
+      background: var(--wf-color-condition);
+    }
+
+    &--parallel {
+      background: var(--wf-color-parallel);
+    }
+
+    &--delay {
+      background: var(--wf-color-delay);
+    }
+
+    &--trigger {
+      background: var(--wf-color-trigger);
+    }
+
+    &--jump {
+      background: var(--wf-color-jump);
+    }
+
+    &--sub-process {
+      background: var(--wf-color-sub-process);
+    }
   }
 }
 
@@ -285,7 +313,8 @@
   flex-direction: column;
   align-items: center;
 
-  &__top-line, &__bottom-line {
+  &__top-line,
+  &__bottom-line {
     width: 2px;
     height: 16px;
     background: var(--wf-connector-color);
@@ -369,7 +398,8 @@
     border-bottom: 1px solid var(--wf-toolbar-border);
     flex-shrink: 0;
 
-    &-left, &-right {
+    &-left,
+    &-right {
       display: flex;
       align-items: center;
       gap: $space-2;

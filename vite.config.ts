@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueDevTools from "vite-plugin-vue-devtools";
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
@@ -11,151 +12,159 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [
     vue(),
+    vueDevTools(),
     AutoImport({
-      dts: 'src/@types/auto-imports.d.ts',
+      dts: "src/@types/auto-imports.d.ts",
       imports: [
-        'vue',
-        'vue-router',
+        "vue",
+        "vue-router",
         {
-          'naive-ui': ['useDialog', 'useMessage', 'useNotification', 'useLoadingBar']
-        }
-      ]
+          "naive-ui": ["useDialog", "useMessage", "useNotification", "useLoadingBar"],
+        },
+      ],
     }),
     Components({
-      dts: 'src/@types/components.d.ts',
-      resolvers: [NaiveUiResolver()]
+      dts: "src/@types/components.d.ts",
+      resolvers: [NaiveUiResolver()],
     }),
     VitePWA({
       // 使用 prompt 模式，让用户决定何时更新
-      registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'pwa/apple-touch-icon.png', 'pwa/mask-icon.svg'],
+      registerType: "prompt",
+      includeAssets: ["favicon.ico", "pwa/apple-touch-icon.png", "pwa/mask-icon.svg"],
       // Workbox 缓存策略配置
       workbox: {
         // 缓存所有静态资源
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff,woff2}"],
         // 允许较大的字体文件被预缓存 (阿里妈妈方圆体 ~3MB)
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         // 防止 Service Worker 拦截 /api 等非前端路径
-        navigateFallback: 'index.html',
+        navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api/],
         // 运行时缓存配置
         runtimeCaching: [
           {
             // 缓存图片资源（同域 + CDN）
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
-            handler: 'CacheFirst',
+            handler: "CacheFirst",
             options: {
-              cacheName: 'images-cache',
+              cacheName: "images-cache",
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
-            }
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
           },
           {
             // 缓存字体文件
             urlPattern: /\.(?:woff|woff2|ttf|eot)$/i,
-            handler: 'CacheFirst',
+            handler: "CacheFirst",
             options: {
-              cacheName: 'fonts-cache',
+              cacheName: "fonts-cache",
               expiration: {
                 maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              }
-            }
-          }
-        ]
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+        ],
       },
       manifest: {
-        name: 'Strix',
-        short_name: 'Strix',
-        description: 'ProjectAn Strix',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
-        display: 'standalone',
-        start_url: '/',
+        name: "Strix",
+        short_name: "Strix",
+        description: "ProjectAn Strix",
+        theme_color: "#ffffff",
+        background_color: "#ffffff",
+        display: "standalone",
+        start_url: "/",
         icons: [
           {
-            src: 'pwa/pwa-64x64.png',
-            sizes: '64x64',
-            type: 'image/png'
+            src: "pwa/pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
           },
           {
-            src: 'pwa/pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "pwa/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
           },
           {
-            src: 'pwa/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: "pwa/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
           },
           {
-            src: 'pwa/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any'
+            src: "pwa/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
           },
           {
-            src: 'pwa/maskable-icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable'
-          }
+            src: "pwa/maskable-icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
         ],
         screenshots: [
           {
-            src: 'pwa/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            form_factor: 'wide',
-            label: 'Strix'
+            src: "pwa/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Strix",
           },
           {
-            src: 'pwa/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            form_factor: 'narrow',
-            label: 'Strix'
-          }
-        ]
-      }
-    })
+            src: "pwa/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Strix",
+          },
+        ],
+      },
+    }),
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
   },
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "@/assets/style/tokens" as *;\n@use "@/assets/style/mixins" as *;\n`
-      }
-    }
+        additionalData: `@use "@/assets/style/tokens" as *;\n@use "@/assets/style/mixins" as *;\n`,
+      },
+    },
   },
   build: {
-    target: 'es2015',
+    target: "es2015",
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-vue': ['vue', 'vue-router', 'pinia', 'pinia-plugin-persistedstate'],
-          'vendor-naive': ['naive-ui'],
-          'vendor-icons': ['lucide-vue-next'],
-          'vendor-echarts': ['echarts', 'vue-echarts'],
-          'vendor-crypto': ['sm-crypto'],
-          'vendor-xlsx': ['xlsx']
-        }
-      }
-    }
+        manualChunks: (id) => {
+          const chunks: Record<string, string[]> = {
+            "vendor-vue": ["vue", "vue-router", "pinia", "pinia-plugin-persistedstate"],
+            "vendor-naive": ["naive-ui"],
+            "vendor-icons": ["lucide-vue-next"],
+            "vendor-echarts": ["echarts", "vue-echarts"],
+            "vendor-crypto": ["sm-crypto"],
+            "vendor-xlsx": ["xlsx"],
+          };
+          for (const [key, modules] of Object.entries(chunks)) {
+            if (modules.some((m) => id.includes(`node_modules/${m}`))) {
+              return key;
+            }
+          }
+        },
+      },
+    },
   },
   server: {
-    host: '0.0.0.0',
-    port: 19889
+    host: "0.0.0.0",
+    port: 19889,
   },
   preview: {
-    host: '0.0.0.0',
-    port: 19889
-  }
-})
+    host: "0.0.0.0",
+    port: 19889,
+  },
+});

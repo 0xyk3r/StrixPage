@@ -110,18 +110,24 @@ export const dictApi = {
   dataList: (key: string, params: Record<string, any>) =>
     http.get<RetResult<DictDataListResp>>(`${BASE}/data/${key}`, {
       params,
-      meta: { operate: '加载字典数据列表' },
+      meta: { operate: "加载字典数据列表" },
     }),
 
   dataDetail: (key: string, id: string) =>
-    http.get<RetResult<DictDataResp>>(`${BASE}/data/${key}/${id}`, { meta: { operate: '加载字典数据信息' } }),
+    http.get<RetResult<DictDataResp>>(`${BASE}/data/${key}/${id}`, {
+      meta: { operate: "加载字典数据信息" },
+    }),
 
   dataCreate: (key: string, data: DictDataUpdateReq) =>
-    http.post<RetResult>(`${BASE}/data/${key}/update`, data, { meta: { operate: '新增字典数据' } }),
+    http.post<RetResult>(`${BASE}/data/${key}/update`, data, { meta: { operate: "新增字典数据" } }),
 
   dataUpdate: (key: string, id: string, data: DictDataUpdateReq) =>
-    http.post<RetResult>(`${BASE}/data/${key}/update/${id}`, data, { meta: { operate: '编辑字典数据' } }),
+    http.post<RetResult>(`${BASE}/data/${key}/update/${id}`, data, {
+      meta: { operate: "编辑字典数据" },
+    }),
 
   dataRemove: (key: string, id: string) =>
-    http.post<RetResult>(`${BASE}/data/${key}/remove/${id}`, null, { meta: { operate: '删除字典数据' } }),
-}
+    http.post<RetResult>(`${BASE}/data/${key}/remove/${id}`, null, {
+      meta: { operate: "删除字典数据" },
+    }),
+};

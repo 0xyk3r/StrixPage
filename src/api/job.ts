@@ -65,4 +65,4 @@ export const jobApi = {
 
   run: (id: string) =>
     http.post<RetResult>(`${BASE}/run/${id}`, null, { meta: { operate: `执行${_n}` } }),
-}
+};
