@@ -60,7 +60,7 @@ export const popularityApi = {
 
   detail: (id: string) =>
     http.get<RetResult<PopularityConfigResp>>(`${BASE}/${id}`, {
-      meta: { operate: `加载${_n}信息` },
+      meta: { operate: `加载${_n}信息` }
     }),
 
   create: (data: PopularityConfigUpdateReq) =>
@@ -69,22 +69,21 @@ export const popularityApi = {
   update: (id: string, data: PopularityConfigUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `保存${_n}` } }),
 
-  remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
+  remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   dataList: (id: string, params: Record<string, any>) =>
     http.get<RetResult<PopularityDataListResp>>(`${BASE}/${id}/data`, {
       params,
-      meta: { operate: "加载热度数据列表" },
+      meta: { operate: '加载热度数据列表' }
     }),
 
   dataUpdate: (id: string, dataId: string, data: PopularityDataUpdateReq) =>
     http.post<RetResult>(`${BASE}/${id}/data/update/${dataId}`, data, {
-      meta: { operate: "修改热度数据数值" },
+      meta: { operate: '修改热度数据数值' }
     }),
 
   dataRemove: (id: string, dataId: string) =>
     http.post<RetResult>(`${BASE}/${id}/data/remove/${dataId}`, null, {
-      meta: { operate: "删除热度数据" },
-    }),
-};
+      meta: { operate: '删除热度数据' }
+    })
+}

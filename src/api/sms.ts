@@ -106,14 +106,13 @@ export const smsApi = {
     list: BASE,
     templateList: `${BASE}/template`,
     signList: `${BASE}/sign`,
-    logList: `${BASE}/log`,
+    logList: `${BASE}/log`
   },
 
   list: (params: Record<string, any>) =>
     http.get<RetResult<SmsListResp>>(BASE, { params, meta: { operate: `加载${_n}列表` } }),
 
-  detail: (id: string) =>
-    http.get<RetResult<SmsConfigResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
+  detail: (id: string) => http.get<RetResult<SmsConfigResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
 
   create: (data: SmsConfigUpdateReq) =>
     http.post<RetResult>(`${BASE}/update`, data, { meta: { operate: `新增${_n}` } }),
@@ -121,29 +120,28 @@ export const smsApi = {
   update: (id: string, data: SmsConfigUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `编辑${_n}` } }),
 
-  remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
+  remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   templateList: (params: Record<string, any>) =>
     http.get<RetResult<SmsTemplateListResp>>(`${BASE}/template`, {
       params,
-      meta: { operate: "加载短信模板列表" },
+      meta: { operate: '加载短信模板列表' }
     }),
 
   signList: (params: Record<string, any>) =>
     http.get<RetResult<SmsSignListResp>>(`${BASE}/sign`, {
       params,
-      meta: { operate: "加载短信签名列表" },
+      meta: { operate: '加载短信签名列表' }
     }),
 
   logList: (params: Record<string, any>) =>
     http.get<RetResult<SmsLogListResp>>(`${BASE}/log`, {
       params,
-      meta: { operate: "加载短信日志列表" },
+      meta: { operate: '加载短信日志列表' }
     }),
 
   configSelect: () =>
     http.get<RetResult<SelectDataResp>>(`${BASE}/config/select`, {
-      meta: { operate: "加载短信配置下拉列表" },
-    }),
-};
+      meta: { operate: '加载短信配置下拉列表' }
+    })
+}

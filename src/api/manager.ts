@@ -59,8 +59,7 @@ export const managerApi = {
   update: (id: string, data: SystemManagerUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `编辑${_n}` } }),
 
-  remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
+  remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   modify: (id: string, data: { field: string; value: string }) =>
     http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } }),
@@ -68,6 +67,6 @@ export const managerApi = {
   transfer: (params?: Record<string, any>) =>
     http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
       params,
-      meta: { operate: `加载${_n}穿梭框` },
-    }),
-};
+      meta: { operate: `加载${_n}穿梭框` }
+    })
+}

@@ -5,11 +5,8 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（名称）"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="请输入搜索条件（名称）" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -89,7 +86,7 @@
             v-model:value="addForm.remarks"
             :autosize="{
               minRows: 3,
-              maxRows: 5,
+              maxRows: 5
             }"
             placeholder="在此输入备注信息"
             type="textarea"
@@ -142,7 +139,7 @@
               v-model:value="editForm.remarks"
               :autosize="{
                 minRows: 3,
-                maxRows: 5,
+                maxRows: 5
               }"
               placeholder="在此输入备注信息"
               type="textarea"
@@ -162,32 +159,32 @@
 </template>
 
 <script lang="ts" setup>
-import type { NTagType } from "@/@types/naive-ui";
-import NebulaTag from "@/components/common/NebulaTag.vue";
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import { regionApi } from "@/api/region";
-import type { CascaderDataItem } from "@/api/types";
-import { useCrud } from "@/composables/useCrud";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules } from "naive-ui";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+import type { NTagType } from '@/@types/naive-ui'
+import NebulaTag from '@/components/common/NebulaTag.vue'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import { regionApi } from '@/api/region'
+import type { CascaderDataItem } from '@/api/types'
+import { useCrud } from '@/composables/useCrud'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
-const _baseName = "系统地区";
-const showExportDialog = ref(false);
+const _baseName = '系统地区'
+const showExportDialog = ref(false)
 
 // 加载所有地区级联选项
-const systemRegionCascaderOptions = ref<CascaderDataItem[]>([]);
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
 const getSystemRegionSelectList = () => {
   regionApi.cascader().then(({ data: res }) => {
-    systemRegionCascaderOptions.value = res.data.options;
-  });
-};
+    systemRegionCascaderOptions.value = res.data.options
+  })
+}
 
 const {
   listParams,
@@ -208,7 +205,7 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: { keyword: null, parentId: null, pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -217,124 +214,120 @@ const {
   api: regionApi,
   hooks: {
     beforeShowAdd: () => getSystemRegionSelectList(),
-    beforeShowEdit: () => getSystemRegionSelectList(),
+    beforeShowEdit: () => getSystemRegionSelectList()
   },
-  draftKey: "SystemRegion",
-});
+  draftKey: 'SystemRegion'
+})
 
-const fetchAllData = createPaginatedFetcher(
-  regionApi.urls.list,
-  "systemRegionList",
-  () => listParams.value,
-);
+const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "name", title: "地区名称", width: 180 },
-  { key: "fullName", title: "完整地区名称", width: 320 },
+  { key: 'name', title: '地区名称', width: 180 },
+  { key: 'fullName', title: '完整地区名称', width: 320 },
   {
-    key: "level",
-    title: "地区层级",
+    key: 'level',
+    title: '地区层级',
     width: 140,
-    align: "center",
+    align: 'center',
     valueMap: {
-      "1": "一级地区",
-      "2": "二级地区",
-      "3": "三级地区",
-      "4": "四级地区",
-      "5": "五级地区",
-      "6": "六级地区",
+      '1': '一级地区',
+      '2': '二级地区',
+      '3': '三级地区',
+      '4': '四级地区',
+      '5': '五级地区',
+      '6': '六级地区'
     },
     render(row: any) {
-      const tagTypes = ["default", "success", "info", "warning", "error", "default"];
-      const tagType: NTagType = (tagTypes[row.level] as NTagType) || "default";
-      const tagBordered = row.level === 6;
+      const tagTypes = ['default', 'success', 'info', 'warning', 'error', 'default']
+      const tagType: NTagType = (tagTypes[row.level] as NTagType) || 'default'
+      const tagBordered = row.level === 6
       return h(
         NebulaTag,
         { type: tagType, bordered: tagBordered },
         {
           default: () => {
-            const levels = ["一", "二", "三", "四", "五", "六"];
-            return levels[row.level - 1] + "级地区";
-          },
-        },
-      );
-    },
+            const levels = ['一', '二', '三', '四', '五', '六']
+            return levels[row.level - 1] + '级地区'
+          }
+        }
+      )
+    }
   },
-  { key: "remarks", title: "备注信息", width: 180 },
+  { key: 'remarks', title: '备注信息', width: 180 },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 180,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "info",
-          label: "添加子项",
-          icon: "plus",
-          onClick: () => showAdd({ parentId: row.id || "" }),
+          type: 'info',
+          label: '添加子项',
+          icon: 'plus',
+          onClick: () => showAdd({ parentId: row.id || '' })
         },
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
-          onClick: () => showEdit(row.id),
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
+const dataRef = ref()
 // 使所有数据可展开
 const handleAddIsLeaf = (data: any[]) => {
   data.forEach((d) => {
-    d.isLeaf = false;
-  });
-};
-const dataLoading = ref(true);
+    d.isLeaf = false
+  })
+}
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   // 清除展开行
-  dataExpandedRowKeys.value = [];
+  dataExpandedRowKeys.value = []
   regionApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.systemRegionList;
-    pagination.itemCount = res.data.total;
-    handleAddIsLeaf(dataRef.value);
-  });
-};
-onMounted(getDataList);
-const dataExpandedRowKeys = ref<string[]>([]);
+    dataLoading.value = false
+    dataRef.value = res.data.systemRegionList
+    pagination.itemCount = res.data.total
+    handleAddIsLeaf(dataRef.value)
+  })
+}
+onMounted(getDataList)
+const dataExpandedRowKeys = ref<string[]>([])
 const onDataChildrenLoad = (row: any) => {
   return new Promise<void>((resolve) => {
     regionApi.children(row.id).then(({ data: res }) => {
-      const children = res.data.children;
-      handleAddIsLeaf(children);
-      row.children = children;
-      row.isLeaf = row.children.length === 0;
-      resolve();
-    });
-  });
-};
+      const children = res.data.children
+      handleAddIsLeaf(children)
+      row.children = children
+      row.isLeaf = row.children.length === 0
+      resolve()
+    })
+  })
+}
 
 const formRules: FormRules = {
-  name: textField("地区名称"),
-};
+  name: textField('地区名称')
+}
 </script>
 
 <style lang="scss" scoped></style>

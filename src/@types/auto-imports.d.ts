@@ -94,7 +94,7 @@ declare global {
     MaybeRef,
     MaybeRefOrGetter,
     VNode,
-    WritableComputedRef,
-  } from "vue";
+    WritableComputedRef
+  } from 'vue'
   import('vue')
 }

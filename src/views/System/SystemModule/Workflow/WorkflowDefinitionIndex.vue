@@ -47,23 +47,14 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入流程名称" />
         </n-form-item>
         <n-form-item label="流程标识" path="key">
-          <n-input
-            v-model:value="addForm.key"
-            clearable
-            placeholder="英文标识，如 leave-approval"
-          />
+          <n-input v-model:value="addForm.key" clearable placeholder="英文标识，如 leave-approval" />
         </n-form-item>
         <n-form-item label="分类" path="category">
           <n-input v-model:value="addForm.category" clearable placeholder="可选，如 人事、行政" />
         </n-form-item>
         <n-form-item label="描述" path="description">
-          <n-input
-            v-model:value="addForm.description"
-            type="textarea"
-            :rows="3"
-            clearable
-            placeholder="流程描述"
-          />
+          <n-input v-model:value="addForm.description" type="textarea" :rows="3" clearable
+                   placeholder="流程描述" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -77,19 +68,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, h, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import { workflowApi } from "@/api/workflow";
-import type { WfDefinition } from "@/api/workflow";
-import { useCrud } from "@/composables/useCrud";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules, useMessage, NTag } from "naive-ui";
+import { ref, h, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import { workflowApi } from '@/api/workflow'
+import type { WfDefinition } from '@/api/workflow'
+import { useCrud } from '@/composables/useCrud'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules, useMessage, NTag } from 'naive-ui'
 
-const _baseName = "流程定义";
-const router = useRouter();
-const message = useMessage();
+const _baseName = '流程定义'
+const router = useRouter()
+const message = useMessage()
 
 const {
   listParams,
@@ -101,7 +92,7 @@ const {
   showAdd,
   submitAdd,
   tryCloseAdd,
-  resetForms,
+  resetForms
 } = useCrud({
   list: { keyword: null, pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -109,104 +100,103 @@ const {
   editForm: {},
   api: {
     create: (data: any) => workflowApi.definitionCreate(data),
-    remove: (id: string) => workflowApi.definitionRemove(id),
+    remove: (id: string) => workflowApi.definitionRemove(id)
   },
-  draftKey: "WorkflowDefinition",
-});
+  draftKey: 'WorkflowDefinition'
+})
 
 const formRules: FormRules = {
-  name: textField("流程名称", { min: 2, max: 64 }),
-  key: textField("流程标识", { min: 2, max: 64 }),
-};
+  name: textField('流程名称', { min: 2, max: 64 }),
+  key: textField('流程标识', { min: 2, max: 64 })
+}
 
 const columns: DataTableColumns = [
-  { key: "name", title: "流程名称", width: 200 },
-  { key: "key", title: "流程标识", width: 180 },
-  { key: "category", title: "分类", width: 120 },
+  { key: 'name', title: '流程名称', width: 200 },
+  { key: 'key', title: '流程标识', width: 180 },
+  { key: 'category', title: '分类', width: 120 },
   {
-    key: "status",
-    title: "状态",
+    key: 'status',
+    title: '状态',
     width: 100,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return h(
         NTag,
         {
-          type: row.status === 1 ? "success" : "default",
-          size: "small",
+          type: row.status === 1 ? 'success' : 'default',
+          size: 'small'
         },
-        () => (row.status === 1 ? "已启用" : "已停用"),
-      );
-    },
+        () => (row.status === 1 ? '已启用' : '已停用')
+      )
+    }
   },
-  { key: "description", title: "描述", width: 200, ellipsis: { tooltip: true } },
-  { key: "createdTime", title: "创建时间", width: 180 },
+  { key: 'description', title: '描述', width: 200, ellipsis: { tooltip: true } },
+  { key: 'createdTime', title: '创建时间', width: 180 },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 280,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "primary",
-          label: "设计",
-          icon: "pencil-ruler",
-          onClick: () =>
-            router.push({ name: "WorkflowDesigner", params: { definitionId: row.id } }),
+          type: 'primary',
+          label: '设计',
+          icon: 'pencil-ruler',
+          onClick: () => router.push({ name: 'WorkflowDesigner', params: { definitionId: row.id } })
         },
         {
-          type: row.status === 1 ? "warning" : "success",
-          label: row.status === 1 ? "停用" : "启用",
-          icon: row.status === 1 ? "pause" : "play",
-          onClick: () => toggleStatus(row),
+          type: row.status === 1 ? 'warning' : 'success',
+          label: row.status === 1 ? '停用' : '启用',
+          icon: row.status === 1 ? 'pause' : 'play',
+          onClick: () => toggleStatus(row)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteDefinition(row.id),
-          popconfirm: true,
-        },
-      ]);
-    },
-  },
-];
+          popconfirm: true
+        }
+      ])
+    }
+  }
+]
 
-const dataRef = ref<WfDefinition[]>([]);
-const dataLoading = ref(true);
+const dataRef = ref<WfDefinition[]>([])
+const dataLoading = ref(true)
 
 async function getDataList() {
-  dataLoading.value = true;
+  dataLoading.value = true
   try {
-    const { data: res } = await workflowApi.definitionList(listParams.value);
-    dataRef.value = res.data.items;
-    pagination.itemCount = res.data.total;
+    const { data: res } = await workflowApi.definitionList(listParams.value)
+    dataRef.value = res.data.items
+    pagination.itemCount = res.data.total
   } finally {
-    dataLoading.value = false;
+    dataLoading.value = false
   }
 }
 
 async function toggleStatus(row: WfDefinition) {
   try {
     if (row.status === 1) {
-      await workflowApi.definitionDisable(row.id);
-      message.success("已停用");
+      await workflowApi.definitionDisable(row.id)
+      message.success('已停用')
     } else {
-      await workflowApi.definitionEnable(row.id);
-      message.success("已启用");
+      await workflowApi.definitionEnable(row.id)
+      message.success('已启用')
     }
-    getDataList();
+    getDataList()
   } catch {}
 }
 
 async function deleteDefinition(id: string) {
   try {
-    await workflowApi.definitionRemove(id);
-    message.success("删除成功");
-    getDataList();
+    await workflowApi.definitionRemove(id)
+    message.success('删除成功')
+    getDataList()
   } catch {}
 }
 
-onMounted(getDataList);
+onMounted(getDataList)
 </script>

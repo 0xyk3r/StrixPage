@@ -9,8 +9,8 @@ import {
   createNode,
   insertNodeAfter,
   removeNode,
-  findNode,
-} from "@/utils/workflow-graph";
+  findNode
+} from '@/utils/workflow-graph'
 import type { NodeType, WorkflowGraph } from '@/api/workflow'
 
 const MAX_UNDO_STEPS = 50
@@ -121,7 +121,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
     pushUndoState()
     const node = findNode(tree.value, nodeId)
     if (node && node.branches && node.branches.length > 2) {
-      node.branches = node.branches.filter((b) => b.id !== branchId);
+      node.branches = node.branches.filter((b) => b.id !== branchId)
     }
   }
 
@@ -202,6 +202,6 @@ export const useWorkflowStore = defineStore('workflow', () => {
     loadDefinition,
     saveVersion,
     publishVersion,
-    resetDesigner,
-  };
+    resetDesigner
+  }
 })

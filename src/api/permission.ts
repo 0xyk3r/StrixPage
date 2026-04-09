@@ -43,7 +43,7 @@ export const permissionApi = {
 
   detail: (id: string) =>
     http.get<RetResult<SystemPermissionResp>>(`${BASE}/${id}`, {
-      meta: { operate: `加载${_n}信息` },
+      meta: { operate: `加载${_n}信息` }
     }),
 
   create: (data: SystemPermissionUpdateReq) =>
@@ -52,12 +52,11 @@ export const permissionApi = {
   update: (id: string, data: SystemPermissionUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `编辑${_n}` } }),
 
-  remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
+  remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   transfer: (params?: Record<string, any>) =>
     http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
       params,
-      meta: { operate: `加载${_n}穿梭框` },
-    }),
-};
+      meta: { operate: `加载${_n}穿梭框` }
+    })
+}

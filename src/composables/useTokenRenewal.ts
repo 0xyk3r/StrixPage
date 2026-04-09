@@ -23,8 +23,8 @@ export function useTokenRenewal() {
 
     if (expireTime - currentTime < thirtyDaysInMs) {
       authApi.renewToken().then(({ data: res }) => {
-        loginInfoStore.updateLoginInfo(res);
-      });
+        loginInfoStore.updateLoginInfo(res)
+      })
     }
   }
 

@@ -5,21 +5,14 @@
         <n-grid :cols="12" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="4">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（昵称、账号）"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="请输入搜索条件（昵称、账号）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi span="3">
-            <n-form
-              :model="listParams"
-              :show-feedback="false"
-              label-placement="left"
-              label-width="auto"
-            >
+            <n-form :model="listParams" :show-feedback="false" label-placement="left"
+                    label-width="auto">
               <n-form-item-gi label="人员角色" path="roleId">
                 <n-select
                   v-model:value="listParams.roleId"
@@ -56,11 +49,8 @@
             />
           </n-form-item-gi>
           <n-form-item-gi label="人员类型" path="type" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.type"
-              :options="systemManagerTypeRef"
-              placeholder="请选择人员类型"
-            />
+            <n-select v-model:value="listParams.type" :options="systemManagerTypeRef"
+                      placeholder="请选择人员类型" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -253,20 +243,20 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import NebulaTag from "@/components/common/NebulaTag.vue";
-import { managerApi } from "@/api/manager";
-import { regionApi } from "@/api/region";
-import { roleApi } from "@/api/role";
-import type { CascaderDataItem, SelectDataItem } from "@/api/types";
-import { useQuickMenuStore } from "@/stores/quick-menu";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField, selectField } from "@/utils/form-rules";
-import { deepSearch } from "@/utils/strix-tools";
-import { differenceWith, find, isEqual } from "lodash-es";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import NebulaTag from '@/components/common/NebulaTag.vue'
+import { managerApi } from '@/api/manager'
+import { regionApi } from '@/api/region'
+import { roleApi } from '@/api/role'
+import type { CascaderDataItem, SelectDataItem } from '@/api/types'
+import { useQuickMenuStore } from '@/stores/quick-menu'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField } from '@/utils/form-rules'
+import { deepSearch } from '@/utils/strix-tools'
+import { differenceWith, find, isEqual } from 'lodash-es'
 import {
   type DataTableColumns,
   type FormRules,
@@ -274,61 +264,61 @@ import {
   NCheckboxGroup,
   NFlex,
   NH6,
-  NSpin,
-} from "naive-ui";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+  NSpin
+} from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
-const quickMenuStore = useQuickMenuStore();
+const quickMenuStore = useQuickMenuStore()
 
 // 本页面操作提示关键词
-const _baseName = "系统人员";
-const showExportDialog = ref(false);
+const _baseName = '系统人员'
+const showExportDialog = ref(false)
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({
-    id: "RefreshSystemManagersRole",
-    icon: "refresh-cw",
-    color: "primary",
-    name: "刷新角色",
-    tips: "强制刷新所有系统人员的角色列表",
+    id: 'RefreshSystemManagersRole',
+    icon: 'refresh-cw',
+    color: 'primary',
+    name: '刷新角色',
+    tips: '强制刷新所有系统人员的角色列表',
     callback: () => {
-      const temp = dataExpandedRowKeys.value;
-      dataExpandedRowKeys.value = [];
+      const temp = dataExpandedRowKeys.value
+      dataExpandedRowKeys.value = []
       nextTick(() => {
-        dataExpandedRowKeysChange(temp);
-      });
-    },
-  });
-});
+        dataExpandedRowKeysChange(temp)
+      })
+    }
+  })
+})
 onDeactivated(() => {
-  quickMenuStore.delQuickMenu("RefreshSystemManagersRole");
-});
+  quickMenuStore.delQuickMenu('RefreshSystemManagersRole')
+})
 
 // 加载字典
-const systemManagerStatusRef = useDict("SystemManagerStatus");
-const systemManagerTypeRef = useDict("SystemManagerType");
+const systemManagerStatusRef = useDict('SystemManagerStatus')
+const systemManagerTypeRef = useDict('SystemManagerType')
 
 // 加载所有地区级联选项
-const systemRegionCascaderOptions = ref<CascaderDataItem[]>([]);
+const systemRegionCascaderOptions = ref<CascaderDataItem[]>([])
 const getSystemRegionSelectList = () => {
   regionApi.cascader().then(({ data: res }) => {
-    systemRegionCascaderOptions.value = res.data.options;
-  });
-};
-onMounted(getSystemRegionSelectList);
+    systemRegionCascaderOptions.value = res.data.options
+  })
+}
+onMounted(getSystemRegionSelectList)
 
 // 加载所有人员角色选项
-const systemRoleSelectList = ref<SelectDataItem[]>([]);
+const systemRoleSelectList = ref<SelectDataItem[]>([])
 const getSystemRoleSelectList = () => {
   roleApi.select().then(({ data: res }) => {
-    systemRoleSelectList.value = res.data.options;
-  });
-};
-onMounted(getSystemRoleSelectList);
+    systemRoleSelectList.value = res.data.options
+  })
+}
+onMounted(getSystemRoleSelectList)
 
 const {
   listParams,
@@ -349,7 +339,7 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: { keyword: null, status: null, type: null, roleId: null, pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -359,7 +349,7 @@ const {
     loginPassword: null,
     status: 1,
     type: 1,
-    regionId: null,
+    regionId: null
   },
   editForm: {
     nickname: null,
@@ -367,195 +357,196 @@ const {
     loginPassword: null,
     status: null,
     type: null,
-    regionId: null,
+    regionId: null
   },
   api: managerApi,
   hooks: {
     beforeShowAdd: () => getSystemRegionSelectList(),
-    beforeShowEdit: () => getSystemRegionSelectList(),
+    beforeShowEdit: () => getSystemRegionSelectList()
   },
-  draftKey: "SystemManager",
-});
+  draftKey: 'SystemManager'
+})
 
-const fetchAllData = createPaginatedFetcher(
-  managerApi.urls.list,
-  "systemManagerList",
-  () => listParams.value,
-);
+const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
   {
-    type: "expand",
+    type: 'expand',
     renderExpand: (row: any) => {
       if (!row.roleIdArray) {
-        return h(NSpin, { size: "large", description: "加载中..." });
+        return h(NSpin, { size: 'large', description: '加载中...' })
       }
-      const rolesCheckboxRender = systemRoleSelectList.value.map(({ value, label }) =>
-        h(NCheckbox, { value, label }),
-      );
-      return h("div", { style: "padding: 5px 10px;" }, [
-        h(NH6, { prefix: "bar", alignText: true }, () => "人员角色设置"),
+      const rolesCheckboxRender = systemRoleSelectList.value.map(({
+                                                                    value,
+                                                                    label
+                                                                  }) => h(NCheckbox, {
+        value,
+        label
+      }))
+      return h('div', { style: 'padding: 5px 10px;' }, [
+        h(NH6, { prefix: 'bar', alignText: true }, () => '人员角色设置'),
         h(
           NCheckboxGroup,
           {
             value: row.roleIdArray,
-            "onUpdate:value": (value) => changeSystemManagerRoles(row.id, value),
+            'onUpdate:value': (value) => changeSystemManagerRoles(row.id, value)
           },
-          () => h(NFlex, {}, () => rolesCheckboxRender),
-        ),
-      ]);
-    },
+          () => h(NFlex, {}, () => rolesCheckboxRender)
+        )
+      ])
+    }
   },
-  { key: "nickname", title: "昵称", width: 160 },
-  { key: "loginName", title: "登录名", width: 160 },
+  { key: 'nickname', title: '昵称', width: 160 },
+  { key: 'loginName', title: '登录名', width: 160 },
   {
-    key: "status",
-    title: "账户状态",
+    key: 'status',
+    title: '账户状态',
     width: 120,
-    align: "center",
-    dictName: "SystemManagerStatus",
+    align: 'center',
+    dictName: 'SystemManagerStatus',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: "SystemManagerStatus" });
-    },
+      return h(StrixTag, { value: row.status, dictName: 'SystemManagerStatus' })
+    }
   },
   {
-    key: "type",
-    title: "账户类型",
+    key: 'type',
+    title: '账户类型',
     width: 120,
-    align: "center",
-    dictName: "SystemManagerType",
+    align: 'center',
+    dictName: 'SystemManagerType',
     render(row: any) {
-      return h(StrixTag, { value: row.type, dictName: "SystemManagerType" });
-    },
+      return h(StrixTag, { value: row.type, dictName: 'SystemManagerType' })
+    }
   },
   {
-    key: "regionId",
-    title: "所属地区",
+    key: 'regionId',
+    title: '所属地区',
     width: 180,
-    align: "center",
+    align: 'center',
     valueResolver: (val: any) => managerRegionName(val),
     render(row: any) {
-      const tagText = managerRegionName(row.regionId);
+      const tagText = managerRegionName(row.regionId)
       return h(
         NebulaTag,
-        { type: "info", bordered: false },
+        { type: 'info', bordered: false },
         {
-          default: () => tagText,
-        },
-      );
-    },
+          default: () => tagText
+        }
+      )
+    }
   },
-  { key: "createdTime", title: "创建时间", width: 180 },
+  { key: 'createdTime', title: '创建时间', width: 180 },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 130,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
-          onClick: () => showEdit(row.id),
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   managerApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
+    dataLoading.value = false
     // 清除展开行
-    dataExpandedRowKeys.value = [];
-    dataRef.value = res.data.systemManagerList;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
-const dataExpandedRowKeys = ref<Array<string | number>>([]);
+    dataExpandedRowKeys.value = []
+    dataRef.value = res.data.systemManagerList
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
+const dataExpandedRowKeys = ref<Array<string | number>>([])
 const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   // 只获取新展开的
-  const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual);
-  dataExpandedRowKeys.value = value;
+  const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
+  dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff });
+    const row = find(dataRef.value, { id: diff })
     if (row) {
       managerApi.detail(row.id).then(({ data: res }) => {
-        row.roleIdArray = res.data.roleIds?.split(",");
-      });
+        row.roleIdArray = res.data.roleIds?.split(',')
+      })
     }
-  });
-};
+  })
+}
 
 const managerRegionName = (regionId: string) => {
-  const result = deepSearch(systemRegionCascaderOptions.value, regionId, "value");
-  return result ? result.label : "未设置";
-};
+  const result = deepSearch(systemRegionCascaderOptions.value, regionId, 'value')
+  return result ? result.label : '未设置'
+}
 
 // 更改系统人员角色
 const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string | number>) => {
-  const row = find(dataRef.value, { id: systemManagerId });
+  const row = find(dataRef.value, { id: systemManagerId })
   managerApi
     .modify(systemManagerId, {
-      field: "role",
-      value: roles.join(","),
+      field: 'role',
+      value: roles.join(',')
     })
     .then(({ data: res }) => {
-      row.roleIdArray = res.data.roleIds?.split(",");
-    });
-};
+      row.roleIdArray = res.data.roleIds?.split(',')
+    })
+}
 
 const passwordComplexityValidator = {
   validator: (_rule: any, value: string) => {
-    if (!value) return true;
-    let categories = 0;
-    if (/[A-Z]/.test(value)) categories++;
-    if (/[a-z]/.test(value)) categories++;
-    if (/\d/.test(value)) categories++;
-    if (/[^A-Za-z0-9]/.test(value)) categories++;
-    return categories >= 3;
+    if (!value) return true
+    let categories = 0
+    if (/[A-Z]/.test(value)) categories++
+    if (/[a-z]/.test(value)) categories++
+    if (/\d/.test(value)) categories++
+    if (/[^A-Za-z0-9]/.test(value)) categories++
+    return categories >= 3
   },
-  message: "密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类",
-  trigger: "blur",
-};
+  message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
+  trigger: 'blur'
+}
 
 const addFormRules: FormRules = {
-  nickname: textField("管理人员昵称", { min: 2, max: 20 }),
-  loginName: textField("登录账号", { min: 4, max: 20 }),
-  loginPassword: [...textField("登录密码", { min: 8, max: 32 }), passwordComplexityValidator],
-  status: selectField("管理人员状态"),
-  type: selectField("管理人员类型"),
-};
+  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
+  loginName: textField('登录账号', { min: 4, max: 20 }),
+  loginPassword: [...textField('登录密码', { min: 8, max: 32 }), passwordComplexityValidator],
+  status: selectField('管理人员状态'),
+  type: selectField('管理人员类型')
+}
 
 const editFormRules: FormRules = {
-  nickname: textField("管理人员昵称", { min: 2, max: 20 }),
-  loginName: textField("登录账号", { min: 4, max: 20 }),
-  loginPassword: [
-    ...textField("登录密码", { required: false, min: 8, max: 32 }),
-    passwordComplexityValidator,
-  ],
-  status: selectField("管理人员状态"),
-  type: selectField("管理人员类型"),
-};
+  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
+  loginName: textField('登录账号', { min: 4, max: 20 }),
+  loginPassword: [...textField('登录密码', {
+    required: false,
+    min: 8,
+    max: 32
+  }), passwordComplexityValidator],
+  status: selectField('管理人员状态'),
+  type: selectField('管理人员类型')
+}
 </script>
 
 <style lang="scss" scoped></style>

@@ -9,14 +9,14 @@
       :assignee-ids="config.assigneeIds"
       @update:assignee-type="
         (v) => {
-          config.assigneeType = v;
-          emitUpdate();
+          config.assigneeType = v
+          emitUpdate()
         }
       "
       @update:assignee-ids="
         (v) => {
-          config.assigneeIds = v;
-          emitUpdate();
+          config.assigneeIds = v
+          emitUpdate()
         }
       "
     />
@@ -24,32 +24,32 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, watch } from "vue";
-import type { DesignerTreeNode } from "@/api/workflow";
-import AssigneeSelector from "../common/AssigneeSelector.vue";
+import { reactive, watch } from 'vue'
+import type { DesignerTreeNode } from '@/api/workflow'
+import AssigneeSelector from '../common/AssigneeSelector.vue'
 
-const props = defineProps<{ node: DesignerTreeNode }>();
-const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>();
+const props = defineProps<{ node: DesignerTreeNode }>()
+const emit = defineEmits<{ update: [config: Record<string, any>, name: string] }>()
 
 const config = reactive({
   name: props.node.name,
-  assigneeType: props.node.config.assigneeType || "MANAGER",
-  assigneeIds: props.node.config.assigneeIds || [],
-});
+  assigneeType: props.node.config.assigneeType || 'MANAGER',
+  assigneeIds: props.node.config.assigneeIds || []
+})
 
 watch(
   () => props.node.id,
   () => {
     Object.assign(config, {
       name: props.node.name,
-      assigneeType: props.node.config.assigneeType || "MANAGER",
-      assigneeIds: props.node.config.assigneeIds || [],
-    });
-  },
-);
+      assigneeType: props.node.config.assigneeType || 'MANAGER',
+      assigneeIds: props.node.config.assigneeIds || []
+    })
+  }
+)
 
 function emitUpdate() {
-  const { name, ...rest } = config;
-  emit("update", rest, name);
+  const { name, ...rest } = config
+  emit('update', rest, name)
 }
 </script>

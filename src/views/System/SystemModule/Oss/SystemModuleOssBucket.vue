@@ -99,21 +99,21 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import { ossApi } from "@/api/oss";
-import type { SelectDataItem } from "@/api/types";
-import { useCrud } from "@/composables/useCrud";
-import { textField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules } from "naive-ui";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import { ossApi } from '@/api/oss'
+import type { SelectDataItem } from '@/api/types'
+import { useCrud } from '@/composables/useCrud'
+import { textField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
-const _baseName = "存储空间";
-const showExportDialog = ref(false);
+const _baseName = '存储空间'
+const showExportDialog = ref(false)
 const {
   listParams,
   clearSearch,
@@ -125,68 +125,64 @@ const {
   showAdd,
   submitAdd,
   resetForms,
-  tryCloseAdd,
+  tryCloseAdd
 } = useCrud({
   list: {
     keyword: null,
     configKey: null,
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 10
   },
   fetchList: () => getDataList(),
   addForm: {
     configKey: null,
-    name: null,
+    name: null
   },
   api: {
     create: (data: any) => ossApi.bucketCreate(data),
-    remove: (id: string) => ossApi.bucketRemove(id),
+    remove: (id: string) => ossApi.bucketRemove(id)
   },
-  draftKey: "ModuleOssBucket",
-});
+  draftKey: 'ModuleOssBucket'
+})
 
-const fetchAllData = createPaginatedFetcher(
-  ossApi.urls.bucketList,
-  "buckets",
-  () => listParams.value,
-);
+const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { title: "存储空间名称", key: "name" },
-  { title: "创建时间", key: "createdTime", width: 180 },
-];
+  { title: '存储空间名称', key: 'name' },
+  { title: '创建时间', key: 'createdTime', width: 180 }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   ossApi.bucketList(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.buckets;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.buckets
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
 
 // 加载存储配置选项
-const ossConfigSelectList = ref<SelectDataItem[]>([]);
+const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
-    ossConfigSelectList.value = res.data.options;
-  });
-};
-onMounted(getOssConfigSelectList);
+    ossConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getOssConfigSelectList)
 
 const addFormRules: FormRules = {
-  configKey: [{ required: true, message: "请选择存储配置 Key", trigger: "change" }],
-  name: textField("Bucket 名称", { min: 1, max: 64 }),
-};
+  configKey: [{ required: true, message: '请选择存储配置 Key', trigger: 'change' }],
+  name: textField('Bucket 名称', { min: 1, max: 64 })
+}
 </script>
 
 <style lang="scss" scoped></style>

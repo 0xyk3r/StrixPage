@@ -65,10 +65,7 @@ export function useFormDraft(draftKey: string) {
     draftCleared = false
     const key = buildKey(draftKey, type, editId)
     savedFormKeys = Object.keys(form.value)
-    debouncedSave = debounce(
-      () => saveDraftToStorage(key, pick(form.value, savedFormKeys)),
-      DRAFT_DEBOUNCE_MS,
-    );
+    debouncedSave = debounce(() => saveDraftToStorage(key, pick(form.value, savedFormKeys)), DRAFT_DEBOUNCE_MS)
     stopWatcher = watch(form, debouncedSave, { deep: true })
   }
 

@@ -94,18 +94,12 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入文件组名称" />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="bucketName">
-          <n-input
-            v-model:value="addForm.bucketName"
-            clearable
-            placeholder="请输入存储空间 (Bucket) 名称"
-          />
+          <n-input v-model:value="addForm.bucketName" clearable
+                   placeholder="请输入存储空间 (Bucket) 名称" />
         </n-form-item>
         <n-form-item label="Bucket 域名" path="bucketDomain">
-          <n-input
-            v-model:value="addForm.bucketDomain"
-            clearable
-            placeholder="请输入Bucket自定义域名"
-          />
+          <n-input v-model:value="addForm.bucketDomain" clearable
+                   placeholder="请输入Bucket自定义域名" />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
           <n-input
@@ -115,11 +109,8 @@
           />
         </n-form-item>
         <n-form-item label="允许的扩展名" path="allowExtension">
-          <n-dynamic-tags
-            v-model:value="addForm.allowExtension"
-            type="primary"
-            @create="handleAllowExtensionCreate"
-          />
+          <n-dynamic-tags v-model:value="addForm.allowExtension" type="primary"
+                          @create="handleAllowExtensionCreate" />
         </n-form-item>
         <n-form-item label="查看权限类型" path="secretType">
           <n-select
@@ -130,18 +121,15 @@
           />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
-          <n-input-number
-            v-model:value="addForm.secretLevel"
-            clearable
-            placeholder="请输入查看权限等级"
-          />
+          <n-input-number v-model:value="addForm.secretLevel" clearable
+                          placeholder="请输入查看权限等级" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
-              maxRows: 5,
+              maxRows: 5
             }"
             placeholder="在此输入备注信息"
             type="textarea"
@@ -178,11 +166,8 @@
             <n-input v-model:value="editForm.name" clearable placeholder="请输入文件组名称" />
           </n-form-item>
           <n-form-item label="Bucket 域名" path="bucketDomain">
-            <n-input
-              v-model:value="editForm.bucketDomain"
-              clearable
-              placeholder="请输入Bucket自定义域名"
-            />
+            <n-input v-model:value="editForm.bucketDomain" clearable
+                     placeholder="请输入Bucket自定义域名" />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
             <n-input
@@ -207,18 +192,15 @@
             />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
-            <n-input-number
-              v-model:value="editForm.secretLevel"
-              clearable
-              placeholder="请输入查看权限等级"
-            />
+            <n-input-number v-model:value="editForm.secretLevel" clearable
+                            placeholder="请输入查看权限等级" />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
               v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
-                maxRows: 5,
+                maxRows: 5
               }"
               placeholder="在此输入备注信息"
               type="textarea"
@@ -234,13 +216,8 @@
       </template>
     </n-modal>
 
-    <n-modal
-      v-model:show="uploadModalShow"
-      class="strix-form-modal"
-      preset="card"
-      size="huge"
-      title="上传文件"
-    >
+    <n-modal v-model:show="uploadModalShow" class="strix-form-modal" preset="card" size="huge"
+             title="上传文件">
       <n-upload
         :action="uploadUrl"
         :headers="{ Authorization: `Bearer ${loginToken}` }"
@@ -263,38 +240,34 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { ossApi } from "@/api/oss";
-import type { SelectDataItem } from "@/api/types";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { createStrixMessage } from "@/utils/strix-message";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField, selectField, remarkField, numberField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules } from "naive-ui";
-import { type LoginInfoStore, useLoginInfoStore } from "@/stores/login-info.ts";
-import { storeToRefs } from "pinia";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { ossApi } from '@/api/oss'
+import type { SelectDataItem } from '@/api/types'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { createStrixMessage } from '@/utils/strix-message'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField, remarkField, numberField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
+import { storeToRefs } from 'pinia'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
-const _baseName = "文件分组";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(
-  ossApi.urls.fileGroupList,
-  "fileGroups",
-  () => listParams.value,
-);
+const _baseName = '文件分组'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileGroupList, 'fileGroups', () => listParams.value)
 
-const loginInfoStore = useLoginInfoStore();
-const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore;
+const loginInfoStore = useLoginInfoStore()
+const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
 
 // 加载字典
-const ossFileGroupSecretTypeRef = useDict("OssFileGroupSecretType");
+const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')
 
 const {
   listParams,
@@ -315,13 +288,13 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: {
     keyword: null,
     configKey: null,
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 10
   },
   fetchList: () => getDataList(),
   addForm: {
@@ -334,7 +307,7 @@ const {
     allowExtension: [],
     secretType: null,
     secretLevel: 1,
-    remark: null,
+    remark: null
   },
   editForm: {
     name: null,
@@ -343,175 +316,174 @@ const {
     allowExtension: [],
     secretType: null,
     secretLevel: null,
-    remark: null,
+    remark: null
   },
   api: {
     detail: (id: string) => ossApi.fileGroupDetail(id),
     create: (data: any) => ossApi.fileGroupCreate(data),
     update: (id: string, data: any) => ossApi.fileGroupUpdate(id, data),
-    remove: (id: string) => ossApi.fileGroupRemove(id),
+    remove: (id: string) => ossApi.fileGroupRemove(id)
   },
   hooks: {
     transformAdd: (form: any) => {
-      form.allowExtension = form.allowExtension.join(",");
-      return form;
+      form.allowExtension = form.allowExtension.join(',')
+      return form
     },
     transformEdit: (form: any) => {
-      form.allowExtension = form.allowExtension.join(",");
-      return form;
+      form.allowExtension = form.allowExtension.join(',')
+      return form
     },
     afterShowEdit: (detail: any) => {
-      editForm.value.allowExtension = detail.allowExtension.split(",");
-    },
+      editForm.value.allowExtension = detail.allowExtension.split(',')
+    }
   },
-  draftKey: "ModuleOssFileGroup",
-});
+  draftKey: 'ModuleOssFileGroup'
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "key", title: "文件组 Key", width: 140 },
-  { key: "name", title: "文件组名称", width: 160 },
-  { key: "configKey", title: "存储服务 Key", width: 140 },
-  { key: "bucketName", title: "所属 Bucket", width: 140 },
-  { key: "bucketDomain", title: "自定义域名", width: 240 },
-  { key: "baseDir", title: "基础路径", width: 160 },
-  { key: "allowExtension", title: "允许的拓展名", width: 240 },
+  { key: 'key', title: '文件组 Key', width: 140 },
+  { key: 'name', title: '文件组名称', width: 160 },
+  { key: 'configKey', title: '存储服务 Key', width: 140 },
+  { key: 'bucketName', title: '所属 Bucket', width: 140 },
+  { key: 'bucketDomain', title: '自定义域名', width: 240 },
+  { key: 'baseDir', title: '基础路径', width: 160 },
+  { key: 'allowExtension', title: '允许的拓展名', width: 240 },
   {
-    key: "secretType",
-    title: "文件权限类型",
+    key: 'secretType',
+    title: '文件权限类型',
     width: 120,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return h(StrixTag, {
         value: row.secretType,
-        dictName: "OssFileGroupSecretType",
-        afterLabel: " / " + row.secretLevel,
-      });
-    },
+        dictName: 'OssFileGroupSecretType',
+        afterLabel: ' / ' + row.secretLevel
+      })
+    }
   },
-  { key: "remark", title: "备注", width: 180 },
+  { key: 'remark', title: '备注', width: 180 },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 220,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "info",
-          label: "上传文件",
-          icon: "upload",
-          onClick: () => showUploadModal(row.key),
+          type: 'info',
+          label: '上传文件',
+          icon: 'upload',
+          onClick: () => showUploadModal(row.key)
         },
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
-          onClick: () => showEdit(row.id),
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage:
-            "是否确认删除这条数据? 删除后会导致该文件组下的所有文件无法访问！ 且该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 删除后会导致该文件组下的所有文件无法访问！ 且该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   ossApi.fileGroupList(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.fileGroups;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.fileGroups
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
 
 // 加载存储配置选项
-const ossConfigSelectList = ref<SelectDataItem[]>([]);
+const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
-    ossConfigSelectList.value = res.data.options;
-  });
-};
-onMounted(getOssConfigSelectList);
+    ossConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getOssConfigSelectList)
 
 const handleAllowExtensionCreate = (label: string): string => {
   if (!/^\.?\w+$/.test(label)) {
-    createStrixMessage("warning", "操作失败", "请输入正确的文件拓展名");
-    return "error";
+    createStrixMessage('warning', '操作失败', '请输入正确的文件拓展名')
+    return 'error'
   }
 
-  return label.startsWith(".") ? label : "." + label;
-};
+  return label.startsWith('.') ? label : '.' + label
+}
 
-const uploadModalShow = ref(false);
-const uploadFileGroupKey = ref("default");
-const uploadUrl = computed(() => `/api/system/common/file/${uploadFileGroupKey.value}/upload`);
+const uploadModalShow = ref(false)
+const uploadFileGroupKey = ref('default')
+const uploadUrl = computed(() => `/api/system/common/file/${uploadFileGroupKey.value}/upload`)
 const showUploadModal = (key: string) => {
-  uploadModalShow.value = true;
-  uploadFileGroupKey.value = key;
-};
+  uploadModalShow.value = true
+  uploadFileGroupKey.value = key
+}
 
 const addFormRules: FormRules = {
-  key: textField("配置 Key", { min: 2, max: 32 }),
-  configKey: [{ required: true, message: "请选择存储配置", trigger: "change" }],
-  name: textField("配置名称", { min: 2, max: 32 }),
-  bucketName: textField("Bucket 名称", { min: 1, max: 64 }),
-  bucketDomain: textField("Bucket 域名", { required: false, max: 64 }),
-  baseDir: textField("基础路径", { required: false, max: 64 }),
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  configKey: [{ required: true, message: '请选择存储配置', trigger: 'change' }],
+  name: textField('配置名称', { min: 2, max: 32 }),
+  bucketName: textField('Bucket 名称', { min: 1, max: 64 }),
+  bucketDomain: textField('Bucket 域名', { required: false, max: 64 }),
+  baseDir: textField('基础路径', { required: false, max: 64 }),
   allowExtension: [
     {
-      trigger: "change",
+      trigger: 'change',
       validator(rule, value) {
-        if (value.length == 0) return new Error("请填入允许上传的文件拓展名");
-        return true;
-      },
-    },
+        if (value.length == 0) return new Error('请填入允许上传的文件拓展名')
+        return true
+      }
+    }
   ],
-  secretType: selectField("查看权限类型"),
-  secretLevel: numberField("查看权限等级", { min: 0, max: 10 }),
-  remark: remarkField(),
-};
+  secretType: selectField('查看权限类型'),
+  secretLevel: numberField('查看权限等级', { min: 0, max: 10 }),
+  remark: remarkField()
+}
 
 const editFormRules: FormRules = {
-  key: textField("配置 Key", { min: 2, max: 32 }),
-  name: textField("配置名称", { min: 2, max: 32 }),
-  platform: selectField("平台"),
-  publicEndpoint: textField("公网节点", { min: 1, max: 128 }),
-  privateEndpoint: textField("内网节点", { min: 1, max: 128 }),
-  accessKey: textField("AccessKey", { max: 64 }),
-  accessSecret: textField("AccessSecret", { required: false, max: 64 }),
-  remark: remarkField(),
-};
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  name: textField('配置名称', { min: 2, max: 32 }),
+  platform: selectField('平台'),
+  publicEndpoint: textField('公网节点', { min: 1, max: 128 }),
+  privateEndpoint: textField('内网节点', { min: 1, max: 128 }),
+  accessKey: textField('AccessKey', { max: 64 }),
+  accessSecret: textField('AccessSecret', { required: false, max: 64 }),
+  remark: remarkField()
+}
 
 // 移除 allowExtension 中的错误项
 const removeErrorAllowExtension = (allowExtension: string[]) => {
-  if (allowExtension.includes("error")) {
-    allowExtension.splice(allowExtension.indexOf("error"), 1);
+  if (allowExtension.includes('error')) {
+    allowExtension.splice(allowExtension.indexOf('error'), 1)
   }
-};
+}
 watch(
   () => addForm.value.allowExtension,
-  (val) => removeErrorAllowExtension(val),
-);
+  (val) => removeErrorAllowExtension(val)
+)
 watch(
   () => editForm.value.allowExtension,
-  (val) => removeErrorAllowExtension(val),
-);
+  (val) => removeErrorAllowExtension(val)
+)
 </script>
 
 <style lang="scss" scoped></style>

@@ -11,16 +11,10 @@
     <div class="wf-add-menu">
       <div class="wf-add-menu__title">添加节点</div>
       <div class="wf-add-menu__grid">
-        <div
-          v-for="item in nodeOptions"
-          :key="item.type"
-          class="wf-add-menu__item"
-          @click="handleSelect(item.type)"
-        >
-          <div
-            class="wf-add-menu__icon"
-            :class="`wf-add-menu__icon--${item.type.toLowerCase().replace('_', '-')}`"
-          >
+        <div v-for="item in nodeOptions" :key="item.type" class="wf-add-menu__item"
+             @click="handleSelect(item.type)">
+          <div class="wf-add-menu__icon"
+               :class="`wf-add-menu__icon--${item.type.toLowerCase().replace('_', '-')}`">
             <component :is="item.icon" :size="16" color="#fff" />
           </div>
           <span>{{ item.label }}</span>
@@ -31,8 +25,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import type { NodeType } from "@/api/workflow";
+import { ref } from 'vue'
+import type { NodeType } from '@/api/workflow'
 import {
   Plus,
   UserCheck,
@@ -42,29 +36,29 @@ import {
   Clock,
   Zap,
   CornerUpRight,
-  Workflow,
-} from "lucide-vue-next";
+  Workflow
+} from 'lucide-vue-next'
 
 const emit = defineEmits<{
-  select: [type: NodeType];
-}>();
+  select: [type: NodeType]
+}>()
 
-const showMenu = ref(false);
+const showMenu = ref(false)
 
 const nodeOptions = [
-  { type: "APPROVAL" as NodeType, label: "审批", icon: UserCheck },
-  { type: "CC" as NodeType, label: "抄送", icon: Send },
-  { type: "CONDITION_GROUP" as NodeType, label: "条件分支", icon: GitBranch },
-  { type: "PARALLEL" as NodeType, label: "并行分支", icon: GitFork },
-  { type: "DELAY" as NodeType, label: "延迟", icon: Clock },
-  { type: "TRIGGER" as NodeType, label: "触发器", icon: Zap },
-  { type: "JUMP" as NodeType, label: "跳转", icon: CornerUpRight },
-  { type: "SUB_PROCESS" as NodeType, label: "子流程", icon: Workflow },
-];
+  { type: 'APPROVAL' as NodeType, label: '审批', icon: UserCheck },
+  { type: 'CC' as NodeType, label: '抄送', icon: Send },
+  { type: 'CONDITION_GROUP' as NodeType, label: '条件分支', icon: GitBranch },
+  { type: 'PARALLEL' as NodeType, label: '并行分支', icon: GitFork },
+  { type: 'DELAY' as NodeType, label: '延迟', icon: Clock },
+  { type: 'TRIGGER' as NodeType, label: '触发器', icon: Zap },
+  { type: 'JUMP' as NodeType, label: '跳转', icon: CornerUpRight },
+  { type: 'SUB_PROCESS' as NodeType, label: '子流程', icon: Workflow }
+]
 
 function handleSelect(type: NodeType) {
-  showMenu.value = false;
-  emit("select", type);
+  showMenu.value = false
+  emit('select', type)
 }
 </script>
 

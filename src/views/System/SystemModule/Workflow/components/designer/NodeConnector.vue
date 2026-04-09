@@ -8,16 +8,16 @@
 </template>
 
 <script lang="ts" setup>
-import AddNodeMenu from "./AddNodeMenu.vue";
-import type { NodeType } from "@/api/workflow";
+import AddNodeMenu from './AddNodeMenu.vue'
+import type { NodeType } from '@/api/workflow'
 
 defineProps<{
-  readonly?: boolean;
-}>();
+  readonly?: boolean
+}>()
 
 const emit = defineEmits<{
-  addNode: [type: NodeType];
-}>();
+  addNode: [type: NodeType]
+}>()
 </script>
 
 <style lang="scss">

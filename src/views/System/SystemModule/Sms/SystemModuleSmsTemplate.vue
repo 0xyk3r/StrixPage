@@ -5,11 +5,8 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="请输入搜索关键字（模板Code、名称）"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="请输入搜索关键字（模板Code、名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -81,91 +78,87 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { smsApi } from "@/api/sms";
-import type { SelectDataItem } from "@/api/types";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { type DataTableColumns } from "naive-ui";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { smsApi } from '@/api/sms'
+import type { SelectDataItem } from '@/api/types'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { type DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
-const _baseName = "短信模板";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(
-  smsApi.urls.templateList,
-  "templates",
-  () => listParams.value,
-);
+const _baseName = '短信模板'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(smsApi.urls.templateList, 'templates', () => listParams.value)
 
 // 加载字典
-const smsTemplateTypeRef = useDict("SmsTemplateType");
-const smsTemplateStatusRef = useDict("SmsTemplateStatus");
+const smsTemplateTypeRef = useDict('SmsTemplateType')
+const smsTemplateStatusRef = useDict('SmsTemplateStatus')
 
 const { listParams, clearSearch, pagination, rowKey } = useCrud({
   list: { keyword: null, configKey: null, type: null, status: null, pageIndex: 1, pageSize: 10 },
-  fetchList: () => getDataList(),
-});
+  fetchList: () => getDataList()
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "code", title: "模板 Code", width: 160 },
-  { key: "name", title: "模板名称", width: 240 },
-  { key: "configKey", title: "短信配置 Key", width: 140 },
+  { key: 'code', title: '模板 Code', width: 160 },
+  { key: 'name', title: '模板名称', width: 240 },
+  { key: 'configKey', title: '短信配置 Key', width: 140 },
   {
-    key: "type",
-    title: "类型",
+    key: 'type',
+    title: '类型',
     width: 120,
-    align: "center",
-    dictName: "SmsTemplateType",
+    align: 'center',
+    dictName: 'SmsTemplateType',
     render(row: any) {
-      return h(StrixTag, { value: row.type, dictName: "SmsTemplateType" });
-    },
+      return h(StrixTag, { value: row.type, dictName: 'SmsTemplateType' })
+    }
   },
   {
-    key: "status",
-    title: "状态",
+    key: 'status',
+    title: '状态',
     width: 120,
-    align: "center",
-    dictName: "SmsTemplateStatus",
+    align: 'center',
+    dictName: 'SmsTemplateStatus',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: "SmsTemplateStatus" });
-    },
+      return h(StrixTag, { value: row.status, dictName: 'SmsTemplateStatus' })
+    }
   },
-  { key: "content", title: "模板内容", width: 600 },
-  { title: "创建时间", key: "createdTime", width: 180 },
-];
+  { key: 'content', title: '模板内容', width: 600 },
+  { title: '创建时间', key: 'createdTime', width: 180 }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   smsApi.templateList(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.templates;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.templates
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
 
 // 加载短信配置选项
-const smsConfigSelectList = ref<SelectDataItem[]>([]);
+const smsConfigSelectList = ref<SelectDataItem[]>([])
 const getSmsConfigSelectList = () => {
   smsApi.configSelect().then(({ data: res }) => {
-    smsConfigSelectList.value = res.data.options;
-  });
-};
-onMounted(getSmsConfigSelectList);
+    smsConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getSmsConfigSelectList)
 </script>
 
 <style lang="scss" scoped></style>

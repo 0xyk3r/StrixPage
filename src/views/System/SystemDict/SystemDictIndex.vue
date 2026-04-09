@@ -5,11 +5,8 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="按字典标识或名称搜索"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="按字典标识或名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -104,19 +101,15 @@
           />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
-          <n-select
-            v-model:value="addForm.status"
-            :options="commonSwitchRef"
-            clearable
-            placeholder="请选择字典状态"
-          />
+          <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable
+                    placeholder="请选择字典状态" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
-              maxRows: 5,
+              maxRows: 5
             }"
             placeholder="在此输入备注信息"
             type="textarea"
@@ -176,7 +169,7 @@
               v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
-                maxRows: 5,
+                maxRows: 5
               }"
               placeholder="在此输入备注信息"
               type="textarea"
@@ -195,31 +188,31 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { dictApi } from "@/api/dict";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField, selectField, remarkField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules } from "naive-ui";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { dictApi } from '@/api/dict'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField, remarkField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
-const router = useRouter();
+const router = useRouter()
 
 // 本页面操作提示关键词
-const _baseName = "系统字典";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(dictApi.urls.list, "items", () => listParams.value);
+const _baseName = '系统字典'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(dictApi.urls.list, 'items', () => listParams.value)
 
 // 加载字典
-const commonFlagRef = useDict("CommonFlag");
-const commonSwitchRef = useDict("CommonSwitch");
-const dictDataTypeRef = useDict("DictDataType");
+const commonFlagRef = useDict('CommonFlag')
+const commonSwitchRef = useDict('CommonSwitch')
+const dictDataTypeRef = useDict('DictDataType')
 
 const {
   listParams,
@@ -240,14 +233,14 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: {
     keyword: null,
     status: null,
     provided: null,
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 10
   },
   fetchList: () => getDataList(),
   addForm: {
@@ -255,116 +248,116 @@ const {
     name: null,
     dataType: 2,
     status: 1,
-    remark: null,
+    remark: null
   },
   editForm: {
     key: null,
     name: null,
     dataType: null,
     status: null,
-    remark: null,
+    remark: null
   },
   api: dictApi,
-  draftKey: "SystemDict",
-});
+  draftKey: 'SystemDict'
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "key", title: "字典标识", width: 240 },
-  { key: "name", title: "字典名称", width: 320 },
-  { key: "version", title: "字典版本", width: 90, align: "center" },
+  { key: 'key', title: '字典标识', width: 240 },
+  { key: 'name', title: '字典名称', width: 320 },
+  { key: 'version', title: '字典版本', width: 90, align: 'center' },
   {
-    key: "status",
-    title: "字典状态",
+    key: 'status',
+    title: '字典状态',
     width: 90,
-    align: "center",
-    dictName: "CommonSwitch",
+    align: 'center',
+    dictName: 'CommonSwitch',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: "CommonSwitch" });
-    },
+      return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
+    }
   },
   {
-    key: "dataType",
-    title: "字典数据类型",
+    key: 'dataType',
+    title: '字典数据类型',
     width: 120,
-    align: "center",
-    dictName: "DictDataType",
+    align: 'center',
+    dictName: 'DictDataType',
     render(row: any) {
-      return h(StrixTag, { value: row.dataType, dictName: "DictDataType" });
-    },
+      return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
+    }
   },
   {
-    key: "provided",
-    title: "是否内置",
+    key: 'provided',
+    title: '是否内置',
     width: 90,
-    align: "center",
-    dictName: "CommonFlag",
+    align: 'center',
+    dictName: 'CommonFlag',
     render(row: any) {
-      return h(StrixTag, { value: row.provided, dictName: "CommonFlag" });
-    },
+      return h(StrixTag, { value: row.provided, dictName: 'CommonFlag' })
+    }
   },
-  { key: "remark", title: "备注", width: 180, titleAlign: "center" },
+  { key: 'remark', title: '备注', width: 180, titleAlign: 'center' },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 180,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "info",
-          label: "查看字典数据",
-          icon: "list",
-          onClick: () => viewDictData(row.key),
+          type: 'info',
+          label: '查看字典数据',
+          icon: 'list',
+          onClick: () => viewDictData(row.key)
         },
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
           disabled: row.provided === 1,
-          onClick: () => showEdit(row.id),
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           disabled: row.provided === 1,
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 且该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   dictApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.items;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.items
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
 
 const viewDictData = (key: string) => {
-  router.push({ path: `/system/dict/${key}` });
-};
+  router.push({ path: `/system/dict/${key}` })
+}
 const formRules: FormRules = {
-  key: textField("字典标识", { min: 2, max: 64 }),
-  name: textField("字典名称", { min: 2, max: 32 }),
-  dataType: selectField("字典数据类型"),
-  status: selectField("字典状态"),
-  remark: remarkField(),
-};
+  key: textField('字典标识', { min: 2, max: 64 }),
+  name: textField('字典名称', { min: 2, max: 32 }),
+  dataType: selectField('字典数据类型'),
+  status: selectField('字典状态'),
+  remark: remarkField()
+}
 </script>
 
 <style lang="scss" scoped></style>

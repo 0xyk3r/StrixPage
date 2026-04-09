@@ -68,71 +68,71 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { smsApi } from "@/api/sms";
-import type { SelectDataItem } from "@/api/types";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
-import { type DataTableColumns } from "naive-ui";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { smsApi } from '@/api/sms'
+import type { SelectDataItem } from '@/api/types'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
+import { type DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
-const _baseName = "短信签名";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(smsApi.urls.signList, "signs", () => listParams.value);
+const _baseName = '短信签名'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(smsApi.urls.signList, 'signs', () => listParams.value)
 
 // 加载字典
-const smsSignStatusRef = useDict("SmsSignStatus");
+const smsSignStatusRef = useDict('SmsSignStatus')
 
 const { listParams, clearSearch, pagination, rowKey } = useCrud({
   list: { keyword: null, configKey: null, status: null, pageIndex: 1, pageSize: 10 },
-  fetchList: () => getDataList(),
-});
+  fetchList: () => getDataList()
+})
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "configKey", title: "短信配置 Key", width: 180 },
-  { key: "name", title: "签名", width: 240 },
+  { key: 'configKey', title: '短信配置 Key', width: 180 },
+  { key: 'name', title: '签名', width: 240 },
   {
-    key: "status",
-    title: "状态",
+    key: 'status',
+    title: '状态',
     width: 120,
-    align: "center",
-    dictName: "SmsSignStatus",
+    align: 'center',
+    dictName: 'SmsSignStatus',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: "SmsSignStatus" });
-    },
-  },
-];
+      return h(StrixTag, { value: row.status, dictName: 'SmsSignStatus' })
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   smsApi.signList(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.signs;
-    pagination.itemCount = res.data.total;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.signs
+    pagination.itemCount = res.data.total
+  })
+}
+onMounted(getDataList)
 
 // 加载短信配置选项
-const smsConfigSelectList = ref<SelectDataItem[]>([]);
+const smsConfigSelectList = ref<SelectDataItem[]>([])
 const getSmsConfigSelectList = () => {
   smsApi.configSelect().then(({ data: res }) => {
-    smsConfigSelectList.value = res.data.options;
-  });
-};
-onMounted(getSmsConfigSelectList);
+    smsConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getSmsConfigSelectList)
 </script>
 
 <style lang="scss" scoped></style>

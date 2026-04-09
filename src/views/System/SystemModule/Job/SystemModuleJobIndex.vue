@@ -5,11 +5,8 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（任务名称）"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="请输入搜索条件（任务名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -72,28 +69,19 @@
         <n-form-item label="调用目标" path="invokeTarget">
           <n-popover placement="bottom-start" trigger="focus">
             <template #trigger>
-              <n-input
-                v-model:value="addForm.invokeTarget"
-                clearable
-                placeholder="请输入调用目标"
-              />
+              <n-input v-model:value="addForm.invokeTarget" clearable
+                       placeholder="请输入调用目标" />
             </template>
             <p>请输入 组件名称.方法名称() 或 组件名称.方法名称(...参数列表)</p>
             <p>其中组件名称为 @Component 注解的值，参数列表可选、数量不限</p>
-            <p>
-              strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L, true)
-            </p>
-            <p>
-              为了系统安全考虑，所有定时任务调用目标类需使用 @StrixJob 注解，否则无法添加和调用。
-            </p>
+            <p>strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L,
+              true)</p>
+            <p>为了系统安全考虑，所有定时任务调用目标类需使用 @StrixJob 注解，否则无法添加和调用。</p>
           </n-popover>
         </n-form-item>
         <n-form-item label="Cron 表达式" path="cronExpression">
-          <n-input
-            v-model:value="addForm.cronExpression"
-            clearable
-            placeholder="请输入 Cron 表达式"
-          />
+          <n-input v-model:value="addForm.cronExpression" clearable
+                   placeholder="请输入 Cron 表达式" />
         </n-form-item>
         <n-form-item label="计划错误策略" path="misfirePolicy">
           <n-select
@@ -112,12 +100,8 @@
           />
         </n-form-item>
         <n-form-item label="任务状态" path="status">
-          <n-select
-            v-model:value="addForm.status"
-            :options="jobStatusRef"
-            clearable
-            placeholder="请选择任务状态"
-          />
+          <n-select v-model:value="addForm.status" :options="jobStatusRef" clearable
+                    placeholder="请选择任务状态" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -153,11 +137,8 @@
             <n-input v-model:value="editForm.invokeTarget" clearable placeholder="请输入调用目标" />
           </n-form-item>
           <n-form-item label="Cron 表达式" path="cronExpression">
-            <n-input
-              v-model:value="editForm.cronExpression"
-              clearable
-              placeholder="请输入 Cron 表达式"
-            />
+            <n-input v-model:value="editForm.cronExpression" clearable
+                     placeholder="请输入 Cron 表达式" />
           </n-form-item>
           <n-form-item label="计划错误策略" path="misfirePolicy">
             <n-select
@@ -176,12 +157,8 @@
             />
           </n-form-item>
           <n-form-item label="任务状态" path="status">
-            <n-select
-              v-model:value="editForm.status"
-              :options="jobStatusRef"
-              clearable
-              placeholder="请选择任务状态"
-            />
+            <n-select v-model:value="editForm.status" :options="jobStatusRef" clearable
+                      placeholder="请选择任务状态" />
           </n-form-item>
         </n-form>
       </n-spin>
@@ -196,29 +173,29 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { jobApi } from "@/api/job";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { textField, selectField } from "@/utils/form-rules";
-import { type DataTableColumns, type FormRules } from "naive-ui";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import { useTableColumns } from "@/composables/useTableColumns";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { jobApi } from '@/api/job'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { textField, selectField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormRules } from 'naive-ui'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import { useTableColumns } from '@/composables/useTableColumns'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
 
 // 本页面操作提示关键词
-const _baseName = "定时任务";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(jobApi.urls.list, "items", () => listParams.value);
+const _baseName = '定时任务'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(jobApi.urls.list, 'items', () => listParams.value)
 
 // 加载字典
-const commonSwitchRef = useDict("CommonSwitch");
-const jobMisfireRef = useDict("JobMisfire");
-const jobStatusRef = useDict("JobStatus");
+const commonSwitchRef = useDict('CommonSwitch')
+const jobMisfireRef = useDict('JobMisfire')
+const jobStatusRef = useDict('JobStatus')
 
 const {
   listParams,
@@ -239,131 +216,132 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: {
     keyword: null,
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 10
   },
   fetchList: () => getDataList(),
   addForm: {
     name: null,
-    group: "DEFAULT",
+    group: 'DEFAULT',
     invokeTarget: null,
     cronExpression: null,
     misfirePolicy: null,
     concurrent: null,
-    status: null,
+    status: null
   },
   editForm: {
     name: null,
-    group: "DEFAULT",
+    group: 'DEFAULT',
     invokeTarget: null,
     cronExpression: null,
     misfirePolicy: null,
     concurrent: null,
-    status: null,
+    status: null
   },
   api: jobApi,
-  draftKey: "ModuleJob",
-});
+  draftKey: 'ModuleJob'
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
-  { key: "name", width: 240, title: "任务名称" },
-  { key: "invokeTarget", width: 320, title: "调用目标" },
-  { key: "cronExpression", width: 160, title: "Cron 表达式" },
+  { key: 'name', width: 240, title: '任务名称' },
+  { key: 'invokeTarget', width: 320, title: '调用目标' },
+  { key: 'cronExpression', width: 160, title: 'Cron 表达式' },
   {
-    key: "misfirePolicy",
-    title: "错过执行策略",
+    key: 'misfirePolicy',
+    title: '错过执行策略',
     width: 120,
-    align: "center",
-    dictName: "JobMisfire",
+    align: 'center',
+    dictName: 'JobMisfire',
     render(row: any) {
-      return h(StrixTag, { value: row.misfirePolicy, dictName: "JobMisfire" });
-    },
+      return h(StrixTag, { value: row.misfirePolicy, dictName: 'JobMisfire' })
+    }
   },
   {
-    key: "concurrent",
-    title: "并发执行",
+    key: 'concurrent',
+    title: '并发执行',
     width: 120,
-    align: "center",
-    dictName: "CommonSwitch",
+    align: 'center',
+    dictName: 'CommonSwitch',
     render(row: any) {
-      return h(StrixTag, { value: row.concurrent, dictName: "CommonSwitch" });
-    },
+      return h(StrixTag, { value: row.concurrent, dictName: 'CommonSwitch' })
+    }
   },
   {
-    key: "status",
-    title: "状态",
+    key: 'status',
+    title: '状态',
     width: 120,
-    align: "center",
-    dictName: "JobStatus",
+    align: 'center',
+    dictName: 'JobStatus',
     render(row: any) {
-      return h(StrixTag, { value: row.status, dictName: "JobStatus" });
-    },
+      return h(StrixTag, { value: row.status, dictName: 'JobStatus' })
+    }
   },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 180,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "info",
-          label: "运行一次",
-          icon: "play",
-          onClick: () => runJob(row.id),
+          type: 'info',
+          label: '运行一次',
+          icon: 'play',
+          onClick: () => runJob(row.id)
         },
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
-          onClick: () => showEdit(row.id),
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   jobApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.items;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.items
+  })
+}
+onMounted(getDataList)
 
 const formRules: FormRules = {
-  name: textField("任务名称", { min: 2, max: 64 }),
-  invokeTarget: textField("调用目标", { min: 5, max: 512 }),
-  cronExpression: textField("Cron 表达式", { min: 5, max: 128 }),
-  misfirePolicy: selectField("计划错误策略"),
-  concurrent: selectField("是否并发执行"),
-  status: selectField("任务状态"),
-};
+  name: textField('任务名称', { min: 2, max: 64 }),
+  invokeTarget: textField('调用目标', { min: 5, max: 512 }),
+  cronExpression: textField('Cron 表达式', { min: 5, max: 128 }),
+  misfirePolicy: selectField('计划错误策略'),
+  concurrent: selectField('是否并发执行'),
+  status: selectField('任务状态')
+}
 
 const runJob = (id: string) => {
-  jobApi.run(id).then(() => {});
-};
+  jobApi.run(id).then(() => {
+  })
+}
 </script>
 
 <style lang="scss" scoped>

@@ -24,57 +24,57 @@
 </template>
 
 <script lang="ts" setup>
-import { roleApi } from "@/api/role";
-import type { TransferDataItem } from "@/api/types";
+import { roleApi } from '@/api/role'
+import type { TransferDataItem } from '@/api/types'
 
-const show = defineModel("show", { type: Boolean, default: false });
+const show = defineModel('show', { type: Boolean, default: false })
 
 const { value } = defineProps({
-  value: { type: Array<string | number>, default: () => [] },
-});
+  value: { type: Array<string | number>, default: () => [] }
+})
 
 const emit = defineEmits<{
-  (e: "complete", data: Array<string | number>): void;
-  (e: "close"): void;
-}>();
+  (e: 'complete', data: Array<string | number>): void
+  (e: 'close'): void
+}>()
 
-const data = ref<TransferDataItem[]>([]);
-const dataLoading = ref(true);
-const selectedData = ref<Array<string | number>>([]);
+const data = ref<TransferDataItem[]>([])
+const dataLoading = ref(true)
+const selectedData = ref<Array<string | number>>([])
 
 // 每次打开弹窗时，将传入的值赋值给 selectedData
 watch(
   () => show.value,
   (newVal) => {
     if (newVal) {
-      selectedData.value = value;
+      selectedData.value = value
     }
-  },
-);
+  }
+)
 
 onMounted(() => {
   roleApi.transfer().then(({ data: res }) => {
-    dataLoading.value = false;
-    data.value = res.data.transferData;
-    console.log(data.value);
-  });
-});
+    dataLoading.value = false
+    data.value = res.data.transferData
+    console.log(data.value)
+  })
+})
 
 // 更新穿梭框选中的数据
 const handleUpdate = (value: Array<string | number>) => {
-  selectedData.value = value;
-};
+  selectedData.value = value
+}
 
 // 确定选择，触发 complete 事件后关闭模态框
 const handleComplete = () => {
-  emit("complete", selectedData.value);
-  closeModal();
-};
+  emit('complete', selectedData.value)
+  closeModal()
+}
 
 const closeModal = () => {
-  show.value = false;
-  emit("close");
-};
+  show.value = false
+  emit('close')
+}
 </script>
 
 <style lang="scss" scoped></style>

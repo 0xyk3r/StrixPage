@@ -11,13 +11,8 @@
       </div>
       <span class="wf-node-card__title">{{ node.name }}</span>
       <div v-if="showActions" class="wf-node-card__actions">
-        <n-button
-          v-if="canDelete"
-          text
-          type="error"
-          size="tiny"
-          @click.stop="emit('delete', node.id)"
-        >
+        <n-button v-if="canDelete" text type="error" size="tiny"
+                  @click.stop="emit('delete', node.id)">
           <template #icon><Trash2 :size="14" /></template>
         </n-button>
       </div>
@@ -29,9 +24,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
-import type { DesignerTreeNode, NodeType } from "@/api/workflow";
-import { useWorkflowStore } from "@/stores/workflow";
+import { computed } from 'vue'
+import type { DesignerTreeNode, NodeType } from '@/api/workflow'
+import { useWorkflowStore } from '@/stores/workflow'
 import {
   Play,
   Square,
@@ -43,26 +38,22 @@ import {
   Zap,
   CornerUpRight,
   Workflow,
-  Trash2,
-} from "lucide-vue-next";
+  Trash2
+} from 'lucide-vue-next'
 
 const props = defineProps<{
-  node: DesignerTreeNode;
-  readonly?: boolean;
-}>();
+  node: DesignerTreeNode
+  readonly?: boolean
+}>()
 
 const emit = defineEmits<{
-  delete: [nodeId: string];
-}>();
+  delete: [nodeId: string]
+}>()
 
-const store = useWorkflowStore();
-const isSelected = computed(() => store.selectedNodeId === props.node.id);
-const canDelete = computed(
-  () => !props.readonly && !["START", "END", "CONDITION"].includes(props.node.type),
-);
-const showActions = computed(
-  () => !props.readonly && props.node.type !== "START" && props.node.type !== "END",
-);
+const store = useWorkflowStore()
+const isSelected = computed(() => store.selectedNodeId === props.node.id)
+const canDelete = computed(() => !props.readonly && !['START', 'END', 'CONDITION'].includes(props.node.type))
+const showActions = computed(() => !props.readonly && props.node.type !== 'START' && props.node.type !== 'END')
 
 const iconMap: Record<NodeType, any> = {
   START: Play,
@@ -75,54 +66,54 @@ const iconMap: Record<NodeType, any> = {
   DELAY: Clock,
   TRIGGER: Zap,
   JUMP: CornerUpRight,
-  SUB_PROCESS: Workflow,
-};
+  SUB_PROCESS: Workflow
+}
 
-const nodeIcon = computed(() => iconMap[props.node.type] || Workflow);
+const nodeIcon = computed(() => iconMap[props.node.type] || Workflow)
 
 const description = computed(() => {
-  const c = props.node.config;
+  const c = props.node.config
   const assigneeLabel = (cfg: any) => {
     const typeMap: Record<string, string> = {
       MANAGER: `${cfg.assigneeIds?.length || 0} 人`,
       ROLE: `${cfg.assigneeIds?.length || 0} 个角色`,
-      INITIATOR: "发起人本人",
-    };
-    return typeMap[cfg.assigneeType] || "未配置";
-  };
-  const unitMap: Record<string, string> = { MINUTES: "分钟", HOURS: "小时", DAYS: "天" };
-  switch (props.node.type) {
-    case "START":
-      return "流程开始";
-    case "END":
-      return "流程结束";
-    case "APPROVAL": {
-      const modeMap: Record<string, string> = {
-        ANY: "任一审批",
-        ALL: "会签",
-        SEQUENTIAL: "顺序审批",
-      };
-      return `${modeMap[c.approvalMode] || "审批"} · ${assigneeLabel(c)}`;
+      INITIATOR: '发起人本人'
     }
-    case "CC":
-      return `抄送 · ${assigneeLabel(c)}`;
-    case "DELAY":
-      return `等待 ${c.delayValue || 0} ${unitMap[c.delayUnit] || c.delayUnit || "小时"}`;
-    case "TRIGGER":
-      return c.triggerKey || "未配置";
-    case "JUMP":
-      return c.targetNodeId ? "跳转到指定节点" : "未配置";
-    case "CONDITION_GROUP":
-      return `${props.node.branches?.length || 0} 个条件分支`;
-    case "PARALLEL":
-      return `${props.node.branches?.length || 0} 个并行分支`;
-    default:
-      return "";
+    return typeMap[cfg.assigneeType] || '未配置'
   }
-});
+  const unitMap: Record<string, string> = { MINUTES: '分钟', HOURS: '小时', DAYS: '天' }
+  switch (props.node.type) {
+    case 'START':
+      return '流程开始'
+    case 'END':
+      return '流程结束'
+    case 'APPROVAL': {
+      const modeMap: Record<string, string> = {
+        ANY: '任一审批',
+        ALL: '会签',
+        SEQUENTIAL: '顺序审批'
+      }
+      return `${modeMap[c.approvalMode] || '审批'} · ${assigneeLabel(c)}`
+    }
+    case 'CC':
+      return `抄送 · ${assigneeLabel(c)}`
+    case 'DELAY':
+      return `等待 ${c.delayValue || 0} ${unitMap[c.delayUnit] || c.delayUnit || '小时'}`
+    case 'TRIGGER':
+      return c.triggerKey || '未配置'
+    case 'JUMP':
+      return c.targetNodeId ? '跳转到指定节点' : '未配置'
+    case 'CONDITION_GROUP':
+      return `${props.node.branches?.length || 0} 个条件分支`
+    case 'PARALLEL':
+      return `${props.node.branches?.length || 0} 个并行分支`
+    default:
+      return ''
+  }
+})
 
 function handleClick() {
-  store.selectNode(props.node.id);
+  store.selectNode(props.node.id)
 }
 </script>
 

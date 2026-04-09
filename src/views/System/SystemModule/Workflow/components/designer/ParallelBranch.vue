@@ -28,11 +28,8 @@
           <div class="wf-branch__children">
             <template v-if="branch.children.length > 0">
               <template v-for="(child, ci) in branch.children" :key="child.id">
-                <node-card
-                  :node="child"
-                  :readonly="readonly"
-                  @delete="(id) => store.deleteNode(id)"
-                />
+                <node-card :node="child" :readonly="readonly"
+                           @delete="(id) => store.deleteNode(id)" />
                 <node-connector
                   v-if="ci < branch.children.length - 1"
                   :readonly="readonly"
@@ -41,10 +38,8 @@
               </template>
             </template>
             <div v-else class="wf-branch__empty">
-              <add-node-menu
-                v-if="!readonly"
-                @select="(type) => addNodeToBranch(branch.id, idx, type)"
-              />
+              <add-node-menu v-if="!readonly"
+                             @select="(type) => addNodeToBranch(branch.id, idx, type)" />
             </div>
           </div>
 
@@ -58,27 +53,27 @@
 </template>
 
 <script lang="ts" setup>
-import type { DesignerTreeNode, NodeType } from "@/api/workflow";
-import { useWorkflowStore } from "@/stores/workflow";
-import { createNode } from "@/utils/workflow-graph";
-import NodeCard from "./NodeCard.vue";
-import NodeConnector from "./NodeConnector.vue";
-import AddNodeMenu from "./AddNodeMenu.vue";
-import { X } from "lucide-vue-next";
+import type { DesignerTreeNode, NodeType } from '@/api/workflow'
+import { useWorkflowStore } from '@/stores/workflow'
+import { createNode } from '@/utils/workflow-graph'
+import NodeCard from './NodeCard.vue'
+import NodeConnector from './NodeConnector.vue'
+import AddNodeMenu from './AddNodeMenu.vue'
+import { X } from 'lucide-vue-next'
 
 const props = defineProps<{
-  node: DesignerTreeNode;
-  readonly?: boolean;
-}>();
+  node: DesignerTreeNode
+  readonly?: boolean
+}>()
 
-const store = useWorkflowStore();
+const store = useWorkflowStore()
 
 function addNodeToBranch(branchId: string, branchIdx: number, type: NodeType) {
-  const branch = props.node.branches?.find((b) => b.id === branchId);
+  const branch = props.node.branches?.find((b) => b.id === branchId)
   if (branch) {
-    const newNode = createNode(type);
-    branch.children.push(newNode);
-    store.selectNode(newNode.id);
+    const newNode = createNode(type)
+    branch.children.push(newNode)
+    store.selectNode(newNode.id)
   }
 }
 </script>

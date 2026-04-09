@@ -5,11 +5,8 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input
-                v-model:value="listParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（配置Key、名称）"
-              />
+              <n-input v-model:value="listParams.keyword" clearable
+                       placeholder="请输入搜索条件（配置Key、名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -75,12 +72,8 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
         <n-form-item label="存储平台" path="platform">
-          <n-select
-            v-model:value="addForm.platform"
-            :options="ossPlatformRef"
-            clearable
-            placeholder="请选择存储平台"
-          />
+          <n-select v-model:value="addForm.platform" :options="ossPlatformRef" clearable
+                    placeholder="请选择存储平台" />
         </n-form-item>
         <n-form-item label="存储地域" path="region">
           <n-input v-model:value="addForm.region" clearable placeholder="请输入存储地域" />
@@ -95,18 +88,15 @@
           <n-input v-model:value="addForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input
-            v-model:value="addForm.accessSecret"
-            clearable
-            placeholder="请输入AccessSecret"
-          />
+          <n-input v-model:value="addForm.accessSecret" clearable
+                   placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
             v-model:value="addForm.remark"
             :autosize="{
               minRows: 3,
-              maxRows: 5,
+              maxRows: 5
             }"
             placeholder="在此输入备注信息"
             type="textarea"
@@ -157,18 +147,12 @@
             <n-input v-model:value="editForm.region" clearable placeholder="请输入存储地域" />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
-            <n-input
-              v-model:value="editForm.publicEndpoint"
-              clearable
-              placeholder="请输入公网节点"
-            />
+            <n-input v-model:value="editForm.publicEndpoint" clearable
+                     placeholder="请输入公网节点" />
           </n-form-item>
           <n-form-item label="内网节点" path="privateEndpoint">
-            <n-input
-              v-model:value="editForm.privateEndpoint"
-              clearable
-              placeholder="请输入内网节点"
-            />
+            <n-input v-model:value="editForm.privateEndpoint" clearable
+                     placeholder="请输入内网节点" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
             <n-input v-model:value="editForm.accessKey" clearable placeholder="请输入AccessKey" />
@@ -185,7 +169,7 @@
               v-model:value="editForm.remark"
               :autosize="{
                 minRows: 3,
-                maxRows: 5,
+                maxRows: 5
               }"
               placeholder="在此输入备注信息"
               type="textarea"
@@ -204,19 +188,19 @@
 </template>
 
 <script lang="ts" setup>
-import StrixBlock from "@/components/common/StrixBlock.vue";
-import StrixTag from "@/components/common/StrixTag.vue";
-import { ossApi } from "@/api/oss";
-import NebulaTag from "@/components/common/NebulaTag.vue";
-import { useCrud } from "@/composables/useCrud";
-import { useDict } from "@/composables/useDict.ts";
-import { useTableColumns } from "@/composables/useTableColumns";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { differenceWith, find, isEqual } from "lodash-es";
-import StrixExportDialog from "@/components/common/StrixExportDialog.vue";
-import { createPaginatedFetcher } from "@/composables/useTableExport";
-import StrixIcon from "@/components/icon/StrixIcon.vue";
-import StrixColumnPanel from "@/components/common/StrixColumnPanel.vue";
+import StrixBlock from '@/components/common/StrixBlock.vue'
+import StrixTag from '@/components/common/StrixTag.vue'
+import { ossApi } from '@/api/oss'
+import NebulaTag from '@/components/common/NebulaTag.vue'
+import { useCrud } from '@/composables/useCrud'
+import { useDict } from '@/composables/useDict.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { differenceWith, find, isEqual } from 'lodash-es'
+import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import { createPaginatedFetcher } from '@/composables/useTableExport'
+import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import {
   type DataTableColumns,
   type FormRules,
@@ -224,17 +208,17 @@ import {
   NScrollbar,
   NSpin,
   NTabPane,
-  NTabs,
-} from "naive-ui";
-import { remarkField, selectField, textField } from "@/utils/form-rules";
+  NTabs
+} from 'naive-ui'
+import { remarkField, selectField, textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词
-const _baseName = "存储服务";
-const showExportDialog = ref(false);
-const fetchAllData = createPaginatedFetcher(ossApi.urls.list, "configs", () => listParams.value);
+const _baseName = '存储服务'
+const showExportDialog = ref(false)
+const fetchAllData = createPaginatedFetcher(ossApi.urls.list, 'configs', () => listParams.value)
 
 // 加载字典
-const ossPlatformRef = useDict("OssPlatform");
+const ossPlatformRef = useDict('OssPlatform')
 
 const {
   listParams,
@@ -255,12 +239,12 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit,
+  tryCloseEdit
 } = useCrud({
   list: {
     keyword: null,
     pageIndex: 1,
-    pageSize: 10,
+    pageSize: 10
   },
   fetchList: () => getDataList(),
   addForm: {
@@ -272,7 +256,7 @@ const {
     privateEndpoint: null,
     accessKey: null,
     accessSecret: null,
-    remark: null,
+    remark: null
   },
   editForm: {
     key: null,
@@ -283,197 +267,193 @@ const {
     privateEndpoint: null,
     accessKey: null,
     accessSecret: null,
-    remark: null,
+    remark: null
   },
   api: ossApi,
-  draftKey: "ModuleOss",
-});
+  draftKey: 'ModuleOss'
+})
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
   {
-    type: "expand",
+    type: 'expand',
     renderExpand: (row: any) => {
-      if (!row.expandTab) row.expandTab = "bucket";
+      if (!row.expandTab) row.expandTab = 'bucket'
       if (!row.loaded) {
-        return h(NSpin, { size: "large", description: "加载中..." });
+        return h(NSpin, { size: 'large', description: '加载中...' })
       }
 
       const expandOssBucketChildrenVNode = [
         h(NDataTable, {
           columns: [
-            { title: "Bucket 名称", key: "name", width: 200 },
-            { title: "创建时间", key: "createdTime", width: 160 },
-            { title: "备注", key: "remark", width: 160 },
+            { title: 'Bucket 名称', key: 'name', width: 200 },
+            { title: '创建时间', key: 'createdTime', width: 160 },
+            { title: '备注', key: 'remark', width: 160 }
           ],
           data: row.buckets,
-          rowKey: (row: any) => row.id,
-        }),
-      ];
+          rowKey: (row: any) => row.id
+        })
+      ]
 
       const expandOssFileGroupChildrenVNode = [
         h(NDataTable, {
           columns: [
-            { key: "key", title: "文件组 Key", width: 120 },
-            { key: "name", title: "文件组名称", width: 120 },
-            { key: "configKey", title: "存储服务 Key", width: 120 },
-            { key: "bucketName", title: "所属 Bucket", width: 120 },
-            { key: "bucketDomain", title: "自定义域名", width: 150 },
-            { key: "baseDir", title: "基础路径", width: 120 },
-            { key: "allowExtension", title: "允许的拓展名", width: 150 },
+            { key: 'key', title: '文件组 Key', width: 120 },
+            { key: 'name', title: '文件组名称', width: 120 },
+            { key: 'configKey', title: '存储服务 Key', width: 120 },
+            { key: 'bucketName', title: '所属 Bucket', width: 120 },
+            { key: 'bucketDomain', title: '自定义域名', width: 150 },
+            { key: 'baseDir', title: '基础路径', width: 120 },
+            { key: 'allowExtension', title: '允许的拓展名', width: 150 },
             {
-              key: "secretType",
-              title: "文件权限类型",
+              key: 'secretType',
+              title: '文件权限类型',
               width: 100,
               render(row: any) {
-                const tagText = row.secretType === 1 ? "管理端文件" : "用户端文件";
+                const tagText = row.secretType === 1 ? '管理端文件' : '用户端文件'
                 return h(
                   NebulaTag,
-                  { type: row.secretType === 1 ? "success" : "info", bordered: false },
+                  { type: row.secretType === 1 ? 'success' : 'info', bordered: false },
                   {
-                    default: () => tagText + "/" + row.secretLevel,
-                  },
-                );
-              },
+                    default: () => tagText + '/' + row.secretLevel
+                  }
+                )
+              }
             },
-            { key: "remark", title: "备注", width: 150 },
+            { key: 'remark', title: '备注', width: 150 }
           ],
           data: row.fileGroups,
-          rowKey: (row) => row.id,
-        }),
-      ];
+          rowKey: (row) => row.id
+        })
+      ]
 
       return h(
         NTabs,
         {
-          type: "segment",
+          type: 'segment',
           animated: true,
           value: row.expandTab,
-          "onUpdate:value": (value) => {
-            row.expandTab = value;
-          },
+          'onUpdate:value': (value) => {
+            row.expandTab = value
+          }
         },
         () => [
-          h(NTabPane, { name: "bucket", tab: "存储空间", class: "expand-sign-pane" }, () =>
+          h(NTabPane, { name: 'bucket', tab: '存储空间', class: 'expand-sign-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h("div", { style: "min-width: 600px; padding-bottom: 10px;" }, [
-                expandOssBucketChildrenVNode,
-              ]),
-            ),
+              h('div', { style: 'min-width: 600px; padding-bottom: 10px;' }, [expandOssBucketChildrenVNode])
+            )
           ),
-          h(NTabPane, { name: "template", tab: "文件分组", class: "expand-template-pane" }, () =>
+          h(NTabPane, { name: 'template', tab: '文件分组', class: 'expand-template-pane' }, () =>
             h(NScrollbar, { xScrollable: true }, () =>
-              h("div", { style: "min-width: 1200px; padding-bottom: 10px;" }, [
-                expandOssFileGroupChildrenVNode,
-              ]),
-            ),
-          ),
-        ],
-      );
-    },
+              h('div', { style: 'min-width: 1200px; padding-bottom: 10px;' }, [expandOssFileGroupChildrenVNode])
+            )
+          )
+        ]
+      )
+    }
   },
-  { key: "key", width: 140, title: "配置 Key" },
-  { key: "name", width: 160, title: "配置名称" },
+  { key: 'key', width: 140, title: '配置 Key' },
+  { key: 'name', width: 160, title: '配置名称' },
   {
-    key: "platform",
+    key: 'platform',
     width: 120,
-    title: "平台",
-    align: "center",
-    dictName: "OssPlatform",
+    title: '平台',
+    align: 'center',
+    dictName: 'OssPlatform',
     render(row: any) {
-      return h(StrixTag, { value: row.platform, dictName: "OssPlatform" });
-    },
+      return h(StrixTag, { value: row.platform, dictName: 'OssPlatform' })
+    }
   },
-  { key: "region", width: 120, title: "地域" },
-  { key: "publicEndpoint", width: 180, title: "公网节点" },
-  { key: "privateEndpoint", width: 180, title: "内网节点" },
-  { key: "accessKey", width: 160, title: "AccessKey" },
-  { key: "remark", width: 180, title: "备注" },
-  { key: "createdTime", width: 180, title: "创建时间" },
+  { key: 'region', width: 120, title: '地域' },
+  { key: 'publicEndpoint', width: 180, title: '公网节点' },
+  { key: 'privateEndpoint', width: 180, title: '内网节点' },
+  { key: 'accessKey', width: 160, title: 'AccessKey' },
+  { key: 'remark', width: 180, title: '备注' },
+  { key: 'createdTime', width: 180, title: '创建时间' },
   {
-    key: "actions",
-    title: "操作",
-    align: "center",
+    key: 'actions',
+    title: '操作',
+    align: 'center',
     width: 180,
     render(row: any) {
       return handleOperate([
         {
-          type: "warning",
-          label: "编辑",
-          icon: "square-pen",
-          onClick: () => showEdit(row.id),
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row.id)
         },
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteRow(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns);
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   ossApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false;
+    dataLoading.value = false
     // 清除展开行
-    dataExpandedRowKeys.value = [];
-    dataRef.value = res.data.configs;
-  });
-};
-onMounted(getDataList);
+    dataExpandedRowKeys.value = []
+    dataRef.value = res.data.configs
+  })
+}
+onMounted(getDataList)
 
-const dataExpandedRowKeys = ref<Array<string | number>>([]);
+const dataExpandedRowKeys = ref<Array<string | number>>([])
 const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   // 只获取新展开的
-  const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual);
-  dataExpandedRowKeys.value = value;
+  const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
+  dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff });
+    const row = find(dataRef.value, { id: diff })
     if (row) {
       ossApi.detail(row.id).then(({ data: res }) => {
-        row.buckets = res.data.buckets;
-        row.fileGroups = res.data.fileGroups;
-        row.loaded = true;
-      });
+        row.buckets = res.data.buckets
+        row.fileGroups = res.data.fileGroups
+        row.loaded = true
+      })
     }
-  });
-};
+  })
+}
 
 const addFormRules: FormRules = {
-  key: textField("配置 Key", { min: 2, max: 32 }),
-  name: textField("配置名称", { min: 2, max: 32 }),
-  platform: selectField("平台"),
-  region: textField("区域", { min: 1, max: 32 }),
-  publicEndpoint: textField("公网节点", { min: 1, max: 128 }),
-  privateEndpoint: textField("内网节点", { min: 1, max: 128 }),
-  accessKey: textField("AccessKey", { max: 64 }),
-  accessSecret: textField("AccessSecret", { max: 64 }),
-  remark: remarkField(),
-};
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  name: textField('配置名称', { min: 2, max: 32 }),
+  platform: selectField('平台'),
+  region: textField('区域', { min: 1, max: 32 }),
+  publicEndpoint: textField('公网节点', { min: 1, max: 128 }),
+  privateEndpoint: textField('内网节点', { min: 1, max: 128 }),
+  accessKey: textField('AccessKey', { max: 64 }),
+  accessSecret: textField('AccessSecret', { max: 64 }),
+  remark: remarkField()
+}
 
 const editFormRules: FormRules = {
-  key: textField("配置 Key", { min: 2, max: 32 }),
-  name: textField("配置名称", { min: 2, max: 32 }),
-  platform: selectField("平台"),
-  region: textField("区域", { min: 1, max: 32 }),
-  publicEndpoint: textField("公网节点", { min: 1, max: 128 }),
-  privateEndpoint: textField("内网节点", { min: 1, max: 128 }),
-  accessKey: textField("AccessKey", { max: 64 }),
-  accessSecret: textField("AccessSecret", { required: false, max: 64 }),
-  remark: remarkField(),
-};
+  key: textField('配置 Key', { min: 2, max: 32 }),
+  name: textField('配置名称', { min: 2, max: 32 }),
+  platform: selectField('平台'),
+  region: textField('区域', { min: 1, max: 32 }),
+  publicEndpoint: textField('公网节点', { min: 1, max: 128 }),
+  privateEndpoint: textField('内网节点', { min: 1, max: 128 }),
+  accessKey: textField('AccessKey', { max: 64 }),
+  accessSecret: textField('AccessSecret', { required: false, max: 64 }),
+  remark: remarkField()
+}
 </script>
 
 <style lang="scss" scoped>

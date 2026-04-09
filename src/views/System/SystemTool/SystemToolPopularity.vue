@@ -30,7 +30,7 @@
           <n-gi span="2">
             <n-card class="full-h">
               <n-h3 align-text prefix="bar" type="info">
-                <n-text type="info">配置详情 - {{ editDataId ? "编辑" : "创建" }}</n-text>
+                <n-text type="info">配置详情 - {{ editDataId ? '编辑' : '创建' }}</n-text>
               </n-h3>
               <n-spin :show="editDataFormLoading">
                 <n-form
@@ -50,11 +50,8 @@
                     />
                   </n-form-item>
                   <n-form-item label="配置名称" path="name" span="2 s:1">
-                    <n-input
-                      v-model:value="editDataForm.name"
-                      clearable
-                      placeholder="请输入配置名称"
-                    />
+                    <n-input v-model:value="editDataForm.name" clearable
+                             placeholder="请输入配置名称" />
                   </n-form-item>
                   <n-form-item label="初始值" path="initialValue" span="2 s:1">
                     <n-input-number
@@ -133,11 +130,8 @@
                 <div>
                   <n-tooltip trigger="hover">
                     <template #trigger>
-                      <n-input-number
-                        v-model:value="calcInput"
-                        :show-button="false"
-                        style="width: 100px"
-                      />
+                      <n-input-number v-model:value="calcInput" :show-button="false"
+                                      style="width: 100px" />
                     </template>
                     原始数值（真实数值）
                   </n-tooltip>
@@ -167,8 +161,7 @@
                     <template #trigger>
                       <span>{{
                         Math.ceil(
-                          (editDataForm.initialValue + calcInput) * editDataForm.magValue +
-                            editDataForm.extraValue,
+                          (editDataForm.initialValue + calcInput) * editDataForm.magValue + editDataForm.extraValue
                         )
                       }}</span>
                     </template>
@@ -186,127 +179,126 @@
 </template>
 
 <script lang="ts" setup>
-import { popularityApi } from "@/api/popularity";
-import { createStrixMessage } from "@/utils/strix-message";
-import { textField, numberField } from "@/utils/form-rules";
-import { handleOperate } from "@/utils/strix-table-tool";
-import { cloneDeep, debounce, pick } from "lodash-es";
-import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from "naive-ui";
-import { usePagination } from "@/composables/usePagination.ts";
+import { popularityApi } from '@/api/popularity'
+import { createStrixMessage } from '@/utils/strix-message'
+import { textField, numberField } from '@/utils/form-rules'
+import { handleOperate } from '@/utils/strix-table-tool'
+import { cloneDeep, debounce, pick } from 'lodash-es'
+import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
+import { usePagination } from '@/composables/usePagination.ts'
 
 // 加载列表
-const dataRef = ref();
-const dataLoading = ref(true);
+const dataRef = ref()
+const dataLoading = ref(true)
 const getDataList = () => {
-  dataLoading.value = true;
+  dataLoading.value = true
   popularityApi.list().then(({ data: res }) => {
-    dataLoading.value = false;
-    dataRef.value = res.data.items;
-  });
-};
-onMounted(getDataList);
+    dataLoading.value = false
+    dataRef.value = res.data.items
+  })
+}
+onMounted(getDataList)
 
 const handleSelectDataChanged = () => {
   if (editDataId.value) {
     // 加载编辑前信息
     popularityApi.detail(editDataId.value).then(({ data: res }) => {
-      const canUpdateFields = Object.keys(initEditDataForm);
-      editDataForm.value = pick(res.data, canUpdateFields);
-      editDataFormLoading.value = false;
-    });
+      const canUpdateFields = Object.keys(initEditDataForm)
+      editDataForm.value = pick(res.data, canUpdateFields)
+      editDataFormLoading.value = false
+    })
     // 加载数据列表
-    getPopularitDataList();
+    getPopularitDataList()
   } else {
-    initDataForm();
+    initDataForm()
   }
-};
+}
 const renderDataMenuExtra = (row: any) => {
   return h(
-    "div",
+    'div',
     {
       style: {
-        position: "absolute",
-        top: "10px",
-        right: "15px",
-      },
+        position: 'absolute',
+        top: '10px',
+        right: '15px'
+      }
     },
     handleOperate(
       [
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deleteData(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 且该操作不可恢复!",
-        },
+          popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
+        }
       ],
-      "tiny",
-    ),
-  );
-};
+      'tiny'
+    )
+  )
+}
 
 // 重置表单
 const initDataForm = () => {
-  editDataFormLoading.value = false;
-  editDataId.value = null;
-  editDataForm.value = cloneDeep(initEditDataForm);
-  popularityDataRef.value = [];
-};
+  editDataFormLoading.value = false
+  editDataId.value = null
+  editDataForm.value = cloneDeep(initEditDataForm)
+  popularityDataRef.value = []
+}
 
 // 编辑数据
-const editDataFormLoading = ref(false);
-const editDataId = ref(null);
+const editDataFormLoading = ref(false)
+const editDataId = ref(null)
 const initEditDataForm = {
   name: null,
   configKey: null,
   initialValue: null,
   extraValue: null,
-  magValue: null,
-};
-const editDataForm = ref<any>(cloneDeep(initEditDataForm));
-const editDataFormRef = ref<FormInst | null>(null);
+  magValue: null
+}
+const editDataForm = ref<any>(cloneDeep(initEditDataForm))
+const editDataFormRef = ref<FormInst | null>(null)
 const formRules: FormRules = {
-  name: textField("配置名称", { min: 1, max: 32 }),
-  configKey: textField("配置Key", { min: 1, max: 32 }),
-  initialValue: numberField("初始值"),
-  extraValue: numberField("附加值"),
-  magValue: numberField("倍率"),
-};
+  name: textField('配置名称', { min: 1, max: 32 }),
+  configKey: textField('配置Key', { min: 1, max: 32 }),
+  initialValue: numberField('初始值'),
+  extraValue: numberField('附加值'),
+  magValue: numberField('倍率')
+}
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
-    if (errors)
-      return createStrixMessage("warning", "表单校验失败", "请检查表单中的错误，并根据提示修改");
+    if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
     const promise = editDataId.value
       ? popularityApi.update(editDataId.value, editDataForm.value)
-      : popularityApi.create(editDataForm.value);
+      : popularityApi.create(editDataForm.value)
     promise.then(() => {
-      initDataForm();
-      getDataList();
-    });
-  });
-};
+      initDataForm()
+      getDataList()
+    })
+  })
+}
 
 // 删除数据
 const deleteData = (id: string) => {
   popularityApi.remove(id).then(() => {
-    getDataList();
-  });
-};
+    getDataList()
+  })
+}
 
 // 获取列表请求参数
 const initGetPopularitDataListParams = {
   pageIndex: 1,
-  pageSize: 10,
-};
-const getPopularitDataListParams = ref(cloneDeep(initGetPopularitDataListParams));
+  pageSize: 10
+}
+const getPopularitDataListParams = ref(cloneDeep(initGetPopularitDataListParams))
 // 展示列信息
 const popularityDataColumns: DataTableColumns = [
-  { key: "dataId", title: "数据ID", width: 120 },
+  { key: 'dataId', title: '数据ID', width: 120 },
   {
-    key: "originalValue",
-    title: "原始数值",
+    key: 'originalValue',
+    title: '原始数值',
     width: 180,
     render(row: any) {
       return h(NInputNumber, {
@@ -314,80 +306,78 @@ const popularityDataColumns: DataTableColumns = [
         showButton: false,
         updateValueOnInput: false,
         onUpdateValue: (val) => {
-          row.originalValue = val;
-          updatePopularityDataValue(row.id, val);
+          row.originalValue = val
+          updatePopularityDataValue(row.id, val)
         },
         style: {
-          minWidth: "120px",
-        },
-      });
-    },
+          minWidth: '120px'
+        }
+      })
+    }
   },
   {
-    key: "showValue",
-    title: "显示数值",
+    key: 'showValue',
+    title: '显示数值',
     width: 180,
     render(row: any) {
-      return calcResult(row.originalValue);
-    },
+      return calcResult(row.originalValue)
+    }
   },
   {
-    key: "actions",
-    title: "操作",
+    key: 'actions',
+    title: '操作',
     width: 80,
-    align: "center",
+    align: 'center',
     render(row: any) {
       return handleOperate([
         {
-          type: "error",
-          label: "删除",
-          icon: "trash",
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
           onClick: () => deletePopularitData(row.id),
           popconfirm: true,
-          popconfirmMessage: "是否确认删除这条数据? 且该操作不可恢复!",
-        },
-      ]);
-    },
-  },
-];
+          popconfirmMessage: '是否确认删除这条数据? 且该操作不可恢复!'
+        }
+      ])
+    }
+  }
+]
 // 加载列表
-const popularityDataRef = ref();
-const popularityDataLoading = ref(false);
+const popularityDataRef = ref()
+const popularityDataLoading = ref(false)
 const getPopularitDataList = () => {
-  if (!editDataId.value) return createStrixMessage("warning", "请先选择配置", "请先选择配置");
-  popularityDataLoading.value = true;
-  popularityApi
-    .dataList(editDataId.value, getPopularitDataListParams.value)
-    .then(({ data: res }) => {
-      popularityDataLoading.value = false;
-      popularityDataRef.value = res.data.items;
-      popularityDataPagination.itemCount = res.data.total;
-    });
-};
-const popularityDataRowKey = (row: any) => row.id;
-const popularityDataPagination = usePagination(getPopularitDataListParams, getPopularitDataList);
+  if (!editDataId.value) return createStrixMessage('warning', '请先选择配置', '请先选择配置')
+  popularityDataLoading.value = true
+  popularityApi.dataList(editDataId.value, getPopularitDataListParams.value).then(({ data: res }) => {
+    popularityDataLoading.value = false
+    popularityDataRef.value = res.data.items
+    popularityDataPagination.itemCount = res.data.total
+  })
+}
+const popularityDataRowKey = (row: any) => row.id
+const popularityDataPagination = usePagination(getPopularitDataListParams, getPopularitDataList)
 
 // 修改数据数值
 const updatePopularityDataValue = debounce((id, value) => {
   popularityApi.dataUpdate(editDataId.value!, id, { originalValue: value }).then(() => {
-    getPopularitDataList();
-  });
-}, 300);
+    getPopularitDataList()
+  })
+}, 300)
 
 // 删除数据
 const deletePopularitData = (id: string) => {
   popularityApi.dataRemove(editDataId.value!, id).then(() => {
-    getPopularitDataList();
-  });
-};
+    getPopularitDataList()
+  })
+}
 
-const calcInput = ref(0);
+const calcInput = ref(0)
 const calcResult = (value: number) => {
-  if (value == null) value = calcInput.value;
-  if (!editDataId.value) return 0;
-  const { initialValue, magValue, extraValue } = editDataForm.value;
-  return Math.ceil((initialValue + value) * magValue + extraValue);
-};
+  if (value == null) value = calcInput.value
+  if (!editDataId.value) return 0
+  const { initialValue, magValue, extraValue } = editDataForm.value
+  return Math.ceil((initialValue + value) * magValue + extraValue)
+}
 </script>
 
 <style lang="scss" scoped>

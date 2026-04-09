@@ -39,8 +39,7 @@ export const userApi = {
   list: (params: Record<string, any>) =>
     http.get<RetResult<UserListResp>>(BASE, { params, meta: { operate: `加载${_n}列表` } }),
 
-  detail: (id: string) =>
-    http.get<RetResult<SystemUserResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
+  detail: (id: string) => http.get<RetResult<SystemUserResp>>(`${BASE}/${id}`, { meta: { operate: `加载${_n}信息` } }),
 
   create: (data: SystemUserUpdateReq) =>
     http.post<RetResult>(`${BASE}/update`, data, { meta: { operate: `新增${_n}` } }),
@@ -48,9 +47,8 @@ export const userApi = {
   update: (id: string, data: SystemUserUpdateReq) =>
     http.post<RetResult>(`${BASE}/update/${id}`, data, { meta: { operate: `编辑${_n}` } }),
 
-  remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
+  remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
   modify: (id: string, data: { field: string; value: string }) =>
-    http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } }),
-};
+    http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } })
+}
