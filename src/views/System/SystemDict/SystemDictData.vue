@@ -86,12 +86,10 @@
           <n-input-number v-model:value="addForm.sort" clearable placeholder="请输入字典排序" />
         </n-form-item>
         <n-form-item label="字典样式" path="style">
-          <n-select v-model:value="addForm.style" :options="dictDataStyleRef" clearable
-                    placeholder="请选择字典样式" />
+          <n-select v-model:value="addForm.style" :options="dictDataStyleRef" clearable placeholder="请选择字典样式" />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
-          <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable
-                    placeholder="请选择字典状态" />
+          <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable placeholder="请选择字典状态" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -187,7 +185,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField, remarkField } from '@/utils/form-rules'
+import { remarkField, selectField, textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'

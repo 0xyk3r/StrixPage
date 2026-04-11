@@ -94,12 +94,10 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入文件组名称" />
         </n-form-item>
         <n-form-item label="Bucket 名称" path="bucketName">
-          <n-input v-model:value="addForm.bucketName" clearable
-                   placeholder="请输入存储空间 (Bucket) 名称" />
+          <n-input v-model:value="addForm.bucketName" clearable placeholder="请输入存储空间 (Bucket) 名称" />
         </n-form-item>
         <n-form-item label="Bucket 域名" path="bucketDomain">
-          <n-input v-model:value="addForm.bucketDomain" clearable
-                   placeholder="请输入Bucket自定义域名" />
+          <n-input v-model:value="addForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
         </n-form-item>
         <n-form-item label="基础路径" path="baseDir">
           <n-input
@@ -109,8 +107,7 @@
           />
         </n-form-item>
         <n-form-item label="允许的扩展名" path="allowExtension">
-          <n-dynamic-tags v-model:value="addForm.allowExtension" type="primary"
-                          @create="handleAllowExtensionCreate" />
+          <n-dynamic-tags v-model:value="addForm.allowExtension" type="primary" @create="handleAllowExtensionCreate" />
         </n-form-item>
         <n-form-item label="查看权限类型" path="secretType">
           <n-select
@@ -121,8 +118,7 @@
           />
         </n-form-item>
         <n-form-item label="查看权限等级" path="secretLevel">
-          <n-input-number v-model:value="addForm.secretLevel" clearable
-                          placeholder="请输入查看权限等级" />
+          <n-input-number v-model:value="addForm.secretLevel" clearable placeholder="请输入查看权限等级" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -166,8 +162,7 @@
             <n-input v-model:value="editForm.name" clearable placeholder="请输入文件组名称" />
           </n-form-item>
           <n-form-item label="Bucket 域名" path="bucketDomain">
-            <n-input v-model:value="editForm.bucketDomain" clearable
-                     placeholder="请输入Bucket自定义域名" />
+            <n-input v-model:value="editForm.bucketDomain" clearable placeholder="请输入Bucket自定义域名" />
           </n-form-item>
           <n-form-item label="基础路径" path="baseDir">
             <n-input
@@ -192,8 +187,7 @@
             />
           </n-form-item>
           <n-form-item label="查看权限等级" path="secretLevel">
-            <n-input-number v-model:value="editForm.secretLevel" clearable
-                            placeholder="请输入查看权限等级" />
+            <n-input-number v-model:value="editForm.secretLevel" clearable placeholder="请输入查看权限等级" />
           </n-form-item>
           <n-form-item label="备注信息" path="remark">
             <n-input
@@ -216,8 +210,7 @@
       </template>
     </n-modal>
 
-    <n-modal v-model:show="uploadModalShow" class="strix-form-modal" preset="card" size="huge"
-             title="上传文件">
+    <n-modal v-model:show="uploadModalShow" class="strix-form-modal" preset="card" size="huge" title="上传文件">
       <n-upload
         :action="uploadUrl"
         :headers="{ Authorization: `Bearer ${loginToken}` }"
@@ -248,7 +241,7 @@ import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField, remarkField, numberField } from '@/utils/form-rules'
+import { numberField, remarkField, selectField, textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { storeToRefs } from 'pinia'

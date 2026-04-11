@@ -5,8 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable
-                       placeholder="请输入搜索条件（配置Key、名称）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（配置Key、名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -72,8 +71,7 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
         <n-form-item label="存储平台" path="platform">
-          <n-select v-model:value="addForm.platform" :options="ossPlatformRef" clearable
-                    placeholder="请选择存储平台" />
+          <n-select v-model:value="addForm.platform" :options="ossPlatformRef" clearable placeholder="请选择存储平台" />
         </n-form-item>
         <n-form-item label="存储地域" path="region">
           <n-input v-model:value="addForm.region" clearable placeholder="请输入存储地域" />
@@ -88,8 +86,7 @@
           <n-input v-model:value="addForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input v-model:value="addForm.accessSecret" clearable
-                   placeholder="请输入AccessSecret" />
+          <n-input v-model:value="addForm.accessSecret" clearable placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -147,12 +144,10 @@
             <n-input v-model:value="editForm.region" clearable placeholder="请输入存储地域" />
           </n-form-item>
           <n-form-item label="公网节点" path="publicEndpoint">
-            <n-input v-model:value="editForm.publicEndpoint" clearable
-                     placeholder="请输入公网节点" />
+            <n-input v-model:value="editForm.publicEndpoint" clearable placeholder="请输入公网节点" />
           </n-form-item>
           <n-form-item label="内网节点" path="privateEndpoint">
-            <n-input v-model:value="editForm.privateEndpoint" clearable
-                     placeholder="请输入内网节点" />
+            <n-input v-model:value="editForm.privateEndpoint" clearable placeholder="请输入内网节点" />
           </n-form-item>
           <n-form-item label="AccessKey" path="accessKey">
             <n-input v-model:value="editForm.accessKey" clearable placeholder="请输入AccessKey" />
@@ -201,15 +196,7 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
-import {
-  type DataTableColumns,
-  type FormRules,
-  NDataTable,
-  NScrollbar,
-  NSpin,
-  NTabPane,
-  NTabs
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
 import { remarkField, selectField, textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词

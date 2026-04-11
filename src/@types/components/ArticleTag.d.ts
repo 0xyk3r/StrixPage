@@ -4,7 +4,9 @@ export interface ArticleTagModel {
   colorParams: string
 }
 
-export type ArticleTagProps = { create: true; model?: ArticleTagModel } | {
-  create?: false;
+export type ArticleTagProps =
+  | { create: true; model?: ArticleTagModel }
+  | {
+  create?: false
   model: ArticleTagModel
 }

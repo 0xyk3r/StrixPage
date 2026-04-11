@@ -50,8 +50,7 @@
                     />
                   </n-form-item>
                   <n-form-item label="配置名称" path="name" span="2 s:1">
-                    <n-input v-model:value="editDataForm.name" clearable
-                             placeholder="请输入配置名称" />
+                    <n-input v-model:value="editDataForm.name" clearable placeholder="请输入配置名称" />
                   </n-form-item>
                   <n-form-item label="初始值" path="initialValue" span="2 s:1">
                     <n-input-number
@@ -130,8 +129,7 @@
                 <div>
                   <n-tooltip trigger="hover">
                     <template #trigger>
-                      <n-input-number v-model:value="calcInput" :show-button="false"
-                                      style="width: 100px" />
+                      <n-input-number v-model:value="calcInput" :show-button="false" style="width: 100px" />
                     </template>
                     原始数值（真实数值）
                   </n-tooltip>
@@ -181,7 +179,7 @@
 <script lang="ts" setup>
 import { popularityApi } from '@/api/popularity'
 import { createStrixMessage } from '@/utils/strix-message'
-import { textField, numberField } from '@/utils/form-rules'
+import { numberField, textField } from '@/utils/form-rules'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'

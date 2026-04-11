@@ -5,8 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable
-                       placeholder="按字典标识或名称搜索" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="按字典标识或名称搜索" />
               <n-button ghost type="primary" @click="getDataList">搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -101,8 +100,7 @@
           />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
-          <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable
-                    placeholder="请选择字典状态" />
+          <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable placeholder="请选择字典状态" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -194,7 +192,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField, remarkField } from '@/utils/form-rules'
+import { remarkField, selectField, textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'

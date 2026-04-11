@@ -162,10 +162,10 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import { roleApi } from '@/api/role'
 import type { SystemRoleItem } from '@/api/role'
-import { menuApi } from '@/api/menu'
+import { roleApi } from '@/api/role'
 import type { SystemMenuManageItem } from '@/api/menu'
+import { menuApi } from '@/api/menu'
 import { EventBus } from '@/plugins/event-bus'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
@@ -238,10 +238,14 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
       return currentMenus.push(
         h(NGrid, { xGap: 10, cols: 6 }, () => [
           h(NGi, { span: 1 }, () =>
-            h(NebulaTag, {
-              closable: true,
-              onClose: () => removeRolePermission(row, menu.id)
-            }, () => menu.name)
+            h(
+              NebulaTag,
+              {
+                closable: true,
+                onClose: () => removeRolePermission(row, menu.id)
+              },
+              () => menu.name
+            )
           )
         ])
       )

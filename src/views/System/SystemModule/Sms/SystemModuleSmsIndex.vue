@@ -5,8 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable
-                       placeholder="请输入搜索条件（配置Key、名称）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（配置Key、名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -72,8 +71,7 @@
           <n-input v-model:value="addForm.name" clearable placeholder="请输入配置名称" />
         </n-form-item>
         <n-form-item label="短信平台" path="platform">
-          <n-select v-model:value="addForm.platform" :options="smsPlatformRef" clearable
-                    placeholder="请选择短信平台" />
+          <n-select v-model:value="addForm.platform" :options="smsPlatformRef" clearable placeholder="请选择短信平台" />
         </n-form-item>
         <n-form-item label="所属地域" path="regionId">
           <n-input v-model:value="addForm.regionId" clearable placeholder="请输入所属地域" />
@@ -82,8 +80,7 @@
           <n-input v-model:value="addForm.accessKey" clearable placeholder="请输入AccessKey" />
         </n-form-item>
         <n-form-item label="AccessSecret" path="accessSecret">
-          <n-input v-model:value="addForm.accessSecret" clearable
-                   placeholder="请输入AccessSecret" />
+          <n-input v-model:value="addForm.accessSecret" clearable placeholder="请输入AccessSecret" />
         </n-form-item>
         <n-form-item label="备注信息" path="remark">
           <n-input
@@ -183,15 +180,7 @@ import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual } from 'lodash-es'
-import {
-  type DataTableColumns,
-  type FormRules,
-  NDataTable,
-  NScrollbar,
-  NSpin,
-  NTabPane,
-  NTabs
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'

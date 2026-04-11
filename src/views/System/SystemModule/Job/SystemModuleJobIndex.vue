@@ -5,8 +5,7 @@
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
             <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable
-                       placeholder="请输入搜索条件（任务名称）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（任务名称）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
@@ -69,19 +68,16 @@
         <n-form-item label="调用目标" path="invokeTarget">
           <n-popover placement="bottom-start" trigger="focus">
             <template #trigger>
-              <n-input v-model:value="addForm.invokeTarget" clearable
-                       placeholder="请输入调用目标" />
+              <n-input v-model:value="addForm.invokeTarget" clearable placeholder="请输入调用目标" />
             </template>
             <p>请输入 组件名称.方法名称() 或 组件名称.方法名称(...参数列表)</p>
             <p>其中组件名称为 @Component 注解的值，参数列表可选、数量不限</p>
-            <p>strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L,
-              true)</p>
+            <p>strixTestJob.testSomething() 或 strixTestJob.testParams('abc', 1, 1.21D, 22222L, true)</p>
             <p>为了系统安全考虑，所有定时任务调用目标类需使用 @StrixJob 注解，否则无法添加和调用。</p>
           </n-popover>
         </n-form-item>
         <n-form-item label="Cron 表达式" path="cronExpression">
-          <n-input v-model:value="addForm.cronExpression" clearable
-                   placeholder="请输入 Cron 表达式" />
+          <n-input v-model:value="addForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
         </n-form-item>
         <n-form-item label="计划错误策略" path="misfirePolicy">
           <n-select
@@ -100,8 +96,7 @@
           />
         </n-form-item>
         <n-form-item label="任务状态" path="status">
-          <n-select v-model:value="addForm.status" :options="jobStatusRef" clearable
-                    placeholder="请选择任务状态" />
+          <n-select v-model:value="addForm.status" :options="jobStatusRef" clearable placeholder="请选择任务状态" />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -137,8 +132,7 @@
             <n-input v-model:value="editForm.invokeTarget" clearable placeholder="请输入调用目标" />
           </n-form-item>
           <n-form-item label="Cron 表达式" path="cronExpression">
-            <n-input v-model:value="editForm.cronExpression" clearable
-                     placeholder="请输入 Cron 表达式" />
+            <n-input v-model:value="editForm.cronExpression" clearable placeholder="请输入 Cron 表达式" />
           </n-form-item>
           <n-form-item label="计划错误策略" path="misfirePolicy">
             <n-select
@@ -157,8 +151,7 @@
             />
           </n-form-item>
           <n-form-item label="任务状态" path="status">
-            <n-select v-model:value="editForm.status" :options="jobStatusRef" clearable
-                      placeholder="请选择任务状态" />
+            <n-select v-model:value="editForm.status" :options="jobStatusRef" clearable placeholder="请选择任务状态" />
           </n-form-item>
         </n-form>
       </n-spin>
@@ -179,7 +172,7 @@ import { jobApi } from '@/api/job'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField } from '@/utils/form-rules'
+import { selectField, textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'

@@ -90,8 +90,7 @@
                 <n-input v-model:value="addForm.icon" clearable placeholder="请输入菜单图标" />
               </n-form-item-gi>
               <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                <n-input-number v-model:value="addForm.sortValue" clearable
-                                placeholder="请输入菜单排序" />
+                <n-input-number v-model:value="addForm.sortValue" clearable placeholder="请输入菜单排序" />
               </n-form-item-gi>
             </n-grid>
           </n-form>
@@ -107,8 +106,7 @@
           >
             <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
               <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                <n-input v-model:value="addPermissionForm.name" clearable
-                         placeholder="请输入权限名称" />
+                <n-input v-model:value="addPermissionForm.name" clearable placeholder="请输入权限名称" />
               </n-form-item-gi>
               <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                 <n-tree-select
@@ -122,8 +120,7 @@
                 />
               </n-form-item-gi>
               <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                <n-input v-model:value="addPermissionForm.key" clearable
-                         placeholder="请输入权限标识" />
+                <n-input v-model:value="addPermissionForm.key" clearable placeholder="请输入权限标识" />
               </n-form-item-gi>
               <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                 <n-input
@@ -195,8 +192,7 @@
                   <n-input v-model:value="editForm.icon" clearable placeholder="请输入菜单图标" />
                 </n-form-item-gi>
                 <n-form-item-gi label="菜单排序" path="sortValue" span="2 s:1">
-                  <n-input-number v-model:value="editForm.sortValue" clearable
-                                  placeholder="请输入菜单排序" />
+                  <n-input-number v-model:value="editForm.sortValue" clearable placeholder="请输入菜单排序" />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
@@ -212,8 +208,7 @@
             >
               <n-grid :cols="2" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
                 <n-form-item-gi label="权限名称" path="name" span="2 s:1">
-                  <n-input v-model:value="editPermissionForm.name" clearable
-                           placeholder="请输入权限名称" />
+                  <n-input v-model:value="editPermissionForm.name" clearable placeholder="请输入权限名称" />
                 </n-form-item-gi>
                 <n-form-item-gi label="父级菜单" path="menuId" span="2 s:1">
                   <n-tree-select
@@ -227,8 +222,7 @@
                   />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限标识" path="key" span="2 s:2">
-                  <n-input v-model:value="editPermissionForm.key" clearable
-                           placeholder="请输入权限标识" />
+                  <n-input v-model:value="editPermissionForm.key" clearable placeholder="请输入权限标识" />
                 </n-form-item-gi>
                 <n-form-item-gi label="权限介绍" path="description" span="2 s:2">
                   <n-input

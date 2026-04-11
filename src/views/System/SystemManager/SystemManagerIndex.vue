@@ -5,14 +5,12 @@
         <n-grid :cols="12" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="4">
             <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable
-                       placeholder="请输入搜索条件（昵称、账号）" />
+              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）" />
               <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
             </n-input-group>
           </n-gi>
           <n-gi span="3">
-            <n-form :model="listParams" :show-feedback="false" label-placement="left"
-                    label-width="auto">
+            <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
               <n-form-item-gi label="人员角色" path="roleId">
                 <n-select
                   v-model:value="listParams.roleId"
@@ -49,8 +47,7 @@
             />
           </n-form-item-gi>
           <n-form-item-gi label="人员类型" path="type" span="6 s:3 m:2">
-            <n-select v-model:value="listParams.type" :options="systemManagerTypeRef"
-                      placeholder="请选择人员类型" />
+            <n-select v-model:value="listParams.type" :options="systemManagerTypeRef" placeholder="请选择人员类型" />
           </n-form-item-gi>
         </n-grid>
       </n-form>
@@ -254,18 +251,10 @@ import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField } from '@/utils/form-rules'
+import { selectField, textField } from '@/utils/form-rules'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual } from 'lodash-es'
-import {
-  type DataTableColumns,
-  type FormRules,
-  NCheckbox,
-  NCheckboxGroup,
-  NFlex,
-  NH6,
-  NSpin
-} from 'naive-ui'
+import { type DataTableColumns, type FormRules, NCheckbox, NCheckboxGroup, NFlex, NH6, NSpin } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -377,13 +366,12 @@ const dataColumns: DataTableColumns = [
       if (!row.roleIdArray) {
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
-      const rolesCheckboxRender = systemRoleSelectList.value.map(({
-                                                                    value,
-                                                                    label
-                                                                  }) => h(NCheckbox, {
-        value,
-        label
-      }))
+      const rolesCheckboxRender = systemRoleSelectList.value.map(({ value, label }) =>
+        h(NCheckbox, {
+          value,
+          label
+        })
+      )
       return h('div', { style: 'padding: 5px 10px;' }, [
         h(NH6, { prefix: 'bar', alignText: true }, () => '人员角色设置'),
         h(
@@ -539,11 +527,14 @@ const addFormRules: FormRules = {
 const editFormRules: FormRules = {
   nickname: textField('管理人员昵称', { min: 2, max: 20 }),
   loginName: textField('登录账号', { min: 4, max: 20 }),
-  loginPassword: [...textField('登录密码', {
-    required: false,
-    min: 8,
-    max: 32
-  }), passwordComplexityValidator],
+  loginPassword: [
+    ...textField('登录密码', {
+      required: false,
+      min: 8,
+      max: 32
+    }),
+    passwordComplexityValidator
+  ],
   status: selectField('管理人员状态'),
   type: selectField('管理人员类型')
 }
