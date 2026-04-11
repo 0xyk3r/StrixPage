@@ -26,7 +26,7 @@ Package manager is **pnpm**. No test framework is configured.
 ### Key Technologies
 
 - **Vue 3.5** with Composition API (`<script setup>`)
-- **Vite 7** with auto-import (Vue/Vue Router APIs) and auto-component registration (Naive UI)
+- **Vite 8** with auto-import (Vue/Vue Router APIs) and auto-component registration (Naive UI)
 - **Pinia 3** with `pinia-plugin-persistedstate` (localStorage)
 - **Naive UI** as the sole component library
 - **Axios** with encryption for API communication
@@ -42,7 +42,8 @@ Package manager is **pnpm**. No test framework is configured.
 
 - `src/components/common/` — Reusable components (`StrixBlock`, `StrixTag`, `StrixImage`, etc.)
 - `src/components/data/` — Data selection components (Manager/Role pickers, NameFetcher)
-- `src/composables/` — Composition utilities (`usePage`, `useDict`, `usePagination`, `useBaseUrl`, `useTokenRenewal`)
+- `src/composables/` — Composition utilities (`useCrud`, `useDict`, `usePagination`, `useTableColumns`, `useFormDraft`,
+  `useTokenRenewal`)
 - `src/directives/auth.ts` — `v-auth` directive for permission-based element visibility
 - `src/plugins/axios.ts` — Axios instance with SM2/SM4 encryption and SM3 request signing
 - `src/stores/` — Pinia stores (login-info, dict, strix-settings, tabs-bar, http-canceler, etc.)
@@ -64,13 +65,29 @@ All API requests go through `/api/` and are encrypted/signed:
 - `v-auth="['perm1', 'perm2']"` — OR logic (default), use `.and` modifier for AND
 - Super permission: `*:*:*`
 
-### View Component Pattern
+### View Component Pattern (useCrud)
 
-List views follow a consistent structure:
+All list views follow: StrixBlock (search) → n-data-table (remote) → n-modal (add/edit form).
 
-1. `StrixBlock` with search/filter controls (cleanable)
-2. `n-data-table` with remote pagination via `usePage` composable
-3. Add/Edit modals with `n-form` validation
+`useCrud` is the core composable — provides `list()`, `showAdd()`, `showEdit(row)`, `handleDelete(row)`, reactive
+`formModel`, `formRules`, `columns`, `loading`, and draft auto-save.
+
+```typescript
+const crud = useCrud({
+  api: systemUserApi,
+  columns: () => [...],
+  formRules: () => ({ nickname: textField('昵称'), status: selectField('状态') }),
+  hooks: {
+    beforeShowAdd: () => {
+    }, afterEdit: (row) => {
+    }, transformAdd: (data) => {
+    }
+  },
+})
+```
+
+Form rules: use `textField()`, `selectField()`, `remarkField()`, `numberField()` from `@/utils/form-rules`.
+Column rendering: use `h(StrixTag, { value: row.status, dictName: 'DictName' })` for dictionary-backed tags.
 
 ### Auto-imports (no manual import needed)
 
