@@ -310,10 +310,11 @@ $captcha-cut: 16px;
   z-index: 10;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color $duration-fast,
-  color $duration-fast,
-  box-shadow $duration-fast,
-  background $duration-fast;
+  transition:
+    border-color $duration-fast,
+    color $duration-fast,
+    box-shadow $duration-fast,
+    background $duration-fast;
 
   &:hover {
     border-color: var(--strix-text-accent);

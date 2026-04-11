@@ -7,6 +7,6 @@ export interface ArticleTagModel {
 export type ArticleTagProps =
   | { create: true; model?: ArticleTagModel }
   | {
-  create?: false
-  model: ArticleTagModel
-}
+      create?: false
+      model: ArticleTagModel
+    }

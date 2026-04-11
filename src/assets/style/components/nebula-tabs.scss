@@ -26,10 +26,11 @@
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: width $duration-fast,
-  opacity $duration-fast,
-  border-color $duration-fast,
-  background $duration-fast;
+  transition:
+    width $duration-fast,
+    opacity $duration-fast,
+    border-color $duration-fast,
+    background $duration-fast;
   opacity: 0;
   pointer-events: none;
   overflow: hidden;

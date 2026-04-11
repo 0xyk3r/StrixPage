@@ -54,27 +54,31 @@
   align-items: center;
   justify-content: center;
   color: var(--strix-text-accent);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3),
-  0 0 12px var(--strix-accent-glow);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 0 12px var(--strix-accent-glow);
   transition: all $duration-fast;
 }
 
 .nebula-fab:hover .nebula-fab__btn {
   border-color: var(--strix-text-accent);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4),
-  0 0 20px var(--strix-accent-glow);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 20px var(--strix-accent-glow);
   transform: scale(1.08);
 }
 
 // ---- Transition ----
 .nebula-fab-enter-active {
-  transition: opacity 0.3s $ease-out-smooth,
-  transform 0.4s $ease-out-expo;
+  transition:
+    opacity 0.3s $ease-out-smooth,
+    transform 0.4s $ease-out-expo;
 }
 
 .nebula-fab-leave-active {
-  transition: opacity 0.2s,
-  transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .nebula-fab-enter-from {

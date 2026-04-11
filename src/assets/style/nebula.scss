@@ -53,8 +53,9 @@ html {
   line-height: t.$leading-normal;
   color: var(--strix-text-primary);
   background: var(--strix-bg-base);
-  transition: background 0.35s ease,
-  color 0.35s ease;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
 }
 
 body {
@@ -76,16 +77,18 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-transition-delay: 99999s !important;
-  -webkit-transition: color 99999s ease-out,
-  background-color 99999s ease-out !important;
+  -webkit-transition:
+    color 99999s ease-out,
+    background-color 99999s ease-out !important;
 }
 
 // ---- 主题切换全局过渡 ----
 html.theme-transitioning * {
-  transition: background 0.35s ease,
-  color 0.35s ease,
-  border-color 0.35s ease,
-  box-shadow 0.35s ease !important;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease !important;
 }
 
 // ============================================================

@@ -75,13 +75,15 @@
 
 // ---- Drawer Transition ----
 .nebula-notif-drawer-enter-active {
-  transition: transform 0.45s $ease-out-expo,
-  opacity 0.3s $ease-out-smooth;
+  transition:
+    transform 0.45s $ease-out-expo,
+    opacity 0.3s $ease-out-smooth;
 }
 
 .nebula-notif-drawer-leave-active {
-  transition: transform 0.25s $ease-out-smooth,
-  opacity 0.2s;
+  transition:
+    transform 0.25s $ease-out-smooth,
+    opacity 0.2s;
 }
 
 .nebula-notif-drawer-enter-from {
@@ -102,8 +104,9 @@
   flex-direction: column;
   @include glass;
   border-radius: $radius-xl;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25),
-  0 0 1px rgba(99, 226, 183, 0.15);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.25),
+    0 0 1px rgba(99, 226, 183, 0.15);
   overflow: hidden;
 }
 
