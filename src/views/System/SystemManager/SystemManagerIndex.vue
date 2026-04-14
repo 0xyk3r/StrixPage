@@ -54,6 +54,7 @@
     </strix-block>
 
     <n-data-table
+      :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
       :data="dataRef"
       :expanded-row-keys="dataExpandedRowKeys"
@@ -63,13 +64,35 @@
       remote
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
+      @update:checked-row-keys="onCheckedRowKeysChange"
     />
+
+    <StrixBatchBar :count="selectedCount" @clear="clearSelection">
+      <n-popselect
+        :options="systemManagerStatusRef"
+        @update:value="(v: number) => batchModify('status', String(v))"
+      >
+        <n-button size="small" quaternary type="primary">
+          <template #icon>
+            <strix-icon icon="toggle-left" :size="14" />
+          </template>
+          批量修改状态
+        </n-button>
+      </n-popselect>
+      <n-button size="small" quaternary type="error" @click="batchDelete">
+        <template #icon>
+          <strix-icon icon="trash-2" :size="14" />
+        </template>
+        批量删除
+      </n-button>
+    </StrixBatchBar>
 
     <strix-export-dialog
       v-model:show="showExportDialog"
       :columns="dataColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
+      :selected-rows="selectedRows"
       :title="_baseName"
     />
 
@@ -257,6 +280,7 @@ import { differenceWith, find, isEqual } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NCheckbox, NCheckboxGroup, NFlex, NH6, NSpin } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
+import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
@@ -314,6 +338,13 @@ const {
   clearSearch,
   pagination,
   rowKey,
+  checkedRowKeys,
+  onCheckedRowKeysChange,
+  clearSelection,
+  selectedCount,
+  selectionColumn,
+  batchDelete,
+  batchModify,
   addModal,
   addForm,
   addFormRef,
@@ -353,13 +384,15 @@ const {
     beforeShowAdd: () => getSystemRegionSelectList(),
     beforeShowEdit: () => getSystemRegionSelectList()
   },
-  draftKey: 'SystemManager'
+  draftKey: 'SystemManager',
+  batch: { disabledKey: 'builtin' }
 })
 
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
+  ...(selectionColumn ? [selectionColumn] : []),
   {
     type: 'expand',
     renderExpand: (row: any) => {
@@ -457,6 +490,9 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
+const selectedRows = computed(() =>
+  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true

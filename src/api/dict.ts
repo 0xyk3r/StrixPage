@@ -104,6 +104,12 @@ export const dictApi = {
 
   remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
+  batchRemove: (ids: string[]) =>
+    http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { meta: { operate: `批量删除${_n}`, notify: true } }),
+
+  batchModify: (data: { ids: string[]; field: string; value: string }) =>
+    http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } }),
+
   dataList: (key: string, params: Record<string, any>) =>
     http.get<RetResult<DictDataListResp>>(`${BASE}/data/${key}`, {
       params,
@@ -126,5 +132,15 @@ export const dictApi = {
   dataRemove: (key: string, id: string) =>
     http.post<RetResult>(`${BASE}/data/${key}/remove/${id}`, null, {
       meta: { operate: '删除字典数据' }
+    }),
+
+  dataBatchRemove: (key: string, ids: string[]) =>
+    http.post<RetResult>(`${BASE}/data/${key}/batch/remove`, { ids }, {
+      meta: { operate: '批量删除字典数据', notify: true }
+    }),
+
+  dataBatchModify: (key: string, data: { ids: string[]; field: string; value: string }) =>
+    http.post<RetResult>(`${BASE}/data/${key}/batch/modify`, data, {
+      meta: { operate: '批量修改字典数据', notify: true }
     })
 }

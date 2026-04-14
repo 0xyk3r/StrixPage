@@ -64,6 +64,12 @@ export const managerApi = {
   modify: (id: string, data: { field: string; value: string }) =>
     http.post<RetResult>(`${BASE}/modify/${id}`, data, { meta: { operate: `修改${_n}字段` } }),
 
+  batchRemove: (ids: string[]) =>
+    http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { meta: { operate: `批量删除${_n}`, notify: true } }),
+
+  batchModify: (data: { ids: string[]; field: string; value: string }) =>
+    http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } }),
+
   transfer: (params?: Record<string, any>) =>
     http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
       params,

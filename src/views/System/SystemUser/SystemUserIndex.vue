@@ -35,6 +35,7 @@
       </n-form>
     </strix-block>
     <n-data-table
+      :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
@@ -42,13 +43,35 @@
       :remote="true"
       :row-key="rowKey"
       table-layout="fixed"
+      @update:checked-row-keys="onCheckedRowKeysChange"
     />
+
+    <StrixBatchBar :count="selectedCount" @clear="clearSelection">
+      <n-popselect
+        :options="systemUserStatusRef"
+        @update:value="(v: number) => batchModify('status', String(v))"
+      >
+        <n-button size="small" quaternary type="primary">
+          <template #icon>
+            <strix-icon icon="toggle-left" :size="14" />
+          </template>
+          批量修改状态
+        </n-button>
+      </n-popselect>
+      <n-button size="small" quaternary type="error" @click="batchDelete">
+        <template #icon>
+          <strix-icon icon="trash-2" :size="14" />
+        </template>
+        批量删除
+      </n-button>
+    </StrixBatchBar>
 
     <strix-export-dialog
       v-model:show="showExportDialog"
       :columns="dataColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
+      :selected-rows="selectedRows"
       :title="_baseName"
     />
 
@@ -104,6 +127,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -127,6 +151,13 @@ const {
   clearSearch,
   pagination,
   rowKey,
+  checkedRowKeys,
+  onCheckedRowKeysChange,
+  clearSelection,
+  selectedCount,
+  selectionColumn,
+  batchDelete,
+  batchModify,
   editModal,
   editLoading,
   editForm,
@@ -150,11 +181,13 @@ const {
     phoneNumber: null
   },
   api: userApi,
-  draftKey: 'SystemUser'
+  draftKey: 'SystemUser',
+  batch: true
 })
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
+  ...(selectionColumn ? [selectionColumn] : []),
   { key: 'nickname', title: '用户昵称', width: 200 },
   { key: 'phoneNumber', title: '手机号码', width: 200 },
   {
@@ -199,6 +232,9 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
+const selectedRows = computed(() =>
+  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true

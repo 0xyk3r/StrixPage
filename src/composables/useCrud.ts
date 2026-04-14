@@ -12,6 +12,8 @@ export interface CrudApi {
   create?: (data: any) => Promise<AxiosResponse<RetResult>>
   update?: (id: string, data: any) => Promise<AxiosResponse<RetResult>>
   remove?: (id: string) => Promise<AxiosResponse<RetResult>>
+  batchRemove?: (ids: string[]) => Promise<AxiosResponse<RetResult>>
+  batchModify?: (data: { ids: string[]; field: string; value: string }) => Promise<AxiosResponse<RetResult>>
 }
 
 /** 生命周期钩子 */
@@ -52,6 +54,8 @@ export interface UseCrudConfig {
   hooks?: UseCrudHooks
   /** 草稿缓存标识（传入即启用表单草稿自动保存） */
   draftKey?: string
+  /** 启用批量操作（传 true 或配置对象） */
+  batch?: boolean | { disabledKey?: string }
 }
 
 const VALIDATION_FAIL_TITLE = '表单校验失败'
@@ -74,6 +78,33 @@ export function useCrud(config: UseCrudConfig) {
   }
 
   const rowKey = (row: any) => row.id
+
+  // ===== 批量操作 =====
+  const batchEnabled = !!config.batch
+  const checkedRowKeys = ref<Array<string | number>>([])
+
+  const onCheckedRowKeysChange = (keys: Array<string | number>) => {
+    checkedRowKeys.value = keys
+  }
+
+  const clearSelection = () => {
+    checkedRowKeys.value = []
+  }
+
+  const hasSelection = computed(() => checkedRowKeys.value.length > 0)
+  const selectedCount = computed(() => checkedRowKeys.value.length)
+
+  const selectionColumn = batchEnabled
+    ? {
+      type: 'selection' as const,
+      disabled: (row: any) => {
+        if (typeof config.batch === 'object' && config.batch.disabledKey) {
+          return !!row[config.batch.disabledKey]
+        }
+        return false
+      }
+    }
+    : null
 
   // ===== 新增表单 =====
   const addModal = ref(false)
@@ -223,12 +254,53 @@ export function useCrud(config: UseCrudConfig) {
     hooks?.afterDelete?.()
   }
 
+  /** 批量删除（含确认弹窗） */
+  const batchDelete = async () => {
+    if (!api?.batchRemove || checkedRowKeys.value.length === 0) return
+
+    return new Promise<void>((resolve) => {
+      dialog.warning({
+        title: '批量删除确认',
+        content: `确定要删除选中的 ${checkedRowKeys.value.length} 条数据吗？该操作不可恢复！`,
+        positiveText: '确认删除',
+        negativeText: '取消',
+        onPositiveClick: async () => {
+          await api.batchRemove!(checkedRowKeys.value as string[])
+          clearSelection()
+          fetchList()
+          hooks?.afterDelete?.()
+          resolve()
+        },
+        onNegativeClick: () => resolve(),
+        onClose: () => resolve(),
+        onMaskClick: () => resolve()
+      })
+    })
+  }
+
+  /** 批量修改字段 */
+  const batchModify = async (field: string, value: string) => {
+    if (!api?.batchModify || checkedRowKeys.value.length === 0) return
+    await api.batchModify({ ids: checkedRowKeys.value as string[], field, value })
+    clearSelection()
+    fetchList()
+  }
+
   return {
     // 列表
     listParams,
     clearSearch,
     pagination,
     rowKey,
+    // 批量操作
+    checkedRowKeys,
+    onCheckedRowKeysChange,
+    clearSelection,
+    hasSelection,
+    selectedCount,
+    selectionColumn,
+    batchDelete,
+    batchModify,
     // 新增表单
     addModal,
     addForm,

@@ -77,6 +77,9 @@ export const roleApi = {
 
   remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
+  batchRemove: (ids: string[]) =>
+    http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { meta: { operate: `批量删除${_n}`, notify: true } }),
+
   updateMenu: (roleId: string, data: SystemRoleUpdateMenuReq) =>
     http.post<RetResult>(`${BASE}/update/${roleId}/menu`, data, {
       meta: { operate: '编辑角色菜单' }

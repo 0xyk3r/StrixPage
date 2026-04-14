@@ -31,6 +31,7 @@
     </strix-block>
 
     <n-data-table
+      :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
       :data="filterDataList"
       :expanded-row-keys="dataExpandedRowKeys"
@@ -38,13 +39,24 @@
       :row-key="rowKey"
       table-layout="fixed"
       @update-expanded-row-keys="dataExpandedRowKeysChange"
+      @update:checked-row-keys="onCheckedRowKeysChange"
     />
+
+    <StrixBatchBar :count="selectedCount" @clear="clearSelection">
+      <n-button size="small" quaternary type="error" @click="batchDelete">
+        <template #icon>
+          <strix-icon icon="trash-2" :size="14" />
+        </template>
+        批量删除
+      </n-button>
+    </StrixBatchBar>
 
     <strix-export-dialog
       v-model:show="showExportDialog"
       :columns="dataColumns"
       :data="filterDataList || []"
       :fetch-all-data="fetchAllData"
+      :selected-rows="selectedRows"
       :title="_baseName"
     />
 
@@ -189,6 +201,7 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import { textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词
@@ -208,6 +221,12 @@ const {
   editForm,
   editFormRef,
   rowKey,
+  checkedRowKeys,
+  onCheckedRowKeysChange,
+  clearSelection,
+  selectedCount,
+  selectionColumn,
+  batchDelete,
   showAdd,
   showEdit,
   submitAdd,
@@ -221,7 +240,8 @@ const {
   addForm: { name: null, regionPermissionType: null },
   editForm: { name: null, regionPermissionType: null },
   api: roleApi,
-  draftKey: 'SystemRole'
+  draftKey: 'SystemRole',
+  batch: { disabledKey: 'builtin' }
 })
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']
@@ -273,6 +293,7 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
+  ...(selectionColumn ? [selectionColumn] : []),
   {
     type: 'expand',
     renderExpand: (row: any) => {
@@ -382,6 +403,10 @@ const filterDataList = computed(() =>
     if (filterDataListParams.value.keyword && d.name.indexOf(filterDataListParams.value.keyword) < 0) filtered = false
     return filtered
   })
+)
+
+const selectedRows = computed(() =>
+  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 
 const dataExpandedRowKeys = ref<Array<string | number>>([])

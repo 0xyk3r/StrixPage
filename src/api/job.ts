@@ -60,5 +60,11 @@ export const jobApi = {
 
   remove: (id: string) => http.post<RetResult>(`${BASE}/remove/${id}`, null, { meta: { operate: `删除${_n}` } }),
 
+  batchRemove: (ids: string[]) =>
+    http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { meta: { operate: `批量删除${_n}`, notify: true } }),
+
+  batchModify: (data: { ids: string[]; field: string; value: string }) =>
+    http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } }),
+
   run: (id: string) => http.post<RetResult>(`${BASE}/run/${id}`, null, { meta: { operate: `执行${_n}` } })
 }

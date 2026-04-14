@@ -27,19 +27,42 @@
     </strix-block>
 
     <n-data-table
+      :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
       :row-key="rowKey"
       table-layout="fixed"
+      @update:checked-row-keys="onCheckedRowKeysChange"
     />
+
+    <StrixBatchBar :count="selectedCount" @clear="clearSelection">
+      <n-popselect
+        :options="jobStatusRef"
+        @update:value="(v: number) => batchModify('status', String(v))"
+      >
+        <n-button size="small" quaternary type="primary">
+          <template #icon>
+            <strix-icon icon="toggle-left" :size="14" />
+          </template>
+          批量修改状态
+        </n-button>
+      </n-popselect>
+      <n-button size="small" quaternary type="error" @click="batchDelete">
+        <template #icon>
+          <strix-icon icon="trash-2" :size="14" />
+        </template>
+        批量删除
+      </n-button>
+    </StrixBatchBar>
 
     <strix-export-dialog
       v-model:show="showExportDialog"
       :columns="dataColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
+      :selected-rows="selectedRows"
       :title="_baseName"
     />
 
@@ -179,6 +202,7 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 
 // 本页面操作提示关键词
 const _baseName = '定时任务'
@@ -195,6 +219,13 @@ const {
   clearSearch,
   pagination,
   rowKey,
+  checkedRowKeys,
+  onCheckedRowKeysChange,
+  clearSelection,
+  selectedCount,
+  selectionColumn,
+  batchDelete,
+  batchModify,
   addModal,
   addForm,
   addFormRef,
@@ -236,11 +267,13 @@ const {
     status: null
   },
   api: jobApi,
-  draftKey: 'ModuleJob'
+  draftKey: 'ModuleJob',
+  batch: true
 })
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
+  ...(selectionColumn ? [selectionColumn] : []),
   { key: 'name', width: 240, title: '任务名称' },
   { key: 'invokeTarget', width: 320, title: '调用目标' },
   { key: 'cronExpression', width: 160, title: 'Cron 表达式' },
@@ -312,6 +345,10 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
+
+const selectedRows = computed(() =>
+  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true

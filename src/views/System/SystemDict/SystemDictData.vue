@@ -40,6 +40,7 @@
     </strix-block>
 
     <n-data-table
+      :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
       :data="dataRef"
       :loading="dataLoading"
@@ -47,13 +48,35 @@
       :remote="true"
       :row-key="rowKey"
       table-layout="fixed"
+      @update:checked-row-keys="onCheckedRowKeysChange"
     />
+
+    <StrixBatchBar :count="selectedCount" @clear="clearSelection">
+      <n-popselect
+        :options="commonSwitchRef"
+        @update:value="(v: number) => batchModify('status', String(v))"
+      >
+        <n-button size="small" quaternary type="primary">
+          <template #icon>
+            <strix-icon icon="toggle-left" :size="14" />
+          </template>
+          批量修改状态
+        </n-button>
+      </n-popselect>
+      <n-button size="small" quaternary type="error" @click="batchDelete">
+        <template #icon>
+          <strix-icon icon="trash-2" :size="14" />
+        </template>
+        批量删除
+      </n-button>
+    </StrixBatchBar>
 
     <strix-export-dialog
       v-model:show="showExportDialog"
       :columns="dataColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
+      :selected-rows="selectedRows"
       :title="_baseName"
     />
 
@@ -192,6 +215,7 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 
 const route = useRoute()
 
@@ -211,6 +235,13 @@ const {
   clearSearch,
   pagination,
   rowKey,
+  checkedRowKeys,
+  onCheckedRowKeysChange,
+  clearSelection,
+  selectedCount,
+  selectionColumn,
+  batchDelete,
+  batchModify,
   addModal,
   addForm,
   addFormRef,
@@ -243,9 +274,12 @@ const {
     detail: (id: string) => dictApi.dataDetail(dictKey, id),
     create: (data: any) => dictApi.dataCreate(dictKey, data),
     update: (id: string, data: any) => dictApi.dataUpdate(dictKey, id, data),
-    remove: (id: string) => dictApi.dataRemove(dictKey, id)
+    remove: (id: string) => dictApi.dataRemove(dictKey, id),
+    batchRemove: (ids: string[]) => dictApi.dataBatchRemove(dictKey, ids),
+    batchModify: (data: { ids: string[]; field: string; value: string }) => dictApi.dataBatchModify(dictKey, data)
   },
-  draftKey: 'SystemDictData'
+  draftKey: 'SystemDictData',
+  batch: true
 })
 
 const fetchAllData = createPaginatedFetcher(
@@ -256,6 +290,7 @@ const fetchAllData = createPaginatedFetcher(
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
+  ...(selectionColumn ? [selectionColumn] : []),
   { key: 'value', title: '字典值', width: 240 },
   { key: 'label', title: '字典标签', width: 240 },
   { key: 'sort', title: '字典排序', width: 90, align: 'center' },
@@ -311,6 +346,10 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 // 加载列表
 const dataRef = ref()
 const dataLoading = ref(true)
+
+const selectedRows = computed(() =>
+  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
