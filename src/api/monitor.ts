@@ -30,6 +30,15 @@ export interface MonitorLogListResp {
   total: number
 }
 
+/** 日志统计响应 */
+export interface SystemLogStatsResp {
+  todayCount: number
+  todayErrorCount: number
+  avgResponseTime: number
+  activeUserCount: number
+  errorRate: number
+}
+
 export const monitorApi = {
   urls: { logList: `${BASE}/log` },
 
@@ -37,6 +46,22 @@ export const monitorApi = {
     http.get<RetResult<MonitorLogListResp>>(`${BASE}/log`, {
       params,
       meta: { operate: '加载系统日志列表' }
+    }),
+
+  logStats: () =>
+    http.get<RetResult<SystemLogStatsResp>>(`${BASE}/log/stats`, {
+      meta: { operate: '加载日志统计' }
+    }),
+
+  logOperationGroups: () =>
+    http.get<RetResult<string[]>>(`${BASE}/log/groups`, {
+      meta: { operate: '加载操作分组' }
+    }),
+
+  logCleanup: (startTime: string, endTime: string) =>
+    http.delete<RetResult<number>>(`${BASE}/log/cleanup`, {
+      params: { startTime, endTime },
+      meta: { operate: '清理操作日志', notify: true }
     }),
 
   cacheInfo: () => http.get<RetResult>(`${BASE}/cache`, { meta: { operate: '加载缓存信息' } }),
