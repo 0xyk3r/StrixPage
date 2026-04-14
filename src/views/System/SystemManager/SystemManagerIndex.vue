@@ -34,6 +34,12 @@
               <template #icon><strix-icon icon="download" :size="16" /></template>
               导出
             </n-button>
+            <n-button v-auth="'system:manager:add'" quaternary type="primary" @click="showImportDialog = true">
+              <template #icon>
+                <strix-icon icon="upload" :size="16" />
+              </template>
+              导入
+            </n-button>
           </n-gi>
         </n-grid>
       </template>
@@ -94,6 +100,14 @@
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
       :title="_baseName"
+    />
+
+    <StrixImportDialog
+      v-model:show="showImportDialog"
+      :fields="managerImportFields"
+      :import-api="managerApi.batchCreate"
+      title="系统人员"
+      @done="getDataList()"
     />
 
     <strix-column-panel v-model:show="showColumnPanel" />
@@ -279,6 +293,8 @@ import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual } from 'lodash-es'
 import { type DataTableColumns, type FormRules, NCheckbox, NCheckboxGroup, NFlex, NH6, NSpin } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
+import type { ImportFieldConfig } from '@/composables/useTableImport'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -290,6 +306,30 @@ const quickMenuStore = useQuickMenuStore()
 // 本页面操作提示关键词
 const _baseName = '系统人员'
 const showExportDialog = ref(false)
+const showImportDialog = ref(false)
+
+const managerImportFields = computed<ImportFieldConfig[]>(() => [
+  { key: 'nickname', label: '昵称', required: true },
+  { key: 'loginName', label: '登录账号', required: true },
+  { key: 'loginPassword', label: '登录密码', required: true },
+  {
+    key: 'status',
+    label: '账户状态',
+    required: true,
+    type: 'number',
+    dictName: 'SystemManagerStatus',
+    dictOptions: systemManagerStatusRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+  },
+  {
+    key: 'type',
+    label: '账户类型',
+    required: true,
+    type: 'number',
+    dictName: 'SystemManagerType',
+    dictOptions: systemManagerTypeRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+  },
+  { key: 'regionId', label: '所属地区' }
+])
 
 onActivated(() => {
   quickMenuStore.addQuickMenu({

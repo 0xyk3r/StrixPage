@@ -56,5 +56,8 @@ export const userApi = {
     http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { meta: { operate: `批量删除${_n}`, notify: true } }),
 
   batchModify: (data: { ids: string[]; field: string; value: string }) =>
-    http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } })
+    http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } }),
+
+  batchCreate: (data: { items: Record<string, any>[]; duplicateStrategy: string }) =>
+    http.post<RetResult>(`${BASE}/batch/create`, data, { meta: { operate: `批量导入${_n}`, notify: false } })
 }

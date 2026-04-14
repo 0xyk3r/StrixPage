@@ -18,6 +18,12 @@
               <template #icon><strix-icon icon="download" :size="16" /></template>
               导出
             </n-button>
+            <n-button v-auth="'system:user:add'" quaternary type="primary" @click="showImportDialog = true">
+              <template #icon>
+                <strix-icon icon="upload" :size="16" />
+              </template>
+              导入
+            </n-button>
           </n-gi>
         </n-grid>
       </template>
@@ -75,6 +81,14 @@
       :title="_baseName"
     />
 
+    <StrixImportDialog
+      v-model:show="showImportDialog"
+      :fields="userImportFields"
+      :import-api="userApi.batchCreate"
+      title="系统用户"
+      @done="getDataList()"
+    />
+
     <strix-column-panel v-model:show="showColumnPanel" />
 
     <n-modal
@@ -127,6 +141,8 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
+import type { ImportFieldConfig } from '@/composables/useTableImport'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
@@ -141,6 +157,20 @@ import { type DataTableColumns, type FormRules } from 'naive-ui'
 // 本页面操作提示关键词
 const _baseName = '系统用户'
 const showExportDialog = ref(false)
+const showImportDialog = ref(false)
+
+const userImportFields = computed<ImportFieldConfig[]>(() => [
+  { key: 'nickname', label: '用户昵称', required: true },
+  { key: 'phoneNumber', label: '手机号码', required: true },
+  {
+    key: 'status',
+    label: '用户状态',
+    required: true,
+    type: 'number',
+    dictName: 'SystemUserStatus',
+    dictOptions: systemUserStatusRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+  }
+])
 const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => listParams.value)
 
 // 加载字典

@@ -21,6 +21,12 @@
               <template #icon><strix-icon icon="download" :size="16" /></template>
               导出
             </n-button>
+            <n-button v-auth="'system:dict:data:add'" quaternary type="primary" @click="showImportDialog = true">
+              <template #icon>
+                <strix-icon icon="upload" :size="16" />
+              </template>
+              导入
+            </n-button>
           </n-gi>
         </n-grid>
       </template>
@@ -78,6 +84,14 @@
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
       :title="_baseName"
+    />
+
+    <StrixImportDialog
+      v-model:show="showImportDialog"
+      :fields="dictDataImportFields"
+      :import-api="dictDataImportApi"
+      title="字典数据"
+      @done="getDataList()"
     />
 
     <strix-column-panel v-model:show="showColumnPanel" />
@@ -212,6 +226,8 @@ import { remarkField, selectField, textField } from '@/utils/form-rules'
 import { type DataTableColumns, type FormRules } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
+import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
+import type { ImportFieldConfig } from '@/composables/useTableImport'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
@@ -222,9 +238,34 @@ const route = useRoute()
 // 本页面操作提示关键词
 const _baseName = '系统字典数据'
 const showExportDialog = ref(false)
+const showImportDialog = ref(false)
 
 // 路由参数
 const dictKey = route.params.dictKey as string
+
+const dictDataImportFields = computed<ImportFieldConfig[]>(() => [
+  { key: 'value', label: '字典值', required: true },
+  { key: 'label', label: '字典标签', required: true },
+  { key: 'sort', label: '字典排序', required: true, type: 'number' },
+  {
+    key: 'style',
+    label: '字典样式',
+    dictName: 'DictDataStyle',
+    dictOptions: dictDataStyleRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+  },
+  {
+    key: 'status',
+    label: '字典状态',
+    required: true,
+    type: 'number',
+    dictName: 'CommonSwitch',
+    dictOptions: commonSwitchRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+  },
+  { key: 'remark', label: '备注' }
+])
+
+const dictDataImportApi = (data: { items: Record<string, any>[]; duplicateStrategy: string }) =>
+  dictApi.dataBatchCreate(dictKey, data)
 
 // 加载字典
 const dictDataStyleRef = useDict('DictDataStyle')

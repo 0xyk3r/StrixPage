@@ -70,6 +70,9 @@ export const managerApi = {
   batchModify: (data: { ids: string[]; field: string; value: string }) =>
     http.post<RetResult>(`${BASE}/batch/modify`, data, { meta: { operate: `批量修改${_n}`, notify: true } }),
 
+  batchCreate: (data: { items: Record<string, any>[]; duplicateStrategy: string }) =>
+    http.post<RetResult>(`${BASE}/batch/create`, data, { meta: { operate: `批量导入${_n}`, notify: false } }),
+
   transfer: (params?: Record<string, any>) =>
     http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
       params,

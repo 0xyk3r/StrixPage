@@ -142,5 +142,10 @@ export const dictApi = {
   dataBatchModify: (key: string, data: { ids: string[]; field: string; value: string }) =>
     http.post<RetResult>(`${BASE}/data/${key}/batch/modify`, data, {
       meta: { operate: '批量修改字典数据', notify: true }
+    }),
+
+  dataBatchCreate: (key: string, data: { items: Record<string, any>[]; duplicateStrategy: string }) =>
+    http.post<RetResult>(`${BASE}/data/${key}/batch/create`, data, {
+      meta: { operate: '批量导入字典数据', notify: false }
     })
 }
