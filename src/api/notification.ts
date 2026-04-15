@@ -42,7 +42,7 @@ export interface ListNotificationReq {
 
 export const notificationApi = {
   list: (data: ListNotificationReq) =>
-    http.post<RetResult<NotificationListResp>>(BASE, data, { meta: { operate: '加载通知列表' } }),
+    http.post<RetResult<NotificationListResp>>(BASE, data, { meta: { operate: '加载通知列表', notify: false } }),
 
   unreadCount: () =>
     http.get<RetResult<NotificationUnreadCountResp>>(`${BASE}/unread-count`, {
