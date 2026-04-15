@@ -248,9 +248,10 @@ const trendOptions = computed<ChartOption | null>(() => {
     legend: {
       data: ['操作总数', '错误数'],
       textStyle: { color: c.textSecondary, fontSize: 11 },
+      icon: 'circle',
       top: 0,
       left: 0,
-      itemWidth: 12,
+      itemWidth: 8,
       itemHeight: 8
     },
     grid: { top: 28, right: 12, bottom: 20, left: 40 },
@@ -274,6 +275,7 @@ const trendOptions = computed<ChartOption | null>(() => {
         smooth: true,
         symbol: 'none',
         lineStyle: { color: c.accent, width: 2 },
+        itemStyle: { color: c.accent },
         areaStyle: {
           color: {
             type: 'linear',
@@ -291,7 +293,8 @@ const trendOptions = computed<ChartOption | null>(() => {
         data: trends.map((t) => t.errorCount),
         smooth: true,
         symbol: 'none',
-        lineStyle: { color: c.error, width: 1.5, type: 'dashed' }
+        lineStyle: { color: c.error, width: 1.5, type: 'dashed' },
+        itemStyle: { color: c.error }
       }
     ]
   }
