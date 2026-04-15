@@ -90,6 +90,7 @@
 
 <script lang="ts" setup>
 import { useNotificationStore } from '@/stores/notification'
+import { useSseStore } from '@/stores/sse'
 import type { NotificationItem } from '@/@types/components/notification'
 import { createStrixMessage } from '@/utils/strix-message'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
@@ -350,12 +351,14 @@ const handleItemClick = async (notification: NotificationItem) => {
 }
 
 onMounted(() => {
-  notificationStore.connectSSE()
+  const sseStore = useSseStore()
+  sseStore.connect()
   document.addEventListener('keydown', handleKeydown, true)
 })
 
 onUnmounted(() => {
-  notificationStore.disconnectSSE()
+  const sseStore = useSseStore()
+  sseStore.disconnect()
   document.removeEventListener('keydown', handleKeydown, true)
 })
 </script>

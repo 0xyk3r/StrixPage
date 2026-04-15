@@ -38,6 +38,11 @@ export interface MenuResp {
 }
 
 export const authApi = {
+  currentInfo: () =>
+    http.get<RetResult<LoginManagerInfo>>('system/current-info', {
+      meta: { operate: '刷新当前管理员信息', notify: false }
+    }),
+
   login: (data: Record<string, any>) =>
     http.post<RetResult<LoginResp>>('system/login', data, {
       meta: { operate: '登录', notify: false }
