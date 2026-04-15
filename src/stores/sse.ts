@@ -62,6 +62,17 @@ export const useSseStore = defineStore('sse', () => {
       }
     })
 
+    // 强制踢出事件
+    eventSource.addEventListener('session:kicked', (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('SSE: 收到强制下线事件', data.reason)
+        handleKicked(data.message)
+      } catch (e) {
+        console.error('SSE: 解析 session:kicked 事件失败', e)
+      }
+    })
+
     // 服务器端错误事件 (如 Unauthorized)
     eventSource.addEventListener('error', (event: MessageEvent) => {
       try {
@@ -93,6 +104,17 @@ export const useSseStore = defineStore('sse', () => {
       eventSource = null
     }
     connected.value = false
+  }
+
+  /**
+   * 处理被踢出事件：断开 SSE → 清除登录信息 → 跳转登录页(带 kicked 标记)
+   * 使用 window.location 而非 useRouter()，因为 SSE 事件回调不在 Vue 组件 setup 上下文中
+   */
+  function handleKicked(message: string) {
+    disconnect()
+    const loginInfoStore = useLoginInfoStore()
+    loginInfoStore.clearLoginInfo()
+    window.location.href = `/login?r=kicked&msg=${encodeURIComponent(message)}`
   }
 
   /**

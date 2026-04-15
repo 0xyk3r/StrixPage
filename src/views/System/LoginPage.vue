@@ -152,6 +152,7 @@ import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
 
 const route = useRoute()
 const router = useRouter()
+const dialog = useDialog()
 const tabBarStore = useTabsBarStore()
 const loginInfoStore = useLoginInfoStore()
 
@@ -176,7 +177,16 @@ interface Dot {
 }
 
 onMounted(() => {
-  if (route.query.r === 'e') {
+  if (route.query.r === 'kicked') {
+    const msg = (route.query.msg as string) || '您的会话已被管理员强制下线'
+    dialog.warning({
+      title: '会话已终止',
+      content: msg,
+      positiveText: '我知道了',
+      closable: false,
+      maskClosable: false
+    })
+  } else if (route.query.r === 'e') {
     createStrixMessage('error', '登录状态失效', '由于在其他设备上登录或凭据过期，登录状态已失效，请重新登录')
   }
   initGrid()
