@@ -406,15 +406,18 @@ const trendOptions = computed<ChartOption | null>(() => {
   // ---- Bottom: trend chart + ranking ----
   &__bottom {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
   }
 
   &__trend {
+    grid-column: 1 / 4;
     border: 1px solid var(--strix-border-default);
     border-radius: 6px;
     background: var(--strix-bg-surface);
     padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
   }
 
   &__trend-header {
@@ -457,7 +460,8 @@ const trendOptions = computed<ChartOption | null>(() => {
   }
 
   &__trend-chart {
-    height: 150px;
+    flex: 1;
+    min-height: 120px;
   }
 
   &__vchart {
@@ -467,10 +471,11 @@ const trendOptions = computed<ChartOption | null>(() => {
 
   // ---- Module ranking ----
   &__ranking {
+    grid-column: 4 / 5;
     border: 1px solid var(--strix-border-default);
     border-radius: 6px;
     background: var(--strix-bg-surface);
-    padding: 16px 20px;
+    padding: 16px 14px;
     display: flex;
     flex-direction: column;
   }
@@ -484,6 +489,8 @@ const trendOptions = computed<ChartOption | null>(() => {
 
   &__rank-list {
     list-style: none;
+    padding: 0;
+    margin: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
