@@ -262,6 +262,7 @@ const detailData = ref<NotificationDetailResp | null>(null)
 
 // 加载数据
 const loadData = async (page?: number) => {
+  if (loading.value) return
   if (page) currentPage.value = page
   try {
     loading.value = true
@@ -269,7 +270,7 @@ const loadData = async (page?: number) => {
       pageSize: pageSize.value,
       pageIndex: currentPage.value,
       keyword: keyword.value || undefined,
-      status: statusFilter.value
+      status: statusFilter.value ?? undefined
     })
     listData.value = res.data
   } catch (e) {
