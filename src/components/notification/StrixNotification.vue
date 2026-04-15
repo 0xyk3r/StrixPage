@@ -351,12 +351,12 @@ const handleItemClick = async (notification: NotificationItem) => {
 }
 
 onMounted(() => {
-  notificationStore.startPolling()
+  notificationStore.connectSSE()
   document.addEventListener('keydown', handleKeydown, true)
 })
 
 onUnmounted(() => {
-  notificationStore.stopPolling()
+  notificationStore.disconnectSSE()
   document.removeEventListener('keydown', handleKeydown, true)
 })
 </script>

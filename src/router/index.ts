@@ -173,6 +173,16 @@ const routes: RouteRecordRaw[] = [
             }
           },
           {
+            path: 'notification-manage',
+            name: 'SystemMonitorNotificationManageIndex',
+            component: () => import('@/views/System/SystemMonitor/NotificationManage/SystemMonitorNotificationManageIndex.vue'),
+            meta: {
+              title: '通知管理',
+              empty: false,
+              permission: 'system:monitor:notification'
+            }
+          },
+          {
             path: 'server',
             name: 'SystemMonitorServerIndex',
             component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
