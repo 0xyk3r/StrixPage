@@ -33,6 +33,9 @@
       </div>
     </div>
 
+    <!-- Dashboard Widget -->
+    <IndexDashboardWidget />
+
     <!-- Divider -->
     <div class="nebula-index__divider">
       <span class="nebula-index__divider-label">NAVIGATION_MODULES</span>
@@ -113,6 +116,7 @@
 </template>
 
 <script lang="ts" setup>
+import IndexDashboardWidget from '@/components/dashboard/IndexDashboardWidget.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { type BookmarkItem, useBookmarksStore } from '@/stores/bookmarks'

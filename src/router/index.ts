@@ -143,6 +143,16 @@ const routes: RouteRecordRaw[] = [
         },
         children: [
           {
+            path: 'dashboard',
+            name: 'SystemMonitorDashboardIndex',
+            component: () => import('@/views/System/SystemMonitor/Dashboard/SystemMonitorDashboardIndex.vue'),
+            meta: {
+              title: '活动仪表板',
+              empty: false,
+              permission: 'system:monitor'
+            }
+          },
+          {
             path: 'server',
             name: 'SystemMonitorServerIndex',
             component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
