@@ -1,5 +1,8 @@
 <template>
   <div class="nebula-app" @click="clickContainer">
+    <!-- 系统公告 Banner -->
+    <strix-announcement />
+
     <!-- 极光背景 -->
     <nebula-bg />
 
@@ -76,6 +79,7 @@
 </template>
 
 <script lang="ts" setup>
+import StrixAnnouncement from '@/components/common/StrixAnnouncement.vue'
 import NebulaBg from '@/components/system/NebulaBg.vue'
 import StrixBreadcrumb from '@/components/system/StrixBreadcrumb.vue'
 import StrixCommandPalette from '@/components/system/StrixCommandPalette.vue'

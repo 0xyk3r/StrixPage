@@ -79,6 +79,7 @@ declare module 'vue' {
     NWatermark: typeof import('naive-ui')['NWatermark']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StrixAnnouncement: typeof import('./../components/common/StrixAnnouncement.vue')['default']
     StrixBackToTop: typeof import('./../components/common/StrixBackToTop.vue')['default']
     StrixBatchBar: typeof import('./../components/common/StrixBatchBar.vue')['default']
     StrixBlock: typeof import('./../components/common/StrixBlock.vue')['default']
