@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索" />
-              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -262,6 +266,9 @@ const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
 // 加载字典
 const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')
 
+// 加载存储配置选项
+const ossConfigSelectList = ref<SelectDataItem[]>([])
+
 const {
   listParams,
   clearSearch,
@@ -281,7 +288,11 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
 } = useCrud({
   list: {
     keyword: null,
@@ -330,7 +341,12 @@ const {
       editForm.value.allowExtension = detail.allowExtension.split(',')
     }
   },
-  draftKey: 'ModuleOssFileGroup'
+  draftKey: 'ModuleOssFileGroup',
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'configKey', label: '存储配置', options: ossConfigSelectList }
+  ],
+  urlSync: true
 })
 
 // 展示列信息
@@ -405,8 +421,6 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-// 加载存储配置选项
-const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options

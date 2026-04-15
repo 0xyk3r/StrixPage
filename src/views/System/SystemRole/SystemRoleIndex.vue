@@ -4,14 +4,12 @@
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input
-                v-model:value="filterDataListParams.keyword"
-                clearable
-                placeholder="请输入搜索条件（角色名称）"
-              />
-              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
-            </n-input-group>
+            <n-input
+              v-model:value="filterDataListParams.keyword"
+              clearable
+              placeholder="请输入搜索条件（角色名称）"
+              @keydown.enter="handleKeywordEnter"
+            />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -234,7 +232,8 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
+  handleKeywordEnter
 } = useCrud({
   fetchList: () => getDataList(),
   addForm: { name: null, regionPermissionType: null },

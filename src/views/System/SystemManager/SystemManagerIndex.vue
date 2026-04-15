@@ -1,31 +1,20 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
-        <n-grid :cols="12" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="4">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）" />
-              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
-            </n-input-group>
+        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
+          <n-gi span="6 s:3 m:2">
+            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
-          <n-gi span="3">
-            <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-              <n-form-item-gi label="人员角色" path="roleId">
-                <n-select
-                  v-model:value="listParams.roleId"
-                  :options="systemRoleSelectList"
-                  clearable
-                  placeholder="请选择人员角色"
-                  @update:value="getDataList"
-                />
-              </n-form-item-gi>
-            </n-form>
-          </n-gi>
-          <n-gi :span="2">
+          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-          </n-gi>
-          <n-gi span="12 s:3" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
               <template #icon><strix-icon icon="columns-3" :size="16" /></template>
               列配置
@@ -45,6 +34,15 @@
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
+          <n-form-item-gi label="人员角色" path="roleId" span="6 s:3 m:2">
+            <n-select
+              v-model:value="listParams.roleId"
+              :options="systemRoleSelectList"
+              clearable
+              placeholder="请选择人员角色"
+              @update:value="getDataList"
+            />
+          </n-form-item-gi>
           <n-form-item-gi label="人员状态" path="status" span="6 s:3 m:2">
             <n-select
               v-model:value="listParams.status"
@@ -399,7 +397,11 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
 } = useCrud({
   list: { keyword: null, status: null, type: null, roleId: null, pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -425,7 +427,14 @@ const {
     beforeShowEdit: () => getSystemRegionSelectList()
   },
   draftKey: 'SystemManager',
-  batch: { disabledKey: 'builtin' }
+  batch: { disabledKey: 'builtin' },
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'roleId', label: '人员角色', options: systemRoleSelectList },
+    { key: 'status', label: '人员状态', dictName: 'SystemManagerStatus' },
+    { key: 'type', label: '人员类型', dictName: 'SystemManagerType' }
+  ],
+  urlSync: true
 })
 
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)

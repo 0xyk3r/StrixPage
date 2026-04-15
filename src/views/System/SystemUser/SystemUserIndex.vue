@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、手机号码）" />
-              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、手机号码）"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -188,6 +192,10 @@ const {
   selectionColumn,
   batchDelete,
   batchModify,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter,
   editModal,
   editLoading,
   editForm,
@@ -205,6 +213,11 @@ const {
     pageSize: 10
   },
   fetchList: () => getDataList(),
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'status', label: '用户状态', dictName: 'SystemUserStatus' }
+  ],
+  urlSync: true,
   editForm: {
     nickname: null,
     status: null,

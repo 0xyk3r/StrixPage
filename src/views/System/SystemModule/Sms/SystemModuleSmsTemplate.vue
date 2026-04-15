@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索关键字（模板Code、名称）" />
-              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索关键字（模板Code、名称）"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -99,9 +103,34 @@ const fetchAllData = createPaginatedFetcher(smsApi.urls.templateList, 'templates
 const smsTemplateTypeRef = useDict('SmsTemplateType')
 const smsTemplateStatusRef = useDict('SmsTemplateStatus')
 
-const { listParams, clearSearch, pagination, rowKey } = useCrud({
+// 加载短信配置选项
+const smsConfigSelectList = ref<SelectDataItem[]>([])
+const getSmsConfigSelectList = () => {
+  smsApi.configSelect().then(({ data: res }) => {
+    smsConfigSelectList.value = res.data.options
+  })
+}
+onMounted(getSmsConfigSelectList)
+
+const {
+  listParams,
+  clearSearch,
+  pagination,
+  rowKey,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
+} = useCrud({
   list: { keyword: null, configKey: null, type: null, status: null, pageIndex: 1, pageSize: 10 },
-  fetchList: () => getDataList()
+  fetchList: () => getDataList(),
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'configKey', label: '配置Key', options: smsConfigSelectList },
+    { key: 'type', label: '类型', dictName: 'SmsTemplateType' },
+    { key: 'status', label: '状态', dictName: 'SmsTemplateStatus' }
+  ],
+  urlSync: true
 })
 
 // 展示列信息
@@ -149,15 +178,6 @@ const getDataList = () => {
   })
 }
 onMounted(getDataList)
-
-// 加载短信配置选项
-const smsConfigSelectList = ref<SelectDataItem[]>([])
-const getSmsConfigSelectList = () => {
-  smsApi.configSelect().then(({ data: res }) => {
-    smsConfigSelectList.value = res.data.options
-  })
-}
-onMounted(getSmsConfigSelectList)
 </script>
 
 <style lang="scss" scoped></style>

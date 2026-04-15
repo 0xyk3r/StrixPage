@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（任务名称）" />
-              <n-button ghost type="primary" @click="getDataList"> 搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（任务名称）"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -226,6 +230,9 @@ const {
   selectionColumn,
   batchDelete,
   batchModify,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
   addModal,
   addForm,
   addFormRef,
@@ -240,7 +247,8 @@ const {
   deleteRow,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
+  handleKeywordEnter
 } = useCrud({
   list: {
     keyword: null,
@@ -268,7 +276,11 @@ const {
   },
   api: jobApi,
   draftKey: 'ModuleJob',
-  batch: true
+  batch: true,
+  filters: [
+    { key: 'keyword', label: '关键词' }
+  ],
+  urlSync: true
 })
 
 // 展示列信息

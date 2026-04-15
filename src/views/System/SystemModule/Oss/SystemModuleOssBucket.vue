@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索" />
-              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -114,6 +118,10 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储空间'
 const showExportDialog = ref(false)
+
+// 加载存储配置选项
+const ossConfigSelectList = ref<SelectDataItem[]>([])
+
 const {
   listParams,
   clearSearch,
@@ -125,7 +133,11 @@ const {
   showAdd,
   submitAdd,
   resetForms,
-  tryCloseAdd
+  tryCloseAdd,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
 } = useCrud({
   list: {
     keyword: null,
@@ -142,7 +154,12 @@ const {
     create: (data: any) => ossApi.bucketCreate(data),
     remove: (id: string) => ossApi.bucketRemove(id)
   },
-  draftKey: 'ModuleOssBucket'
+  draftKey: 'ModuleOssBucket',
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'configKey', label: '存储配置', options: ossConfigSelectList }
+  ],
+  urlSync: true
 })
 
 const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)
@@ -170,8 +187,6 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-// 加载存储配置选项
-const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options

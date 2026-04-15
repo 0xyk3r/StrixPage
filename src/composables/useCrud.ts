@@ -1,8 +1,10 @@
 import type { AxiosResponse } from 'axios'
-import { cloneDeep, isEqual, pick } from 'lodash-es'
+import { cloneDeep, debounce, isEqual, pick } from 'lodash-es'
 import type { FormInst } from 'naive-ui'
 import type { RetResult } from '@/api/types'
 import { useFormDraft } from '@/composables/useFormDraft'
+import { type FilterDefinition, useFilterState } from '@/composables/useFilterState'
+import { type FilterUrlConfig, useFilterUrl } from '@/composables/useFilterUrl'
 import { usePagination } from '@/composables/usePagination'
 import { createStrixMessage } from '@/utils/strix-message'
 
@@ -56,6 +58,10 @@ export interface UseCrudConfig {
   draftKey?: string
   /** 启用批量操作（传 true 或配置对象） */
   batch?: boolean | { disabledKey?: string }
+  /** 筛选字段定义（启用 Filter Chips） */
+  filters?: FilterDefinition[]
+  /** URL 同步配置（传 true 使用默认配置，传对象自定义） */
+  urlSync?: boolean | FilterUrlConfig
 }
 
 const VALIDATION_FAIL_TITLE = '表单校验失败'
@@ -68,9 +74,52 @@ export function useCrud(config: UseCrudConfig) {
 
   // ===== 列表/搜索 =====
   const listParams = ref(cloneDeep(config.list || {}))
+  const listDefaults = cloneDeep(config.list || {})
+
+  // ===== URL 持久化 =====
+  const urlSyncConfig = config.urlSync === true ? {} : config.urlSync || undefined
+  if (config.urlSync) {
+    useFilterUrl({ params: listParams, defaults: listDefaults, urlConfig: urlSyncConfig })
+  }
+
   const pagination = usePagination(listParams, fetchList)
 
+  // ===== 实时搜索（关键词去抖） =====
+  const debouncedFetch = debounce(fetchList, 500)
+  const hasKeyword = config.list != null && 'keyword' in config.list
+
+  if (hasKeyword) {
+    watch(() => listParams.value.keyword, () => {
+      debouncedFetch()
+    })
+  }
+
+  const handleKeywordEnter = (e: KeyboardEvent) => {
+    if (e.isComposing) return
+    debouncedFetch.cancel()
+    fetchList()
+  }
+
+  // ===== 筛选状态 =====
+  const filterState = config.filters
+    ? useFilterState({
+      definitions: config.filters,
+      params: listParams,
+      defaults: listDefaults,
+      onClear: () => {
+        debouncedFetch.cancel()
+        fetchList()
+      }
+    })
+    : null
+
+  const activeFilters = filterState?.activeFilters ?? computed(() => [])
+  const activeFilterCount = filterState?.activeFilterCount ?? computed(() => 0)
+  const clearFilter = filterState?.clearFilter ?? (() => {
+  })
+
   const clearSearch = () => {
+    debouncedFetch.cancel()
     listParams.value = cloneDeep(config.list || {})
     pagination.page = config.list?.pageIndex || 1
     pagination.pageSize = config.list?.pageSize || 10
@@ -290,6 +339,7 @@ export function useCrud(config: UseCrudConfig) {
     // 列表
     listParams,
     clearSearch,
+    handleKeywordEnter,
     pagination,
     rowKey,
     // 批量操作
@@ -321,6 +371,10 @@ export function useCrud(config: UseCrudConfig) {
     tryCloseAdd,
     tryCloseEdit,
     // 工具（用于 pick 字段等场景）
-    initEditForm
+    initEditForm,
+    // 筛选状态
+    activeFilters,
+    activeFilterCount,
+    clearFilter
   }
 }

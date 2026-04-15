@@ -35,7 +35,7 @@
           <router-view v-slot="{ Component, route }">
             <transition name="nebula-page">
               <keep-alive :include="tabsBarStore.cachedRouteNames">
-                <component :is="wrapDynamicComponent(Component, route)" :key="route.fullPath" />
+                <component :is="wrapDynamicComponent(Component, route)" :key="route.path" />
               </keep-alive>
             </transition>
           </router-view>

@@ -350,8 +350,9 @@ router.beforeEach((to, form, next) => {
   const loginInfoStore = useLoginInfoStore()
   const { loginToken } = storeToRefs(loginInfoStore)
 
-  // 处理相同路由跳转问题
-  if (!to.meta.isRedirect && to.name === form.name) return next(`/redirect${to.path}`)
+  // 处理相同路由跳转问题（允许仅查询参数变化的导航，用于筛选条件 URL 同步）
+  if (!to.meta.isRedirect && to.name === form.name && to.fullPath === form.fullPath)
+    return next(`/redirect${to.path}`)
 
   // 加载条
   controlStrixLoadingBar('start')

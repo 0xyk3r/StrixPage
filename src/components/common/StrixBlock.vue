@@ -9,6 +9,24 @@
       <slot name="body" />
     </div>
 
+    <!-- 活跃筛选条件标签 -->
+    <div v-if="activeFilters.length > 0" class="strix-block__chips">
+      <n-tag
+        v-for="filter in activeFilters"
+        :key="filter.key"
+        size="small"
+        closable
+        round
+        :bordered="false"
+        @close="$emit('clear-filter', filter.key)"
+      >
+        <template #icon>
+          <strix-icon icon="filter" :size="12" />
+        </template>
+        {{ filter.label }}: {{ filter.displayValue }}
+      </n-tag>
+    </div>
+
     <!-- 可展开高级区域 -->
     <div v-if="cleanable || $slots.default" ref="moreRef" class="strix-block__more">
       <div v-if="$slots.default" ref="moreBodyRef" class="strix-block__more-inner">
@@ -26,7 +44,16 @@
 
       <!-- 展开/折叠触发器 -->
       <button v-if="$slots.default" class="strix-block__toggle" @click="switchExpand">
-        <span class="strix-block__toggle-text">{{ isExpanded ? '收起筛选' : '展开筛选' }}</span>
+        <span class="strix-block__toggle-text">
+          {{ isExpanded ? '收起筛选' : '展开筛选' }}
+        </span>
+        <n-badge
+          v-if="activeFilterCount > 0 && !isExpanded"
+          :value="activeFilterCount"
+          :max="99"
+          type="info"
+          class="strix-block__toggle-badge"
+        />
         <span :class="['strix-block__toggle-icon', { flipped: isExpanded }]">
           <StrixIcon icon="chevron-down" :size="14" />
         </span>
@@ -38,11 +65,14 @@
 <script lang="ts" setup>
 import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
 import { storeToRefs } from 'pinia'
+import type { ActiveFilter } from '@/composables/useFilterState'
 
 defineProps({
-  cleanable: { type: Boolean, default: false }
+  cleanable: { type: Boolean, default: false },
+  activeFilters: { type: Array as PropType<ActiveFilter[]>, default: () => [] },
+  activeFilterCount: { type: Number, default: 0 }
 })
-defineEmits(['clear'])
+defineEmits(['clear', 'clear-filter'])
 const slots = useSlots()
 
 const globalSettingsStore = useStrixSettingsStore()
@@ -92,6 +122,14 @@ watch(isExpanded, (val) => {
 // ---- 主体内容 ----
 .strix-block__body {
   padding: $space-4;
+}
+
+// ---- 活跃筛选标签 ----
+.strix-block__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-1;
+  padding: 0 $space-4 $space-2;
 }
 
 // ---- 可展开区域 ----
@@ -178,6 +216,10 @@ watch(isExpanded, (val) => {
 
 .strix-block__toggle-text {
   transition: opacity $duration-fast;
+}
+
+.strix-block__toggle-badge {
+  margin: 0 $space-1;
 }
 
 .strix-block__toggle-icon {

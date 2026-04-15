@@ -42,14 +42,18 @@
       </n-gi>
     </n-grid>
 
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="按操作名称搜索" />
-              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="按操作名称搜索"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-space align="center" :size="4">
@@ -277,7 +281,16 @@ const handleDateRangeChange = (val: [number, number] | null) => {
   getDataList()
 }
 
-const { listParams, clearSearch, pagination, rowKey } = useCrud({
+const {
+  listParams,
+  clearSearch,
+  pagination,
+  rowKey,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
+} = useCrud({
   list: {
     keyword: null,
     operationType: null,
@@ -290,7 +303,16 @@ const { listParams, clearSearch, pagination, rowKey } = useCrud({
     pageIndex: 1,
     pageSize: 10
   },
-  fetchList: () => getDataList()
+  fetchList: () => getDataList(),
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'operationType', label: '操作类型', dictName: 'SystemLogOperType' },
+    { key: 'operationGroup', label: '操作分组', options: operationGroupOptions },
+    { key: 'responseCode', label: '响应状态', options: responseCodeOptions },
+    { key: 'clientUsername', label: '操作用户' },
+    { key: 'clientIp', label: '客户端IP' }
+  ],
+  urlSync: { exclude: ['startTime', 'endTime'] }
 })
 
 // 详情抽屉

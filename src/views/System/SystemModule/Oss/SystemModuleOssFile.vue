@@ -1,13 +1,17 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
-    <strix-block cleanable @clear="clearSearch">
+    <strix-block
+      cleanable
+      :active-filters="activeFilters"
+      :active-filter-count="activeFilterCount"
+      @clear="clearSearch"
+      @clear-filter="clearFilter"
+    >
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input-group>
-              <n-input v-model:value="listParams.keyword" clearable placeholder="按文件名搜索" />
-              <n-button ghost type="primary" @click="getDataList">搜索</n-button>
-            </n-input-group>
+            <n-input v-model:value="listParams.keyword" clearable placeholder="按文件名搜索"
+                     @keydown.enter="handleKeywordEnter" />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -85,12 +89,33 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 // 本页面操作提示关键词
 const _baseName = '存储文件'
 const showExportDialog = ref(false)
-const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => listParams.value)
 
-const { listParams, clearSearch, pagination, rowKey } = useCrud({
+// 加载存储配置选项
+const ossConfigSelectList = ref<SelectDataItem[]>([])
+// 加载文件组配置选项
+const ossFileGroupSelectList = ref<SelectDataItem[]>([])
+
+const {
+  listParams,
+  clearSearch,
+  pagination,
+  rowKey,
+  activeFilters,
+  activeFilterCount,
+  clearFilter,
+  handleKeywordEnter
+} = useCrud({
   list: { keyword: null, configKey: null, groupKey: null, pageIndex: 1, pageSize: 10 },
-  fetchList: () => getDataList()
+  fetchList: () => getDataList(),
+  filters: [
+    { key: 'keyword', label: '关键词' },
+    { key: 'configKey', label: '存储配置', options: ossConfigSelectList },
+    { key: 'groupKey', label: '文件组', options: ossFileGroupSelectList }
+  ],
+  urlSync: true
 })
+
+const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => listParams.value)
 
 // 展示列信息
 const dataColumns: DataTableColumns = [
@@ -149,16 +174,12 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-// 加载存储配置选项
-const ossConfigSelectList = ref<SelectDataItem[]>([])
 const getOssConfigSelectList = () => {
   ossApi.configSelect().then(({ data: res }) => {
     ossConfigSelectList.value = res.data.options
   })
 }
 onMounted(getOssConfigSelectList)
-// 加载文件组配置选项
-const ossFileGroupSelectList = ref<SelectDataItem[]>([])
 const getOssFileGroupSelectList = (configKey?: string) => {
   if (configKey) {
     listParams.value.groupKey = null

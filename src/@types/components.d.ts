@@ -15,6 +15,7 @@ declare module 'vue' {
     CaptchaPuzzle: typeof import('./../components/captcha/components/CaptchaPuzzle.vue')['default']
     DynamicWrapper: typeof import('./../components/view/DynamicWrapper.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
+    NBadge: typeof import('naive-ui')['NBadge']
     NButton: typeof import('naive-ui')['NButton']
     NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
