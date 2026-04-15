@@ -319,7 +319,6 @@ const handleMarkAllAsRead = async () => {
         n.readAt = new Date().toISOString()
       }
     })
-    createStrixMessage('success', '操作成功', '已全部标记为已读')
   } catch (error) {
     console.log(error)
     createStrixMessage('error', '操作失败', '标记全部为已读失败')
@@ -351,12 +350,12 @@ const handleItemClick = async (notification: NotificationItem) => {
 }
 
 onMounted(() => {
-  notificationStore.startPolling()
+  notificationStore.connectSSE()
   document.addEventListener('keydown', handleKeydown, true)
 })
 
 onUnmounted(() => {
-  notificationStore.stopPolling()
+  notificationStore.disconnectSSE()
   document.removeEventListener('keydown', handleKeydown, true)
 })
 </script>
