@@ -1,6 +1,7 @@
 import { authApi } from '@/api/auth'
 import { EventBus } from '@/plugins/event-bus'
 import { useLoginInfoStore } from '@/stores/login-info'
+import type { SseAnnouncement } from '@/api/announcement'
 import { useDictStore } from '@/stores/dict'
 import { useNotificationStore } from '@/stores/notification'
 import { defineStore } from 'pinia'
@@ -15,6 +16,7 @@ import { defineStore } from 'pinia'
  */
 export const useSseStore = defineStore('sse', () => {
   const connected = ref(false)
+  const activeAnnouncements = ref<SseAnnouncement[]>([])
   let eventSource: EventSource | null = null
 
   function connect() {
@@ -86,6 +88,33 @@ export const useSseStore = defineStore('sse', () => {
       }
     })
 
+    // 系统公告推送
+    eventSource.addEventListener('system:announce', (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data) as SseAnnouncement
+        console.log('SSE: 收到系统公告', data.title)
+        const idx = activeAnnouncements.value.findIndex((a) => a.id === data.id)
+        if (idx >= 0) {
+          activeAnnouncements.value[idx] = data
+        } else {
+          activeAnnouncements.value.push(data)
+        }
+      } catch (e) {
+        console.error('SSE: 解析 system:announce 事件失败', e)
+      }
+    })
+
+    // 系统公告撤除
+    eventSource.addEventListener('system:announce:dismiss', (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('SSE: 收到公告撤除', data.id)
+        activeAnnouncements.value = activeAnnouncements.value.filter((a) => a.id !== data.id)
+      } catch (e) {
+        console.error('SSE: 解析 system:announce:dismiss 事件失败', e)
+      }
+    })
+
     // 服务器端错误事件 (如 Unauthorized)
     eventSource.addEventListener('error', (event: MessageEvent) => {
       try {
@@ -117,6 +146,7 @@ export const useSseStore = defineStore('sse', () => {
       eventSource = null
     }
     connected.value = false
+    activeAnnouncements.value = []
   }
 
   /**
@@ -150,6 +180,7 @@ export const useSseStore = defineStore('sse', () => {
 
   return {
     connected,
+    activeAnnouncements,
     connect,
     disconnect
   }
