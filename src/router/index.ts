@@ -192,6 +192,16 @@ const routes: RouteRecordRaw[] = [
             }
           },
           {
+            path: 'announcement',
+            name: 'SystemMonitorAnnouncementIndex',
+            component: () => import('@/views/System/SystemMonitor/Announcement/SystemMonitorAnnouncementIndex.vue'),
+            meta: {
+              title: '系统公告',
+              empty: false,
+              permission: 'system:monitor:announcement'
+            }
+          },
+          {
             path: 'server',
             name: 'SystemMonitorServerIndex',
             component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
