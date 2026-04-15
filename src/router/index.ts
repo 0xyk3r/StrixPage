@@ -135,6 +135,15 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
+        path: 'system/config',
+        name: 'SystemConfigIndex',
+        component: () => import('@/views/System/SystemConfig/SystemConfigIndex.vue'),
+        meta: {
+          title: '系统配置',
+          permission: 'system:config'
+        }
+      },
+      {
         path: 'system/monitor',
         name: 'SystemMonitor',
         meta: {
