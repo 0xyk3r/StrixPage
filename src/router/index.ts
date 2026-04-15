@@ -153,6 +153,16 @@ const routes: RouteRecordRaw[] = [
             }
           },
           {
+            path: 'session',
+            name: 'SystemMonitorSessionIndex',
+            component: () => import('@/views/System/SystemMonitor/Session/SystemMonitorSessionIndex.vue'),
+            meta: {
+              title: '在线会话管理',
+              empty: false,
+              permission: 'system:monitor:session'
+            }
+          },
+          {
             path: 'server',
             name: 'SystemMonitorServerIndex',
             component: () => import('@/views/System/SystemMonitor/Server/SystemMonitorServerIndex.vue'),
