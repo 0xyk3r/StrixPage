@@ -91,11 +91,20 @@ export const useDictStore = defineStore(
       return promise
     }
 
+    /**
+     * SSE 触发的字典刷新：跳过缓存校验，直接拉取最新数据覆盖写入
+     */
+    async function refreshDictByKey(key: string): Promise<void> {
+      await fetchDictData(key)
+      console.log('Dict: 已刷新字典数据, key=', key)
+    }
+
     return {
       versionMap,
       dictMap,
       refreshVersion,
-      getDictData
+      getDictData,
+      refreshDictByKey
     }
   },
   {

@@ -1,6 +1,7 @@
 import { authApi } from '@/api/auth'
 import { EventBus } from '@/plugins/event-bus'
 import { useLoginInfoStore } from '@/stores/login-info'
+import { useDictStore } from '@/stores/dict'
 import { useNotificationStore } from '@/stores/notification'
 import { defineStore } from 'pinia'
 
@@ -70,6 +71,18 @@ export const useSseStore = defineStore('sse', () => {
         handleKicked(data.message)
       } catch (e) {
         console.error('SSE: 解析 session:kicked 事件失败', e)
+      }
+    })
+
+    // 字典刷新事件
+    eventSource.addEventListener('dict:refresh', (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log('SSE: 收到字典刷新事件, dictKey=', data.dictKey)
+        const dictStore = useDictStore()
+        dictStore.refreshDictByKey(data.dictKey)
+      } catch (e) {
+        console.error('SSE: 解析 dict:refresh 事件失败', e)
       }
     })
 
