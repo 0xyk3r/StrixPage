@@ -220,8 +220,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { remarkField, selectField, textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
@@ -296,7 +295,8 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: { pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -319,7 +319,8 @@ const {
     batchModify: (data: { ids: string[]; field: string; value: string }) => dictApi.dataBatchModify(dictKey, data)
   },
   draftKey: 'SystemDictData',
-  batch: true
+  batch: true,
+  schemaDto: 'DictDataUpdateReq'
 })
 
 const fetchAllData = createPaginatedFetcher(
@@ -401,15 +402,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const formRules: FormRules = {
-  key: textField('字典标识', { min: 2, max: 64 }),
-  value: textField('字典值', { min: 1, max: 64 }),
-  label: textField('字典标签', { min: 1, max: 64 }),
-  sort: selectField('字典排序值'),
-  style: textField('字典样式', { required: false, max: 32 }),
-  status: selectField('字典状态'),
-  remark: remarkField()
-}
+
 </script>
 
 <style lang="scss" scoped></style>

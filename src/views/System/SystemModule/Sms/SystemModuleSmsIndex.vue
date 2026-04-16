@@ -57,7 +57,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addFormRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -113,7 +113,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editFormRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -178,13 +178,13 @@ import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
+import { type DataTableColumns, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
-import { remarkField, selectField, textField } from '@/utils/form-rules'
+
 
 // 本页面操作提示关键词
 const _baseName = '短信服务'
@@ -214,7 +214,8 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: {
     keyword: null,
@@ -241,7 +242,8 @@ const {
     remark: null
   },
   api: smsApi,
-  draftKey: 'ModuleSms'
+  draftKey: 'ModuleSms',
+  schemaDto: 'SmsConfigUpdateReq'
 })
 
 // 展示列信息
@@ -474,25 +476,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addFormRules: FormRules = {
-  key: textField('配置 Key', { min: 2, max: 32 }),
-  name: textField('配置名称', { min: 2, max: 32 }),
-  platform: selectField('平台'),
-  regionId: textField('区域', { min: 1, max: 32 }),
-  accessKey: textField('AccessKey', { max: 64 }),
-  accessSecret: textField('AccessSecret', { max: 64 }),
-  remark: remarkField()
-}
 
-const editFormRules: FormRules = {
-  key: textField('配置 Key', { min: 2, max: 32 }),
-  name: textField('配置名称', { min: 2, max: 32 }),
-  platform: selectField('平台'),
-  regionId: textField('区域', { min: 1, max: 32 }),
-  accessKey: textField('AccessKey', { max: 64 }),
-  accessSecret: textField('AccessSecret', { required: false, max: 64 }),
-  remark: remarkField()
-}
 </script>
 
 <style lang="scss" scoped>
