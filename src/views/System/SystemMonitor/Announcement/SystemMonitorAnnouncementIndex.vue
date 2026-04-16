@@ -124,7 +124,7 @@
         </n-form-item>
         <n-form-item label="展示方式" path="displayType">
           <n-radio-group v-model:value="publishForm.displayType">
-            <n-radio value="BANNER">顶部横幅</n-radio>
+            <n-radio value="BANNER">底部横幅</n-radio>
             <n-radio value="MODAL">弹窗提醒</n-radio>
           </n-radio-group>
         </n-form-item>
@@ -180,7 +180,7 @@
             </n-tag>
           </n-descriptions-item>
           <n-descriptions-item label="展示方式">
-            {{ detailData.displayType === 'BANNER' ? '顶部横幅' : '弹窗提醒' }}
+            {{ detailData.displayType === 'BANNER' ? '底部横幅' : '弹窗提醒' }}
           </n-descriptions-item>
           <n-descriptions-item label="状态">
             <n-tag :type="detailData.status === 1 ? 'success' : 'error'" size="small" :bordered="false">
@@ -207,12 +207,17 @@
 </template>
 
 <script lang="ts" setup>
+import type {
+  AnnouncementDetail,
+  AnnouncementItem,
+  AnnouncementListResp,
+  PublishAnnouncementReq
+} from '@/api/announcement'
 import { announcementApi } from '@/api/announcement'
-import type { AnnouncementItem, AnnouncementListResp, AnnouncementDetail, PublishAnnouncementReq } from '@/api/announcement'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField } from '@/utils/form-rules'
-import { NTag } from 'naive-ui'
+import { selectField, textField } from '@/utils/form-rules'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
+import { NTag } from 'naive-ui'
 
 const dialog = useDialog()
 
@@ -391,24 +396,21 @@ const columns: DataTableColumn<AnnouncementItem>[] = [
     title: '级别',
     key: 'level',
     width: 100,
-    render: (row) =>
-      h(NTag, { type: levelTagType(row.level), size: 'small', bordered: false }, () => row.level)
+    render: (row) => h(NTag, { type: levelTagType(row.level), size: 'small', bordered: false }, () => row.level)
   },
   {
     title: '展示方式',
     key: 'displayType',
     width: 100,
-    render: (row) => (row.displayType === 'BANNER' ? '顶部横幅' : '弹窗提醒')
+    render: (row) => (row.displayType === 'BANNER' ? '底部横幅' : '弹窗提醒')
   },
   {
     title: '状态',
     key: 'status',
-    width: 70,
+    width: 80,
     render: (row) =>
-      h(
-        NTag,
-        { type: row.status === 1 ? 'success' : 'error', size: 'small', bordered: false },
-        () => (row.status === 1 ? '有效' : '已终止')
+      h(NTag, { type: row.status === 1 ? 'success' : 'error', size: 'small', bordered: false }, () =>
+        row.status === 1 ? '有效' : '已终止'
       )
   },
   {
