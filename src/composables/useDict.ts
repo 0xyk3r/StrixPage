@@ -1,3 +1,4 @@
+import type { Ref } from 'vue'
 import { useDictStore } from '@/stores/dict.ts'
 
 /**
@@ -47,3 +48,18 @@ export function useDict(dictName: string) {
  * @deprecated 请使用 useDict
  */
 export const useDictData = useDict
+
+/**
+ * 级联字典数据 Composable
+ * 根据父级值过滤子级字典数据
+ * @param childDictName 子级字典名称
+ * @param parentValue 响应式的父级值
+ * @returns 过滤后的字典数据
+ */
+export function useCascadeDict(childDictName: string, parentValue: Ref<string | number | null>) {
+  const fullData = useDict(childDictName)
+  return computed(() => {
+    if (parentValue.value == null) return fullData.value
+    return fullData.value.filter((item: any) => item.parentValue === String(parentValue.value))
+  })
+}

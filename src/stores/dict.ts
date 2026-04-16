@@ -99,11 +99,21 @@ export const useDictStore = defineStore(
       console.log('Dict: 已刷新字典数据, key=', key)
     }
 
+    /**
+     * 获取字典默认值
+     */
+    async function getDefaultValue(key: string): Promise<any> {
+      const items = await getDictData(key)
+      const defaultItem = items.find((item: any) => item.isDefault === 1)
+      return defaultItem?.value ?? null
+    }
+
     return {
       versionMap,
       dictMap,
       refreshVersion,
       getDictData,
+      getDefaultValue,
       refreshDictByKey
     }
   },
@@ -133,6 +143,17 @@ function convertType(value: string, typeName: number) {
       return parseInt(value)
     case 8:
       return parseInt(value)
+    case 9:
+      return value // DATE: keep as ISO string
+    case 10: {
+      try {
+        return JSON.parse(value)
+      } catch {
+        return value
+      }
+    }
+    case 11:
+      return value.split(',') // ENUM_SET
     default:
       return value
   }
