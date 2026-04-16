@@ -193,7 +193,7 @@ import type {
   SendNotificationReq
 } from '@/api/notification-manage'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField } from '@/utils/form-rules'
+import { useFormSchema } from '@/composables/useFormSchema'
 import StrixManagerSelector from '@/components/data/StrixManagerSelector.vue'
 import { NTag } from 'naive-ui'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
@@ -237,11 +237,7 @@ const sendForm = ref<SendNotificationReq>({
   jumpParams: ''
 })
 
-const sendFormRules = {
-  title: textField('通知标题'),
-  content: textField('通知内容'),
-  sendMode: selectField('发送方式')
-}
+const sendFormRules = useFormSchema('SendNotificationReq')
 
 const jumpTypeOptions = [
   { label: '无跳转', value: 'NONE' },

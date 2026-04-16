@@ -179,10 +179,10 @@
 <script lang="ts" setup>
 import { popularityApi } from '@/api/popularity'
 import { createStrixMessage } from '@/utils/strix-message'
-import { numberField, textField } from '@/utils/form-rules'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
-import { type DataTableColumns, type FormInst, type FormRules, NInputNumber } from 'naive-ui'
+import { type DataTableColumns, type FormInst, NInputNumber } from 'naive-ui'
+import { useFormSchema } from '@/composables/useFormSchema'
 import { usePagination } from '@/composables/usePagination.ts'
 
 // 加载列表
@@ -257,13 +257,7 @@ const initEditDataForm = {
 }
 const editDataForm = ref<any>(cloneDeep(initEditDataForm))
 const editDataFormRef = ref<FormInst | null>(null)
-const formRules: FormRules = {
-  name: textField('配置名称', { min: 1, max: 32 }),
-  configKey: textField('配置Key', { min: 1, max: 32 }),
-  initialValue: numberField('初始值'),
-  extraValue: numberField('附加值'),
-  magValue: numberField('倍率')
-}
+const formRules = useFormSchema('PopularityConfigUpdateReq')
 const editData = () => {
   editDataFormRef.value?.validate((errors) => {
     if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')

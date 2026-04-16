@@ -215,7 +215,7 @@ import type {
 } from '@/api/announcement'
 import { announcementApi } from '@/api/announcement'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { selectField, textField } from '@/utils/form-rules'
+import { useFormSchema } from '@/composables/useFormSchema'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
 
@@ -263,12 +263,7 @@ const publishForm = ref({
   endTimeTs: null as number | null
 })
 
-const publishFormRules = {
-  title: textField('公告标题'),
-  content: textField('公告内容'),
-  level: selectField('公告级别'),
-  displayType: selectField('展示方式')
-}
+const publishFormRules = useFormSchema('PublishAnnouncementReq')
 
 // 详情模态框
 const showDetailModal = ref(false)
