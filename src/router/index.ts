@@ -7,7 +7,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 const Redirect = () => import('@/components/view/StrixRedirect.vue')
 const NotFound = () => import('@/components/common/StrixNotFound.vue')
 const Forbidden = () => import('@/components/common/StrixForbidden.vue')
-const DynamicWrapper = () => import('@/components/view/DynamicWrapper.vue')
+
 
 const customRoutes: any[] = []
 
@@ -123,13 +123,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'system/dict/:dictKey',
         name: 'SystemDictDynamicWrapper',
-        component: DynamicWrapper,
+        component: () => import('@/views/System/SystemDict/SystemDictData.vue'),
         meta: {
           title: '字典数据',
           titleTemplate: ' 字典数据 - {dictKey}',
           parentRouteName: 'SystemDictIndex',
           isDynamicWrapper: true,
-          dynamicComponent: () => import('@/views/System/SystemDict/SystemDictData.vue'),
           dynamicComponentNameTemplate: 'SystemDictData-{dictKey}',
           permission: 'system:dict:data'
         }

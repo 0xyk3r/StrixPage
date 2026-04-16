@@ -53,11 +53,6 @@ declare module 'vue-router' {
     isDynamicWrapper?: boolean
 
     /**
-     * 动态组件加载函数
-     */
-    dynamicComponent?: () => Promise<any>
-
-    /**
      * 动态组件名称模板
      */
     dynamicComponentNameTemplate?: string
