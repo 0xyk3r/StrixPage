@@ -36,3 +36,6 @@ coverage
 __screenshots__/
 
 dev-dist
+
+# Generated dict types
+src/types/dict-generated.d.ts
