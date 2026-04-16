@@ -174,16 +174,31 @@ function formatTime(time: string): string {
   &--info {
     color: #1a6fb5;
     background: #e8f4fd;
+
+    [data-theme='dark'] & {
+      color: #70b8e8;
+      background: rgba(26, 111, 181, 0.15);
+    }
   }
 
   &--warning {
     color: #b57a1a;
     background: #fef3e2;
+
+    [data-theme='dark'] & {
+      color: #e8b860;
+      background: rgba(181, 122, 26, 0.15);
+    }
   }
 
   &--urgent {
     color: #b51a1a;
     background: #fde8e8;
+
+    [data-theme='dark'] & {
+      color: #e87070;
+      background: rgba(181, 26, 26, 0.15);
+    }
 
     .strix-announce-banner__title {
       font-weight: 600;
