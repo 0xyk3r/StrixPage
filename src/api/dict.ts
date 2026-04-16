@@ -15,6 +15,9 @@ export interface DictItem {
   version: number
   provided: number
   createdTime: string
+  groupId: string | null
+  groupName: string | null
+  parentDictKey: string | null
 }
 
 /** 字典列表响应 */
@@ -33,6 +36,10 @@ export interface DictDataItem {
   style: string
   status: number
   remark: string
+  parentValue: string | null
+  isDefault: number
+  validFrom: string | null
+  validTo: string | null
 }
 
 /** 字典详情响应 */
@@ -45,6 +52,8 @@ export interface DictResp {
   remark: string
   version: number
   provided: number
+  groupId: string | null
+  parentDictKey: string | null
   dictDataList: DictDataItem[]
 }
 
@@ -73,6 +82,8 @@ export interface DictUpdateReq {
   dataType: number
   status: number
   remark: string
+  groupId?: string | null
+  parentDictKey?: string | null
 }
 
 /** 字典数据更新请求 */
@@ -84,6 +95,10 @@ export interface DictDataUpdateReq {
   style: string
   status: number
   remark: string
+  parentValue?: string | null
+  isDefault?: number
+  validFrom?: string | null
+  validTo?: string | null
 }
 
 export const dictApi = {
@@ -147,5 +162,29 @@ export const dictApi = {
   dataBatchCreate: (key: string, data: { items: Record<string, any>[]; duplicateStrategy: string }) =>
     http.post<RetResult>(`${BASE}/data/${key}/batch/create`, data, {
       meta: { operate: '批量导入字典数据', notify: false }
-    })
+    }),
+
+  clone: (key: string, data: { newKey: string; newName: string }) =>
+    http.post<RetResult>(`${BASE}/${key}/clone`, data, { meta: { operate: '克隆字典', notify: true } }),
+
+  batchSort: (key: string, data: { sortedIds: string[] }) =>
+    http.post<RetResult>(`${BASE}/${key}/sort`, data, { meta: { operate: '排序字典数据', notify: true } }),
+
+  changelog: (key: string, params: Record<string, any>) =>
+    http.get<RetResult>(`${BASE}/${key}/changelog`, { params, meta: { operate: '加载变更历史' } }),
+
+  rollback: (logId: string) =>
+    http.post<RetResult>(`${BASE}/changelog/${logId}/rollback`, null, { meta: { operate: '回滚字典数据', notify: true } }),
+
+  usage: (key: string) =>
+    http.get<RetResult>(`${BASE}/${key}/usage`, { meta: { operate: '加载使用统计' } }),
+
+  globalSearch: (params: { keyword: string }) =>
+    http.get<RetResult>(`${BASE}/search`, { params, meta: { operate: '字典全局搜索' } }),
+
+  exportDicts: (data: { dictKeys: string[] }) =>
+    http.post<RetResult>(`${BASE}/export`, data, { meta: { operate: '导出字典' } }),
+
+  importDicts: (data: { dicts: any[]; conflictStrategy: string }) =>
+    http.post<RetResult>(`${BASE}/import`, data, { meta: { operate: '导入字典', notify: true } })
 }
