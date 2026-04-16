@@ -78,7 +78,7 @@
 import { systemConfigApi } from '@/api/system-config'
 import type { SystemConfigItem } from '@/api/system-config'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField, selectField } from '@/utils/form-rules'
+import { useFormSchema } from '@/composables/useFormSchema'
 import { NTag } from 'naive-ui'
 import type { DataTableColumn, FormInst } from 'naive-ui'
 
@@ -121,11 +121,8 @@ const typeOptions = [
   { label: '内容', value: 2 }
 ]
 
-const formRules = {
-  key: textField('配置标识'),
-  name: textField('配置名称'),
-  type: selectField('配置类型')
-}
+const schemaGroup = computed(() => (isEdit.value ? 'update' : 'insert'))
+const formRules = useFormSchema('SystemConfigUpdateReq', schemaGroup)
 
 const loadData = async () => {
   try {
