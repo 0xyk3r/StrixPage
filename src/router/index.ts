@@ -404,13 +404,13 @@ const router = createRouter({
 })
 
 // 前置路由导航守卫
-router.beforeEach((to, form, next) => {
+router.beforeEach((to, from) => {
   const loginInfoStore = useLoginInfoStore()
   const { loginToken } = storeToRefs(loginInfoStore)
 
   // 处理相同路由跳转问题（允许仅查询参数变化的导航，用于筛选条件 URL 同步）
-  if (!to.meta.isRedirect && to.name === form.name && to.fullPath === form.fullPath)
-    return next(`/redirect${to.path}`)
+  if (!to.meta.isRedirect && to.name === from.name && to.fullPath === from.fullPath)
+    return `/redirect${to.path}`
 
   // 加载条
   controlStrixLoadingBar('start')
@@ -426,8 +426,8 @@ router.beforeEach((to, form, next) => {
     document.title = 'Strix'
   }
 
-  if (to.path === '/login') return next()
-  if (!loginToken.value) return next('/login?to=' + to.fullPath)
+  if (to.path === '/login') return
+  if (!loginToken.value) return '/login?to=' + to.fullPath
 
   // 权限路由守卫：检查当前路由或其匹配的父路由链中是否有 permission 要求
   const requiredPermission = to.matched
@@ -438,11 +438,9 @@ router.beforeEach((to, form, next) => {
   if (requiredPermission) {
     const permissions = loginInfoStore.loginInfo.permissionKeys || []
     if (!permissions.includes('*:*:*') && !permissions.includes(requiredPermission)) {
-      return next({ path: '/403', query: { path: to.fullPath, permission: requiredPermission }, replace: true })
+      return { path: '/403', query: { path: to.fullPath, permission: requiredPermission }, replace: true }
     }
   }
-
-  return next()
 })
 
 // 后置路由导航守卫
