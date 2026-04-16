@@ -1,7 +1,7 @@
 <template>
   <n-modal v-model:show="show" preset="card" :title="mode === 'export' ? '导出字典' : '导入字典'" style="width: 680px">
     <!-- 导出模式 -->
-    <template v-if="mode === 'export'">
+    <div v-if="mode === 'export'">
       <n-space vertical :size="12">
         <n-text>选择要导出的字典：</n-text>
         <n-checkbox-group v-model:value="selectedKeys">
@@ -14,18 +14,10 @@
           <n-button size="small" @click="selectedKeys = []">取消全选</n-button>
         </n-space>
       </n-space>
-      <template #footer>
-        <n-flex justify="end">
-          <n-button @click="show = false">取消</n-button>
-          <n-button type="primary" :loading="processing" :disabled="selectedKeys.length === 0" @click="handleExport">
-            导出 ({{ selectedKeys.length }})
-          </n-button>
-        </n-flex>
-      </template>
-    </template>
+    </div>
 
     <!-- 导入模式 -->
-    <template v-else>
+    <div v-else>
       <n-space vertical :size="12">
         <n-upload :max="1" accept=".json" :default-upload="false" @change="handleFileChange">
           <n-button>选择 JSON 文件</n-button>
@@ -52,14 +44,30 @@
           </n-form-item>
         </template>
       </n-space>
-      <template #footer>
-        <n-flex justify="end">
-          <n-button @click="show = false">取消</n-button>
-          <n-button type="primary" :loading="processing" :disabled="importPreview.length === 0" @click="handleImport">
-            导入
-          </n-button>
-        </n-flex>
-      </template>
+    </div>
+
+    <template #footer>
+      <n-flex justify="end">
+        <n-button @click="show = false">取消</n-button>
+        <n-button
+          v-if="mode === 'export'"
+          type="primary"
+          :loading="processing"
+          :disabled="selectedKeys.length === 0"
+          @click="handleExport"
+        >
+          导出 ({{ selectedKeys.length }})
+        </n-button>
+        <n-button
+          v-else
+          type="primary"
+          :loading="processing"
+          :disabled="importPreview.length === 0"
+          @click="handleImport"
+        >
+          导入
+        </n-button>
+      </n-flex>
     </template>
   </n-modal>
 </template>
