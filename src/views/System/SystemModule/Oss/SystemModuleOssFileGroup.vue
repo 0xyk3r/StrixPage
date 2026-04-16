@@ -78,7 +78,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addFormRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -157,7 +157,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editFormRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -245,8 +245,7 @@ import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { numberField, remarkField, selectField, textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { storeToRefs } from 'pinia'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -292,7 +291,8 @@ const {
   activeFilters,
   activeFilterCount,
   clearFilter,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: {
     keyword: null,
@@ -342,6 +342,23 @@ const {
     }
   },
   draftKey: 'ModuleOssFileGroup',
+  schemaDto: 'OssFileGroupUpdateReq',
+  schemaOverrides: {
+    configKey: {
+      replace: [{ required: true, message: '请选择存储配置', trigger: 'change' }]
+    },
+    allowExtension: {
+      replace: [
+        {
+          trigger: 'change',
+          validator(_rule: any, value: any) {
+            if (value.length == 0) return new Error('请填入允许上传的文件拓展名')
+            return true
+          }
+        }
+      ]
+    }
+  },
   filters: [
     { key: 'keyword', label: '关键词' },
     { key: 'configKey', label: '存储配置', options: ossConfigSelectList }
@@ -445,39 +462,6 @@ const showUploadModal = (key: string) => {
   uploadFileGroupKey.value = key
 }
 
-const addFormRules: FormRules = {
-  key: textField('配置 Key', { min: 2, max: 32 }),
-  configKey: [{ required: true, message: '请选择存储配置', trigger: 'change' }],
-  name: textField('配置名称', { min: 2, max: 32 }),
-  bucketName: textField('Bucket 名称', { min: 1, max: 64 }),
-  bucketDomain: textField('Bucket 域名', { required: false, max: 64 }),
-  baseDir: textField('基础路径', { required: false, max: 64 }),
-  allowExtension: [
-    {
-      trigger: 'change',
-      validator(rule, value) {
-        if (value.length == 0) return new Error('请填入允许上传的文件拓展名')
-        return true
-      }
-    }
-  ],
-  secretType: selectField('查看权限类型'),
-  secretLevel: numberField('查看权限等级', { min: 0, max: 10 }),
-  remark: remarkField()
-}
-
-const editFormRules: FormRules = {
-  key: textField('配置 Key', { min: 2, max: 32 }),
-  name: textField('配置名称', { min: 2, max: 32 }),
-  platform: selectField('平台'),
-  publicEndpoint: textField('公网节点', { min: 1, max: 128 }),
-  privateEndpoint: textField('内网节点', { min: 1, max: 128 }),
-  accessKey: textField('AccessKey', { max: 64 }),
-  accessSecret: textField('AccessSecret', { required: false, max: 64 }),
-  remark: remarkField()
-}
-
-// 移除 allowExtension 中的错误项
 const removeErrorAllowExtension = (allowExtension: string[]) => {
   if (allowExtension.includes('error')) {
     allowExtension.splice(allowExtension.indexOf('error'), 1)

@@ -60,7 +60,7 @@
           <n-form
             ref="addFormRef"
             :model="addForm"
-            :rules="menuFormRules"
+            :rules="formRules"
             label-placement="left"
             label-width="auto"
             require-mark-placement="right-hanging"
@@ -162,7 +162,7 @@
             <n-form
               ref="editFormRef"
               :model="editForm"
-              :rules="menuFormRules"
+              :rules="formRules"
               label-placement="left"
               label-width="auto"
               require-mark-placement="right-hanging"
@@ -263,8 +263,8 @@ import { useCrud } from '@/composables/useCrud'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, kebabCase, pick } from 'lodash-es'
-import { type DataTableColumns, type FormInst, type FormRules } from 'naive-ui'
-import { lengthRange, numberField, requiredInput, textField } from '@/utils/form-rules'
+import { type DataTableColumns, type FormInst } from 'naive-ui'
+import { useFormSchema } from '@/composables/useFormSchema'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -288,7 +288,8 @@ const {
   editFormRef,
   resetForms,
   tryCloseAdd,
-  tryCloseEdit
+  tryCloseEdit,
+  formRules
 } = useCrud({
   list: {
     pageIndex: 1,
@@ -319,7 +320,8 @@ const {
       editPermissionForm.value = cloneDeep(initEditPermissionForm)
     }
   },
-  draftKey: 'SystemMenu'
+  draftKey: 'SystemMenu',
+  schemaDto: 'SystemMenuUpdateReq'
 })
 
 const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)
@@ -402,12 +404,6 @@ const getDataList = () => {
 onMounted(getDataList)
 
 const addDataModalType = ref('menu')
-const menuFormRules: FormRules = {
-  name: textField('菜单名称', { min: 2, max: 10 }),
-  key: textField('权限标识', { min: 2, max: 32 }),
-  url: [requiredInput('菜单路由'), lengthRange('菜单路由', 1, 128)],
-  sortValue: numberField('菜单排序值', { min: 0, max: 99999 })
-}
 const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
   if (id) {
     addForm.value.parentId = id
@@ -518,12 +514,11 @@ const initAddPermissionForm = {
 }
 const addPermissionForm = ref<any>(cloneDeep(initAddPermissionForm))
 const addPermissionFormRef = ref<FormInst | null>(null)
-const permissionFormRules: FormRules = {
-  name: textField('权限名称', { min: 2, max: 12 }),
-  key: textField('权限标识', { min: 2, max: 64 }),
-  menuId: [{ required: true, message: '请选择父级菜单', trigger: 'change' }],
-  description: textField('权限介绍', { required: false, max: 128 })
-}
+const permissionFormRules = useFormSchema('SystemPermissionUpdateReq', undefined, {
+  menuId: {
+    replace: [{ required: true, message: '请选择父级菜单', trigger: 'change' }]
+  }
+})
 
 const initEditPermissionForm = {
   name: null,
