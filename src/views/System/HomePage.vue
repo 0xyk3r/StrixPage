@@ -1,8 +1,5 @@
 <template>
   <div class="nebula-app" @click="clickContainer">
-    <!-- 系统公告 Banner -->
-    <strix-announcement />
-
     <!-- 极光背景 -->
     <nebula-bg />
 
@@ -60,6 +57,9 @@
 
     <!-- 回到顶部 + 进度环 -->
     <StrixBackToTop />
+
+    <!-- 系统公告 -->
+    <strix-announcement />
 
     <!-- 水印 -->
     <n-watermark

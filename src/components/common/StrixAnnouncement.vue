@@ -1,5 +1,5 @@
 <template>
-  <!-- Banner 公告 -->
+  <!-- 底部 Banner 公告栏 -->
   <div v-if="visibleBanners.length > 0" class="strix-announce-banners">
     <div
       v-for="announcement in visibleBanners"
@@ -7,9 +7,9 @@
       :class="['strix-announce-banner', `strix-announce-banner--${announcement.level.toLowerCase()}`]"
     >
       <div class="strix-announce-banner__icon">
-        <strix-icon :icon="levelIcon(announcement.level)" :size="16" />
+        <strix-icon :icon="levelIcon(announcement.level)" :size="14" />
       </div>
-      <div class="strix-announce-banner__content">
+      <div class="strix-announce-banner__content" @click="showDetail(announcement)">
         <span class="strix-announce-banner__title">{{ announcement.title }}</span>
         <span v-if="announcement.endTime" class="strix-announce-banner__countdown">
           {{ formatCountdown(announcement.endTime) }}
@@ -25,7 +25,26 @@
     </div>
   </div>
 
-  <!-- Modal 公告 (URGENT + MODAL) -->
+  <!-- 公告详情弹窗 -->
+  <n-modal
+    v-model:show="showDetailModal"
+    preset="card"
+    :title="detailData?.title ?? '公告详情'"
+    style="width: 520px"
+    :closable="true"
+  >
+    <div v-if="detailData" class="strix-announce-modal">
+      <n-tag :type="levelTagType(detailData.level)" size="small" :bordered="false" style="margin-bottom: 12px">
+        {{ detailData.level }}
+      </n-tag>
+      <div class="strix-announce-modal__content">{{ detailData.content }}</div>
+      <div v-if="detailData.endTime" class="strix-announce-modal__time">
+        失效时间: {{ formatTime(detailData.endTime) }}
+      </div>
+    </div>
+  </n-modal>
+
+  <!-- Modal 公告 (MODAL 展示方式) -->
   <n-modal
     v-model:show="showUrgentModal"
     preset="card"
@@ -91,6 +110,10 @@ const pendingModals = computed(() => {
 const showUrgentModal = ref(false)
 const urgentModalData = ref<SseAnnouncement | null>(null)
 
+// 详情弹窗
+const showDetailModal = ref(false)
+const detailData = ref<SseAnnouncement | null>(null)
+
 // 监听待显示的 Modal 队列
 watch(
   pendingModals,
@@ -102,6 +125,11 @@ watch(
   },
   { immediate: true }
 )
+
+function showDetail(announcement: SseAnnouncement) {
+  detailData.value = announcement
+  showDetailModal.value = true
+}
 
 function dismissBanner(id: string) {
   dismissedIds.value.add(id)
@@ -139,6 +167,17 @@ function levelIcon(level: string): string {
   }
 }
 
+function levelTagType(level: string): 'info' | 'warning' | 'error' {
+  switch (level) {
+    case 'WARNING':
+      return 'warning'
+    case 'URGENT':
+      return 'error'
+    default:
+      return 'info'
+  }
+}
+
 function formatCountdown(endTime: string): string {
   if (!endTime) return ''
   const end = new Date(endTime).getTime()
@@ -159,15 +198,19 @@ function formatTime(time: string): string {
 
 <style lang="scss" scoped>
 .strix-announce-banners {
-  position: relative;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .strix-announce-banner {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 6px 16px;
   font-size: 13px;
   line-height: 1.5;
 
@@ -177,7 +220,7 @@ function formatTime(time: string): string {
 
     [data-theme='dark'] & {
       color: #70b8e8;
-      background: rgba(26, 111, 181, 0.15);
+      background: rgba(26, 111, 181, 0.2);
     }
   }
 
@@ -187,7 +230,7 @@ function formatTime(time: string): string {
 
     [data-theme='dark'] & {
       color: #e8b860;
-      background: rgba(181, 122, 26, 0.15);
+      background: rgba(181, 122, 26, 0.2);
     }
   }
 
@@ -197,7 +240,7 @@ function formatTime(time: string): string {
 
     [data-theme='dark'] & {
       color: #e87070;
-      background: rgba(181, 26, 26, 0.15);
+      background: rgba(181, 26, 26, 0.2);
     }
 
     .strix-announce-banner__title {
@@ -218,6 +261,11 @@ function formatTime(time: string): string {
     display: flex;
     align-items: center;
     gap: 12px;
+    cursor: pointer;
+
+    &:hover .strix-announce-banner__title {
+      text-decoration: underline;
+    }
   }
 
   &__title {
