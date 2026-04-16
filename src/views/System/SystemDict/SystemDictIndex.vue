@@ -219,8 +219,7 @@ import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { remarkField, selectField, textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -267,6 +266,7 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
+  formRules,
   activeFilters,
   activeFilterCount,
   clearFilter,
@@ -302,7 +302,8 @@ const {
     { key: 'status', label: '字典状态', dictName: 'CommonSwitch' },
     { key: 'provided', label: '是否内置', dictName: 'CommonFlag' }
   ],
-  urlSync: true
+  urlSync: true,
+  schemaDto: 'DictUpdateReq'
 })
 
 // 展示列信息
@@ -400,13 +401,7 @@ onMounted(getDataList)
 const viewDictData = (key: string) => {
   router.push({ path: `/system/dict/${key}` })
 }
-const formRules: FormRules = {
-  key: textField('字典标识', { min: 2, max: 64 }),
-  name: textField('字典名称', { min: 2, max: 32 }),
-  dataType: selectField('字典数据类型'),
-  status: selectField('字典状态'),
-  remark: remarkField()
-}
+
 </script>
 
 <style lang="scss" scoped></style>

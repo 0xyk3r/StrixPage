@@ -122,7 +122,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addFormRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -203,7 +203,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editFormRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -286,10 +286,9 @@ import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { selectField, textField } from '@/utils/form-rules'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual } from 'lodash-es'
-import { type DataTableColumns, type FormRules, NCheckbox, NCheckboxGroup, NFlex, NH6, NSpin } from 'naive-ui'
+import { type DataTableColumns, NCheckbox, NCheckboxGroup, NFlex, NH6, NSpin } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
 import type { ImportFieldConfig } from '@/composables/useTableImport'
@@ -398,6 +397,7 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
+  formRules,
   activeFilters,
   activeFilterCount,
   clearFilter,
@@ -434,7 +434,8 @@ const {
     { key: 'status', label: '人员状态', dictName: 'SystemManagerStatus' },
     { key: 'type', label: '人员类型', dictName: 'SystemManagerType' }
   ],
-  urlSync: true
+  urlSync: true,
+  schemaDto: 'SystemManagerUpdateReq'
 })
 
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
@@ -587,42 +588,7 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
     })
 }
 
-const passwordComplexityValidator = {
-  validator: (_rule: any, value: string) => {
-    if (!value) return true
-    let categories = 0
-    if (/[A-Z]/.test(value)) categories++
-    if (/[a-z]/.test(value)) categories++
-    if (/\d/.test(value)) categories++
-    if (/[^A-Za-z0-9]/.test(value)) categories++
-    return categories >= 3
-  },
-  message: '密码必须包含大写字母、小写字母、数字、特殊字符中的至少3类',
-  trigger: 'blur'
-}
 
-const addFormRules: FormRules = {
-  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
-  loginName: textField('登录账号', { min: 4, max: 20 }),
-  loginPassword: [...textField('登录密码', { min: 8, max: 32 }), passwordComplexityValidator],
-  status: selectField('管理人员状态'),
-  type: selectField('管理人员类型')
-}
-
-const editFormRules: FormRules = {
-  nickname: textField('管理人员昵称', { min: 2, max: 20 }),
-  loginName: textField('登录账号', { min: 4, max: 20 }),
-  loginPassword: [
-    ...textField('登录密码', {
-      required: false,
-      min: 8,
-      max: 32
-    }),
-    passwordComplexityValidator
-  ],
-  status: selectField('管理人员状态'),
-  type: selectField('管理人员类型')
-}
 </script>
 
 <style lang="scss" scoped></style>

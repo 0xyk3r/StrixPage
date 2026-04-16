@@ -72,7 +72,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addFormRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -110,7 +110,7 @@
         <n-form
           ref="editFormRef"
           :model="editForm"
-          :rules="editFormRules"
+          :rules="formRules"
           label-placement="left"
           label-width="auto"
           require-mark-placement="right-hanging"
@@ -184,7 +184,6 @@ import { deepMap, flatTree } from '@/utils/strix-tools'
 import { differenceWith, isEqual } from 'lodash-es'
 import {
   type DataTableColumns,
-  type FormRules,
   NEmpty,
   NGi,
   NGrid,
@@ -200,7 +199,6 @@ import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
-import { textField } from '@/utils/form-rules'
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
@@ -233,6 +231,7 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
+  formRules,
   handleKeywordEnter
 } = useCrud({
   fetchList: () => getDataList(),
@@ -240,7 +239,8 @@ const {
   editForm: { name: null, regionPermissionType: null },
   api: roleApi,
   draftKey: 'SystemRole',
-  batch: { disabledKey: 'builtin' }
+  batch: { disabledKey: 'builtin' },
+  schemaDto: 'SystemRoleUpdateReq'
 })
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']
@@ -423,13 +423,6 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   })
 }
 
-const addFormRules: FormRules = {
-  name: textField('角色名称', { min: 2, max: 12 })
-}
-
-const editFormRules: FormRules = {
-  name: textField('角色名称', { min: 2, max: 16 })
-}
 
 const removeRoleMenu = (row: any, menuId: string) => {
   roleApi.removeMenu(row.id, menuId).then(({ data: res }) => {
