@@ -199,8 +199,7 @@ import { jobApi } from '@/api/job'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { selectField, textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -248,7 +247,8 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: {
     keyword: null,
@@ -280,7 +280,8 @@ const {
   filters: [
     { key: 'keyword', label: '关键词' }
   ],
-  urlSync: true
+  urlSync: true,
+  schemaDto: 'JobUpdateReq'
 })
 
 // 展示列信息
@@ -371,14 +372,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const formRules: FormRules = {
-  name: textField('任务名称', { min: 2, max: 64 }),
-  invokeTarget: textField('调用目标', { min: 5, max: 512 }),
-  cronExpression: textField('Cron 表达式', { min: 5, max: 128 }),
-  misfirePolicy: selectField('计划错误策略'),
-  concurrent: selectField('是否并发执行'),
-  status: selectField('任务状态')
-}
+
 
 const runJob = (id: string) => {
   jobApi.run(id).then(() => {

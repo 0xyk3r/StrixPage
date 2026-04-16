@@ -155,8 +155,7 @@ import { userApi } from '@/api/user'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -204,7 +203,8 @@ const {
   submitEdit,
   deleteRow,
   resetForms,
-  tryCloseEdit
+  tryCloseEdit,
+  formRules
 } = useCrud({
   list: {
     keyword: null,
@@ -225,7 +225,8 @@ const {
   },
   api: userApi,
   draftKey: 'SystemUser',
-  batch: true
+  batch: true,
+  schemaDto: 'SystemUserUpdateReq'
 })
 
 // 展示列信息
@@ -289,9 +290,7 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-const formRules: FormRules = {
-  nickname: textField('用户昵称')
-}
+
 </script>
 
 <style lang="scss" scoped></style>

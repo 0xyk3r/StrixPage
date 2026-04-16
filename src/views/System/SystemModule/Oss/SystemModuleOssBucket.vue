@@ -75,7 +75,7 @@
       <n-form
         ref="addFormRef"
         :model="addForm"
-        :rules="addFormRules"
+        :rules="formRules"
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
@@ -107,8 +107,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
-import { textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -137,7 +136,8 @@ const {
   activeFilters,
   activeFilterCount,
   clearFilter,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: {
     keyword: null,
@@ -159,7 +159,8 @@ const {
     { key: 'keyword', label: '关键词' },
     { key: 'configKey', label: '存储配置', options: ossConfigSelectList }
   ],
-  urlSync: true
+  urlSync: true,
+  schemaDto: 'OssBucketUpdateReq'
 })
 
 const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)
@@ -194,10 +195,7 @@ const getOssConfigSelectList = () => {
 }
 onMounted(getOssConfigSelectList)
 
-const addFormRules: FormRules = {
-  configKey: [{ required: true, message: '请选择存储配置 Key', trigger: 'change' }],
-  name: textField('Bucket 名称', { min: 1, max: 64 })
-}
+
 </script>
 
 <style lang="scss" scoped></style>

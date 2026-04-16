@@ -163,8 +163,7 @@ import { regionApi } from '@/api/region'
 import type { CascaderDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { textField } from '@/utils/form-rules'
-import { type DataTableColumns, type FormRules } from 'naive-ui'
+import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -203,7 +202,8 @@ const {
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
-  handleKeywordEnter
+  handleKeywordEnter,
+  formRules
 } = useCrud({
   list: { keyword: null, parentId: null, pageIndex: 1, pageSize: 10 },
   fetchList: () => getDataList(),
@@ -214,7 +214,8 @@ const {
     beforeShowAdd: () => getSystemRegionSelectList(),
     beforeShowEdit: () => getSystemRegionSelectList()
   },
-  draftKey: 'SystemRegion'
+  draftKey: 'SystemRegion',
+  schemaDto: 'SystemRegionUpdateReq'
 })
 
 const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)
@@ -323,9 +324,7 @@ const onDataChildrenLoad = (row: any) => {
   })
 }
 
-const formRules: FormRules = {
-  name: textField('地区名称')
-}
+
 </script>
 
 <style lang="scss" scoped></style>
