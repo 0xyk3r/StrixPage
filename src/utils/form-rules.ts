@@ -1,5 +1,10 @@
 import type { FormItemRule } from 'naive-ui'
 
+/**
+ * @deprecated 使用 useFormSchema composable 替代手动规则定义
+ * 仅保留给 SystemConfigIndex 等无后端 DTO 的页面使用
+ */
+
 // ===== 基础规则生成器 =====
 
 /** 必填文本字段 */
