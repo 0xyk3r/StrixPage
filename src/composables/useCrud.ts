@@ -6,6 +6,8 @@ import { useFormDraft } from '@/composables/useFormDraft'
 import { type FilterDefinition, useFilterState } from '@/composables/useFilterState'
 import { type FilterUrlConfig, useFilterUrl } from '@/composables/useFilterUrl'
 import { usePagination } from '@/composables/usePagination'
+import { useFormSchema } from '@/composables/useFormSchema'
+import type { SchemaOverrides } from '@/api/form-schema'
 import { createStrixMessage } from '@/utils/strix-message'
 
 /** CRUD API 接口 */
@@ -62,6 +64,10 @@ export interface UseCrudConfig {
   filters?: FilterDefinition[]
   /** URL 同步配置（传 true 使用默认配置，传对象自定义） */
   urlSync?: boolean | FilterUrlConfig
+  /** Schema DTO 名称 (启用自动表单 Schema 加载) */
+  schemaDto?: string
+  /** 前端专有规则覆盖/追加 (仅 schemaDto 启用时生效) */
+  schemaOverrides?: SchemaOverrides
 }
 
 const VALIDATION_FAIL_TITLE = '表单校验失败'
@@ -71,6 +77,12 @@ export function useCrud(config: UseCrudConfig) {
   const { fetchList, api, hooks } = config
   const initAddForm = config.addForm
   const initEditForm = config.editForm
+
+  // ===== Schema 自动规则 =====
+  const currentSchemaGroup = ref<'insert' | 'update'>('insert')
+  const formRules = config.schemaDto
+    ? useFormSchema(config.schemaDto, currentSchemaGroup, config.schemaOverrides)
+    : ref({})
 
   // ===== 列表/搜索 =====
   const listParams = ref(cloneDeep(config.list || {}))
@@ -228,6 +240,7 @@ export function useCrud(config: UseCrudConfig) {
 
   /** 打开新增弹窗 */
   const showAdd = async (initialValues?: Record<string, any>) => {
+    currentSchemaGroup.value = 'insert'
     if (initAddForm) addForm.value = cloneDeep(initAddForm)
     if (initialValues && !(initialValues instanceof Event)) Object.assign(addForm.value, initialValues)
     await hooks?.beforeShowAdd?.()
@@ -239,6 +252,7 @@ export function useCrud(config: UseCrudConfig) {
 
   /** 打开编辑弹窗并加载详情 */
   const showEdit = async (id: string) => {
+    currentSchemaGroup.value = 'update'
     if (!api?.detail) return
     editLoading.value = true
     try {
@@ -370,6 +384,8 @@ export function useCrud(config: UseCrudConfig) {
     resetForms,
     tryCloseAdd,
     tryCloseEdit,
+    // Schema 规则
+    formRules,
     // 工具（用于 pick 字段等场景）
     initEditForm,
     // 筛选状态
