@@ -128,7 +128,7 @@ const loadData = async () => {
   try {
     loading.value = true
     const { data: res } = await systemConfigApi.list()
-    data.value = res.data ?? []
+    data.value = res.data?.items ?? []
   } catch (e) {
     console.error('加载配置列表失败', e)
   } finally {

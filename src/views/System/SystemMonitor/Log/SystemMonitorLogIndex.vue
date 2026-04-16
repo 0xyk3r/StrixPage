@@ -253,7 +253,7 @@ const responseCodeOptions = [
 const operationGroupOptions = ref<{ label: string; value: string }[]>([])
 const loadOperationGroups = () => {
   monitorApi.logOperationGroups().then(({ data: res }) => {
-    operationGroupOptions.value = res.data.map((g: string) => ({ label: g, value: g }))
+    operationGroupOptions.value = res.data.items.map((g: string) => ({ label: g, value: g }))
   })
 }
 

@@ -39,6 +39,18 @@ export interface SystemLogStatsResp {
   errorRate: number
 }
 
+/** 操作分组列表响应 */
+export interface LogOperationGroupsResp {
+  items: string[]
+}
+
+/** 缓存信息响应 */
+export interface CacheInfoResp {
+  info: Record<string, string>
+  dbSize: number
+  commandStats: Array<{ name: string; value: string }>
+}
+
 export const monitorApi = {
   urls: { logList: `${BASE}/log` },
 
@@ -54,7 +66,7 @@ export const monitorApi = {
     }),
 
   logOperationGroups: () =>
-    http.get<RetResult<string[]>>(`${BASE}/log/groups`, {
+    http.get<RetResult<LogOperationGroupsResp>>(`${BASE}/log/groups`, {
       meta: { operate: '加载操作分组' }
     }),
 
@@ -64,7 +76,7 @@ export const monitorApi = {
       meta: { operate: '清理操作日志', notify: true }
     }),
 
-  cacheInfo: () => http.get<RetResult>(`${BASE}/cache`, { meta: { operate: '加载缓存信息' } }),
+  cacheInfo: () => http.get<RetResult<CacheInfoResp>>(`${BASE}/cache`, { meta: { operate: '加载缓存信息' } }),
 
   serverInfo: () => http.get<RetResult>(`${BASE}/server`, { meta: { operate: '加载服务器信息' } })
 }
