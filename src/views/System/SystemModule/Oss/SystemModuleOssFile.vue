@@ -68,6 +68,8 @@
     />
 
     <strix-column-panel v-model:show="showColumnPanel" />
+
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -86,6 +88,8 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '存储文件'
@@ -116,6 +120,8 @@ const {
   urlSync: true
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemOssFile')
+
 const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => listParams.value)
 
 // 展示列信息
@@ -139,6 +145,7 @@ const dataColumns: DataTableColumns<OssFileItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'primary',
           label: '下载文件',

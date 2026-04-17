@@ -283,6 +283,7 @@
         @success="getDataList"
       />
     </n-layout-content>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </n-layout>
 </template>
 
@@ -309,6 +310,8 @@ import DictCloneModal from './components/DictCloneModal.vue'
 import DictChangeLogModal from './components/DictChangeLogModal.vue'
 import DictUsageModal from './components/DictUsageModal.vue'
 import DictImportExportModal from './components/DictImportExportModal.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 const router = useRouter()
 
@@ -443,6 +446,8 @@ const {
   schemaDto: 'DictUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemDict')
+
 // 展开行：内联预览
 const expandedRowKeys = ref<string[]>([])
 const expandedDataCache = ref<Record<string, DictDataItem[]>>({})
@@ -568,6 +573,7 @@ const dataColumns: DataTableColumns<DictItem> = [
     render(row) {
       const isProvided = row.provided === 1
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '数据',

@@ -164,6 +164,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -199,6 +200,8 @@ import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '系统角色'
@@ -242,6 +245,8 @@ const {
   batch: { disabledKey: 'builtin' },
   schemaDto: 'SystemRoleUpdateReq'
 })
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemRole')
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']
 
@@ -352,6 +357,7 @@ const dataColumns: DataTableColumns<ExpandedRoleRow> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '编辑菜单权限',

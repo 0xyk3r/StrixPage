@@ -181,6 +181,8 @@
       :value="sendForm.receiverIds"
       @complete="onManagerSelected"
     />
+
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -195,11 +197,15 @@ import type {
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
 import StrixManagerSelector from '@/components/data/StrixManagerSelector.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 import { NTag } from 'naive-ui'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
 
 const dialog = useDialog()
 const message = useMessage()
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemNotification')
 
 // 列表状态
 const loading = ref(false)
@@ -416,6 +422,7 @@ const columns: DataTableColumn<NotificationManageItem>[] = [
     fixed: 'right',
     render: (row) =>
       handleOperate([
+        commentButton(row),
         {
           label: '详情',
           icon: 'file-text',

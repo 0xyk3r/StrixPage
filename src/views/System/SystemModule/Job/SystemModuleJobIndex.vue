@@ -189,6 +189,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -207,6 +208,8 @@ import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '定时任务'
@@ -285,6 +288,8 @@ const {
   schemaDto: 'JobUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemJob')
+
 // 展示列信息
 const dataColumns: DataTableColumns<JobItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
@@ -328,6 +333,7 @@ const dataColumns: DataTableColumns<JobItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '运行一次',

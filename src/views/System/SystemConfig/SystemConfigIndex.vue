@@ -71,6 +71,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -81,6 +82,8 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
 import { NTag } from 'naive-ui'
 import type { DataTableColumn, FormInst } from 'naive-ui'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 const dialog = useDialog()
 
@@ -123,6 +126,8 @@ const typeOptions = [
 
 const schemaGroup = computed(() => (isEdit.value ? 'update' : 'insert'))
 const formRules = useFormSchema('SystemConfigUpdateReq', schemaGroup)
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemConfig')
 
 const loadData = async () => {
   try {
@@ -232,6 +237,7 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
     fixed: 'right',
     render: (row) =>
       handleOperate([
+        commentButton(row),
         {
           label: '编辑',
           icon: 'edit',

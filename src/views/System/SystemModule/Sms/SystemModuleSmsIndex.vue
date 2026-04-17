@@ -165,6 +165,8 @@
         </n-flex>
       </template>
     </n-modal>
+
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -185,6 +187,8 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 
 // 本页面操作提示关键词
@@ -246,6 +250,8 @@ const {
   draftKey: 'ModuleSms',
   schemaDto: 'SmsConfigUpdateReq'
 })
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemSms')
 
 type ExpandedSmsConfigRow = SmsConfigItem & {
   expandTab?: string
@@ -430,6 +436,7 @@ const dataColumns: DataTableColumns<ExpandedSmsConfigRow> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'warning',
           label: '编辑',

@@ -137,6 +137,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -157,6 +158,8 @@ import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '系统用户'
@@ -230,6 +233,8 @@ const {
   schemaDto: 'SystemUserUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemUser')
+
 // 展示列信息
 const dataColumns: DataTableColumns<SystemUserItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
@@ -252,6 +257,7 @@ const dataColumns: DataTableColumns<SystemUserItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'warning',
           label: '编辑',

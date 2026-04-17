@@ -284,6 +284,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -307,6 +308,8 @@ import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import { VueDraggable } from 'vue-draggable-plus'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 const route = useRoute()
 const message = useMessage()
@@ -541,6 +544,8 @@ const {
   }
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemDictData')
+
 const fetchAllData = createPaginatedFetcher(
   () => dictApi.urls.dataList(dictKey),
   'items',
@@ -603,6 +608,7 @@ const dataColumns: DataTableColumns<DictDataItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'warning',
           label: '编辑',

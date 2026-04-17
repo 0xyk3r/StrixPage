@@ -177,6 +177,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -196,6 +197,8 @@ import { createPaginatedFetcher } from '@/composables/useTableExport'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { type DataTableColumns, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '存储服务'
@@ -260,6 +263,8 @@ const {
   draftKey: 'ModuleOss',
   schemaDto: 'OssConfigUpdateReq'
 })
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemOss')
 
 type ExpandedOssConfigRow = OssConfigItem & {
   expandTab?: string
@@ -372,6 +377,7 @@ const dataColumns: DataTableColumns<ExpandedOssConfigRow> = [
     width: 180,
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'warning',
           label: '编辑',

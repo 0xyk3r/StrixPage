@@ -233,6 +233,8 @@
         </n-upload-dragger>
       </n-upload>
     </n-modal>
+
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -254,6 +256,8 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '文件分组'
@@ -367,6 +371,8 @@ const {
   urlSync: true
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemOssFileGroup')
+
 // 展示列信息
 const dataColumns: DataTableColumns<OssFileGroupItem> = [
   { key: 'key', title: '文件组 Key', width: 140 },
@@ -397,6 +403,7 @@ const dataColumns: DataTableColumns<OssFileGroupItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '上传文件',

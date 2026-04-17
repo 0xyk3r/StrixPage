@@ -249,6 +249,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -271,6 +272,8 @@ import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 // 本页面操作提示关键词
 const _baseName = '系统菜单'
@@ -325,6 +328,8 @@ const {
   schemaDto: 'SystemMenuUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemMenu')
+
 const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)
 
 // 展示列信息
@@ -362,6 +367,7 @@ const dataColumns: DataTableColumns<SystemMenuManageItem> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '添加',

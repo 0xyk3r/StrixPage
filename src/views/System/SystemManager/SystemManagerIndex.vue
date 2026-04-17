@@ -271,6 +271,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -278,7 +279,7 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import NebulaTag from '@/components/common/NebulaTag.vue'
-import { managerApi } from '@/api/manager'
+import { managerApi }from '@/api/manager'
 import type { SystemManagerItem } from '@/api/manager'
 import { regionApi } from '@/api/region'
 import { roleApi } from '@/api/role'
@@ -298,6 +299,8 @@ import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 const quickMenuStore = useQuickMenuStore()
 
@@ -439,6 +442,8 @@ const {
   schemaDto: 'SystemManagerUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemManager')
+
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
 
 type ExpandedManagerRow = SystemManagerItem & {
@@ -520,6 +525,7 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'warning',
           label: '编辑',

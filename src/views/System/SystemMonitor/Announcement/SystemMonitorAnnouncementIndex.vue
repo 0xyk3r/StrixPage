@@ -203,6 +203,8 @@
         </n-descriptions>
       </template>
     </n-modal>
+
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -216,10 +218,14 @@ import type {
 import { announcementApi } from '@/api/announcement'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
 
 const dialog = useDialog()
+
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemAnnouncement')
 
 // 列表状态
 const loading = ref(false)
@@ -433,6 +439,7 @@ const columns: DataTableColumn<AnnouncementItem>[] = [
     fixed: 'right',
     render: (row) =>
       handleOperate([
+        commentButton(row),
         {
           label: '详情',
           icon: 'file-text',

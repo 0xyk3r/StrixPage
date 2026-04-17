@@ -152,6 +152,7 @@
         </n-flex>
       </template>
     </n-modal>
+    <StrixCommentPanel v-bind="commentPanelProps" />
   </div>
 </template>
 
@@ -170,6 +171,8 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
+import { useComment } from '@/composables/useComment'
 
 type SystemRegionRow = SystemRegionListItem & { isLeaf?: boolean; children?: SystemRegionRow[] }
 
@@ -221,6 +224,8 @@ const {
   schemaDto: 'SystemRegionUpdateReq'
 })
 
+const { commentButton, panelProps: commentPanelProps } = useComment('SystemRegion')
+
 const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)
 
 // 展示列信息
@@ -264,6 +269,7 @@ const dataColumns: DataTableColumns<SystemRegionRow> = [
     align: 'center',
     render(row) {
       return handleOperate([
+        commentButton(row),
         {
           type: 'info',
           label: '添加子项',
