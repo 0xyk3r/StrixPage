@@ -197,10 +197,25 @@ onUnmounted(() => {
   window.removeEventListener('resize', resizeGrid)
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseleave', onMouseLeave)
+  themeObserver?.disconnect()
 })
 
 const dots: Dot[] = []
 const SPACE = 36
+
+// 主题感知的点阵颜色 (RGB)
+const dotColorRgb = ref('99,226,183')
+
+function updateDotColor() {
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--strix-text-accent').trim()
+  const hex = accent.replace('#', '')
+  if (hex.length === 6) {
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    dotColorRgb.value = `${r},${g},${b}`
+  }
+}
 
 function resizeGrid() {
   const canvas = gridCanvas.value
@@ -257,13 +272,13 @@ function drawFrame(t: number) {
 
     ctx.beginPath()
     ctx.arc(d.x, d.y, sz, 0, Math.PI * 2)
-    ctx.fillStyle = `rgba(99,226,183,${d.a})`
+    ctx.fillStyle = `rgba(${dotColorRgb.value},${d.a})`
     ctx.fill()
 
     if (mi > 0.15) {
       ctx.beginPath()
       ctx.arc(d.x, d.y, sz + 5, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(99,226,183,${mi * 0.08})`
+      ctx.strokeStyle = `rgba(${dotColorRgb.value},${mi * 0.08})`
       ctx.lineWidth = 0.5
       ctx.stroke()
     }
@@ -272,11 +287,21 @@ function drawFrame(t: number) {
   animId = requestAnimationFrame(drawFrame)
 }
 
+let themeObserver: MutationObserver | null = null
+
 function initGrid() {
   resizeGrid()
+  updateDotColor()
   window.addEventListener('resize', resizeGrid)
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseleave', onMouseLeave)
+
+  themeObserver = new MutationObserver(() => updateDotColor())
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  })
+
   animId = requestAnimationFrame(drawFrame)
 }
 

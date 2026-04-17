@@ -422,6 +422,30 @@ $cut-sm: 14px;
   }
 }
 
+// Light mode: softer glow effects
+[data-theme='light'] {
+  .nebula-login__field.focused {
+    .nebula-login__input-shell {
+      box-shadow:
+        0 0 0 1px var(--strix-accent-glow-subtle),
+        0 0 16px rgba(45, 180, 140, 0.08),
+        inset 0 0 20px rgba(45, 180, 140, 0.03);
+    }
+  }
+
+  .nebula-login__submit {
+    &::after {
+      background: linear-gradient(90deg, transparent, rgba(45, 180, 140, 0.2), transparent);
+    }
+
+    &:hover:not(:disabled) {
+      box-shadow:
+        0 0 20px var(--strix-accent-glow-subtle),
+        inset 0 0 20px rgba(45, 180, 140, 0.04);
+    }
+  }
+}
+
 // Error 状态
 .nebula-login__field.has-error {
   .nebula-login__input-shell {
