@@ -63,7 +63,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -195,6 +195,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { JobItem } from '@/api/job'
 import { jobApi } from '@/api/job'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
@@ -285,7 +286,7 @@ const {
 })
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<JobItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
   { key: 'name', width: 240, title: '任务名称' },
   { key: 'invokeTarget', width: 320, title: '调用目标' },
@@ -296,7 +297,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'JobMisfire',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.misfirePolicy, dictName: 'JobMisfire' })
     }
   },
@@ -306,7 +307,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'CommonSwitch',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.concurrent, dictName: 'CommonSwitch' })
     }
   },
@@ -316,7 +317,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'JobStatus',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'JobStatus' })
     }
   },
@@ -325,7 +326,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 180,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'info',
@@ -353,14 +354,14 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<JobItem[]>()
 const dataLoading = ref(true)
 
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 // 加载数据
 const getDataList = () => {

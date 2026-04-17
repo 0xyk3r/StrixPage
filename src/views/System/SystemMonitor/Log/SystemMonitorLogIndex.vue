@@ -175,7 +175,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -253,7 +253,7 @@ const responseCodeOptions = [
 const operationGroupOptions = ref<{ label: string; value: string }[]>([])
 const loadOperationGroups = () => {
   monitorApi.logOperationGroups().then(({ data: res }) => {
-    operationGroupOptions.value = res.data.items.map((g: string) => ({ label: g, value: g }))
+    operationGroupOptions.value = res.data.items.map((g) => ({ label: g, value: g }))
   })
 }
 
@@ -327,7 +327,7 @@ const rowProps = (row: SystemLogItem) => ({
 })
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<SystemLogItem> = [
   { key: 'operationGroup', title: '操作模块', width: 140, ellipsis: { tooltip: true } },
   {
     key: 'operationName',
@@ -341,7 +341,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     ellipsis: { tooltip: false },
-    render(row: any) {
+    render(row) {
       return h(
         NebulaTag,
         { type: row.operationMethod === 'POST' ? 'info' : 'default', bordered: false },
@@ -396,8 +396,8 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     ellipsis: { tooltip: false },
-    valueResolver: (val: any) => (val ? val + 'ms' : '失败'),
-    render(row: any) {
+    valueResolver: (val: number) => (val ? val + 'ms' : '失败'),
+    render(row) {
       let type: NTagType
       if (row.operationMethod === 'GET') {
         type =
@@ -433,7 +433,7 @@ const dataColumns: DataTableColumns = [
     width: 90,
     align: 'center',
     ellipsis: { tooltip: false },
-    render(row: any) {
+    render(row) {
       let type: NTagType = 'warning'
       if (row.responseCode === 200) {
         type = 'success'
@@ -462,10 +462,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<SystemLogItem[]>()
 const dataLoading = ref(true)
 const getDataList = () => {
   dataLoading.value = true
