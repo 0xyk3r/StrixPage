@@ -15,8 +15,8 @@ body {
 }
 
 ::selection {
-  background: rgba(0, 196, 182, 0.75);
-  color: #f7f7f7;
+  background: var(--strix-selection-bg);
+  color: var(--strix-selection-color);
 }
 
 /* 禁止浏览器自动填充行为更改输入框的背景颜色 */
