@@ -1,3 +1,4 @@
+import { EventBus } from '@/plugins/event-bus'
 import { defineStore } from 'pinia'
 
 export const useNetworkStore = defineStore('network', () => {
@@ -5,7 +6,10 @@ export const useNetworkStore = defineStore('network', () => {
   const wasOffline = ref(false)
 
   function handleOnline() {
-    if (!isOnline.value) wasOffline.value = true
+    if (!isOnline.value) {
+      wasOffline.value = true
+      EventBus.emit('network:recovered')
+    }
     isOnline.value = true
   }
 

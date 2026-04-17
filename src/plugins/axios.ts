@@ -39,9 +39,24 @@ const clientSm2PrivateKey = import.meta.env.VITE_APP_CLIENT_SM2_PRIVATE_KEY
 axios.interceptors.request.clear()
 axios.interceptors.response.clear()
 
+// 离线错误防抖：5秒内同类错误只提示一次
+let lastOfflineToastTime = 0
+const OFFLINE_TOAST_DEBOUNCE = 5000
+
 // 请求拦截器
 axios.interceptors.request.use((config) => {
   initStore()
+
+  // 离线时拦截所有请求
+  if (!navigator.onLine) {
+    const now = Date.now()
+    if (now - lastOfflineToastTime > OFFLINE_TOAST_DEBOUNCE) {
+      lastOfflineToastTime = now
+      createStrixMessage('warning', '网络不可用', '当前处于离线状态，请恢复网络连接后重试')
+    }
+    return Promise.reject(new axios.Cancel('离线状态，请求已拦截'))
+  }
+
   config.headers['Content-Type'] = 'application/json'
   config.headers.timestamp = new Date().getTime() + ''
   if (token?.value) {
@@ -136,11 +151,15 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    // 请求被主动取消
+    // 请求被主动取消（包括离线拦截）
     if (axios.isCancel(error)) return
 
     if (!navigator.onLine || error.code === 'ERR_NETWORK') {
-      createStrixMessage('error', '网络连接异常', '请检查您的网络连接后重试')
+      const now = Date.now()
+      if (now - lastOfflineToastTime > OFFLINE_TOAST_DEBOUNCE) {
+        lastOfflineToastTime = now
+        createStrixMessage('error', '网络连接异常', '请检查您的网络连接后重试')
+      }
     } else if (error.code === 'ECONNABORTED') {
       createStrixMessage('error', '请求超时', '服务器响应时间过长, 请稍后重试')
     } else if (error.response) {
