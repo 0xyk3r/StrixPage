@@ -51,7 +51,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="filterDataList || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -172,7 +172,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import type { SystemRoleItem } from '@/api/role'
+import type { SystemRoleItem, SystemRoleResp, SystemPermissionItem } from '@/api/role'
 import { roleApi } from '@/api/role'
 import type { SystemMenuManageItem } from '@/api/menu'
 import { menuApi } from '@/api/menu'
@@ -244,15 +244,23 @@ const {
 })
 
 const colorList: NTagType[] = ['info', 'warning', 'error', 'success']
-const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) => {
+
+type ExpandedRoleRow = SystemRoleItem & {
+  menus?: SystemMenuManageItem[]
+  permissions?: SystemPermissionItem[]
+  loaded?: boolean
+  expandTab?: string
+}
+
+const renderExpandMenuChildren = (row: SystemRoleItem, children: SystemMenuManageItem[] | undefined, colorIndex: number) => {
   if (!children) {
     return []
   }
   if (colorIndex == colorList.length - 1) {
     colorIndex = 0
   }
-  const currentMenus: any[] = []
-  children?.forEach((menu: any) => {
+  const currentMenus: ReturnType<typeof h>[] = []
+  children?.forEach((menu) => {
     if (menu.type === 'permission') {
       return currentMenus.push(
         h(NGrid, { xGap: 10, cols: 6 }, () => [
@@ -291,11 +299,11 @@ const renderExpandMenuChildren = (row: any, children: any, colorIndex: number) =
 }
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<ExpandedRoleRow> = [
   ...(selectionColumn ? [selectionColumn] : []),
   {
     type: 'expand',
-    renderExpand: (row: any) => {
+    renderExpand: (row) => {
       if (!row.expandTab) row.expandTab = 'menu'
       if (!row.loaded) return h(NSpin, { size: 'large', description: '加载中...' })
 
@@ -330,7 +338,7 @@ const dataColumns: DataTableColumns = [
     width: 180,
     align: 'center',
     dictName: 'SystemRoleRegionPermissionType',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, {
         value: row.regionPermissionType,
         dictName: 'SystemRoleRegionPermissionType'
@@ -342,7 +350,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 180,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'info',
@@ -373,7 +381,7 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<SystemRoleItem[]>([])
@@ -405,7 +413,7 @@ const filterDataList = computed(() =>
 )
 
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 
 const dataExpandedRowKeys = ref<Array<string | number>>([])
@@ -424,18 +432,18 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
 }
 
 
-const removeRoleMenu = (row: any, menuId: string) => {
+const removeRoleMenu = (row: ExpandedRoleRow, menuId: string) => {
   roleApi.removeMenu(row.id, menuId).then(({ data: res }) => {
     handleEditSuccessResponse(row, res.data)
     EventBus.emit('refresh-menu')
   })
 }
-const removeRolePermission = (row: any, permissionId: string) => {
+const removeRolePermission = (row: ExpandedRoleRow, permissionId: string) => {
   roleApi.removePermission(row.id, permissionId).then(({ data: res }) => {
     handleEditSuccessResponse(row, res.data)
   })
 }
-const handleEditSuccessResponse = (row: any, data: any) => {
+const handleEditSuccessResponse = (row: ExpandedRoleRow, data: SystemRoleResp) => {
   row.menus = data.menus
   row.loaded = true
 }
@@ -458,9 +466,9 @@ const initModifyForm = () => {
 const editRoleMenusModalShow = ref(false)
 const editRoleMenusLoading = ref(false)
 let editRoleMenusRoleId = ''
-let editRoleMenusRoleRow: any = null
+let editRoleMenusRoleRow: ExpandedRoleRow | null = null
 const editRoleMenusCheckedKeys = ref<string[]>([])
-const showEditRoleMenusModal = (roleRow: any) => {
+const showEditRoleMenusModal = (roleRow: ExpandedRoleRow) => {
   editRoleMenusLoading.value = true
   editRoleMenusModalShow.value = true
   // 加载编辑前信息
@@ -474,12 +482,12 @@ const showEditRoleMenusModal = (roleRow: any) => {
 }
 const editRoleMenusTreeRef = ref<TreeInst | null>(null)
 const editRoleMenus = () => {
-  const flatMenu: any[] = flatTree(systemMenuTreeData.value)
+  const flatMenu: SystemMenuManageItem[] = flatTree(systemMenuTreeData.value)
 
   const menuIds: string[] = []
   const permissionIds: string[] = []
 
-  const checkedIds: any[] = [
+  const checkedIds: Array<string | number> = [
     ...(editRoleMenusTreeRef.value?.getCheckedData().keys || []),
     ...(editRoleMenusTreeRef.value?.getIndeterminateData().keys || [])
   ]
@@ -501,15 +509,15 @@ const editRoleMenus = () => {
     })
     .then(({ data: res }) => {
       editRoleMenusModalShow.value = false
-      handleEditSuccessResponse(editRoleMenusRoleRow, res.data)
+      handleEditSuccessResponse(editRoleMenusRoleRow!, res.data)
       EventBus.emit('refresh-menu')
     })
 }
-const editRoleMenusRenderPrefix = ({ option: row }: { option: any }) => {
+const editRoleMenusRenderPrefix = ({ option }: { option: Record<string, unknown> }) => {
   return h(
     NebulaTag,
-    { type: row.type === 'menu' ? 'success' : 'info', bordered: false, size: 'tiny' },
-    { default: () => (row.type === 'menu' ? '菜单' : '按钮') }
+    { type: option.type === 'menu' ? 'success' : 'info', bordered: false, size: 'tiny' },
+    { default: () => (option.type === 'menu' ? '菜单' : '按钮') }
   )
 }
 </script>
