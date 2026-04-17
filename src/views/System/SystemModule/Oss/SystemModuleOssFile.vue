@@ -61,7 +61,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -73,6 +73,7 @@
 
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
+import type { OssFileItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { commonApi } from '@/api/common'
@@ -118,7 +119,7 @@ const {
 const fetchAllData = createPaginatedFetcher(ossApi.urls.fileList, 'files', () => listParams.value)
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<OssFileItem> = [
   { key: 'path', title: '文件路径', width: 360 },
   { key: 'configKey', title: '存储配置 Key', width: 140 },
   { key: 'groupKey', title: '文件组配置 Key', width: 160 },
@@ -126,8 +127,8 @@ const dataColumns: DataTableColumns = [
     key: 'size',
     title: '文件大小',
     width: 120,
-    valueResolver: (val: any) => formatFileSize(val),
-    render: (row: any) => formatFileSize(row.size)
+    valueResolver: (val: number) => formatFileSize(val),
+    render: (row) => formatFileSize(row.size)
   },
   { key: 'ext', title: '文件拓展名', width: 100 },
   { key: 'createdTime', title: '上传时间', width: 180 },
@@ -136,7 +137,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 130,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'primary',
@@ -158,10 +159,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<OssFileItem[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {

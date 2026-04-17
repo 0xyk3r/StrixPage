@@ -37,7 +37,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -183,6 +183,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { OssConfigItem, OssBucketItem, OssFileGroupItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import { useCrud } from '@/composables/useCrud'
@@ -260,11 +261,18 @@ const {
   schemaDto: 'OssConfigUpdateReq'
 })
 
+type ExpandedOssConfigRow = OssConfigItem & {
+  expandTab?: string
+  loaded?: boolean
+  buckets?: OssBucketItem[]
+  fileGroups?: OssFileGroupItem[]
+}
+
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<ExpandedOssConfigRow> = [
   {
     type: 'expand',
-    renderExpand: (row: any) => {
+    renderExpand: (row) => {
       if (!row.expandTab) row.expandTab = 'bucket'
       if (!row.loaded) {
         return h(NSpin, { size: 'large', description: '加载中...' })
@@ -278,7 +286,7 @@ const dataColumns: DataTableColumns = [
             { title: '备注', key: 'remark', width: 160 }
           ],
           data: row.buckets,
-          rowKey: (row: any) => row.id
+          rowKey: (row) => row.id
         })
       ]
 
@@ -296,7 +304,7 @@ const dataColumns: DataTableColumns = [
               key: 'secretType',
               title: '文件权限类型',
               width: 100,
-              render(row: any) {
+              render(row) {
                 const tagText = row.secretType === 1 ? '管理端文件' : '用户端文件'
                 return h(
                   NebulaTag,
@@ -347,7 +355,7 @@ const dataColumns: DataTableColumns = [
     title: '平台',
     align: 'center',
     dictName: 'OssPlatform',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.platform, dictName: 'OssPlatform' })
     }
   },
@@ -362,7 +370,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     align: 'center',
     width: 180,
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'warning',
@@ -384,10 +392,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<ExpandedOssConfigRow[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
@@ -407,7 +415,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
   dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff })
+    const row = find(dataRef.value, { id: diff }) as ExpandedOssConfigRow | undefined
     if (row) {
       ossApi.detail(row.id).then(({ data: res }) => {
         row.buckets = res.data.buckets

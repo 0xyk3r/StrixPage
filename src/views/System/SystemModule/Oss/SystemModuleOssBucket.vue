@@ -55,7 +55,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -104,6 +104,7 @@
 
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
+import type { OssBucketItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
@@ -166,16 +167,16 @@ const {
 const fetchAllData = createPaginatedFetcher(ossApi.urls.bucketList, 'buckets', () => listParams.value)
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<OssBucketItem> = [
   { title: '存储空间名称', key: 'name' },
   { title: '创建时间', key: 'createdTime', width: 180 }
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<OssBucketItem[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {

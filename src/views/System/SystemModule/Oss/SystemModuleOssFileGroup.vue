@@ -58,7 +58,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -239,6 +239,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { OssFileGroupItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
@@ -329,16 +330,16 @@ const {
     remove: (id: string) => ossApi.fileGroupRemove(id)
   },
   hooks: {
-    transformAdd: (form: any) => {
-      form.allowExtension = form.allowExtension.join(',')
+    transformAdd: (form: Record<string, unknown>) => {
+      form.allowExtension = (form.allowExtension as string[]).join(',')
       return form
     },
-    transformEdit: (form: any) => {
-      form.allowExtension = form.allowExtension.join(',')
+    transformEdit: (form: Record<string, unknown>) => {
+      form.allowExtension = (form.allowExtension as string[]).join(',')
       return form
     },
-    afterShowEdit: (detail: any) => {
-      editForm.value.allowExtension = detail.allowExtension.split(',')
+    afterShowEdit: (detail: Record<string, unknown>) => {
+      editForm.value.allowExtension = (detail.allowExtension as string).split(',')
     }
   },
   draftKey: 'ModuleOssFileGroup',
@@ -351,7 +352,7 @@ const {
       replace: [
         {
           trigger: 'change',
-          validator(_rule: any, value: any) {
+          validator(_rule: unknown, value: string[]) {
             if (value.length == 0) return new Error('请填入允许上传的文件拓展名')
             return true
           }
@@ -367,7 +368,7 @@ const {
 })
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<OssFileGroupItem> = [
   { key: 'key', title: '文件组 Key', width: 140 },
   { key: 'name', title: '文件组名称', width: 160 },
   { key: 'configKey', title: '存储服务 Key', width: 140 },
@@ -380,7 +381,7 @@ const dataColumns: DataTableColumns = [
     title: '文件权限类型',
     width: 120,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, {
         value: row.secretType,
         dictName: 'OssFileGroupSecretType',
@@ -394,7 +395,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 220,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'info',
@@ -422,10 +423,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<OssFileGroupItem[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
