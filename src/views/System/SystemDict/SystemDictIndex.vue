@@ -475,10 +475,10 @@ const dataColumns: DataTableColumns<DictItem> = [
       const items = expandedDataCache.value[row.key]
       if (!items) {
         loadExpandData(row.key)
-        return h('div', { style: 'padding: 8px; color: #999' }, '加载中...')
+        return h('div', { style: 'padding: 8px; color: var(--strix-text-tertiary)' }, '加载中...')
       }
       if (items.length === 0) {
-        return h('div', { style: 'padding: 8px; color: #999' }, '暂无字典数据')
+        return h('div', { style: 'padding: 8px; color: var(--strix-text-tertiary)' }, '暂无字典数据')
       }
       return h(NDataTable, {
         size: 'small',
@@ -512,7 +512,7 @@ const dataColumns: DataTableColumns<DictItem> = [
     title: '分组',
     width: 100,
     render(row) {
-      if (!row.groupName) return h('span', { style: 'color: #999' }, '-')
+      if (!row.groupName) return h('span', { style: 'color: var(--strix-text-tertiary)' }, '-')
       return h(
         NTag,
         {
