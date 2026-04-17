@@ -559,7 +559,7 @@ const dataColumns: DataTableColumns<DictDataItem> = [
     width: 60,
     align: 'center',
     render(row) {
-      return row.isDefault === 1 ? h('span', { style: 'color: #f0a020; font-size: 16px' }, '★') : h('span', { style: 'color: #ccc' }, '-')
+      return row.isDefault === 1 ? h('span', { style: 'color: var(--strix-color-star); font-size: 16px' }, '★') : h('span', { style: 'color: var(--strix-text-tertiary)' }, '-')
     }
   },
   {
@@ -582,7 +582,7 @@ const dataColumns: DataTableColumns<DictDataItem> = [
       if (status === 'expired') return h(NTag, { size: 'small', type: 'error', bordered: false }, () => '已过期')
       if (status === 'not_started') return h(NTag, { size: 'small', type: 'info', bordered: false }, () => '未生效')
       if (row.validFrom || row.validTo) return h(NTag, { size: 'small', type: 'success', bordered: false }, () => '有效')
-      return h('span', { style: 'color: #999' }, '永久')
+      return h('span', { style: 'color: var(--strix-text-tertiary)' }, '永久')
     }
   },
   {
