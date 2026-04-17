@@ -121,7 +121,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -334,7 +334,7 @@ async function loadDictInfo() {
 // 父级字典数据选项
 const parentDictData = ref<any[]>([])
 const parentDictOptions = computed(() =>
-  parentDictData.value.map((d: any) => ({ label: `${d.label} (${d.value})`, value: d.value }))
+  parentDictData.value.map((d) => ({ label: `${d.label} (${d.value})`, value: d.value }))
 )
 
 async function loadParentDictData() {
@@ -378,7 +378,7 @@ async function saveSortOrder() {
 }
 
 // 有效期辅助
-function getValidityStatus(item: any): 'valid' | 'expired' | 'not_started' {
+function getValidityStatus(item: DictDataItem): 'valid' | 'expired' | 'not_started' {
   const now = new Date()
   if (item.validTo && new Date(item.validTo) < now) return 'expired'
   if (item.validFrom && new Date(item.validFrom) > now) return 'not_started'
@@ -393,7 +393,7 @@ function onDefaultToggle(mode: 'add' | 'edit', val: boolean) {
   const form = mode === 'add' ? addForm : editForm
   form.value.isDefault = val ? 1 : 0
   if (val) {
-    const existing = (dataRef.value ?? []).find((d: any) => d.isDefault === 1)
+    const existing = (dataRef.value ?? []).find((d) => d.isDefault === 1)
     if (existing) {
       message.warning(`当前已有默认值「${existing.label}」，保存后将替换`)
     }
@@ -445,7 +445,7 @@ const dictDataImportFields = computed<ImportFieldConfig[]>(() => [
     key: 'style',
     label: '字典样式',
     dictName: 'DictDataStyle',
-    dictOptions: dictDataStyleRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+    dictOptions: dictDataStyleRef.value?.map((d) => ({ label: d.label, value: d.value })) ?? []
   },
   {
     key: 'status',
@@ -453,7 +453,7 @@ const dictDataImportFields = computed<ImportFieldConfig[]>(() => [
     required: true,
     type: 'number',
     dictName: 'CommonSwitch',
-    dictOptions: commonSwitchRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+    dictOptions: commonSwitchRef.value?.map((d) => ({ label: d.label, value: d.value })) ?? []
   },
   { key: 'remark', label: '备注' }
 ])
@@ -548,7 +548,7 @@ const fetchAllData = createPaginatedFetcher(
 )
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<DictDataItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
   { key: 'value', title: '字典值', width: 160 },
   { key: 'label', title: '字典标签', width: 160 },
@@ -558,7 +558,7 @@ const dataColumns: DataTableColumns = [
     title: '默认',
     width: 60,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return row.isDefault === 1 ? h('span', { style: 'color: #f0a020; font-size: 16px' }, '★') : h('span', { style: 'color: #ccc' }, '-')
     }
   },
@@ -568,7 +568,7 @@ const dataColumns: DataTableColumns = [
     width: 140,
     align: 'center',
     exportable: false,
-    render(row: any) {
+    render(row) {
       return h(NebulaTag, { type: row.style || 'default' }, () => row.label)
     }
   },
@@ -577,7 +577,7 @@ const dataColumns: DataTableColumns = [
     title: '有效期',
     width: 100,
     align: 'center',
-    render(row: any) {
+    render(row) {
       const status = getValidityStatus(row)
       if (status === 'expired') return h(NTag, { size: 'small', type: 'error', bordered: false }, () => '已过期')
       if (status === 'not_started') return h(NTag, { size: 'small', type: 'info', bordered: false }, () => '未生效')
@@ -591,7 +591,7 @@ const dataColumns: DataTableColumns = [
     width: 80,
     align: 'center',
     dictName: 'CommonSwitch',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }
   },
@@ -601,7 +601,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 130,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'warning',
@@ -624,13 +624,13 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<DictDataItem[]>()
 const dataLoading = ref(true)
 
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 
 const getDataList = () => {

@@ -38,7 +38,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -256,6 +256,7 @@
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { menuApi } from '@/api/menu'
+import type { SystemMenuManageItem } from '@/api/menu'
 import { permissionApi } from '@/api/permission'
 import type { TreeDataItem } from '@/api/types'
 import { EventBus } from '@/plugins/event-bus'
@@ -327,7 +328,7 @@ const {
 const fetchAllData = createPaginatedFetcher(menuApi.urls.list, 'systemMenuList', () => listParams.value)
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<SystemMenuManageItem> = [
   { key: 'name', title: '菜单名称', width: 240 },
   {
     key: 'type',
@@ -349,7 +350,7 @@ const dataColumns: DataTableColumns = [
     align: 'center',
     width: 120,
     exportable: false,
-    render(row: any) {
+    render(row) {
       return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 })
     }
   },
@@ -359,7 +360,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 180,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'info',
@@ -388,10 +389,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<SystemMenuManageItem[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
@@ -404,7 +405,7 @@ const getDataList = () => {
 onMounted(getDataList)
 
 const addDataModalType = ref('menu')
-const showAddDataModal = ({ id, key }: { id: string; key: string } | any) => {
+const showAddDataModal = ({ id, key }: { id: string; key: string }) => {
   if (id) {
     addForm.value.parentId = id
     addForm.value.key = key + ':'
@@ -440,7 +441,7 @@ const addData = () => {
 }
 
 const editDataModalType = ref('menu')
-const showEditDataModal = (row: any) => {
+const showEditDataModal = (row: SystemMenuManageItem) => {
   editModal.value = true
   editDataModalType.value = row.type
   editLoading.value = true

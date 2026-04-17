@@ -39,7 +39,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -160,6 +160,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import { regionApi } from '@/api/region'
+import type { SystemRegionListItem } from '@/api/region'
 import type { CascaderDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -169,6 +170,8 @@ import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { useTableColumns } from '@/composables/useTableColumns'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+
+type SystemRegionRow = SystemRegionListItem & { isLeaf?: boolean; children?: SystemRegionRow[] }
 
 // 本页面操作提示关键词
 const _baseName = '系统地区'
@@ -221,7 +224,7 @@ const {
 const fetchAllData = createPaginatedFetcher(regionApi.urls.list, 'systemRegionList', () => listParams.value)
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<SystemRegionRow> = [
   { key: 'name', title: '地区名称', width: 180 },
   { key: 'fullName', title: '完整地区名称', width: 320 },
   {
@@ -237,7 +240,7 @@ const dataColumns: DataTableColumns = [
       '5': '五级地区',
       '6': '六级地区'
     },
-    render(row: any) {
+    render(row) {
       const tagTypes = ['default', 'success', 'info', 'warning', 'error', 'default']
       const tagType: NTagType = (tagTypes[row.level] as NTagType) || 'default'
       const tagBordered = row.level === 6
@@ -259,7 +262,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 180,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'info',
@@ -287,12 +290,12 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<SystemRegionRow[]>()
 // 使所有数据可展开
-const handleAddIsLeaf = (data: any[]) => {
+const handleAddIsLeaf = (data: SystemRegionRow[]) => {
   data.forEach((d) => {
     d.isLeaf = false
   })
@@ -312,7 +315,8 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 const dataExpandedRowKeys = ref<string[]>([])
-const onDataChildrenLoad = (row: any) => {
+const onDataChildrenLoad = (rowData: Record<string, unknown>) => {
+  const row = rowData as unknown as SystemRegionRow
   return new Promise<void>((resolve) => {
     regionApi.children(row.id).then(({ data: res }) => {
       const children = res.data.children

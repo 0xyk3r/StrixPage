@@ -78,7 +78,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -152,6 +152,7 @@ import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
 import { userApi } from '@/api/user'
+import type { SystemUserItem } from '@/api/user'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -171,7 +172,7 @@ const userImportFields = computed<ImportFieldConfig[]>(() => [
     required: true,
     type: 'number',
     dictName: 'SystemUserStatus',
-    dictOptions: systemUserStatusRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+    dictOptions: systemUserStatusRef.value?.map((d) => ({ label: d.label, value: d.value })) ?? []
   }
 ])
 const fetchAllData = createPaginatedFetcher(userApi.urls.list, 'systemUserList', () => listParams.value)
@@ -230,7 +231,7 @@ const {
 })
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<SystemUserItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
   { key: 'nickname', title: '用户昵称', width: 200 },
   { key: 'phoneNumber', title: '手机号码', width: 200 },
@@ -240,7 +241,7 @@ const dataColumns: DataTableColumns = [
     width: 140,
     align: 'center',
     dictName: 'SystemUserStatus',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'SystemUserStatus' })
     }
   },
@@ -249,7 +250,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 130,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'warning',
@@ -271,13 +272,13 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<SystemUserItem[]>()
 const dataLoading = ref(true)
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 // 加载数据
 const getDataList = () => {
