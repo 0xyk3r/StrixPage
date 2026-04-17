@@ -53,7 +53,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
       return
     }
 
-    const refreshIndex = refreshRoutes.value.findIndex((rr: any) => rr.fullPath === route.path)
+    const refreshIndex = refreshRoutes.value.findIndex((rr) => rr.fullPath === route.path)
     if (refreshIndex !== -1) {
       const rr = refreshRoutes.value[refreshIndex]
       visitedRoutes.value.splice(rr.oldIndex, 0, rr)
@@ -168,7 +168,7 @@ export const useTabsBarStore = defineStore('tabsBar', () => {
    * @param newTitle 新标题
    */
   function updateVisitedRouteTitle(fullPath: string, newTitle: string) {
-    const index = visitedRoutes.value.findIndex((item: any) => item.fullPath === fullPath)
+    const index = visitedRoutes.value.findIndex((item) => item.fullPath === fullPath)
     if (index !== -1 && visitedRoutes.value[index].meta) {
       const oldTitle = visitedRoutes.value[index].meta.title
 

@@ -104,6 +104,7 @@ import { useBookmarksStore } from '@/stores/bookmarks.ts'
 import { storeToRefs } from 'pinia'
 import { useDraggable } from 'vue-draggable-plus'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
+import type { RouteLocationNormalizedGeneric } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -188,7 +189,7 @@ useDraggable(scrollRef, visitedRoutes, {
   ghostClass: 'nebula-tab--ghost',
   chosenClass: 'nebula-tab--chosen',
   dragClass: 'nebula-tab--drag',
-  onMove: (evt: any) => {
+  onMove: (evt: { related?: HTMLElement }) => {
     if (evt.related?.classList.contains('nebula-tab--fixed')) {
       return false
     }
@@ -196,8 +197,8 @@ useDraggable(scrollRef, visitedRoutes, {
 })
 
 // 获取路由的唯一标识符
-const getRouteKey = (route: any): string => {
-  return route.fullPath || route.path || route.name || ''
+const getRouteKey = (route: RouteLocationNormalizedGeneric): string => {
+  return route.fullPath || route.path || String(route.name ?? '') || ''
 }
 
 // tabs的右击相关逻辑
@@ -254,8 +255,8 @@ const fixedTabs = computed(() =>
 watch(
   fixedTabs,
   (fixedTabs) => {
-    fixedTabs.forEach((fixedTab: any) => {
-      tabsBarStore.addVisitedRoute(fixedTab)
+    fixedTabs.forEach((fixedTab) => {
+      tabsBarStore.addVisitedRoute(fixedTab as unknown as RouteLocationNormalizedGeneric)
     })
   },
   { immediate: true }
@@ -278,7 +279,7 @@ watch(() => route.path, setupTabs, { immediate: true })
 
 // 点击标签页
 const handleTabClick = (tabKey: string) => {
-  const r = visitedRoutes.value.find((item: any) => getRouteKey(item) === tabKey)
+  const r = visitedRoutes.value.find((item) => getRouteKey(item) === tabKey)
   if (r?.path !== route.path) {
     const state = tabsBarStore.getRouteState(r.path)
     router.push({ path: r.path, query: r.query, state })
@@ -326,8 +327,8 @@ const toggleBookmark = () => {
 
 const reloadRouter = async () => {
   const oldIndex =
-    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
-  const view: any = visitedRoutes.value[oldIndex]
+    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r) => tabActive.value === getRouteKey(r))
+  const view = visitedRoutes.value[oldIndex]
   if (view) {
     const currentPath = view.fullPath || view.path
     view.oldIndex = view.meta.fixed ? view.meta.fixedIndex : oldIndex
@@ -353,7 +354,7 @@ const closeOtherTabs = () => {
   if (view) {
     tabsBarStore.delOthersVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+      if (!visitedRoutes.value.some((r) => tabActive.value === getRouteKey(r))) {
         router.push('/redirect' + (view.fullPath || view.path))
       }
     })
@@ -365,7 +366,7 @@ const closeLeftTabs = () => {
   if (view) {
     tabsBarStore.delLeftVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+      if (!visitedRoutes.value.some((r) => tabActive.value === getRouteKey(r))) {
         router.push('/redirect' + (view.fullPath || view.path))
       }
     })
@@ -377,7 +378,7 @@ const closeRightTabs = () => {
   if (view) {
     tabsBarStore.delRightVisitedRoute(view)
     nextTick(() => {
-      if (!visitedRoutes.value.some((r: any) => tabActive.value === getRouteKey(r))) {
+      if (!visitedRoutes.value.some((r) => tabActive.value === getRouteKey(r))) {
         router.push('/redirect' + (view.fullPath || view.path))
       }
     })
@@ -391,11 +392,11 @@ const closeAllTabs = async () => {
 }
 
 // 通用函数
-const isActive = (r: any) => route.path === r.path
-const isAffix = (r: any) => r.meta?.fixed
+const isActive = (r: RouteLocationNormalizedGeneric) => route.path === r.path
+const isAffix = (r: RouteLocationNormalizedGeneric) => r.meta?.fixed
 const getContextmenuTagView = () => {
   const index =
-    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r: any) => tabActive.value === getRouteKey(r))
+    contextmenuRoutesIndex.value ?? visitedRoutes.value.findIndex((r) => tabActive.value === getRouteKey(r))
   return visitedRoutes.value[index]
 }
 </script>
