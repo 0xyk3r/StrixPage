@@ -14,7 +14,18 @@ const typeToClass: Record<string, string> = {
   success: 'is-success'
 }
 
-export const handleOperate = (buttons: any[], _size = 'medium') => {
+export interface OperateButton {
+  type?: 'primary' | 'error' | 'warning' | 'info' | 'success'
+  label?: string
+  icon: string
+  disabled?: boolean
+  auth?: string
+  onClick: () => void
+  popconfirm?: boolean
+  popconfirmMessage?: string
+}
+
+export const handleOperate = (buttons: OperateButton[], _size = 'medium') => {
   const operateButtons = buttons.map((button) => {
     const { type, label, icon, disabled, onClick, popconfirm, popconfirmMessage } = button
 
@@ -23,7 +34,7 @@ export const handleOperate = (buttons: any[], _size = 'medium') => {
       onClick()
     }
 
-    const btnClass = ['nebula-action-btn', typeToClass[type] || ''].filter(Boolean)
+    const btnClass = ['nebula-action-btn', type ? typeToClass[type] : ''].filter(Boolean)
     const iconVNode = h(StrixIcon, { icon, size: 16 })
     const btn = h(
       'button',
