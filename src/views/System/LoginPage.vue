@@ -203,10 +203,14 @@ onUnmounted(() => {
 const dots: Dot[] = []
 const SPACE = 36
 
-// 主题感知的点阵颜色 (RGB)
+// 主题感知的点阵颜色 (RGB) 和透明度倍率
 const dotColorRgb = ref('99,226,183')
+const dotAlphaMultiplier = ref(1)
 
 function updateDotColor() {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light'
+  dotAlphaMultiplier.value = isDark ? 1 : 2.8
+
   const accent = getComputedStyle(document.documentElement).getPropertyValue('--strix-text-accent').trim()
   const hex = accent.replace('#', '')
   if (hex.length === 6) {
@@ -272,13 +276,13 @@ function drawFrame(t: number) {
 
     ctx.beginPath()
     ctx.arc(d.x, d.y, sz, 0, Math.PI * 2)
-    ctx.fillStyle = `rgba(${dotColorRgb.value},${d.a})`
+    ctx.fillStyle = `rgba(${dotColorRgb.value},${Math.min(d.a * dotAlphaMultiplier.value, 1)})`
     ctx.fill()
 
     if (mi > 0.15) {
       ctx.beginPath()
       ctx.arc(d.x, d.y, sz + 5, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(${dotColorRgb.value},${mi * 0.08})`
+      ctx.strokeStyle = `rgba(${dotColorRgb.value},${Math.min(mi * 0.08 * dotAlphaMultiplier.value, 1)})`
       ctx.lineWidth = 0.5
       ctx.stroke()
     }

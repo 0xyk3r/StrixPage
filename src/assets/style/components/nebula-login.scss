@@ -422,27 +422,94 @@ $cut-sm: 14px;
   }
 }
 
-// Light mode: softer glow effects
+// ---- Light Mode 综合适配 ----
 [data-theme='light'] {
+  // 扫描线: 降低可见度, 避免灰蒙感
+  .nebula-login__scanlines {
+    opacity: 0.35;
+  }
+
+  // HUD 四角: 提高对比度
+  .nebula-login__hud-corner {
+    &::before,
+    &::after {
+      opacity: 0.5;
+    }
+  }
+
+  .nebula-login__hud-label {
+    color: var(--strix-text-tertiary);
+  }
+
+  // 面板: 白底卡片 + 阴影层次, 取代暗色半透明叠加
+  .nebula-login__panel {
+    filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.1))
+      drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06));
+  }
+
+  .nebula-login__frame {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(24px) saturate(120%);
+  }
+
+  // 面板扫描线: 使用较深绿色
+  .nebula-login__scan {
+    background: linear-gradient(90deg, transparent, rgba(45, 180, 140, 0.35), transparent);
+  }
+
+  // 面板标题栏
+  .nebula-login__panel-header {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+
+  // 输入框外壳: 白底 + 清晰边框
+  .nebula-login__input-shell {
+    background: rgba(255, 255, 255, 0.65);
+    border-color: rgba(0, 0, 0, 0.13);
+
+    &::before {
+      opacity: 0.35;
+    }
+  }
+
+  // Focus: 柔和绿光
   .nebula-login__field.focused {
     .nebula-login__input-shell {
+      border-color: var(--strix-border-accent-hover);
       box-shadow:
         0 0 0 1px var(--strix-accent-glow-subtle),
         0 0 16px rgba(45, 180, 140, 0.08),
         inset 0 0 20px rgba(45, 180, 140, 0.03);
+
+      &::before {
+        box-shadow: 0 0 6px rgba(45, 180, 140, 0.15);
+      }
+    }
+
+    .nebula-login__indicator {
+      box-shadow: 0 0 8px rgba(45, 180, 140, 0.2);
     }
   }
 
+  // 登录按钮
   .nebula-login__submit {
+    border-color: rgba(45, 180, 140, 0.35);
+
     &::after {
       background: linear-gradient(90deg, transparent, rgba(45, 180, 140, 0.2), transparent);
     }
 
     &:hover:not(:disabled) {
+      border-color: var(--strix-text-accent);
       box-shadow:
         0 0 20px var(--strix-accent-glow-subtle),
         inset 0 0 20px rgba(45, 180, 140, 0.04);
     }
+  }
+
+  // 验证码区域
+  .nebula-login__captcha-img {
+    border-color: rgba(0, 0, 0, 0.1);
   }
 }
 
