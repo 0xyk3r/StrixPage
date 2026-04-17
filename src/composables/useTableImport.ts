@@ -208,13 +208,13 @@ export function useTableImport(config: UseTableImportConfig) {
       })
       importResult.value = resp.data.data
       step.value = 4
-    } catch (e: any) {
+    } catch (e) {
       importResult.value = {
         total: mappedData.value.length,
         successCount: 0,
         failedCount: mappedData.value.length,
         skippedCount: 0,
-        errors: [{ row: -1, field: 'general', message: e.message || '导入请求失败' }]
+        errors: [{ row: -1, field: 'general', message: e instanceof Error ? e.message : '导入请求失败' }]
       }
       step.value = 4
     } finally {

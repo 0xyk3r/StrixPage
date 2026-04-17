@@ -27,19 +27,20 @@ export interface ExportConfig {
  */
 export function extractExportableColumns(columns: DataTableColumn[]): ExportableColumn[] {
   return columns
-    .filter((col: any) => {
-      if (col.type === 'selection' || col.type === 'expand') return false
+    .filter((col): col is DataTableColumn & { key: string; title: string } => {
+      if ('type' in col && (col.type === 'selection' || col.type === 'expand')) return false
+      if (!('key' in col) || !('title' in col)) return false
       if (col.key === 'actions' || col.key === 'action') return false
-      if (col.exportable === false) return false
-      return col.key && col.title
+      if ('exportable' in col && col.exportable === false) return false
+      return typeof col.key === 'string' && typeof col.title === 'string'
     })
-    .map((col: any) => ({
-      key: col.key as string,
-      title: col.title as string,
+    .map((col) => ({
+      key: col.key,
+      title: col.title,
       enabled: true,
-      ...(col.dictName ? { dictName: col.dictName } : {}),
-      ...(col.valueMap ? { valueMap: col.valueMap } : {}),
-      ...(col.valueResolver ? { valueResolver: col.valueResolver } : {})
+      ...('dictName' in col && col.dictName ? { dictName: col.dictName } : {}),
+      ...('valueMap' in col && col.valueMap ? { valueMap: col.valueMap } : {}),
+      ...('valueResolver' in col && col.valueResolver ? { valueResolver: col.valueResolver } : {})
     }))
 }
 
@@ -101,7 +102,7 @@ export async function exportData(data: any[], config: ExportConfig) {
       if (col.dictName) {
         const dictData = dictStore.dictMap[col.dictName]
         if (dictData?.dictDataList) {
-          const item = dictData.dictDataList.find((d: any) => d.value === val)
+          const item = dictData.dictDataList.find((d) => d.value === val)
           if (item) return item.label
         }
       }
