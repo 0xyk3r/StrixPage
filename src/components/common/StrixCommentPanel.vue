@@ -278,7 +278,7 @@ const filteredManagers = computed(() => {
 const pendingAttachments = ref<{ fileId: string }[]>([])
 
 // 加载评论
-async function loadComments() {
+async function loadComments(scrollToBottom = false) {
   if (!props.bizType || !props.bizId) return
   loading.value = true
   try {
@@ -289,6 +289,13 @@ async function loadComments() {
     })
     if (data?.data) {
       comments.value = data.data.items || []
+    }
+    if (scrollToBottom) {
+      nextTick(() => {
+        if (commentListRef.value) {
+          commentListRef.value.scrollTop = commentListRef.value.scrollHeight
+        }
+      })
     }
   } finally {
     loading.value = false
@@ -305,7 +312,7 @@ function debouncedLoad() {
 // 监听面板打开
 watch(() => props.show, (val) => {
   if (val && props.bizId) {
-    loadComments()
+    loadComments(true)
     loadManagers()
   } else {
     resetInput()
@@ -314,7 +321,7 @@ watch(() => props.show, (val) => {
 
 watch(() => props.bizId, (val) => {
   if (val && props.show) {
-    loadComments()
+    loadComments(true)
   }
 })
 
@@ -398,14 +405,7 @@ async function handleSubmit() {
     }
 
     resetInput()
-    await loadComments()
-
-    // 滚动到底部
-    nextTick(() => {
-      if (commentListRef.value) {
-        commentListRef.value.scrollTop = commentListRef.value.scrollHeight
-      }
-    })
+    await loadComments(true)
   } finally {
     submitting.value = false
   }
