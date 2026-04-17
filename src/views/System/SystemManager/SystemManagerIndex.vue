@@ -93,7 +93,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -279,6 +279,7 @@ import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import { managerApi } from '@/api/manager'
+import type { SystemManagerItem } from '@/api/manager'
 import { regionApi } from '@/api/region'
 import { roleApi } from '@/api/role'
 import type { CascaderDataItem, SelectDataItem } from '@/api/types'
@@ -315,7 +316,7 @@ const managerImportFields = computed<ImportFieldConfig[]>(() => [
     required: true,
     type: 'number',
     dictName: 'SystemManagerStatus',
-    dictOptions: systemManagerStatusRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+    dictOptions: systemManagerStatusRef.value?.map((d) => ({ label: d.label, value: d.value })) ?? []
   },
   {
     key: 'type',
@@ -323,7 +324,7 @@ const managerImportFields = computed<ImportFieldConfig[]>(() => [
     required: true,
     type: 'number',
     dictName: 'SystemManagerType',
-    dictOptions: systemManagerTypeRef.value?.map((d: any) => ({ label: d.label, value: d.value })) ?? []
+    dictOptions: systemManagerTypeRef.value?.map((d) => ({ label: d.label, value: d.value })) ?? []
   },
   { key: 'regionId', label: '所属地区' }
 ])
@@ -440,12 +441,16 @@ const {
 
 const fetchAllData = createPaginatedFetcher(managerApi.urls.list, 'systemManagerList', () => listParams.value)
 
+type ExpandedManagerRow = SystemManagerItem & {
+  roleIdArray?: Array<string | number>
+}
+
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<ExpandedManagerRow> = [
   ...(selectionColumn ? [selectionColumn] : []),
   {
     type: 'expand',
-    renderExpand: (row: any) => {
+    renderExpand: (row) => {
       if (!row.roleIdArray) {
         return h(NSpin, { size: 'large', description: '加载中...' })
       }
@@ -476,7 +481,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'SystemManagerStatus',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'SystemManagerStatus' })
     }
   },
@@ -486,7 +491,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'SystemManagerType',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.type, dictName: 'SystemManagerType' })
     }
   },
@@ -495,8 +500,8 @@ const dataColumns: DataTableColumns = [
     title: '所属地区',
     width: 180,
     align: 'center',
-    valueResolver: (val: any) => managerRegionName(val),
-    render(row: any) {
+    valueResolver: (val: string) => managerRegionName(val),
+    render(row) {
       const tagText = managerRegionName(row.regionId)
       return h(
         NebulaTag,
@@ -513,7 +518,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 130,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'warning',
@@ -535,13 +540,13 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<ExpandedManagerRow[]>()
 const dataLoading = ref(true)
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 // 加载数据
 const getDataList = () => {
@@ -561,7 +566,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
   dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff })
+    const row = find(dataRef.value, { id: diff }) as ExpandedManagerRow | undefined
     if (row) {
       managerApi.detail(row.id).then(({ data: res }) => {
         row.roleIdArray = res.data.roleIds?.split(',')
@@ -584,7 +589,7 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
       value: roles.join(',')
     })
     .then(({ data: res }) => {
-      row.roleIdArray = res.data.roleIds?.split(',')
+      if (row) row.roleIdArray = res.data.roleIds?.split(',')
     })
 }
 
