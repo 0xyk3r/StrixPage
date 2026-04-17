@@ -460,9 +460,13 @@ function handleInputKeydown(e: KeyboardEvent) {
 // Markdown 渲染
 function renderMarkdown(content: string): string {
   if (!content) return ''
-  // 高亮 @提及
-  const highlighted = content.replace(/@(\S+)/g, '<span class="mention-highlight">@$1</span>')
-  return md.render(highlighted)
+  // 先渲染 Markdown（html: false 会转义所有 HTML）
+  const rendered = md.render(content)
+  // 再在 HTML 文本节点中高亮 @提及（避免修改标签属性）
+  return rendered.replace(/>([^<]*)</g, (match, text: string) => {
+    if (!text.includes('@')) return match
+    return '>' + text.replace(/(^|\s)@(\S+)/g, '$1<span class="mention-highlight">@$2</span>') + '<'
+  })
 }
 
 // 时间格式化
@@ -498,7 +502,7 @@ function formatTime(time: string): string {
   font-weight: 600;
 
   .comment-header-label {
-    color: var(--text-color-3);
+    color: var(--strix-text-tertiary);
     font-weight: 400;
     font-size: 13px;
     max-width: 200px;
@@ -526,12 +530,12 @@ function formatTime(time: string): string {
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: var(--hover-color);
+    background-color: var(--strix-bg-surface-hover);
   }
 
   &.comment-pinned {
-    background-color: var(--info-color-suppl);
-    border-left: 3px solid var(--info-color);
+    background-color: var(--strix-bg-surface);
+    border-left: 3px solid var(--strix-color-info);
   }
 }
 
@@ -540,7 +544,7 @@ function formatTime(time: string): string {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: var(--info-color);
+  color: var(--strix-color-info);
   margin-bottom: 4px;
 }
 
@@ -552,12 +556,12 @@ function formatTime(time: string): string {
 
   .comment-time {
     font-size: 12px;
-    color: var(--text-color-3);
+    color: var(--strix-text-tertiary);
   }
 
   .comment-edited {
     font-size: 11px;
-    color: var(--text-color-3);
+    color: var(--strix-text-tertiary);
     font-style: italic;
   }
 }
@@ -568,24 +572,24 @@ function formatTime(time: string): string {
   word-break: break-word;
 
   :deep(blockquote) {
-    border-left: 3px solid var(--border-color);
+    border-left: 3px solid var(--strix-border-default);
     padding: 4px 12px;
     margin: 4px 0;
-    color: var(--text-color-3);
+    color: var(--strix-text-tertiary);
     font-size: 13px;
-    background-color: var(--action-color);
+    background-color: var(--strix-bg-surface);
     border-radius: 0 4px 4px 0;
   }
 
   :deep(code) {
-    background-color: var(--action-color);
+    background-color: var(--strix-bg-surface);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
   }
 
   :deep(pre) {
-    background-color: var(--action-color);
+    background-color: var(--strix-bg-surface);
     padding: 12px;
     border-radius: 6px;
     overflow-x: auto;
@@ -598,7 +602,7 @@ function formatTime(time: string): string {
   }
 
   :deep(.mention-highlight) {
-    color: var(--primary-color);
+    color: var(--strix-color-accent);
     font-weight: 500;
   }
 
@@ -607,7 +611,7 @@ function formatTime(time: string): string {
   }
 
   :deep(a) {
-    color: var(--primary-color);
+    color: var(--strix-color-accent);
     text-decoration: none;
     &:hover {
       text-decoration: underline;
@@ -661,7 +665,7 @@ function formatTime(time: string): string {
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: var(--hover-color);
+      background-color: var(--strix-bg-surface-hover);
     }
   }
 }
@@ -679,7 +683,7 @@ function formatTime(time: string): string {
 }
 
 .comment-input-area {
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--strix-border-default);
   padding-top: 12px;
 }
 
@@ -733,14 +737,14 @@ function formatTime(time: string): string {
     font-size: 13px;
 
     &:hover {
-      background-color: var(--hover-color);
+      background-color: var(--strix-bg-surface-hover);
     }
   }
 
   .mention-empty {
     padding: 8px;
     text-align: center;
-    color: var(--text-color-3);
+    color: var(--strix-text-tertiary);
     font-size: 13px;
   }
 }
