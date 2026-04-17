@@ -189,6 +189,7 @@
 <script lang="ts" setup>
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import { monitorApi } from '@/api/monitor'
+import { useChartTheme } from '@/composables/useChartTheme'
 import type { GaugeSeriesOption, PieSeriesOption } from 'echarts/charts'
 import { GaugeChart, PieChart } from 'echarts/charts'
 import type { TooltipComponentOption } from 'echarts/components'
@@ -200,6 +201,8 @@ import { Pause, Play, RefreshCw } from 'lucide-vue-next'
 import VChart from 'vue-echarts'
 
 use([CanvasRenderer, PieChart, GaugeChart, TooltipComponent])
+
+const { colors: chartColors } = useChartTheme()
 
 // 数据状态
 const loading = ref(true)
@@ -295,9 +298,9 @@ const updateCharts = (data: any) => {
             lineStyle: {
               width: 20,
               color: [
-                [0.3, '#67e0e3'],
-                [0.7, '#37a2da'],
-                [1, '#fd666d']
+                [0.3, chartColors.value.accent],
+                [0.7, chartColors.value.info],
+                [1, chartColors.value.error]
               ]
             }
           },
@@ -305,7 +308,7 @@ const updateCharts = (data: any) => {
             distance: -20,
             length: 8,
             lineStyle: {
-              color: '#fff',
+              color: chartColors.value.text,
               width: 2
             }
           },
@@ -313,7 +316,7 @@ const updateCharts = (data: any) => {
             distance: -20,
             length: 20,
             lineStyle: {
-              color: '#fff',
+              color: chartColors.value.text,
               width: 4
             }
           },
@@ -377,6 +380,13 @@ const stopAutoRefresh = () => {
 watch(refreshInterval, () => {
   if (autoRefresh.value) {
     startAutoRefresh()
+  }
+})
+
+// 监听主题变化，重新渲染图表
+watch(chartColors, () => {
+  if (cacheInfo.value.info?.used_memory) {
+    updateCharts(cacheInfo.value)
   }
 })
 
