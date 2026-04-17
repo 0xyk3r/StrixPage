@@ -56,6 +56,12 @@ $light-text-dim: rgba(0, 0, 0, 0.45);
 $light-text-muted: rgba(0, 0, 0, 0.28);
 $light-text-accent: #2db48c;
 
+// ---- Light 主题语义色 (用于 light 选择器中) ----
+$light-color-success: #15803d;
+$light-color-warning: #b45309;
+$light-color-error: #b91c1c;
+$light-color-info: #0369a1;
+
 // ---- NaiveUI 主题对接颜色 (用于 themeOverrides) ----
 $naive-dark-body-color: #0a0b14;
 $naive-dark-card-color: #0f1019;

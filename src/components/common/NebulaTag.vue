@@ -152,31 +152,31 @@ const tagClasses = computed(() => [
 
     &--success {
       background: rgba(22, 163, 74, 0.08);
-      color: #15803d;
+      color: var(--strix-color-success);
       border-color: rgba(22, 163, 74, 0.25);
     }
 
     &--warning {
       background: rgba(234, 138, 0, 0.08);
-      color: #b45309;
+      color: var(--strix-color-warning);
       border-color: rgba(234, 138, 0, 0.25);
     }
 
     &--error {
       background: rgba(220, 38, 38, 0.08);
-      color: #b91c1c;
+      color: var(--strix-color-error);
       border-color: rgba(220, 38, 38, 0.25);
     }
 
     &--info {
       background: rgba(14, 116, 209, 0.08);
-      color: #0369a1;
+      color: var(--strix-color-info);
       border-color: rgba(14, 116, 209, 0.25);
     }
 
     &--primary {
       background: rgba(22, 163, 74, 0.08);
-      color: #15803d;
+      color: var(--strix-color-success);
       border-color: rgba(22, 163, 74, 0.25);
     }
   }

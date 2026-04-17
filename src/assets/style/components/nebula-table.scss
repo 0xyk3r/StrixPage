@@ -303,7 +303,7 @@
     }
 
     &.is-primary {
-      color: #15803d;
+      color: var(--strix-color-success);
       border-color: rgba(22, 163, 74, 0.25);
 
       &:hover {
@@ -313,7 +313,7 @@
     }
 
     &.is-warning {
-      color: #b45309;
+      color: var(--strix-color-warning);
       border-color: rgba(234, 138, 0, 0.25);
 
       &:hover {
@@ -324,7 +324,7 @@
 
     &.is-error,
     &.is-danger {
-      color: #b91c1c;
+      color: var(--strix-color-error);
       border-color: rgba(220, 38, 38, 0.2);
 
       &:hover {
@@ -334,7 +334,7 @@
     }
 
     &.is-info {
-      color: #0369a1;
+      color: var(--strix-color-info);
       border-color: rgba(14, 116, 209, 0.25);
 
       &:hover {
@@ -344,7 +344,7 @@
     }
 
     &.is-success {
-      color: #15803d;
+      color: var(--strix-color-success);
       border-color: rgba(22, 163, 74, 0.25);
 
       &:hover {
