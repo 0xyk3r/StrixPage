@@ -270,9 +270,9 @@ const previewColumns = computed<DataTableColumn[]>(() => {
       const errors = validationErrors.value.get(rowIndex)
       if (errors && errors.size > 0) {
         const msgs = Array.from(errors.values())
-        return h('span', { style: 'color: var(--n-text-color-error, #d03050)' }, msgs.join('；'))
+        return h('span', { style: 'color: var(--strix-color-error)' }, msgs.join('；'))
       }
-      return h('span', { style: 'color: var(--n-text-color-success, #18a058)' }, '✓')
+      return h('span', { style: 'color: var(--strix-color-success)' }, '✓')
     }
   })
   return cols
@@ -417,7 +417,7 @@ const handleAfterLeave = () => {
   align-items: center;
   gap: $space-2;
   padding: $space-4;
-  color: var(--strix-text-success, #18a058);
+  color: var(--strix-color-success);
 }
 
 .strix-import__result-errors {

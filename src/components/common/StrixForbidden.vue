@@ -182,6 +182,10 @@ onUnmounted(() => {
   justify-content: center;
   color: var(--strix-color-error, #e88080);
   filter: drop-shadow(0 0 20px rgba(232, 128, 128, 0.25));
+
+  [data-theme='light'] & {
+    filter: drop-shadow(0 0 20px rgba(208, 48, 80, 0.2));
+  }
 }
 
 .shield-pulse {
@@ -197,6 +201,10 @@ onUnmounted(() => {
 
   &--delayed {
     animation-delay: 1.5s;
+  }
+
+  [data-theme='light'] & {
+    border-color: rgba(208, 48, 80, 0.15);
   }
 }
 
@@ -242,6 +250,12 @@ onUnmounted(() => {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 16px;
+
+  [data-theme='light'] & {
+    background: linear-gradient(180deg, var(--strix-color-error) 0%, rgba(208, 48, 80, 0.4) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
 
   @media (max-width: 768px) {
     font-size: 80px;

@@ -60,12 +60,12 @@ onUnmounted(() => {
   pointer-events: none;
 
   &.offline {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
+    background: linear-gradient(135deg, var(--strix-color-error), rgba(239, 68, 68, 0.9));
     color: #fff;
   }
 
   &.recovery {
-    background: linear-gradient(135deg, #16a34a, #22c55e);
+    background: linear-gradient(135deg, var(--strix-color-success), rgba(34, 197, 94, 0.9));
     color: #fff;
   }
 }

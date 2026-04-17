@@ -175,6 +175,13 @@ onUnmounted(() => {
     inset -8px -6px 16px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(124, 106, 239, 0.15);
   animation: planet-float 6s ease-in-out infinite;
+
+  [data-theme='light'] & {
+    background: linear-gradient(135deg, #7c6aef, #5a4fb8, #3d3885);
+    box-shadow:
+      inset -8px -6px 16px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(124, 106, 239, 0.25);
+  }
 }
 
 .planet-ring {
@@ -186,6 +193,10 @@ onUnmounted(() => {
   border: 2px solid rgba(99, 226, 183, 0.2);
   border-radius: 50%;
   transform: translate(-50%, -50%) rotateX(70deg);
+
+  [data-theme='light'] & {
+    border-color: rgba(45, 180, 140, 0.3);
+  }
 }
 
 .orbit {
