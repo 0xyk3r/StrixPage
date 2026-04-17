@@ -215,8 +215,10 @@ function formatTime(time: string): string {
   line-height: 1.5;
 
   &--info {
-    color: #1a6fb5;
-    background: #e8f4fd;
+    [data-theme='light'] & {
+      color: #1a6fb5;
+      background: #e8f4fd;
+    }
 
     [data-theme='dark'] & {
       color: #70b8e8;
@@ -225,8 +227,10 @@ function formatTime(time: string): string {
   }
 
   &--warning {
-    color: #b57a1a;
-    background: #fef3e2;
+    [data-theme='light'] & {
+      color: #b57a1a;
+      background: #fef3e2;
+    }
 
     [data-theme='dark'] & {
       color: #e8b860;
@@ -235,8 +239,10 @@ function formatTime(time: string): string {
   }
 
   &--urgent {
-    color: #b51a1a;
-    background: #fde8e8;
+    [data-theme='light'] & {
+      color: #b51a1a;
+      background: #fde8e8;
+    }
 
     [data-theme='dark'] & {
       color: #e87070;
