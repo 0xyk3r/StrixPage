@@ -13,9 +13,12 @@ export const COLUMN_PANEL_KEY = Symbol() as InjectionKey<{
   reset: () => void
 }>
 
-function isFixedColumn(col: any): boolean {
-  if (col.type === 'expand' || col.type === 'selection') return true
-  if (col.key === 'actions' || col.key === 'action') return true
+type KeyedColumn = DataTableColumn & { key: string | number }
+type ToggleableColumn = KeyedColumn & { title: string }
+
+function isFixedColumn(col: DataTableColumn): boolean {
+  if ('type' in col && (col.type === 'expand' || col.type === 'selection')) return true
+  if ('key' in col && (col.key === 'actions' || col.key === 'action')) return true
   return false
 }
 
@@ -31,9 +34,16 @@ export function useTableColumns(rawColumns: DataTableColumns, tableId?: string) 
   const showPanel = ref(false)
 
   // 分离固定列（不可切换）和可切换列
-  const fixedStartColumns = rawColumns.filter((col: any) => col.type === 'expand' || col.type === 'selection')
-  const fixedEndColumns = rawColumns.filter((col: any) => col.key === 'actions' || col.key === 'action')
-  const toggleableRawColumns = rawColumns.filter((col: any) => !isFixedColumn(col) && col.key && col.title)
+  const fixedStartColumns = rawColumns.filter(
+    (col) => 'type' in col && (col.type === 'expand' || col.type === 'selection')
+  )
+  const fixedEndColumns = rawColumns.filter(
+    (col) => 'key' in col && (col.key === 'actions' || col.key === 'action')
+  )
+  const toggleableRawColumns = rawColumns.filter(
+    (col): col is ToggleableColumn =>
+      !isFixedColumn(col) && 'key' in col && 'title' in col && typeof col.title === 'string'
+  )
 
   const columnConfigs = ref<ColumnConfigItem[]>([])
 
@@ -45,26 +55,26 @@ export function useTableColumns(rawColumns: DataTableColumns, tableId?: string) 
 
       // 按存储顺序恢复列配置
       for (const sc of stored) {
-        const raw = toggleableRawColumns.find((c: any) => c.key === sc.key)
+        const raw = toggleableRawColumns.find((c) => String(c.key) === sc.key)
         if (raw) {
-          result.push({ key: sc.key, title: (raw as any).title as string, visible: sc.visible })
+          result.push({ key: sc.key, title: raw.title, visible: sc.visible })
           usedKeys.add(sc.key)
         }
       }
 
       // 新增的列追加到末尾
       for (const raw of toggleableRawColumns) {
-        const col = raw as any
-        if (!usedKeys.has(col.key)) {
-          result.push({ key: col.key, title: col.title as string, visible: true })
+        const key = String(raw.key)
+        if (!usedKeys.has(key)) {
+          result.push({ key, title: raw.title, visible: true })
         }
       }
 
       columnConfigs.value = result
     } else {
-      columnConfigs.value = toggleableRawColumns.map((col: any) => ({
-        key: col.key as string,
-        title: col.title as string,
+      columnConfigs.value = toggleableRawColumns.map((col) => ({
+        key: String(col.key),
+        title: col.title,
         visible: true
       }))
     }
@@ -89,7 +99,7 @@ export function useTableColumns(rawColumns: DataTableColumns, tableId?: string) 
     const result: DataTableColumn[] = [...fixedStartColumns]
     for (const config of columnConfigs.value) {
       if (config.visible) {
-        const rawCol = rawColumns.find((c: any) => c.key === config.key)
+        const rawCol = rawColumns.find((c) => 'key' in c && String(c.key) === config.key)
         if (rawCol) result.push(rawCol)
       }
     }
