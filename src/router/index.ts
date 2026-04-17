@@ -9,7 +9,7 @@ const NotFound = () => import('@/components/common/StrixNotFound.vue')
 const Forbidden = () => import('@/components/common/StrixForbidden.vue')
 
 
-const customRoutes: any[] = []
+const customRoutes: RouteRecordRaw[] = []
 
 const developmentRoutes = []
 if (import.meta.env.MODE === 'development') {

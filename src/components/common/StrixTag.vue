@@ -21,7 +21,7 @@ const tag = computed(() => {
     return { label: '加载中...', type: 'default' as NTagType }
   }
 
-  const foundItem: any = dict.value.find((item: any) => item.value === value)
+  const foundItem = dict.value.find((item) => item.value === value)
   return {
     label: foundItem?.label || notFoundLabel,
     type: (foundItem?.style || 'default') as NTagType

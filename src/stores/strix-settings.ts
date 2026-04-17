@@ -15,7 +15,7 @@ export const useStrixSettingsStore = defineStore(
       isSmallWindow.value = value
     }
 
-    const setTheme = (value: any) => {
+    const setTheme = (value: string) => {
       theme.value = value
     }
 

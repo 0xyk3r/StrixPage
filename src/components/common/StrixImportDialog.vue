@@ -282,7 +282,7 @@ const previewColumns = computed<DataTableColumn[]>(() => {
 const previewData = computed(() => mappedData.value)
 
 // ===== 预览行样式 =====
-const previewRowClass = (_: any, rowIndex: number) => {
+const previewRowClass = (_: Record<string, unknown>, rowIndex: number) => {
   return validationErrors.value.has(rowIndex) ? 'strix-import-error-row' : ''
 }
 

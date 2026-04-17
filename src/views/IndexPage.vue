@@ -120,7 +120,7 @@ import IndexDashboardWidget from '@/components/dashboard/IndexDashboardWidget.vu
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { type BookmarkItem, useBookmarksStore } from '@/stores/bookmarks'
-import { useHomeMenu } from '@/composables/useHomeMenu'
+import { useHomeMenu, type MenuItem } from '@/composables/useHomeMenu'
 
 const loginInfoStore = useLoginInfoStore()
 const bookmarksStore = useBookmarksStore()
@@ -168,7 +168,7 @@ onUnmounted(() => {
 const { menuList } = useHomeMenu()
 const modules = computed(() => menuList.value || [])
 
-const navigateToModule = (mod: any) => {
+const navigateToModule = (mod: MenuItem) => {
   if (mod.children?.length) {
     const leaf = findFirstLeaf(mod.children)
     if (leaf?.url) {
@@ -179,7 +179,7 @@ const navigateToModule = (mod: any) => {
   if (mod.url) router.push(mod.url)
 }
 
-const navigateToChild = (child: any) => {
+const navigateToChild = (child: MenuItem) => {
   if (isLeaf(child) && child.url) {
     router.push(child.url)
     return
@@ -194,11 +194,11 @@ const navigateToChild = (child: any) => {
   }
 }
 
-const isLeaf = (item: any): boolean => {
+const isLeaf = (item: MenuItem): boolean => {
   return !item.children || item.children.length === 0
 }
 
-const findFirstLeaf = (items: any[]): any | null => {
+const findFirstLeaf = (items: MenuItem[]): MenuItem | null => {
   for (const item of items) {
     if (isLeaf(item) && item.url) return item
     if (item.children?.length) {

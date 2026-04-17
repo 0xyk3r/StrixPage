@@ -71,7 +71,7 @@ const { isOpen, searchQuery, activeIndex, filteredCommands, groupedResults, clos
 const inputRef = ref<HTMLInputElement>()
 const itemRefs = ref<Map<number, HTMLElement>>(new Map())
 
-const setItemRef = (index: number, el: any) => {
+const setItemRef = (index: number, el: Element | ComponentPublicInstance | null) => {
   if (el) {
     itemRefs.value.set(index, el as HTMLElement)
   }
