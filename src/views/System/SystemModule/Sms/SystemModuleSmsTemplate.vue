@@ -70,7 +70,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -83,6 +83,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { SmsTemplateItem } from '@/api/sms'
 import { smsApi } from '@/api/sms'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
@@ -134,7 +135,7 @@ const {
 })
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<SmsTemplateItem> = [
   { key: 'code', title: '模板 Code', width: 160 },
   { key: 'name', title: '模板名称', width: 240 },
   { key: 'configKey', title: '短信配置 Key', width: 140 },
@@ -144,7 +145,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'SmsTemplateType',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.type, dictName: 'SmsTemplateType' })
     }
   },
@@ -154,7 +155,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'SmsTemplateStatus',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'SmsTemplateStatus' })
     }
   },
@@ -163,10 +164,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<SmsTemplateItem[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {

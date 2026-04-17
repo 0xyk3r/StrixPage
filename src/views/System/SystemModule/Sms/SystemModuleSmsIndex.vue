@@ -37,7 +37,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="dataColumns"
+      :columns="(dataColumns as unknown as DataTableColumns)"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -173,6 +173,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { SmsConfigItem, SmsSignItem, SmsTemplateItem } from '@/api/sms'
 import { smsApi } from '@/api/sms'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
@@ -246,11 +247,18 @@ const {
   schemaDto: 'SmsConfigUpdateReq'
 })
 
+type ExpandedSmsConfigRow = SmsConfigItem & {
+  expandTab?: string
+  loaded?: boolean
+  signs?: SmsSignItem[]
+  templates?: SmsTemplateItem[]
+}
+
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<ExpandedSmsConfigRow> = [
   {
     type: 'expand',
-    renderExpand: (row: any) => {
+    renderExpand: (row) => {
       if (!row.expandTab) row.expandTab = 'sign'
       if (!row.loaded) {
         return h(NSpin, { size: 'large', description: '加载中...' })
@@ -264,7 +272,7 @@ const dataColumns: DataTableColumns = [
               title: '签名状态',
               key: 'status',
               width: 80,
-              render: (row: any) => {
+              render: (row) => {
                 let tagType: NTagType
                 let tagLabel = ''
                 switch (row.status) {
@@ -295,7 +303,7 @@ const dataColumns: DataTableColumns = [
             { title: '创建时间', key: 'createdTime', width: 160 }
           ],
           data: row.signs,
-          rowKey: (row: any) => row.id
+          rowKey: (row) => row.id
         })
       ]
 
@@ -308,7 +316,7 @@ const dataColumns: DataTableColumns = [
               title: '模板类型',
               key: 'type',
               width: 100,
-              render: (row: any) => {
+              render: (row) => {
                 const tagType: NTagType = 'primary'
                 let tagLabel = ''
                 switch (row.status) {
@@ -338,7 +346,7 @@ const dataColumns: DataTableColumns = [
               title: '模板状态',
               key: 'status',
               width: 100,
-              render: (row: any) => {
+              render: (row) => {
                 let tagType: NTagType
                 let tagLabel = ''
                 switch (row.status) {
@@ -370,7 +378,7 @@ const dataColumns: DataTableColumns = [
             { title: '创建时间', key: 'createdTime', width: 160 }
           ],
           data: row.templates,
-          rowKey: (row: any) => row.id
+          rowKey: (row) => row.id
         })
       ]
 
@@ -407,7 +415,7 @@ const dataColumns: DataTableColumns = [
     width: 120,
     align: 'center',
     dictName: 'SmsPlatform',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.platform, dictName: 'SmsPlatform' })
     }
   },
@@ -420,7 +428,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 180,
     align: 'center',
-    render(row: any) {
+    render(row) {
       return handleOperate([
         {
           type: 'warning',
@@ -442,10 +450,10 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<ExpandedSmsConfigRow[]>()
 const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
@@ -465,7 +473,7 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
   const diffs = differenceWith(value, dataExpandedRowKeys.value, isEqual)
   dataExpandedRowKeys.value = value
   diffs.forEach((diff) => {
-    const row = find(dataRef.value, { id: diff })
+    const row = find(dataRef.value, { id: diff }) as ExpandedSmsConfigRow | undefined
     if (row) {
       smsApi.detail(row.id).then(({ data: res }) => {
         row.signs = res.data.signs
