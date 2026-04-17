@@ -27,11 +27,11 @@ export interface UseCrudHooks {
   /** 打开编辑弹窗前（detail 加载前） */
   beforeShowEdit?: (id: string) => void | Promise<void>
   /** 编辑详情加载后（可变换数据或设置额外状态） */
-  afterShowEdit?: (detail: any) => void
+  afterShowEdit?: (detail: Record<string, any>) => void
   /** 新增提交前变换表单数据 */
-  transformAdd?: (form: any) => any
+  transformAdd?: (form: Record<string, any>) => Record<string, unknown>
   /** 编辑提交前变换表单数据 */
-  transformEdit?: (form: any) => any
+  transformEdit?: (form: Record<string, any>) => Record<string, unknown>
   /** 新增成功后 */
   afterAdd?: () => void
   /** 编辑成功后 */
@@ -138,7 +138,7 @@ export function useCrud(config: UseCrudConfig) {
     fetchList()
   }
 
-  const rowKey = (row: any) => row.id
+  const rowKey = (row: Record<string, any>) => row.id
 
   // ===== 批量操作 =====
   const batchEnabled = !!config.batch
@@ -158,7 +158,7 @@ export function useCrud(config: UseCrudConfig) {
   const selectionColumn = batchEnabled
     ? {
       type: 'selection' as const,
-      disabled: (row: any) => {
+      disabled: (row: Record<string, any>) => {
         if (typeof config.batch === 'object' && config.batch.disabledKey) {
           return !!row[config.batch.disabledKey]
         }
