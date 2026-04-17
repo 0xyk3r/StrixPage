@@ -6,7 +6,7 @@
     :trap-focus="false"
     class="strix-comment-drawer"
   >
-    <n-drawer-content closable>
+    <n-drawer-content closable :body-content-style="{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }">
       <template #header>
         <div class="comment-header">
           <StrixIcon icon="message-square" :size="18" />
@@ -520,6 +520,7 @@ function formatTime(time: string): string {
 }
 
 .comment-search {
+  flex-shrink: 0;
   padding: 0 0 12px;
 }
 
@@ -698,6 +699,7 @@ function formatTime(time: string): string {
 }
 
 .comment-input-area {
+  flex-shrink: 0;
   border-top: 1px solid var(--strix-border-default);
   padding-top: 12px;
 }
