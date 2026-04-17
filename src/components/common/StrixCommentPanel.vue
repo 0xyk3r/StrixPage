@@ -67,52 +67,52 @@
               </div>
             </div>
 
-            <!-- Emoji 反应 -->
-            <div class="comment-reactions">
-              <n-button
-                v-for="(users, emoji) in item.reactions"
-                :key="emoji"
-                size="tiny"
-                :type="isMyReaction(users) ? 'primary' : 'default'"
-                :secondary="!isMyReaction(users)"
-                :tertiary="isMyReaction(users)"
-                class="reaction-btn"
-                @click="handleToggleReaction(item.id, emoji)"
-              >
-                {{ EMOJI_MAP[emoji] || emoji }} {{ users.length }}
-              </n-button>
-              <n-popover trigger="click" placement="bottom-start">
-                <template #trigger>
-                  <n-button size="tiny" quaternary circle class="reaction-add-btn">
-                    <template #icon><StrixIcon icon="smile-plus" :size="14" /></template>
-                  </n-button>
-                </template>
-                <div class="emoji-picker">
-                  <span
-                    v-for="(display, code) in EMOJI_MAP"
-                    :key="code"
-                    class="emoji-option"
-                    @click="handleToggleReaction(item.id, code)"
-                  >
-                    {{ display }}
-                  </span>
-                </div>
-              </n-popover>
-            </div>
-
-            <!-- 操作按钮 -->
-            <div class="comment-actions">
-              <n-button text size="tiny" @click="handleQuote(item)">引用</n-button>
-              <n-button v-if="item.editable" text size="tiny" @click="handleEdit(item)">编辑</n-button>
-              <n-popconfirm v-if="item.mine || isSuperManager" @positive-click="handleDelete(item.id)">
-                <template #trigger>
-                  <n-button text size="tiny" type="error">删除</n-button>
-                </template>
-                确认删除此评论？
-              </n-popconfirm>
-              <n-button v-if="canPin" text size="tiny" @click="handleTogglePin(item.id)">
-                {{ item.pinned === 1 ? '取消置顶' : '置顶' }}
-              </n-button>
+            <!-- 反应 & 操作 -->
+            <div class="comment-footer">
+              <div class="comment-reactions">
+                <n-button
+                  v-for="(users, emoji) in item.reactions"
+                  :key="emoji"
+                  size="tiny"
+                  :type="isMyReaction(users) ? 'primary' : 'default'"
+                  :secondary="!isMyReaction(users)"
+                  :tertiary="isMyReaction(users)"
+                  class="reaction-btn"
+                  @click="handleToggleReaction(item.id, emoji)"
+                >
+                  {{ EMOJI_MAP[emoji] || emoji }} {{ users.length }}
+                </n-button>
+                <n-popover trigger="click" placement="bottom-start">
+                  <template #trigger>
+                    <n-button size="tiny" quaternary circle class="reaction-add-btn">
+                      <template #icon><StrixIcon icon="smile-plus" :size="14" /></template>
+                    </n-button>
+                  </template>
+                  <div class="emoji-picker">
+                    <span
+                      v-for="(display, code) in EMOJI_MAP"
+                      :key="code"
+                      class="emoji-option"
+                      @click="handleToggleReaction(item.id, code)"
+                    >
+                      {{ display }}
+                    </span>
+                  </div>
+                </n-popover>
+              </div>
+              <div class="comment-actions">
+                <n-button text size="tiny" @click="handleQuote(item)">引用</n-button>
+                <n-button v-if="item.editable" text size="tiny" @click="handleEdit(item)">编辑</n-button>
+                <n-popconfirm v-if="item.mine || isSuperManager" @positive-click="handleDelete(item.id)">
+                  <template #trigger>
+                    <n-button text size="tiny" type="error">删除</n-button>
+                  </template>
+                  确认删除此评论？
+                </n-popconfirm>
+                <n-button v-if="canPin" text size="tiny" @click="handleTogglePin(item.id)">
+                  {{ item.pinned === 1 ? '取消置顶' : '置顶' }}
+                </n-button>
+              </div>
             </div>
           </div>
         </n-spin>
@@ -350,7 +350,13 @@ function selectMention(mgr: SystemManagerItem) {
 
 // 引用
 function handleQuote(item: CommentItem) {
-  const excerpt = item.content.length > 80 ? item.content.substring(0, 80) + '...' : item.content
+  // 剥离已有引用行，只取作者本人的首行有效内容
+  const firstLine = item.content
+    .split('\n')
+    .filter((line) => !line.startsWith('> '))
+    .map((line) => line.trim())
+    .find(Boolean) || ''
+  const excerpt = firstLine.length > 80 ? firstLine.substring(0, 80) + '...' : firstLine
   inputContent.value = `> ${item.authorName}: ${excerpt}\n\n${inputContent.value}`
   inputRef.value?.focus()
 }
@@ -494,6 +500,7 @@ function formatTime(time: string): string {
 </script>
 
 <style lang="scss" scoped>
+@use '@/assets/style/mixins/responsive' as r;
 .comment-header {
   display: flex;
   align-items: center;
@@ -521,12 +528,14 @@ function formatTime(time: string): string {
   overflow-y: auto;
   padding-bottom: 12px;
   min-height: 200px;
+
+  @include r.thin-scrollbar;
 }
 
 .comment-item {
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   transition: background-color 0.2s;
 
   &:hover {
@@ -626,12 +635,19 @@ function formatTime(time: string): string {
   margin-top: 8px;
 }
 
+.comment-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  min-height: 24px;
+}
+
 .comment-reactions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px;
-  margin-top: 8px;
 
   .reaction-btn {
     font-size: 12px;
@@ -673,7 +689,6 @@ function formatTime(time: string): string {
 .comment-actions {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
   opacity: 0;
   transition: opacity 0.2s;
 }
