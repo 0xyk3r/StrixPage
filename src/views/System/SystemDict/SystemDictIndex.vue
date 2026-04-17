@@ -116,7 +116,7 @@
 
         <strix-export-dialog
           v-model:show="showExportDialog"
-          :columns="dataColumns"
+          :columns="(dataColumns as unknown as DataTableColumns)"
           :data="dataRef || []"
           :fetch-all-data="fetchAllData"
           :selected-rows="selectedRows"
@@ -457,7 +457,7 @@ async function loadExpandData(dictKey: string) {
   }
 }
 
-function rowProps(row: any) {
+function rowProps(row: Record<string, unknown>) {
   return {
     onClick: (e: MouseEvent) => {
       const target = e.target as HTMLElement
@@ -467,11 +467,11 @@ function rowProps(row: any) {
 }
 
 // 展示列信息
-const dataColumns: DataTableColumns = [
+const dataColumns: DataTableColumns<DictItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
   {
     type: 'expand',
-    renderExpand: (row: any) => {
+    renderExpand: (row) => {
       const items = expandedDataCache.value[row.key]
       if (!items) {
         loadExpandData(row.key)
@@ -491,18 +491,18 @@ const dataColumns: DataTableColumns = [
             title: '样式',
             key: 'style',
             width: 80,
-            render: (r: any) => h(StrixTag, { value: r.value, dictName: row.key })
+            render: (r: DictDataItem) => h(StrixTag, { value: r.value, dictName: row.key })
           },
           {
             title: '状态',
             key: 'status',
             width: 80,
-            render: (r: any) => h(StrixTag, { value: r.status, dictName: 'CommonSwitch' })
+            render: (r: DictDataItem) => h(StrixTag, { value: r.status, dictName: 'CommonSwitch' })
           }
         ],
         data: items,
         pagination: false
-      } as any)
+      } as Record<string, unknown>)
     }
   },
   { key: 'key', title: '字典标识', width: 200 },
@@ -511,7 +511,7 @@ const dataColumns: DataTableColumns = [
     key: 'groupName',
     title: '分组',
     width: 100,
-    render(row: any) {
+    render(row) {
       if (!row.groupName) return h('span', { style: 'color: #999' }, '-')
       return h(
         NTag,
@@ -535,7 +535,7 @@ const dataColumns: DataTableColumns = [
     width: 80,
     align: 'center',
     dictName: 'CommonSwitch',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.status, dictName: 'CommonSwitch' })
     }
   },
@@ -545,7 +545,7 @@ const dataColumns: DataTableColumns = [
     width: 100,
     align: 'center',
     dictName: 'DictDataType',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.dataType, dictName: 'DictDataType' })
     }
   },
@@ -555,7 +555,7 @@ const dataColumns: DataTableColumns = [
     width: 70,
     align: 'center',
     dictName: 'CommonFlag',
-    render(row: any) {
+    render(row) {
       return h(StrixTag, { value: row.provided, dictName: 'CommonFlag' })
     }
   },
@@ -565,7 +565,7 @@ const dataColumns: DataTableColumns = [
     title: '操作',
     width: 260,
     align: 'center',
-    render(row: any) {
+    render(row) {
       const isProvided = row.provided === 1
       return handleOperate([
         {
@@ -619,14 +619,14 @@ const dataColumns: DataTableColumns = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns)
+const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
-const dataRef = ref()
+const dataRef = ref<DictItem[]>()
 const dataLoading = ref(true)
 
 const selectedRows = computed(() =>
-  dataRef.value?.filter((row: any) => checkedRowKeys.value.includes(row.id)) ?? []
+  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
 )
 
 const getDataList = () => {
