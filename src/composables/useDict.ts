@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { useDictStore } from '@/stores/dict.ts'
+import { type DictItem, useDictStore } from '@/stores/dict.ts'
 
 /**
  * 字典数据 Composable (完整版)
@@ -10,7 +10,7 @@ import { useDictStore } from '@/stores/dict.ts'
 export function useDictFull(dictName: string) {
   const dictStore = useDictStore()
 
-  const data = shallowRef<any[]>([])
+  const data = shallowRef<DictItem[]>([])
   const loading = ref(true)
   const error = ref<Error | null>(null)
 
@@ -60,6 +60,6 @@ export function useCascadeDict(childDictName: string, parentValue: Ref<string | 
   const fullData = useDict(childDictName)
   return computed(() => {
     if (parentValue.value == null) return fullData.value
-    return fullData.value.filter((item: any) => item.parentValue === String(parentValue.value))
+    return fullData.value.filter((item) => item.parentValue === String(parentValue.value))
   })
 }

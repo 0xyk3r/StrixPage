@@ -36,6 +36,7 @@ export interface CommonDictDataItem {
   style: string
   status: number
   remark: string
+  [k: string]: unknown
 }
 
 /** 通用字典响应 */

@@ -7,11 +7,14 @@ export interface DictItem {
   id: string
   key: string
   label: string
-  value: string | number | boolean
+  value: string | number
   sort: number
   style: string
   status: number
   remark: string
+  parentValue?: string
+  isDefault?: number
+  [k: string]: unknown
 }
 
 export const useDictStore = defineStore(
@@ -102,9 +105,9 @@ export const useDictStore = defineStore(
     /**
      * 获取字典默认值
      */
-    async function getDefaultValue(key: string): Promise<any> {
+    async function getDefaultValue(key: string): Promise<DictItem['value'] | null> {
       const items = await getDictData(key)
-      const defaultItem = items.find((item: any) => item.isDefault === 1)
+      const defaultItem = items.find((item) => item.isDefault === 1)
       return defaultItem?.value ?? null
     }
 
