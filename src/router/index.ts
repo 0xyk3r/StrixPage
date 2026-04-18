@@ -376,7 +376,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'file',
                 name: 'SystemModuleOssFile',
-                component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssFile.vue'),
+                component: () => import('@/views/System/SystemModule/Oss/SystemModuleOssFileBrowser.vue'),
                 meta: {
                   title: '存储文件列表',
                   empty: false,
