@@ -151,7 +151,10 @@ const verifyCaptcha = async () => {
 
 // ---- 拖动逻辑 ----
 const getClientX = (e: MouseEvent | TouchEvent): number => {
-  return e instanceof TouchEvent && e.touches.length > 0 ? e.touches[0]!.clientX : (e as MouseEvent).clientX
+  // Firefox desktop does not define TouchEvent — guard with typeof check before instanceof
+  return typeof TouchEvent !== 'undefined' && e instanceof TouchEvent && e.touches.length > 0
+    ? e.touches[0]!.clientX
+    : (e as MouseEvent).clientX
 }
 
 const onDragStart = (e: MouseEvent | TouchEvent) => {
