@@ -277,8 +277,13 @@ function dec(response: any) {
   const sign = response.sign
   const ivField = response.iv
 
-  // 处理报错信息
+  // 处理报错信息（无 sign 且非 200 成功响应）
   if ((!data || !sign) && response.code !== 200) {
+    return response
+  }
+
+  // 无加密标记 (sign/iv)：端点使用 @IgnoreEncryption，响应为明文，直接返回
+  if (!sign) {
     return response
   }
 
