@@ -28,6 +28,7 @@ const searchKeyword = ref('')
 const mkdirVisible = ref(false)
 const mkdirName = ref('')
 const mkdirLoading = ref(false)
+const fileInputRef = ref<HTMLInputElement>()
 
 const sortOptions = [
   { label: '名称', value: 'name' },
@@ -73,15 +74,15 @@ async function handleMkdir() {
 }
 
 function handleUploadClick() {
-  const input = document.createElement('input')
-  input.type = 'file'
-  input.multiple = true
-  input.onchange = () => {
-    if (input.files) {
-      uploadFiles(Array.from(input.files))
-    }
+  fileInputRef.value?.click()
+}
+
+function onFileInputChange() {
+  const input = fileInputRef.value
+  if (input?.files?.length) {
+    uploadFiles(Array.from(input.files))
+    input.value = ''
   }
-  input.click()
 }
 
 async function uploadFiles(fileList: File[]) {
@@ -214,6 +215,15 @@ async function uploadFiles(fileList: File[]) {
         @keyup.enter="handleMkdir"
       />
     </n-modal>
+
+    <!-- hidden file input for upload -->
+    <input
+      ref="fileInputRef"
+      type="file"
+      multiple
+      style="display: none"
+      @change="onFileInputChange"
+    />
   </div>
 </template>
 

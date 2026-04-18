@@ -16,6 +16,15 @@ const truncated = ref(false)
 
 const MAX_SIZE = 1024 * 1024 // 1MB
 
+const md = new MarkdownIt({
+  highlight: (str, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(str, { language: lang }).value
+    }
+    return ''
+  }
+})
+
 const isMarkdown = computed(() => {
   const ext = props.file.ext?.toLowerCase() || ''
   return ['.md', '.markdown'].includes(ext)
@@ -35,14 +44,6 @@ const language = computed(() => {
 
 const renderedHtml = computed(() => {
   if (isMarkdown.value) {
-    const md = new MarkdownIt({
-      highlight: (str, lang) => {
-        if (lang && hljs.getLanguage(lang)) {
-          return hljs.highlight(str, { language: lang }).value
-        }
-        return ''
-      }
-    })
     return md.render(content.value)
   }
 
@@ -77,7 +78,9 @@ async function loadContent() {
   }
 }
 
-onMounted(() => loadContent())
+watch(() => props.url, (url) => {
+  if (url) loadContent()
+}, { immediate: true })
 </script>
 
 <template>

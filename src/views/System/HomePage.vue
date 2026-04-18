@@ -29,7 +29,7 @@
     </header>
 
     <!-- 主内容区 -->
-    <main class="nebula-main">
+    <main :class="['nebula-main', { 'nebula-main--full': route.meta.fullPage }]">
       <strix-error-boundary>
         <div v-if="routerViewShow" class="nebula-content-view">
           <router-view v-slot="{ Component, route }">
@@ -102,6 +102,8 @@ import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
 import { initStrixMessage } from '@/utils/strix-message'
+
+const route = useRoute()
 
 // 初始化全局工具
 initStrixLoadingBar(useLoadingBar())

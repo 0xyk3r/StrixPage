@@ -380,6 +380,7 @@ const routes: RouteRecordRaw[] = [
                 meta: {
                   title: '存储文件列表',
                   empty: false,
+                  fullPage: true,
                   permission: 'system:module:oss:file'
                 }
               }

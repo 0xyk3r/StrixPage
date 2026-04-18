@@ -23,6 +23,7 @@ const emit = defineEmits<{
 const currentIndex = ref(0)
 const previewUrl = ref('')
 const previewLoading = ref(false)
+let loadGeneration = 0
 
 const currentFile = computed(() => props.files[currentIndex.value] ?? null)
 
@@ -57,27 +58,38 @@ watch(() => props.visible, (v) => {
     currentIndex.value = props.initialIndex
     loadPreview()
   }
-})
+}, { immediate: true })
 
 watch(currentIndex, () => {
   if (props.visible) loadPreview()
 })
 
+function revokeCurrentBlob() {
+  if (previewUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewUrl.value)
+  }
+}
+
 async function loadPreview() {
   if (!currentFile.value) return
+  const gen = ++loadGeneration
   previewLoading.value = true
   try {
     const { data } = await ossBrowseApi.getPreviewUrl(currentFile.value.id)
+    if (gen !== loadGeneration) return
     if (data.code === 200 && data.data) {
+      revokeCurrentBlob()
       previewUrl.value = data.data
     } else {
       const res = await commonApi.fileDownload(currentFile.value.id)
+      if (gen !== loadGeneration) return
+      revokeCurrentBlob()
       previewUrl.value = URL.createObjectURL(new Blob([res.data]))
     }
   } catch {
-    previewUrl.value = ''
+    if (gen === loadGeneration) previewUrl.value = ''
   } finally {
-    previewLoading.value = false
+    if (gen === loadGeneration) previewLoading.value = false
   }
 }
 
@@ -91,9 +103,7 @@ function navigateNext() {
 
 function close() {
   emit('update:visible', false)
-  if (previewUrl.value.startsWith('blob:')) {
-    URL.revokeObjectURL(previewUrl.value)
-  }
+  revokeCurrentBlob()
   previewUrl.value = ''
 }
 

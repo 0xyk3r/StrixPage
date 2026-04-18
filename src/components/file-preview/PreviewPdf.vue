@@ -21,6 +21,7 @@ const error = ref('')
 const canvasRef = ref<HTMLCanvasElement>()
 
 let pdfDoc: pdfjsLib.PDFDocumentProxy | null = null
+let rendering = false
 
 async function loadPdf() {
   loading.value = true
@@ -38,14 +39,20 @@ async function loadPdf() {
 }
 
 async function renderPage() {
-  if (!pdfDoc || !canvasRef.value) return
-  const page = await pdfDoc.getPage(currentPage.value)
-  const viewport = page.getViewport({ scale: scale.value })
-  const canvas = canvasRef.value
-  canvas.height = viewport.height
-  canvas.width = viewport.width
-  const ctx = canvas.getContext('2d')!
-  await page.render({ canvasContext: ctx, viewport, canvas: canvas }).promise
+  if (!pdfDoc || !canvasRef.value || rendering) return
+  rendering = true
+  try {
+    const page = await pdfDoc.getPage(currentPage.value)
+    const viewport = page.getViewport({ scale: scale.value })
+    const canvas = canvasRef.value
+    canvas.height = viewport.height
+    canvas.width = viewport.width
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    await page.render({ canvasContext: ctx, viewport, canvas: canvas }).promise
+  } finally {
+    rendering = false
+  }
 }
 
 function prevPage() {
@@ -72,7 +79,9 @@ function zoomOut() {
   renderPage()
 }
 
-onMounted(() => loadPdf())
+watch(() => props.url, (url) => {
+  if (url) loadPdf()
+}, { immediate: true })
 
 onUnmounted(() => {
   pdfDoc?.destroy()

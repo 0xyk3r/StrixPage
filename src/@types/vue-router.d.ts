@@ -71,5 +71,10 @@ declare module 'vue-router' {
      * 是否在导航守卫中忽略此路由（不加入 TabBar 等）
      */
     ignore?: boolean
+
+    /**
+     * 全高度页面 — 移除 .nebula-main 的内边距，内容区铺满剩余空间
+     */
+    fullPage?: boolean
   }
 }
