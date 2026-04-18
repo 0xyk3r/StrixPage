@@ -168,7 +168,9 @@ async function uploadFiles(fileList: File[]) {
         key: o.value
       }))"
       @select="handleSortSelect"
-    />
+    >
+      <n-button size="small">排序</n-button>
+    </n-dropdown>
 
     <n-input
       v-model:value="searchKeyword"
