@@ -31,7 +31,10 @@ $captcha-cut: 16px;
 
 .nebula-captcha__frame {
   position: relative;
-  background: var(--strix-bg-overlay);
+  // Use solid bg as base so panel is always visible.
+  // Firefox silently drops backdrop-filter when a parent has filter:drop-shadow(),
+  // which would leave a nearly-transparent panel with the old semi-opaque overlay color.
+  background: var(--strix-bg-elevated);
   backdrop-filter: blur(40px) saturate(130%);
   clip-path: polygon(
     0 $captcha-cut,
