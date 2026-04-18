@@ -166,7 +166,9 @@ $cut-sm: 14px;
   transform: translate(-50%, -50%);
   z-index: 10;
   width: 440px;
-  filter: drop-shadow(0 0 1px var(--strix-border-accent));
+  // Removed filter:drop-shadow — causes Firefox not to render elements with
+  // child backdrop-filter+clip-path (Firefox compositor bug). Border glow
+  // is on .nebula-login__frame instead.
   animation: nebula-login-boot 1s $ease-out-expo 0.3s both;
 
   @media (max-width: 500px) {
@@ -177,11 +179,11 @@ $cut-sm: 14px;
 .nebula-login__frame {
   position: relative;
   padding: 52px 44px 44px;
-  // Use solid bg as base so panel is always visible.
-  // Firefox silently drops backdrop-filter when a parent has filter:drop-shadow(),
-  // which would leave a nearly-transparent panel with the old semi-opaque overlay color.
+  // Solid bg so panel is visible in all browsers. backdrop-filter is enhancement only.
   background: var(--strix-bg-elevated);
   backdrop-filter: blur(40px) saturate(130%);
+  // Border replaces the removed filter:drop-shadow glow on parent (Firefox compatible).
+  border: 1px solid var(--strix-border-accent);
   clip-path: polygon(
     0 $cut,
     $cut 0,
@@ -445,14 +447,12 @@ $cut-sm: 14px;
   }
 
   // 面板: 白底卡片 + 阴影层次, 取代暗色半透明叠加
-  .nebula-login__panel {
-    filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.1))
-      drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06));
-  }
-
+  // Removed filter:drop-shadow from panel — causes Firefox compositor bug with child
+  // backdrop-filter+clip-path. Shadow effect omitted; border on frame provides edge decoration.
   .nebula-login__frame {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(24px) saturate(120%);
+    border-color: rgba(0, 0, 0, 0.12);
   }
 
   // 面板扫描线: 使用较深绿色

@@ -25,17 +25,19 @@ $captcha-cut: 16px;
   z-index: 1;
   width: 100%;
   max-width: 400px;
-  filter: drop-shadow(0 0 1px var(--strix-border-accent));
+  // Removed filter:drop-shadow — it causes Firefox to not render elements that have
+  // a child with backdrop-filter+clip-path (Firefox compositor bug). The border glow
+  // is achieved via border on .nebula-captcha__frame instead.
   animation: nebula-captcha-enter 0.4s $ease-out-expo both;
 }
 
 .nebula-captcha__frame {
   position: relative;
-  // Use solid bg as base so panel is always visible.
-  // Firefox silently drops backdrop-filter when a parent has filter:drop-shadow(),
-  // which would leave a nearly-transparent panel with the old semi-opaque overlay color.
+  // Solid bg so panel is visible in all browsers. backdrop-filter is enhancement only.
   background: var(--strix-bg-elevated);
   backdrop-filter: blur(40px) saturate(130%);
+  // Border replaces the removed filter:drop-shadow glow on parent (Firefox compatible).
+  border: 1px solid var(--strix-border-accent);
   clip-path: polygon(
     0 $captcha-cut,
     $captcha-cut 0,
