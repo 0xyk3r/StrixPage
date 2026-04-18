@@ -149,6 +149,7 @@ export default defineConfig({
             "vendor-echarts": ["echarts", "vue-echarts"],
             "vendor-crypto": ["sm-crypto"],
             "vendor-xlsx": ["xlsx"],
+            "vendor-pdf": ["pdfjs-dist"],
           };
           for (const [key, modules] of Object.entries(chunks)) {
             if (modules.some((m) => id.includes(`node_modules/${m}`))) {

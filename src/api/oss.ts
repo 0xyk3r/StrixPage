@@ -73,6 +73,8 @@ export interface OssFileItem {
   path: string
   size: number
   ext: string
+  originalName: string
+  contentType: string
   uploaderId: string
   createdTime: string
 }
