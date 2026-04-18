@@ -57,7 +57,6 @@ axios.interceptors.request.use((config) => {
     return Promise.reject(new axios.Cancel('离线状态，请求已拦截'))
   }
 
-  config.headers['Content-Type'] = 'application/json'
   config.headers.timestamp = new Date().getTime() + ''
   if (token?.value) {
     config.headers.Authorization = `Bearer ${token.value}`
@@ -75,6 +74,22 @@ axios.interceptors.request.use((config) => {
       httpCancelerStore?.registerRequest(strixRequestingApi)
     })
   }
+
+  // FormData 请求（文件上传）跳过加密/签名，让浏览器自动设置 multipart Content-Type
+  if (config.data instanceof FormData) {
+    console.log(
+      '%c Strix HTTP %c POST %c%s',
+      'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+      'background: #f59e0b; color: white; padding: 4px 4px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+      'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+      config.meta?.operate || '请求 (multipart)',
+      '[FormData — encryption skipped]'
+    )
+    // Do not set Content-Type — let axios set multipart/form-data with boundary automatically
+    return config
+  }
+
+  config.headers['Content-Type'] = 'application/json'
 
   // 请求预处理 & 加密 & 签名
   if (config.method === 'get') {
