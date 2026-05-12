@@ -11,8 +11,7 @@ export const downloadBlob = (res: AxiosResponse<Blob>, fileName: string) => {
   const tempLink = document.createElement('a')
   tempLink.style.display = 'none'
   tempLink.href = blobURL
-  const contentDisposition = res.headers['content-disposition'] || `attachment;filename=${fileName}`
-  tempLink.setAttribute('download', decodeURI(contentDisposition.split(';')[1].split('=')[1]))
+  tempLink.setAttribute('download', fileName)
   // 兼容：某些浏览器不支持 HTML5 的 download 属性
   if (typeof tempLink.download === 'undefined') {
     tempLink.setAttribute('target', '_blank')

@@ -150,7 +150,7 @@ const dataColumns: DataTableColumns<OssFileItem> = [
           type: 'primary',
           label: '下载文件',
           icon: 'download',
-          onClick: () => downloadFile(row.id)
+          onClick: () => downloadFile(row.id, row.originalName)
         },
         {
           type: 'error',
@@ -200,9 +200,9 @@ const getOssFileGroupSelectList = (configKey?: string) => {
 }
 onMounted(getOssFileGroupSelectList)
 
-const downloadFile = (id: string) => {
+const downloadFile = (id: string, originalName: string) => {
   commonApi.fileDownload(id).then((res) => {
-    downloadBlob(res, id)
+    downloadBlob(res, originalName || id)
   })
 }
 const deleteFile = (id: string) => {
