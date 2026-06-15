@@ -18,7 +18,16 @@
         <!-- 标题栏 -->
         <div class="ai-chat-page__topbar">
           <div class="ai-chat-page__session-name">{{ activeSession?.title }}</div>
-          <div class="ai-chat-page__model-tag">{{ activeSession?.modelConfigName }}</div>
+          <n-select
+            :value="activeSession?.modelConfigId"
+            :options="modelOptions"
+            :loading="loadingModels"
+            :disabled="chatStore.streaming"
+            placeholder="选择模型"
+            size="small"
+            style="width: 240px"
+            @update:value="handleSwitchModel"
+          />
           <div style="flex: 1" />
           <n-button quaternary size="small" title="清空消息" :disabled="chatStore.streaming"
                     @click="confirmClearMessages">
@@ -145,10 +154,11 @@ const newSessionModelId = ref<string>('')
 const newSessionTitle = ref('')
 const creating = ref(false)
 const inputRef = ref()
-const modelList = ref<AiModelConfigResp[]>([])
+const modelConfigs = ref<AiModelConfigResp[]>([])
+const loadingModels = ref(false)
 
 const modelOptions = computed(() =>
-  modelList.value
+  modelConfigs.value
     .filter((m) => m.status === 1 && (m.type === 1 || m.type === 2))
     .map((m) => ({ label: `${m.name} (${m.modelName})`, value: m.id }))
 )
@@ -156,17 +166,32 @@ const modelOptions = computed(() =>
 const activeSession = computed(() => chatStore.sessions.find((s) => s.id === chatStore.activeSessionId))
 
 const activeModelConfig = computed(() =>
-  modelList.value.find((m) => m.id === activeSession.value?.modelConfigId)
+  modelConfigs.value.find((m) => m.id === activeSession.value?.modelConfigId)
 )
 
 const isVisionModel = computed(() => {
-  const config = modelList.value.find((m) => m.id === activeSession.value?.modelConfigId)
+  const config = modelConfigs.value.find((m) => m.id === activeSession.value?.modelConfigId)
   return config?.type === 2
 })
 
-async function loadModels() {
-  const res = await aiApi.modelConfigList()
-  modelList.value = (res.data?.data ?? []) as AiModelConfigResp[]
+async function loadModelConfigs() {
+  loadingModels.value = true
+  try {
+    const res = await aiApi.modelConfigList()
+    modelConfigs.value = (res.data?.data ?? []) as AiModelConfigResp[]
+  } finally {
+    loadingModels.value = false
+  }
+}
+
+async function handleSwitchModel(modelConfigId: string) {
+  if (!chatStore.activeSessionId || chatStore.streaming) return
+  try {
+    await chatStore.switchModel(chatStore.activeSessionId, modelConfigId)
+    message.success('模型已切换')
+  } catch (err) {
+    message.error('模型切换失败')
+  }
 }
 
 async function createSession() {
@@ -213,7 +238,7 @@ function confirmClearMessages() {
 }
 
 onMounted(async () => {
-  await Promise.all([chatStore.loadSessions(), loadModels()])
+  await Promise.all([chatStore.loadSessions(), loadModelConfigs()])
 })
 </script>
 
@@ -254,15 +279,6 @@ onMounted(async () => {
     font-weight: 600;
     font-size: 14px;
     color: rgba(255, 255, 255, 0.85);
-  }
-
-  &__model-tag {
-    font-size: 12px;
-    color: rgba(99, 102, 241, 0.8);
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    padding: 1px 8px;
-    border-radius: 10px;
   }
 
   &__empty {

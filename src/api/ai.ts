@@ -19,7 +19,8 @@ export interface AiModelConfigResp {
   topP?: number
   maxTokens?: number
   systemPrompt?: string
-  enableThinking?: boolean
+  /** 0=禁用 1=启用 */
+  enableThinking?: number
   thinkingBudget?: number
   voice?: string
   speed?: number
@@ -46,7 +47,8 @@ export interface AiModelConfigUpdateReq {
   topP?: number | null
   maxTokens?: number | null
   systemPrompt?: string
-  enableThinking?: boolean
+  /** 0=禁用 1=启用 */
+  enableThinking?: number
   thinkingBudget?: number | null
   voice?: string
   speed?: number | null
@@ -57,6 +59,19 @@ export interface AiModelConfigUpdateReq {
   ossBucketName?: string
   status?: number
   remark?: string
+}
+
+export interface AiFetchModelsReq {
+  baseUrl: string
+  apiKey: string
+}
+
+export interface AiModelInfo {
+  id: string
+  name: string
+  ownedBy: string
+  created?: number
+  type: number
 }
 
 // ============================================================
@@ -98,6 +113,9 @@ export interface AiMessageResp {
   /** 0=生成中 1=完成 2=错误 */
   status: number
   errorMsg?: string
+  modelConfigId?: string
+  modelConfigName?: string
+  durationMs?: number
   createdTime: string
 }
 
@@ -162,6 +180,11 @@ export const aiApi = {
       meta: { operate: '测试模型连通性' }
     }),
 
+  fetchModels: (data: AiFetchModelsReq) =>
+    http.post<RetResult<AiModelInfo[]>>(`${BASE}/model-config/fetch-models`, data, {
+      meta: { operate: '获取模型列表', notify: false }
+    }),
+
   // 会话
   sessionList: (params: { page: number; pageSize: number }) =>
     http.get<RetResult<AiSessionResp[]>>(`${BASE}/session`, {
@@ -182,6 +205,11 @@ export const aiApi = {
   sessionRename: (id: string, data: AiSessionRenameTitleReq) =>
     http.patch<RetResult>(`${BASE}/session/${id}/title`, data, {
       meta: { operate: '重命名会话' }
+    }),
+
+  sessionSwitchModel: (id: string, data: { modelConfigId: string }) =>
+    http.patch<RetResult>(`${BASE}/session/${id}/model`, data, {
+      meta: { operate: '切换模型', notify: true }
     }),
 
   // 消息

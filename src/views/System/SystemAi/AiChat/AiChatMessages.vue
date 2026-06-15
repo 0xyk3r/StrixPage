@@ -66,7 +66,15 @@
 
           <div class="message__bubble message__bubble--assistant">
             <template v-if="msg.status === 0 && !msg.content">
-              <n-spin :show="true" size="small" />
+              <!-- AI 正在生成（还没有内容时显示状态） -->
+              <div v-if="!msg.thinkingContent" class="message__generating">
+                <n-spin :show="true" size="small" />
+                <span class="message__generating-text">AI 正在生成回复...</span>
+              </div>
+              <div v-else class="message__generating">
+                <n-spin :show="true" size="small" />
+                <span class="message__generating-text">正在根据思考结果生成回复...</span>
+              </div>
             </template>
             <template v-else-if="msg.status === 2">
               <n-alert type="error" :title="msg.errorMsg || '生成失败'" style="background: transparent" />
@@ -77,9 +85,12 @@
 
           <!-- Token/时间元数据 -->
           <div
-            v-if="msg.status === 1 && (msg.inputTokens || msg.outputTokens || msg.durationMs)"
+            v-if="msg.status === 1 && (msg.modelConfigName || msg.inputTokens || msg.outputTokens || msg.durationMs)"
             class="message__meta"
           >
+            <span v-if="msg.modelConfigName" class="message__model-tag" :title="msg.modelConfigName">
+              {{ msg.modelConfigName }}
+            </span>
             <span v-if="msg.inputTokens" title="输入 tokens">↑{{ msg.inputTokens }}</span>
             <span v-if="msg.outputTokens" title="输出 tokens">↓{{ msg.outputTokens }}</span>
             <span v-if="msg.durationMs" title="耗时">{{ (msg.durationMs / 1000).toFixed(1) }}s</span>
@@ -259,6 +270,19 @@ onMounted(() => scrollToBottom())
     }
   }
 
+  &__generating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+
+    &-text {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.5);
+      font-style: italic;
+    }
+  }
+
   &__text {
     white-space: pre-wrap;
   }
@@ -293,6 +317,19 @@ onMounted(() => scrollToBottom())
     margin-top: 4px;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.25);
+  }
+
+  &__model-tag {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: rgba(99, 102, 241, 0.9);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__actions {

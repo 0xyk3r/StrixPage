@@ -25,6 +25,10 @@ export interface UiMessage {
   metaExpanded: boolean
   /** 消息创建时间（ISO string，用于截断操作） */
   createdTime?: string
+  /** 使用的模型配置 ID */
+  modelConfigId?: string
+  /** 使用的模型配置名称 */
+  modelConfigName?: string
 }
 
 export const useAiChatStore = defineStore('aiChat', () => {
@@ -80,6 +84,16 @@ export const useAiChatStore = defineStore('aiChat', () => {
     if (session) session.title = title
   }
 
+  async function switchModel(id: string, modelConfigId: string) {
+    await aiApi.sessionSwitchModel(id, { modelConfigId })
+    const session = sessions.value.find((s) => s.id === id)
+    if (session) {
+      session.modelConfigId = modelConfigId
+      // modelConfigName 需要从模型配置列表中查找或重新加载会话列表
+      await loadSessions()
+    }
+  }
+
   async function selectSession(id: string) {
     if (streaming.value) abortStream()
     activeSessionId.value = id
@@ -124,8 +138,11 @@ export const useAiChatStore = defineStore('aiChat', () => {
       thinkingDone: !!m.thinkingContent,
       inputTokens: m.promptTokens,
       outputTokens: m.completionTokens,
+      durationMs: m.durationMs,
       metaExpanded: false,
-      createdTime: m.createdTime
+      createdTime: m.createdTime,
+      modelConfigId: m.modelConfigId,
+      modelConfigName: m.modelConfigName
     }
   }
 
@@ -177,6 +194,8 @@ export const useAiChatStore = defineStore('aiChat', () => {
           last.status = 1
           if (event.messageId) last.id = event.messageId
           if (event.userMessageId) userMsg.id = event.userMessageId
+          if (event.modelConfigId) last.modelConfigId = event.modelConfigId
+          if (event.modelConfigName) last.modelConfigName = event.modelConfigName
           last.inputTokens = event.promptTokens
           last.outputTokens = event.completionTokens
           last.durationMs = Date.now() - sendStartTime
@@ -246,6 +265,8 @@ export const useAiChatStore = defineStore('aiChat', () => {
         } else if (event.type === 'done') {
           last.status = 1
           if (event.messageId) last.id = event.messageId
+          if (event.modelConfigId) last.modelConfigId = event.modelConfigId
+          if (event.modelConfigName) last.modelConfigName = event.modelConfigName
           last.inputTokens = event.promptTokens
           last.outputTokens = event.completionTokens
           last.durationMs = Date.now() - sendStartTime
@@ -284,6 +305,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
     createSession,
     removeSession,
     renameSession,
+    switchModel,
     selectSession,
     togglePin,
     sendMessage,

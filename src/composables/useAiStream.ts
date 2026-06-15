@@ -8,6 +8,8 @@ export interface AiStreamEvent {
   content?: string
   messageId?: string
   userMessageId?: string
+  modelConfigId?: string
+  modelConfigName?: string
   promptTokens?: number
   completionTokens?: number
   message?: string
@@ -96,6 +98,8 @@ export async function streamAiMessage(
                   type: 'done',
                   messageId: parsed.messageId,
                   userMessageId: parsed.userMessageId,
+                  modelConfigId: parsed.modelConfigId,
+                  modelConfigName: parsed.modelConfigName,
                   promptTokens: parsed.promptTokens,
                   completionTokens: parsed.completionTokens
                 })
@@ -194,6 +198,8 @@ export async function streamAiRegenerate(
                 onEvent({
                   type: 'done',
                   messageId: parsed.messageId,
+                  modelConfigId: parsed.modelConfigId,
+                  modelConfigName: parsed.modelConfigName,
                   promptTokens: parsed.promptTokens,
                   completionTokens: parsed.completionTokens
                 })

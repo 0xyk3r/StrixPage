@@ -34,7 +34,33 @@
       />
     </n-form-item>
     <n-form-item label="模型名称" path="modelName">
-      <n-input v-model:value="form.modelName" clearable placeholder="如 qwen3-max" />
+      <n-space vertical style="width: 100%">
+        <n-space>
+          <n-button :disabled="!canFetchModels" :loading="fetchingModels" @click="fetchModels">
+            获取模型列表
+          </n-button>
+          <n-text depth="3" style="font-size: 12px">填写 Base URL 和 API Key 后可获取</n-text>
+        </n-space>
+        <n-checkbox-group v-if="fetchedModels.length > 0" v-model:value="filterTypes">
+          <n-space>
+            <n-checkbox :value="1" label="TEXT" />
+            <n-checkbox :value="2" label="VISION" />
+            <n-checkbox :value="3" label="TTS" />
+            <n-checkbox :value="4" label="STT" />
+            <n-checkbox :value="5" label="IMAGE_GEN" />
+          </n-space>
+        </n-checkbox-group>
+        <n-select
+          v-if="fetchedModels.length > 0"
+          v-model:value="form.modelName"
+          :options="modelOptions"
+          filterable
+          tag
+          clearable
+          placeholder="选择或输入模型名称"
+        />
+        <n-input v-else v-model:value="form.modelName" clearable placeholder="如 qwen3-max" />
+      </n-space>
     </n-form-item>
     <n-form-item label="状态" path="status">
       <n-switch v-model:value="statusSwitch" />
@@ -118,8 +144,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { FormInst, FormRules } from 'naive-ui'
-import type { AiModelConfigResp, AiModelConfigUpdateReq } from '@/api/ai'
+import type { FormInst, FormRules, SelectOption } from 'naive-ui'
+import type { AiModelConfigResp, AiModelConfigUpdateReq, AiModelInfo } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 
 interface Props {
@@ -134,6 +160,10 @@ const message = useMessage()
 const formRef = ref<FormInst | null>(null)
 const saving = ref(false)
 const isEdit = computed(() => !!props.editId)
+
+const fetchedModels = ref<AiModelInfo[]>([])
+const fetchingModels = ref(false)
+const filterTypes = ref<number[]>([1, 2, 3, 4, 5])
 
 const typeOptions = [
   { label: 'TEXT（文本对话）', value: 1 },
@@ -167,7 +197,7 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   topP: null,
   maxTokens: null,
   systemPrompt: '',
-  enableThinking: false,
+  enableThinking: 0,
   thinkingBudget: null,
   voice: '',
   speed: null,
@@ -183,9 +213,9 @@ const statusSwitch = computed({
   set: (v) => (form.value.status = v ? 1 : 0)
 })
 const thinkingSwitch = computed({
-  get: () => !!form.value.enableThinking,
+  get: () => form.value.enableThinking === 1,
   set: (v) => {
-    form.value.enableThinking = v
+    form.value.enableThinking = v ? 1 : 0
     if (!v) form.value.thinkingBudget = null
   }
 })
@@ -194,6 +224,23 @@ const isText = computed(() => form.value.type === 1)
 const isTextOrVision = computed(() => form.value.type === 1 || form.value.type === 2)
 const isTts = computed(() => form.value.type === 3)
 const isStt = computed(() => form.value.type === 4)
+
+const canFetchModels = computed(() => {
+  // 编辑模式：只需要 baseUrl（假设后端已有 API Key）
+  if (props.editId) {
+    return !!form.value.baseUrl?.trim()
+  }
+  // 新增模式：需要 baseUrl 和 apiKey
+  return !!(form.value.baseUrl?.trim() && form.value.apiKey?.trim())
+})
+
+const modelOptions = computed<SelectOption[]>(() => {
+  const filtered = fetchedModels.value.filter((m: AiModelInfo) => filterTypes.value.includes(m.type))
+  return filtered.map((m: AiModelInfo) => ({
+    label: `${m.name} (${typeOptions.find((t) => t.value === m.type)?.label})`,
+    value: m.name
+  }))
+})
 
 watch(
   () => props.initialData,
@@ -210,7 +257,7 @@ watch(
         topP: data.topP ?? null,
         maxTokens: data.maxTokens ?? null,
         systemPrompt: data.systemPrompt ?? '',
-        enableThinking: data.enableThinking ?? false,
+        enableThinking: data.enableThinking ?? 0,
         thinkingBudget: data.thinkingBudget ?? null,
         voice: data.voice ?? '',
         speed: data.speed ?? null,
@@ -234,6 +281,44 @@ const rules: FormRules = {
   modelName: [{ required: true, message: '请输入模型名称', trigger: 'blur' }]
 }
 
+async function fetchModels() {
+  if (!canFetchModels.value) {
+    if (props.editId) {
+      message.warning('请先填写 Base URL')
+    } else {
+      message.warning('请先填写 Base URL 和 API Key')
+    }
+    return
+  }
+
+  // 编辑模式且 API Key 为空时，使用占位符（后端会使用已存储的 API Key）
+  const apiKey = form.value.apiKey || (props.editId ? '__USE_EXISTING__' : '')
+
+  if (!apiKey) {
+    message.warning('请填写 API Key')
+    return
+  }
+
+  fetchingModels.value = true
+  try {
+    const res = await aiApi.fetchModels({
+      baseUrl: form.value.baseUrl,
+      apiKey: apiKey
+    })
+
+    if (res.data?.code === 200 && res.data.data) {
+      fetchedModels.value = res.data.data
+      message.success(`成功获取 ${fetchedModels.value.length} 个模型`)
+    } else {
+      message.error(res.data?.msg ?? '获取模型列表失败')
+    }
+  } catch (error) {
+    message.error('获取模型列表失败')
+  } finally {
+    fetchingModels.value = false
+  }
+}
+
 async function submit() {
   try {
     await formRef.value!.validate()
@@ -244,7 +329,12 @@ async function submit() {
   saving.value = true
   try {
     const payload: AiModelConfigUpdateReq = { ...form.value }
+
+    // 过滤空的 API Key（编辑时可选）
     if (!payload.apiKey) delete payload.apiKey
+
+    // 过滤占位符（防止占位符被保存到数据库）
+    if (payload.apiKey === '__USE_EXISTING__') delete payload.apiKey
 
     const res = isEdit.value
       ? await aiApi.modelConfigUpdate(props.editId!, payload)
