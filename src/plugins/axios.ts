@@ -12,6 +12,19 @@ import { type Ref } from 'vue'
 import { useBaseURL } from '@/composables/useBaseUrl.ts'
 import router from '@/router'
 
+// 扩展 axios 类型定义
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    meta?: {
+      requestGroup?: string
+      requestId?: string
+      operate?: string
+      notify?: boolean
+      skipEncryption?: boolean
+    }
+  }
+}
+
 let loginInfoStore: ReturnType<typeof useLoginInfoStore> | null = null
 let httpCancelerStore: ReturnType<typeof useHttpCancelerStore> | null = null
 let token: Ref<any> | null = null
@@ -89,6 +102,21 @@ axios.interceptors.request.use((config) => {
     return config
   }
 
+  // 标记为跳过加密的请求（如 TTS）
+  if (config.meta?.skipEncryption) {
+    console.log(
+      '%c Strix HTTP %c POST %c%s',
+      'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+      'background: #f59e0b; color: white; padding: 4px 4px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+      'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+      config.meta?.operate || '请求',
+      '[encryption skipped]',
+      config.data
+    )
+    config.headers['Content-Type'] = 'application/json'
+    return config
+  }
+
   config.headers['Content-Type'] = 'application/json'
 
   // 请求预处理 & 加密 & 签名
@@ -139,6 +167,23 @@ axios.interceptors.response.use(
     if (response.config.meta?.requestGroup && response.config.meta?.requestId) {
       httpCancelerStore?.removeRequestById(response.config.meta.requestId)
     }
+
+    // Blob 响应（如 TTS 音频、文件下载）跳过解密，直接返回
+    if (response.config.responseType && response.config.responseType === 'blob') {
+      console.log(
+        '%c Strix HTTP %c 响应 %c%s',
+        'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
+        'background: #059669; color: white; padding: 4px 6px 4px 2px; border-radius: 0 6px 6px 0; font-weight: bold; font-size: 12px;',
+        'background: #eee; color: #374151; padding: 4px 6px; border-radius: 6px; font-weight: 600; margin-left: 8px;',
+        response.config.meta?.operate || '响应',
+        `[Blob ${response.data?.size || 0} bytes — decryption skipped]`
+      )
+      if (showNotify) {
+        createStrixMessage('success', (response.config.meta?.operate || '操作') + '成功', '操作成功')
+      }
+      return response
+    }
+
     // 解密 & 处理响应
     if (response.data) {
       response.data = dec(response.data)
@@ -157,7 +202,7 @@ axios.interceptors.response.use(
         throw new Error('请求过于频繁')
       }
 
-      if (response.data.code !== 200 && !response.data.repCode && response.config.responseType !== 'blob') {
+      if (response.data.code !== 200 && !response.data.repCode) {
         handleError(response)
       } else if (showNotify) {
         createStrixMessage('success', (response.config.meta?.operate || '操作') + '成功', '操作成功')

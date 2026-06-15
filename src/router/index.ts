@@ -389,6 +389,31 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
+        path: 'system/ai',
+        name: 'SystemAi',
+        meta: { title: 'AI 能力', empty: true },
+        children: [
+          {
+            path: 'chat',
+            name: 'SystemAiChat',
+            component: () => import('@/views/System/SystemAi/AiChat/AiChatPage.vue'),
+            meta: { title: 'AI 对话', permission: 'system:ai:chat' }
+          },
+          {
+            path: 'workshop',
+            name: 'SystemAiWorkshop',
+            component: () => import('@/views/System/SystemAi/AiWorkshop/AiWorkshopPage.vue'),
+            meta: { title: 'AI 工坊', permission: 'system:ai:workshop' }
+          },
+          {
+            path: 'model-config',
+            name: 'SystemAiModelConfig',
+            component: () => import('@/views/System/SystemAi/AiModelConfig/AiModelConfigPage.vue'),
+            meta: { title: '模型配置', permission: 'system:ai:model-config' }
+          }
+        ]
+      },
+      {
         path: '/403',
         name: 'Forbidden',
         component: Forbidden,
