@@ -48,6 +48,7 @@
             <n-checkbox :value="3" label="TTS" />
             <n-checkbox :value="4" label="STT" />
             <n-checkbox :value="5" label="IMAGE_GEN" />
+            <n-checkbox :value="6" label="ASR" />
           </n-space>
         </n-checkbox-group>
         <n-select
@@ -99,6 +100,30 @@
       <n-form-item v-if="thinkingSwitch" label="思考 Token 预算">
         <n-input-number v-model:value="form.thinkingBudget" :min="1024" :step="1024" clearable style="width: 160px" />
       </n-form-item>
+      <n-form-item label="代码解释器">
+        <n-space align="center">
+          <n-switch v-model:value="codeInterpreterSwitch" :disabled="!thinkingSwitch" />
+          <n-text depth="3" style="font-size: 12px">需开启思考模式，仅流式对话生效</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="联网搜索">
+        <n-switch v-model:value="searchSwitch" />
+      </n-form-item>
+      <n-form-item v-if="searchSwitch" label="搜索策略">
+        <n-select
+          v-model:value="form.searchStrategy"
+          :options="searchStrategyOptions"
+          clearable
+          placeholder="选择搜索策略"
+          style="width: 220px"
+        />
+      </n-form-item>
+      <n-form-item v-if="searchSwitch" label="来源引用">
+        <n-space align="center">
+          <n-switch v-model:value="sourceSwitch" />
+          <n-text depth="3" style="font-size: 12px">在回答中附带搜索来源</n-text>
+        </n-space>
+      </n-form-item>
     </template>
 
     <!-- TTS 参数 -->
@@ -136,6 +161,13 @@
       </n-form-item>
     </template>
 
+    <!-- ASR 参数（实时语音识别） -->
+    <template v-if="isAsr">
+      <n-form-item label="语言" path="language">
+        <n-input v-model:value="form.language" clearable placeholder="如 zh / en（可选）" />
+      </n-form-item>
+    </template>
+
     <n-space justify="end" style="margin-top: 16px">
       <n-button @click="emit('cancel')">取消</n-button>
       <n-button type="primary" :loading="saving" @click="submit">保存</n-button>
@@ -163,14 +195,15 @@ const isEdit = computed(() => !!props.editId)
 
 const fetchedModels = ref<AiModelInfo[]>([])
 const fetchingModels = ref(false)
-const filterTypes = ref<number[]>([1, 2, 3, 4, 5])
+const filterTypes = ref<number[]>([1, 2, 3, 4, 5, 6])
 
 const typeOptions = [
   { label: 'TEXT（文本对话）', value: 1 },
   { label: 'VISION（视觉理解）', value: 2 },
   { label: 'TTS（语音合成）', value: 3 },
-  { label: 'STT（语音识别）', value: 4 },
-  { label: 'IMAGE_GEN（图片生成）', value: 5 }
+  { label: 'STT（离线语音识别）', value: 4 },
+  { label: 'IMAGE_GEN（图片生成）', value: 5 },
+  { label: 'ASR（实时语音识别）', value: 6 }
 ]
 
 const audioFormatOptions = [
@@ -199,9 +232,13 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   systemPrompt: '',
   enableThinking: 0,
   thinkingBudget: null,
+  enableCodeInterpreter: 0,
+  enableSearch: 0,
+  searchStrategy: null,
+  enableSource: 0,
   voice: '',
   speed: null,
-  responseFormat: '',
+  responseFormat: null,
   language: '',
   status: 1,
   remark: ''
@@ -216,14 +253,44 @@ const thinkingSwitch = computed({
   get: () => form.value.enableThinking === 1,
   set: (v) => {
     form.value.enableThinking = v ? 1 : 0
-    if (!v) form.value.thinkingBudget = null
+    if (!v) {
+      form.value.thinkingBudget = null
+      // 代码解释器依赖思考模式，关闭思考时一并关闭
+      form.value.enableCodeInterpreter = 0
+    }
   }
 })
+const codeInterpreterSwitch = computed({
+  get: () => form.value.enableCodeInterpreter === 1,
+  set: (v) => (form.value.enableCodeInterpreter = v ? 1 : 0)
+})
+const searchSwitch = computed({
+  get: () => form.value.enableSearch === 1,
+  set: (v) => {
+    form.value.enableSearch = v ? 1 : 0
+    if (!v) {
+      form.value.searchStrategy = null
+      form.value.enableSource = 0
+    }
+  }
+})
+const sourceSwitch = computed({
+  get: () => form.value.enableSource === 1,
+  set: (v) => (form.value.enableSource = v ? 1 : 0)
+})
+
+const searchStrategyOptions = [
+  { label: 'auto（模型自主判断）', value: 'auto' },
+  { label: 'standard（标准搜索）', value: 'standard' },
+  { label: 'max（高性能搜索）', value: 'max' },
+  { label: 'agent（深度研究）', value: 'agent' }
+]
 
 const isText = computed(() => form.value.type === 1)
 const isTextOrVision = computed(() => form.value.type === 1 || form.value.type === 2)
 const isTts = computed(() => form.value.type === 3)
 const isStt = computed(() => form.value.type === 4)
+const isAsr = computed(() => form.value.type === 6)
 
 const canFetchModels = computed(() => {
   // 编辑模式：只需要 baseUrl（假设后端已有 API Key）
@@ -259,9 +326,13 @@ watch(
         systemPrompt: data.systemPrompt ?? '',
         enableThinking: data.enableThinking ?? 0,
         thinkingBudget: data.thinkingBudget ?? null,
+        enableCodeInterpreter: data.enableCodeInterpreter ?? 0,
+        enableSearch: data.enableSearch ?? 0,
+        searchStrategy: data.searchStrategy ?? null,
+        enableSource: data.enableSource ?? 0,
         voice: data.voice ?? '',
         speed: data.speed ?? null,
-        responseFormat: data.responseFormat ?? '',
+        responseFormat: data.responseFormat ?? null,
         language: data.language ?? '',
         status: data.status ?? 1,
         remark: data.remark ?? ''
@@ -303,7 +374,8 @@ async function fetchModels() {
   try {
     const res = await aiApi.fetchModels({
       baseUrl: form.value.baseUrl,
-      apiKey: apiKey
+      apiKey: apiKey,
+      configId: props.editId || undefined
     })
 
     if (res.data?.code === 200 && res.data.data) {
@@ -312,7 +384,7 @@ async function fetchModels() {
     } else {
       message.error(res.data?.msg ?? '获取模型列表失败')
     }
-  } catch (error) {
+  } catch {
     message.error('获取模型列表失败')
   } finally {
     fetchingModels.value = false

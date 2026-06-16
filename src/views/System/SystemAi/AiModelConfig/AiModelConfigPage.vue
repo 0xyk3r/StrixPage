@@ -76,7 +76,8 @@ const MODEL_TYPE_LABEL: Record<number, string> = {
   2: 'VISION',
   3: 'TTS',
   4: 'STT',
-  5: 'IMAGE_GEN'
+  5: 'IMAGE_GEN',
+  6: 'ASR'
 }
 
 const MODEL_TYPE_COLOR: Record<number, string> = {
@@ -84,7 +85,8 @@ const MODEL_TYPE_COLOR: Record<number, string> = {
   2: 'success',
   3: 'warning',
   4: 'error',
-  5: 'default'
+  5: 'default',
+  6: 'warning'
 }
 
 const typeOptions = Object.entries(MODEL_TYPE_LABEL).map(([v, l]) => ({

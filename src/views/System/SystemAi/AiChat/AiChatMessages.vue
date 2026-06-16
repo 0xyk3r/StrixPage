@@ -1,5 +1,5 @@
 <template>
-  <n-scrollbar ref="scrollRef" class="message-list">
+  <n-scrollbar ref="scrollRef" class="message-list" @scroll="handleScroll">
     <div class="message-list__inner">
       <n-empty v-if="!loading && messages.length === 0" description="暂无消息，开始对话吧" style="margin: 40px auto" />
       <n-spin v-if="loading" :show="true" style="display: flex; justify-content: center; padding: 40px 0" />
@@ -207,12 +207,35 @@ async function scrollToBottom() {
   scrollRef.value?.scrollTo({ top: 999999 })
 }
 
+/** 用户是否贴近底部：贴近时才在流式增量更新中自动滚动，避免上滑查看历史时被强制拉回 */
+const autoScroll = ref(true)
+
+function handleScroll(e: Event) {
+  const el = e.target as HTMLElement
+  if (!el) return
+  const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+  autoScroll.value = distanceToBottom < 80
+}
+
+let lastMessageCount = props.messages.length
+
 watch(
   () => {
     const last = props.messages[props.messages.length - 1]
     return [props.messages.length, last?.content, last?.thinkingContent]
   },
-  () => scrollToBottom()
+  () => {
+    const count = props.messages.length
+    if (count !== lastMessageCount) {
+      // 新增消息（发送/接收新条目或切换会话）：总是滚动到底
+      lastMessageCount = count
+      autoScroll.value = true
+      scrollToBottom()
+    } else if (autoScroll.value) {
+      // 同一条消息的流式增量：仅在用户贴近底部时滚动
+      scrollToBottom()
+    }
+  }
 )
 
 onMounted(() => scrollToBottom())

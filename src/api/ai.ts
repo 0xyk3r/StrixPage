@@ -11,7 +11,7 @@ export interface AiModelConfigResp {
   id: string
   key: string
   name: string
-  /** 1=TEXT 2=VISION 3=TTS 4=STT 5=IMAGE_GEN */
+  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
   type: number
   baseUrl: string
   modelName: string
@@ -22,6 +22,14 @@ export interface AiModelConfigResp {
   /** 0=禁用 1=启用 */
   enableThinking?: number
   thinkingBudget?: number
+  /** 是否启用代码解释器：0=禁用 1=启用 */
+  enableCodeInterpreter?: number
+  /** 是否启用联网搜索：0=禁用 1=启用 */
+  enableSearch?: number
+  /** 搜索策略：auto/standard/max/agent */
+  searchStrategy?: string
+  /** 是否附带搜索来源引用：0=禁用 1=启用 */
+  enableSource?: number
   voice?: string
   speed?: number
   responseFormat?: string
@@ -38,7 +46,7 @@ export interface AiModelConfigResp {
 export interface AiModelConfigUpdateReq {
   key: string
   name: string
-  /** 1=TEXT 2=VISION 3=TTS 4=STT 5=IMAGE_GEN */
+  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
   type: number
   baseUrl: string
   apiKey?: string
@@ -50,9 +58,17 @@ export interface AiModelConfigUpdateReq {
   /** 0=禁用 1=启用 */
   enableThinking?: number
   thinkingBudget?: number | null
+  /** 是否启用代码解释器：0=禁用 1=启用 */
+  enableCodeInterpreter?: number
+  /** 是否启用联网搜索：0=禁用 1=启用 */
+  enableSearch?: number
+  /** 搜索策略：auto/standard/max/agent */
+  searchStrategy?: string | null
+  /** 是否附带搜索来源引用：0=禁用 1=启用 */
+  enableSource?: number
   voice?: string
   speed?: number | null
-  responseFormat?: string
+  responseFormat?: string | null
   language?: string
   promptAudioUrl?: string
   ossConfigKey?: string
@@ -64,6 +80,8 @@ export interface AiModelConfigUpdateReq {
 export interface AiFetchModelsReq {
   baseUrl: string
   apiKey: string
+  /** 编辑场景下传配置 ID：apiKey 为 __USE_EXISTING__ 占位符时，后端据此精确取已存储的 Key */
+  configId?: string
 }
 
 export interface AiModelInfo {
@@ -142,6 +160,18 @@ export interface AiImageGenerateReq {
   imageUrls?: string[]
   prompt: string
   size?: string
+}
+
+/** AI 异步任务状态（TTS 音色注册 / STT 转写） */
+export interface AiTaskStatus {
+  taskId: string
+  type: string
+  /** PENDING | RUNNING | SUCCEEDED | FAILED */
+  status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED'
+  /** 成功时的结果（音色 ID 或识别文本） */
+  result?: string
+  /** 失败时的错误信息 */
+  error?: string
 }
 
 // ============================================================
@@ -240,7 +270,7 @@ export const aiApi = {
       meta: { operate: '注册 TTS 音色' }
     }),
 
-  // STT：FormData 上传，跳过加密
+  // STT：FormData 上传，跳过加密；返回 taskId，需轮询 taskStatus
   sttTranscribe: (configKey: string, audioFile: File) => {
     const fd = new FormData()
     fd.append('audio', audioFile)
@@ -249,6 +279,12 @@ export const aiApi = {
       meta: { operate: 'STT 语音转写', notify: false, skipEncryption: true }
     })
   },
+
+  // 查询异步任务状态（TTS 音色注册 / STT 转写）
+  taskStatus: (taskId: string) =>
+    http.get<RetResult<AiTaskStatus>>(`${BASE}/task/${taskId}`, {
+      meta: { operate: '查询任务状态', notify: false }
+    }),
 
   // 图片生成
   imageGenerate: (data: AiImageGenerateReq) =>

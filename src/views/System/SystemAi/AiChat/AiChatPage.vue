@@ -189,7 +189,7 @@ async function handleSwitchModel(modelConfigId: string) {
   try {
     await chatStore.switchModel(chatStore.activeSessionId, modelConfigId)
     message.success('模型已切换')
-  } catch (err) {
+  } catch {
     message.error('模型切换失败')
   }
 }
@@ -239,6 +239,11 @@ function confirmClearMessages() {
 
 onMounted(async () => {
   await Promise.all([chatStore.loadSessions(), loadModelConfigs()])
+})
+
+onUnmounted(() => {
+  // 离开页面时中止进行中的 SSE 流，避免 store 单例残留 streaming 状态与后台孤儿 fetch
+  chatStore.abortStream()
 })
 </script>
 

@@ -131,7 +131,7 @@ export const useAiChatStore = defineStore('aiChat', () => {
       role: m.role as 'user' | 'assistant',
       content: m.content ?? '',
       thinkingContent: m.thinkingContent ?? '',
-      attachments: m.attachments ? JSON.parse(m.attachments) : [],
+      attachments: parseAttachments(m.attachments),
       status: m.status ?? 1,
       errorMsg: m.errorMsg,
       thinkingExpanded: false,
@@ -143,6 +143,18 @@ export const useAiChatStore = defineStore('aiChat', () => {
       createdTime: m.createdTime,
       modelConfigId: m.modelConfigId,
       modelConfigName: m.modelConfigName
+    }
+  }
+
+  /** 安全解析附件 JSON：单条数据损坏不应导致整段历史加载失败 */
+  function parseAttachments(json?: string): UiMessage['attachments'] {
+    if (!json) return []
+    try {
+      const parsed = JSON.parse(json)
+      return Array.isArray(parsed) ? parsed : []
+    } catch (e) {
+      console.warn('[ai-chat] 解析附件 JSON 失败，已忽略该消息附件:', e)
+      return []
     }
   }
 
@@ -176,39 +188,47 @@ export const useAiChatStore = defineStore('aiChat', () => {
     messages.value.push(assistantMsg)
 
     streaming.value = true
-    abortController = new AbortController()
+    const controller = new AbortController()
+    abortController = controller
     const sendStartTime = Date.now()
+    // 必须捕获响应式数组中的代理对象（而非原始局部对象 userMsg/assistantMsg）：
+    // 直接修改 push 进数组的原始对象不会触发 Vue 响应式，流式内容将无法实时渲染。
+    // 持有稳定代理引用也可避免流式中切换会话写错对象 / 旧流收尾误关新流。
+    const targetUserMsg = messages.value[messages.value.length - 2]!
+    const targetMsg = messages.value[messages.value.length - 1]!
 
     await streamAiMessage(
       activeSessionId.value,
       { content, attachments: attachments.length ? attachments : undefined },
       (event) => {
-        const last = messages.value[messages.value.length - 1]
-        if (!last) return
         if (event.type === 'thinking') {
-          last.thinkingContent += event.content
+          targetMsg.thinkingContent += event.content ?? ''
         } else if (event.type === 'content') {
-          if (!last.thinkingDone) last.thinkingDone = true
-          last.content += event.content
+          if (!targetMsg.thinkingDone) targetMsg.thinkingDone = true
+          targetMsg.content += event.content ?? ''
         } else if (event.type === 'done') {
-          last.status = 1
-          if (event.messageId) last.id = event.messageId
-          if (event.userMessageId) userMsg.id = event.userMessageId
-          if (event.modelConfigId) last.modelConfigId = event.modelConfigId
-          if (event.modelConfigName) last.modelConfigName = event.modelConfigName
-          last.inputTokens = event.promptTokens
-          last.outputTokens = event.completionTokens
-          last.durationMs = Date.now() - sendStartTime
-          streaming.value = false
-          abortController = null
+          targetMsg.status = 1
+          if (event.messageId) targetMsg.id = event.messageId
+          if (event.userMessageId) targetUserMsg.id = event.userMessageId
+          if (event.modelConfigId) targetMsg.modelConfigId = event.modelConfigId
+          if (event.modelConfigName) targetMsg.modelConfigName = event.modelConfigName
+          targetMsg.inputTokens = event.promptTokens
+          targetMsg.outputTokens = event.completionTokens
+          targetMsg.durationMs = Date.now() - sendStartTime
+          if (abortController === controller) {
+            streaming.value = false
+            abortController = null
+          }
         } else if (event.type === 'error') {
-          last.status = 2
-          last.errorMsg = event.message
-          streaming.value = false
-          abortController = null
+          targetMsg.status = 2
+          targetMsg.errorMsg = event.message
+          if (abortController === controller) {
+            streaming.value = false
+            abortController = null
+          }
         }
       },
-      abortController.signal
+      controller.signal
     )
   }
 
@@ -249,37 +269,42 @@ export const useAiChatStore = defineStore('aiChat', () => {
     messages.value.push(assistantMsg)
 
     streaming.value = true
-    abortController = new AbortController()
+    const controller = new AbortController()
+    abortController = controller
     const sendStartTime = Date.now()
+    // 捕获响应式数组中的代理对象（而非原始局部对象），否则流式更新不会触发视图渲染
+    const targetMsg = messages.value[messages.value.length - 1]!
 
     await streamAiRegenerate(
       activeSessionId.value,
       (event) => {
-        const last = messages.value[messages.value.length - 1]
-        if (!last) return
         if (event.type === 'thinking') {
-          last.thinkingContent += event.content
+          targetMsg.thinkingContent += event.content ?? ''
         } else if (event.type === 'content') {
-          if (!last.thinkingDone) last.thinkingDone = true
-          last.content += event.content
+          if (!targetMsg.thinkingDone) targetMsg.thinkingDone = true
+          targetMsg.content += event.content ?? ''
         } else if (event.type === 'done') {
-          last.status = 1
-          if (event.messageId) last.id = event.messageId
-          if (event.modelConfigId) last.modelConfigId = event.modelConfigId
-          if (event.modelConfigName) last.modelConfigName = event.modelConfigName
-          last.inputTokens = event.promptTokens
-          last.outputTokens = event.completionTokens
-          last.durationMs = Date.now() - sendStartTime
-          streaming.value = false
-          abortController = null
+          targetMsg.status = 1
+          if (event.messageId) targetMsg.id = event.messageId
+          if (event.modelConfigId) targetMsg.modelConfigId = event.modelConfigId
+          if (event.modelConfigName) targetMsg.modelConfigName = event.modelConfigName
+          targetMsg.inputTokens = event.promptTokens
+          targetMsg.outputTokens = event.completionTokens
+          targetMsg.durationMs = Date.now() - sendStartTime
+          if (abortController === controller) {
+            streaming.value = false
+            abortController = null
+          }
         } else if (event.type === 'error') {
-          last.status = 2
-          last.errorMsg = event.message
-          streaming.value = false
-          abortController = null
+          targetMsg.status = 2
+          targetMsg.errorMsg = event.message
+          if (abortController === controller) {
+            streaming.value = false
+            abortController = null
+          }
         }
       },
-      abortController.signal
+      controller.signal
     )
   }
 
