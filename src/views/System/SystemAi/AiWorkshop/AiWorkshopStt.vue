@@ -2,70 +2,70 @@
   <div class="workshop-stt">
     <n-card title="语音识别" class="workshop-card">
       <n-tabs v-model:value="mode" type="line" animated @update:value="onModeChange">
-        <!-- 实时识别（ASR，流式） -->
+        <!-- 实时识别（ASR，流式）：左控制面板 + 右识别结果 -->
         <n-tab-pane name="realtime" tab="实时识别">
-          <n-form label-placement="left" label-width="80px">
-            <n-form-item label="选择模型">
-              <n-select
-                v-model:value="asrConfigKey"
-                :options="asrModelOptions"
-                placeholder="选择实时语音识别 (ASR) 模型"
-                filterable
-                style="max-width: 360px"
+          <div class="realtime-layout">
+            <!-- 左：控制面板 -->
+            <div class="realtime-layout__panel">
+              <n-form label-placement="top">
+                <n-form-item label="选择模型">
+                  <n-select
+                    v-model:value="asrConfigKey"
+                    :options="asrModelOptions"
+                    placeholder="选择实时语音识别 (ASR) 模型"
+                    filterable
+                  />
+                </n-form-item>
+                <n-form-item label="麦克风">
+                  <n-select
+                    v-model:value="settings.deviceId"
+                    :options="deviceOptions"
+                    :disabled="asrRecording || asrConnecting"
+                    placeholder="选择麦克风输入设备"
+                  />
+                </n-form-item>
+              </n-form>
+
+              <!-- 音频可视化指示器（常驻） -->
+              <asr-audio-meter
+                :rms="asrCurrentRms"
+                :phase="asrVadPhase"
+                :rms-start="settings.vad.rmsStart"
+                :rms-stop="settings.vad.rmsStop"
               />
-            </n-form-item>
-            <n-form-item label="麦克风">
-              <n-select
-                v-model:value="settings.deviceId"
-                :options="deviceOptions"
-                :disabled="asrRecording || asrConnecting"
-                placeholder="选择麦克风输入设备"
-                style="max-width: 360px"
-              />
-            </n-form-item>
-          </n-form>
 
-          <n-space vertical :size="16">
-            <!-- 音频可视化指示器（常驻） -->
-            <asr-audio-meter
-              :rms="asrCurrentRms"
-              :phase="asrVadPhase"
-              :rms-start="settings.vad.rmsStart"
-              :rms-stop="settings.vad.rmsStop"
-            />
+              <!-- 高级 VAD 设置（默认折叠） -->
+              <n-collapse>
+                <n-collapse-item title="高级 VAD 设置" name="vad">
+                  <asr-vad-settings :vad="settings.vad" @update="onVadUpdate" @reset="reset" />
+                </n-collapse-item>
+              </n-collapse>
 
-            <!-- 高级 VAD 设置（默认折叠） -->
-            <n-collapse>
-              <n-collapse-item title="高级 VAD 设置" name="vad">
-                <asr-vad-settings :vad="settings.vad" @update="onVadUpdate" @reset="reset" />
-              </n-collapse-item>
-            </n-collapse>
-
-            <n-space align="center">
-              <n-button
-                v-if="!asrRecording && !asrConnecting"
-                type="primary"
-                :disabled="!asrConfigKey"
-                @click="onStart"
-              >
-                开始录音
-              </n-button>
-              <n-button v-else type="error" :loading="asrConnecting" @click="stopAsr">停止</n-button>
-              <n-text depth="3" style="font-size: 12px">
-                {{ asrConnecting ? '连接中…' : asrRecording ? '聆听中，请讲话…' : '点击开始，授权麦克风后实时识别' }}
-              </n-text>
-            </n-space>
-
-            <n-alert v-if="asrError" type="error" :show-icon="false" style="background: transparent">
-              {{ asrError }}
-            </n-alert>
-
-            <div v-if="asrText" class="stt-result">
-              <p class="stt-result__label">识别结果：</p>
-              <n-input :value="asrText" type="textarea" :rows="6" readonly style="max-width: 640px" />
-              <n-button size="small" ghost @click="copyText(asrText)">复制结果</n-button>
+              <div class="realtime-layout__actions">
+                <n-button
+                  v-if="!asrRecording && !asrConnecting"
+                  type="primary"
+                  block
+                  :disabled="!asrConfigKey"
+                  @click="onStart"
+                >
+                  开始录音
+                </n-button>
+                <n-button v-else type="error" block :loading="asrConnecting" @click="stopAsr">停止</n-button>
+                <n-text depth="3" style="font-size: 12px">
+                  {{ asrConnecting ? '连接中…' : asrRecording ? '聆听中，请讲话…' : '点击开始，授权麦克风后实时识别' }}
+                </n-text>
+                <n-alert v-if="asrError" type="error" :show-icon="false" style="background: transparent">
+                  {{ asrError }}
+                </n-alert>
+              </div>
             </div>
-          </n-space>
+
+            <!-- 右：识别结果 -->
+            <div class="realtime-layout__result">
+              <asr-transcript-view :sentences="asrSentences" :recording="asrRecording" @clear="asrSentences = []" />
+            </div>
+          </div>
         </n-tab-pane>
 
         <!-- 上传识别（离线 STT，批量异步轮询） -->
@@ -99,10 +99,15 @@
             <n-text v-if="statusHint" depth="3" style="font-size: 12px">{{ statusHint }}</n-text>
           </n-space>
 
-          <div v-if="result" class="stt-result">
-            <p class="stt-result__label">识别结果：</p>
-            <n-input :value="result" type="textarea" :rows="6" readonly style="max-width: 640px" />
-            <n-button size="small" ghost @click="copyText(result)">复制结果</n-button>
+          <div v-if="result" class="stt-result-card">
+            <div class="stt-result-card__head">
+              <span class="stt-result-card__title">识别结果</span>
+              <span class="stt-result-card__count">共 {{ result.length }} 字</span>
+            </div>
+            <p class="stt-result-card__body">{{ result }}</p>
+            <div class="stt-result-card__foot">
+              <n-button size="small" ghost @click="copyText(result)">复制结果</n-button>
+            </div>
           </div>
         </n-tab-pane>
       </n-tabs>
@@ -119,6 +124,7 @@ import { type AsrVadParams, useAsrSettings } from '@/composables/useAsrSettings'
 import { useMediaDevices } from '@/composables/useMediaDevices'
 import AsrAudioMeter from './AsrAudioMeter.vue'
 import AsrVadSettings from './AsrVadSettings.vue'
+import AsrTranscriptView from './AsrTranscriptView.vue'
 
 interface Props {
   models: AiModelConfigResp[]
@@ -144,7 +150,7 @@ const { options: deviceOptions, refresh: refreshDevices } = useMediaDevices()
 const {
   recording: asrRecording,
   connecting: asrConnecting,
-  displayText: asrText,
+  sentences: asrSentences,
   errorMsg: asrError,
   currentRms: asrCurrentRms,
   vadPhase: asrVadPhase,
@@ -261,20 +267,93 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.stt-result {
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+// —— 实时识别两列布局：左控制面板 + 右识别结果 ——
+.realtime-layout {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 16px;
+  // 给定边界高度，右侧识别结果区据此滚动；随视口自适应，下限保证可用
+  height: clamp(420px, calc(100vh - 320px), 760px);
 
-  &__label {
+  &__panel {
+    flex: none;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+  }
+
+  &__result {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// 窄屏：上下堆叠，结果区给固定高度
+@media (max-width: 900px) {
+  .realtime-layout {
+    flex-direction: column;
+    height: auto;
+
+    &__panel {
+      width: 100%;
+      overflow: visible;
+    }
+
+    &__result {
+      height: 480px;
+    }
+  }
+}
+
+.stt-result-card {
+  margin-top: 20px;
+  max-width: 640px;
+  border-radius: 12px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  overflow: hidden;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--strix-border-subtle);
+  }
+
+  &__title {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+    color: var(--strix-text-secondary);
+  }
+
+  &__count {
+    font-size: 12px;
+    color: var(--strix-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__body {
     margin: 0;
+    padding: 14px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--strix-text-primary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  &__foot {
+    padding: 0 14px 14px;
   }
 }
 </style>

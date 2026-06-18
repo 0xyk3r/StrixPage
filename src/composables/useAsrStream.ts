@@ -14,25 +14,85 @@ import type { AsrSettings } from '@/composables/useAsrSettings'
 const FRAME_MS = 100 // 每帧时长（worklet 缓冲 100ms）
 
 /**
+ * 单个断句的识别结果。
+ * 同一句的多次中间结果共享同一 id（itemId），通过 upsert 替换式更新 text；final 后定稿。
+ */
+export interface AsrSentence {
+  /** 对话项 ID（按句聚合的 key） */
+  id: string
+  /** 当前文本（实时替换，非追加） */
+  text: string
+  /** 情绪（仅 Qwen-ASR 返回，7 类之一：surprised/neutral/happy/sad/disgusted/angry/fearful） */
+  emotion?: string
+  /** 语种代码（zh/en/...） */
+  language?: string
+  /** 是否已确认（最终结果） */
+  final: boolean
+}
+
+/** 后端下发的转写消息 */
+interface AsrMessage {
+  itemId?: string
+  text: string
+  final: boolean
+  emotion?: string
+  language?: string
+}
+
+/**
  * 实时语音识别（ASR）composable。
  * <p>
  * 麦克风 → AudioContext(16kHz) → AudioWorklet(PCM16) → WebSocket(/ws/ai/asr) → DashScope 实时识别。
  * 设备与 VAD 参数来自传入的响应式 settings（录音中调参即时生效）。
- * 增量结果以 { text, final } 推送：final=true 的句子追加到 finalText，未完成的句子作为 interimText 实时显示。
+ * 识别结果以句子数组 sentences 维护：后端按 itemId 下发，前端 upsert 聚合为逐句结构，
+ * 每句携带 text / emotion / language / final，供按句 + 情绪展示。
  * 同时暴露 currentRms / vadPhase 供音频可视化指示器使用。
  */
 export function useAsrStream(settings: AsrSettings) {
   const connecting = ref(false)
   const recording = ref(false)
-  const finalText = ref('')
-  const interimText = ref('')
+  /** 逐句识别结果（按 itemId 聚合） */
+  const sentences = ref<AsrSentence[]>([])
   const errorMsg = ref('')
   /** 最近一帧 RMS（驱动可视化，范围约 [0,1]，语音通常远小于 1） */
   const currentRms = ref(0)
   /** VAD 阶段：idle 待机 / starting 起说判定中 / active 说话中 / trailing 静音计时中 */
   const vadPhase = ref<'idle' | 'starting' | 'active' | 'trailing'>('idle')
 
-  const displayText = computed(() => finalText.value + interimText.value)
+  /** 所有句子文本拼接（供整体复制） */
+  const displayText = computed(() => sentences.value.map((s) => s.text).join(''))
+
+  /**
+   * 按 itemId upsert 一句识别结果（替换式更新当前句文本，非追加）。
+   * itemId 命中已有句则更新；否则回退「最后一个未确认句」（兜底无 itemId 的平台）；都没有则新建。
+   */
+  function upsertSentence(msg: AsrMessage) {
+    const list = sentences.value
+    let idx = -1
+    if (msg.itemId) {
+      idx = list.findIndex((s) => s.id === msg.itemId)
+    }
+    if (idx === -1 && !msg.itemId) {
+      // 无 itemId 兜底：更新最后一个未确认句
+      idx = list.findIndex((s) => !s.final)
+    }
+    if (idx === -1) {
+      list.push({
+        id: msg.itemId ?? `local-${list.length}-${Date.now()}`,
+        text: msg.text,
+        final: msg.final,
+        emotion: msg.emotion,
+        language: msg.language
+      })
+    } else {
+      const s = list[idx]!
+      s.text = msg.text
+      s.final = msg.final
+      // 情绪 / 语种仅在有值时覆盖，避免后续空值清掉已识别到的情绪
+      if (msg.emotion) s.emotion = msg.emotion
+      if (msg.language) s.language = msg.language
+    }
+  }
 
   let ws: WebSocket | null = null
   let audioCtx: AudioContext | null = null
@@ -159,8 +219,7 @@ export function useAsrStream(settings: AsrSettings) {
       return
     }
     errorMsg.value = ''
-    finalText.value = ''
-    interimText.value = ''
+    sentences.value = []
     connecting.value = true
     // 重置 VAD 状态
     vadPhase.value = 'idle'
@@ -218,12 +277,13 @@ export function useAsrStream(settings: AsrSettings) {
             return
           }
           if (typeof data.text === 'string') {
-            if (data.final) {
-              finalText.value += data.text
-              interimText.value = ''
-            } else {
-              interimText.value = data.text
-            }
+            upsertSentence({
+              itemId: data.itemId,
+              text: data.text,
+              final: !!data.final,
+              emotion: data.emotion,
+              language: data.language
+            })
           }
         } catch {
           /* 忽略非 JSON 消息 */
@@ -293,8 +353,7 @@ export function useAsrStream(settings: AsrSettings) {
   return {
     connecting,
     recording,
-    finalText,
-    interimText,
+    sentences,
     displayText,
     errorMsg,
     currentRms,
