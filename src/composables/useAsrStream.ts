@@ -1,34 +1,36 @@
 import workletUrl from '@/utils/audio/pcm-encoder-worklet.js?url'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useBaseURL } from '@/composables/useBaseUrl'
+import type { AsrSettings } from '@/composables/useAsrSettings'
 
 /**
- * 前端 RMS 语音活动检测（VAD）参数。
+ * 前端 RMS 语音活动检测（VAD）说明。
  * 仅在检测到说话时上行音频（含前/后冗余），减少空闲数据包并避免把背景噪声送去识别。
- * 服务端仍开启 server_vad（silence=1500ms）做句子级断句，故 IDLE_STOP_MS 必须大于该窗口，
- * 以保证停发前服务端已对当前句完成提交，避免句尾被截断（即"后冗余"）。
- * 阈值与音量/麦克风相关，可按需微调：识别不到轻声→调低，噪声误触发→调高。
+ * 服务端 server_vad 以 silence_duration_ms=400ms 做句子级断句；前端 idleStopMs 为"停发"阈值，
+ * 须大于服务端断句窗口（400ms），以保证停发前服务端已对当前句完成提交，避免句尾被截断（"后冗余"）。
+ * 阈值与音量/麦克风相关，可在页面实时微调：识别不到轻声→调低起说阈值，噪声误触发→调高。
+ * 各参数默认值见 useAsrSettings.DEFAULT_VAD。
  */
 const FRAME_MS = 100 // 每帧时长（worklet 缓冲 100ms）
-const RMS_START = 0.015 // 起说阈值：连续达到若干帧判定开始说话
-const RMS_STOP = 0.004 // 静音阈值：低于此累计静音计时（滞回，低于起说阈值）
-const START_FRAMES = 2 // 连续达到起说阈值的帧数（防瞬时噪声误触发）
-const PREROLL_FRAMES = 3 // 前冗余：进入说话态时补发最近的帧数（~300ms），防起始截断
-const IDLE_STOP_MS = 2000 // 后冗余/停发阈值：连续静音超过此值才停发（须 > 服务端 silence）
 
 /**
  * 实时语音识别（ASR）composable。
  * <p>
  * 麦克风 → AudioContext(16kHz) → AudioWorklet(PCM16) → WebSocket(/ws/ai/asr) → DashScope 实时识别。
- * 增量结果以 { text, sentenceId, final } 推送：final=true 的句子追加到 finalText，
- * 未完成的句子作为 interimText 实时显示。
+ * 设备与 VAD 参数来自传入的响应式 settings（录音中调参即时生效）。
+ * 增量结果以 { text, final } 推送：final=true 的句子追加到 finalText，未完成的句子作为 interimText 实时显示。
+ * 同时暴露 currentRms / vadPhase 供音频可视化指示器使用。
  */
-export function useAsrStream() {
+export function useAsrStream(settings: AsrSettings) {
   const connecting = ref(false)
   const recording = ref(false)
   const finalText = ref('')
   const interimText = ref('')
   const errorMsg = ref('')
+  /** 最近一帧 RMS（驱动可视化，范围约 [0,1]，语音通常远小于 1） */
+  const currentRms = ref(0)
+  /** VAD 阶段：idle 待机 / starting 起说判定中 / active 说话中 / trailing 静音计时中 */
+  const vadPhase = ref<'idle' | 'starting' | 'active' | 'trailing'>('idle')
 
   const displayText = computed(() => finalText.value + interimText.value)
 
@@ -39,7 +41,6 @@ export function useAsrStream() {
   let workletNode: AudioWorkletNode | null = null
   let finishTimer: ReturnType<typeof setTimeout> | null = null
   // —— 前端 RMS VAD 状态 ——
-  let vadState: 'idle' | 'active' = 'idle'
   let preroll: ArrayBuffer[] = []
   let vadStartCount = 0
   let vadIdleMs = 0
@@ -65,6 +66,8 @@ export function useAsrStream() {
     sourceNode = null
     audioCtx = null
     mediaStream = null
+    currentRms.value = 0
+    vadPhase.value = 'idle'
   }
 
   /** 关闭 WebSocket 并清理结束计时器（幂等） */
@@ -89,18 +92,20 @@ export function useAsrStream() {
   }
 
   /**
-   * RMS VAD 帧处理：
-   * - idle 态：仅滚动缓冲前冗余帧并检测起说；连续 START_FRAMES 帧超过 RMS_START 即进入说话态，补发前冗余。
-   * - active 态：持续上行（句间短停顿一并发送，交由服务端 VAD 按 1500ms 断句）；
-   *   连续静音超过 IDLE_STOP_MS 才停发省流并回到 idle（IDLE_STOP_MS > 服务端断句窗口，保证句尾不被截断）。
+   * RMS VAD 帧处理（读 settings.vad 实时值，录音中调参即时生效）：
+   * - idle/starting：仅滚动缓冲前冗余帧并检测起说；连续 startFrames 帧超过 rmsStart 进入 active，补发前冗余。
+   * - active/trailing：持续上行；连续静音超过 idleStopMs 才停发回 idle（idleStopMs > 服务端断句窗口，保证句尾不截断）。
    */
   function handleFrame(rms: number, pcm: ArrayBuffer) {
-    if (vadState === 'idle') {
+    currentRms.value = rms
+    const v = settings.vad
+    if (vadPhase.value === 'idle' || vadPhase.value === 'starting') {
       preroll.push(pcm)
-      if (preroll.length > PREROLL_FRAMES) preroll.shift()
-      if (rms >= RMS_START) {
-        if (++vadStartCount >= START_FRAMES) {
-          vadState = 'active'
+      while (preroll.length > v.prerollFrames) preroll.shift()
+      if (rms >= v.rmsStart) {
+        vadPhase.value = 'starting'
+        if (++vadStartCount >= v.startFrames) {
+          vadPhase.value = 'active'
           vadIdleMs = 0
           vadStartCount = 0
           for (const b of preroll) sendFrame(b) // 补发前冗余（含起始帧）
@@ -108,19 +113,42 @@ export function useAsrStream() {
         }
       } else {
         vadStartCount = 0
+        vadPhase.value = 'idle'
       }
     } else {
       sendFrame(pcm)
-      if (rms < RMS_STOP) {
+      if (rms < v.rmsStop) {
         vadIdleMs += FRAME_MS
-        if (vadIdleMs >= IDLE_STOP_MS) {
-          vadState = 'idle'
+        vadPhase.value = 'trailing'
+        if (vadIdleMs >= v.idleStopMs) {
+          vadPhase.value = 'idle'
           vadIdleMs = 0
           preroll = []
         }
       } else {
         vadIdleMs = 0
+        vadPhase.value = 'active'
       }
+    }
+  }
+
+  /** 按 settings.deviceId 采集麦克风；指定设备不可用时回退系统默认 */
+  async function acquireMic(): Promise<MediaStream> {
+    const base: MediaTrackConstraints = {
+      channelCount: 1,
+      echoCancellation: true,
+      noiseSuppression: true
+    }
+    const deviceId = settings.deviceId
+    try {
+      const audio: MediaTrackConstraints = deviceId ? { ...base, deviceId: { exact: deviceId } } : base
+      return await navigator.mediaDevices.getUserMedia({ audio })
+    } catch (e: any) {
+      if (deviceId && e?.name === 'OverconstrainedError') {
+        errorMsg.value = '所选麦克风不可用，已切换为默认设备'
+        return await navigator.mediaDevices.getUserMedia({ audio: base })
+      }
+      throw e
     }
   }
 
@@ -135,19 +163,21 @@ export function useAsrStream() {
     interimText.value = ''
     connecting.value = true
     // 重置 VAD 状态
-    vadState = 'idle'
+    vadPhase.value = 'idle'
     preroll = []
     vadStartCount = 0
     vadIdleMs = 0
 
     try {
-      // 1. 麦克风采集（单声道）
-      mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
-      })
+      // 1. 麦克风采集（单声道，按 settings.deviceId）
+      mediaStream = await acquireMic()
 
       // 2. 16kHz AudioContext + PCM 编码 worklet
       audioCtx = new AudioContext({ sampleRate: 16000 })
+      // 少数浏览器不支持指定采样率会回落（如 48kHz），而 PCM 仍按 16kHz 上行将致识别异常：此处显式告警
+      if (Math.abs(audioCtx.sampleRate - 16000) > 1) {
+        errorMsg.value = `当前浏览器不支持 16kHz 采样（实际 ${audioCtx.sampleRate}Hz），识别可能异常`
+      }
       await audioCtx.audioWorklet.addModule(workletUrl)
       sourceNode = audioCtx.createMediaStreamSource(mediaStream)
       workletNode = new AudioWorkletNode(audioCtx, 'pcm-encoder')
@@ -163,7 +193,6 @@ export function useAsrStream() {
       mute.connect(audioCtx.destination)
 
       // 3. WebSocket 连接（token + configKey 走 query；SSE/WS 无法自定义请求头）
-      // 经 Nginx 统一 /api 前缀反向代理到后端（与 HTTP 请求同源同前缀）
       const token = useLoginInfoStore().loginToken
       const proto = location.protocol === 'https:' ? 'wss' : 'ws'
       const apiBase = useBaseURL() // 形如 '/api/'
@@ -215,7 +244,10 @@ export function useAsrStream() {
     } catch (e: any) {
       connecting.value = false
       recording.value = false
-      errorMsg.value = e?.message ?? '无法启动麦克风或建立连接'
+      const name = e?.name
+      if (name === 'NotAllowedError') errorMsg.value = '麦克风权限被拒绝，请在浏览器允许后重试'
+      else if (name === 'NotFoundError') errorMsg.value = '未检测到麦克风设备'
+      else if (!errorMsg.value) errorMsg.value = e?.message ?? '无法启动麦克风或建立连接'
       cleanupAudio()
       if (ws) {
         try {
@@ -238,7 +270,7 @@ export function useAsrStream() {
       } catch {
         /* ignore */
       }
-      // 等待服务端返回最终结果与 {done} 后由 onmessage 关闭；6s 兜底（长语音最终转写可能耗时）
+      // 等待服务端返回最终结果与 {done} 后由 onmessage 关闭；6s 兜底
       if (finishTimer) clearTimeout(finishTimer)
       finishTimer = setTimeout(closeWs, 6000)
     } else {
@@ -258,5 +290,16 @@ export function useAsrStream() {
     closeWs()
   })
 
-  return { connecting, recording, finalText, interimText, displayText, errorMsg, start, stop }
+  return {
+    connecting,
+    recording,
+    finalText,
+    interimText,
+    displayText,
+    errorMsg,
+    currentRms,
+    vadPhase,
+    start,
+    stop
+  }
 }

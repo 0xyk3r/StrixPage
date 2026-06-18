@@ -14,15 +14,39 @@
                 style="max-width: 360px"
               />
             </n-form-item>
+            <n-form-item label="麦克风">
+              <n-select
+                v-model:value="settings.deviceId"
+                :options="deviceOptions"
+                :disabled="asrRecording || asrConnecting"
+                placeholder="选择麦克风输入设备"
+                style="max-width: 360px"
+              />
+            </n-form-item>
           </n-form>
 
-          <n-space vertical>
+          <n-space vertical :size="16">
+            <!-- 音频可视化指示器（常驻） -->
+            <asr-audio-meter
+              :rms="asrCurrentRms"
+              :phase="asrVadPhase"
+              :rms-start="settings.vad.rmsStart"
+              :rms-stop="settings.vad.rmsStop"
+            />
+
+            <!-- 高级 VAD 设置（默认折叠） -->
+            <n-collapse>
+              <n-collapse-item title="高级 VAD 设置" name="vad">
+                <asr-vad-settings :vad="settings.vad" @update="onVadUpdate" @reset="reset" />
+              </n-collapse-item>
+            </n-collapse>
+
             <n-space align="center">
               <n-button
                 v-if="!asrRecording && !asrConnecting"
                 type="primary"
                 :disabled="!asrConfigKey"
-                @click="startAsr(asrConfigKey)"
+                @click="onStart"
               >
                 开始录音
               </n-button>
@@ -64,8 +88,12 @@
           </n-form>
 
           <n-space style="margin-top: 12px" align="center">
-            <n-button type="primary" :loading="transcribing" :disabled="!sttConfigKey || !audioFile"
-                      @click="transcribe">
+            <n-button
+              type="primary"
+              :loading="transcribing"
+              :disabled="!sttConfigKey || !audioFile"
+              @click="transcribe"
+            >
               开始识别
             </n-button>
             <n-text v-if="statusHint" depth="3" style="font-size: 12px">{{ statusHint }}</n-text>
@@ -87,6 +115,10 @@ import type { UploadFileInfo } from 'naive-ui'
 import type { AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import { useAsrStream } from '@/composables/useAsrStream'
+import { type AsrVadParams, useAsrSettings } from '@/composables/useAsrSettings'
+import { useMediaDevices } from '@/composables/useMediaDevices'
+import AsrAudioMeter from './AsrAudioMeter.vue'
+import AsrVadSettings from './AsrVadSettings.vue'
 
 interface Props {
   models: AiModelConfigResp[]
@@ -107,14 +139,36 @@ const sttModelOptions = computed(() =>
 
 // ——— 实时识别（ASR） ———
 const asrConfigKey = ref('')
+const { settings, reset } = useAsrSettings()
+const { options: deviceOptions, refresh: refreshDevices } = useMediaDevices()
 const {
   recording: asrRecording,
   connecting: asrConnecting,
   displayText: asrText,
   errorMsg: asrError,
+  currentRms: asrCurrentRms,
+  vadPhase: asrVadPhase,
   start: startAsr,
   stop: stopAsr
-} = useAsrStream()
+} = useAsrStream(settings)
+
+async function onStart() {
+  await startAsr(asrConfigKey.value)
+  // 授权麦克风后设备 label 才可读，补全设备下拉
+  refreshDevices()
+}
+
+// 选中设备被拔出/失效时回退系统默认
+watch(deviceOptions, (opts) => {
+  if (settings.deviceId && !opts.some((o) => o.value === settings.deviceId)) {
+    settings.deviceId = ''
+  }
+})
+
+// 子组件回传的 VAD 参数变更：写入共享 settings（自动持久化）
+function onVadUpdate(key: keyof AsrVadParams, value: number) {
+  settings.vad[key] = value
+}
 
 function onModeChange(next: string) {
   // 离开实时识别页时，若仍在录音则停止
