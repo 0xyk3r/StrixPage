@@ -1,6 +1,7 @@
 import type { CancelableRequest } from '@/stores/http-canceler'
 import { useHttpCancelerStore } from '@/stores/http-canceler'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
+import { useSseStore } from '@/stores/sse'
 import { decrypt, encrypt, signGet, signPost } from '@/utils/crypto'
 import { RateLimitError, StrixError } from '@/utils/strix-error'
 import { createStrixMessage } from '@/utils/strix-message'
@@ -267,6 +268,12 @@ function handleError(response: AxiosResponse) {
 
   // 登录失效 清除登录信息并跳转到登录页
   if (errCode === 401) {
+    // 同步断开 SSE 连接，避免持续重连
+    try {
+      useSseStore().disconnect()
+    } catch {
+      // SSE store 可能未初始化，忽略
+    }
     loginInfoStore?.clearLoginInfo()
     // noinspection JSIgnoredPromiseFromCall
     router.replace({
