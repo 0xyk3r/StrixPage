@@ -39,6 +39,8 @@ export interface AiModelConfigResp {
   ossBucketName?: string
   /** ASR run-task 默认参数（JSON 文本，ASR 专用） */
   asrParams?: string
+  /** STT 离线默认参数（JSON 文本，STT 专用） */
+  sttParams?: string
   status: number
   remark?: string
   createdTime: string
@@ -73,10 +75,12 @@ export interface AiModelConfigUpdateReq {
   responseFormat?: string | null
   language?: string
   promptAudioUrl?: string
-  ossConfigKey?: string
-  ossBucketName?: string
+  ossConfigKey?: string | null
+  ossBucketName?: string | null
   /** ASR run-task 默认参数（JSON 文本，ASR 专用） */
   asrParams?: string | null
+  /** STT 离线默认参数（JSON 文本，STT 专用） */
+  sttParams?: string | null
   status?: number
   remark?: string
 }
@@ -178,6 +182,38 @@ export interface AiTaskStatus {
   error?: string
 }
 
+/** 离线 STT 字级时间戳 */
+export interface SttWord {
+  beginTime: number
+  endTime: number
+  text: string
+  punctuation: string
+}
+
+/** 离线 STT 句级结果 */
+export interface SttSentence {
+  text: string
+  /** 句级开始时间(ms)（Qwen-Flash 无） */
+  beginTime?: number
+  endTime?: number
+  /** 说话人索引（Fun-ASR/Paraformer 开启分离时） */
+  speakerId?: number
+  /** 情绪（Qwen 7 类） */
+  emotion?: string
+  /** 句级语种 */
+  language?: string
+  /** 字级时间戳 */
+  words?: SttWord[]
+}
+
+/** 离线 STT 结构化识别结果（任务成功时 result 字段为本结构的 JSON 字符串） */
+export interface SttResult {
+  text: string
+  durationMs?: number
+  language?: string
+  sentences: SttSentence[]
+}
+
 // ============================================================
 //  API 方法
 // ============================================================
@@ -275,10 +311,13 @@ export const aiApi = {
     }),
 
   // STT：FormData 上传，跳过加密；返回 taskId，需轮询 taskStatus
-  sttTranscribe: (configKey: string, audioFile: File) => {
+  sttTranscribe: (configKey: string, audioFile: File, params?: Record<string, unknown>) => {
     const fd = new FormData()
     fd.append('audio', audioFile)
     fd.append('configKey', configKey)
+    if (params && Object.keys(params).length > 0) {
+      fd.append('params', JSON.stringify(params))
+    }
     return http.post<RetResult<string>>(`${BASE}/stt/transcribe`, fd, {
       meta: { operate: 'STT 语音转写', notify: false, skipEncryption: true }
     })

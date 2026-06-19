@@ -145,10 +145,33 @@
       </n-form-item>
     </template>
 
-    <!-- STT 参数 -->
+    <!-- STT 参数（离线语音识别） -->
     <template v-if="isStt">
+      <n-form-item label="存储配置" path="ossConfigKey">
+        <n-select
+          v-model:value="form.ossConfigKey"
+          :options="ossConfigOptions"
+          clearable
+          filterable
+          placeholder="选择 OSS 存储配置（音频经此上传转写）"
+          style="width: 100%"
+          @update:value="onOssConfigChange"
+        />
+      </n-form-item>
+      <n-form-item label="存储空间" path="ossBucketName">
+        <n-select
+          v-model:value="form.ossBucketName"
+          :options="ossBucketOptions"
+          :loading="loadingBuckets"
+          :disabled="!form.ossConfigKey"
+          clearable
+          filterable
+          :placeholder="form.ossConfigKey ? '选择存储空间 Bucket' : '请先选择存储配置'"
+          style="width: 100%"
+        />
+      </n-form-item>
       <n-form-item label="语言" path="language">
-        <n-input v-model:value="form.language" clearable placeholder="如 zh / en（可选）" />
+        <n-input v-model:value="form.language" clearable placeholder="如 zh / en（可选，默认语种）" />
       </n-form-item>
       <n-form-item label="响应格式" path="responseFormat">
         <n-select
@@ -157,6 +180,53 @@
           clearable
           placeholder="结果格式"
           style="width: 200px"
+        />
+      </n-form-item>
+      <n-form-item label="说话人分离">
+        <n-space align="center">
+          <n-switch v-model:value="sttParamsForm.diarizationEnabled" />
+          <n-text depth="3" style="font-size: 12px">仅 Fun-ASR / Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item v-if="sttParamsForm.diarizationEnabled" label="说话人数">
+        <n-input-number
+          v-model:value="sttParamsForm.speakerCount"
+          :min="2"
+          :max="100"
+          clearable
+          placeholder="自动判断"
+          style="width: 180px"
+        />
+      </n-form-item>
+      <n-form-item label="过滤语气词">
+        <n-space align="center">
+          <n-switch v-model:value="sttParamsForm.disfluencyRemovalEnabled" />
+          <n-text depth="3" style="font-size: 12px">仅 Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="时间戳校准">
+        <n-space align="center">
+          <n-switch v-model:value="sttParamsForm.timestampAlignmentEnabled" />
+          <n-text depth="3" style="font-size: 12px">仅 Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="数字正则化">
+        <n-space align="center">
+          <n-switch v-model:value="sttParamsForm.enableItn" />
+          <n-text depth="3" style="font-size: 12px">ITN，仅 Qwen</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="字级时间戳">
+        <n-space align="center">
+          <n-switch v-model:value="sttParamsForm.enableWords" />
+          <n-text depth="3" style="font-size: 12px">仅 Qwen-Filetrans</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="热词 ID">
+        <n-input
+          v-model:value="sttParamsForm.vocabularyId"
+          clearable
+          placeholder="可选，热词列表 ID（Fun-ASR/Paraformer）"
         />
       </n-form-item>
     </template>
@@ -234,6 +304,7 @@
 import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import type { AiModelConfigResp, AiModelConfigUpdateReq, AiModelInfo } from '@/api/ai'
 import { aiApi } from '@/api/ai'
+import { ossApi } from '@/api/oss'
 
 interface Props {
   editId?: string
@@ -297,7 +368,10 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   language: '',
   status: 1,
   remark: '',
-  asrParams: null
+  asrParams: null,
+  sttParams: null,
+  ossConfigKey: null,
+  ossBucketName: null
 })
 
 const form = ref(getDefaultForm())
@@ -326,6 +400,73 @@ const getDefaultAsrParams = (): AsrParamsForm => ({
 })
 
 const asrParamsForm = ref<AsrParamsForm>(getDefaultAsrParams())
+
+/** STT 默认参数编辑态（提交时序列化为 form.sttParams JSON 字符串；语种沿用上方"语言"字段） */
+interface SttParamsForm {
+  enableItn: boolean
+  enableWords: boolean
+  diarizationEnabled: boolean
+  speakerCount: number | null
+  disfluencyRemovalEnabled: boolean
+  timestampAlignmentEnabled: boolean
+  vocabularyId: string
+}
+
+const getDefaultSttParams = (): SttParamsForm => ({
+  enableItn: false,
+  enableWords: false,
+  diarizationEnabled: false,
+  speakerCount: null,
+  disfluencyRemovalEnabled: false,
+  timestampAlignmentEnabled: false,
+  vocabularyId: ''
+})
+
+const sttParamsForm = ref<SttParamsForm>(getDefaultSttParams())
+
+// ——— STT 专用：OSS 存储联动（音频文件需先上传至 OSS） ———
+const ossConfigOptions = ref<SelectOption[]>([])
+const ossBucketOptions = ref<SelectOption[]>([])
+const loadingBuckets = ref(false)
+
+/** 加载存储配置下拉 */
+async function loadOssConfigs() {
+  try {
+    const res = await ossApi.configSelect()
+    ossConfigOptions.value = (res.data?.data?.options ?? []).map((o) => ({ label: o.label, value: o.value }))
+  } catch {
+    ossConfigOptions.value = []
+  }
+}
+
+/** 按所选存储配置加载其存储空间（Bucket）下拉 */
+async function loadOssBuckets(configKey: string) {
+  if (!configKey) {
+    ossBucketOptions.value = []
+    return
+  }
+  loadingBuckets.value = true
+  try {
+    const res = await ossApi.bucketList({ configKey, pageSize: 200, pageNum: 1 })
+    ossBucketOptions.value = (res.data?.data?.buckets ?? []).map((b) => ({ label: b.name, value: b.name }))
+  } catch {
+    ossBucketOptions.value = []
+  } finally {
+    loadingBuckets.value = false
+  }
+}
+
+/** 切换存储配置：重载 Bucket 列表，并清空已选 Bucket（除非回填阶段） */
+function onOssConfigChange(key: string) {
+  form.value.ossConfigKey = key
+  form.value.ossBucketName = null
+  ossBucketOptions.value = []
+  loadOssBuckets(key)
+}
+
+// 初始化存储配置下拉（STT 类型用）
+loadOssConfigs()
+
 const statusSwitch = computed({
   get: () => form.value.status === 1,
   set: (v) => (form.value.status = v ? 1 : 0)
@@ -416,8 +557,14 @@ watch(
         responseFormat: data.responseFormat ?? null,
         language: data.language ?? '',
         status: data.status ?? 1,
-        remark: data.remark ?? ''
+        remark: data.remark ?? '',
+        ossConfigKey: data.ossConfigKey ?? null,
+        ossBucketName: data.ossBucketName ?? null
       })
+      // STT 存储联动：编辑态若已选配置，加载其 Bucket 列表以供下拉展示
+      if (data.ossConfigKey) {
+        loadOssBuckets(data.ossConfigKey)
+      }
       // ASR 默认参数：从 asrParams JSON 反序列化（非法/空 → 默认）
       asrParamsForm.value = getDefaultAsrParams()
       if (data.asrParams) {
@@ -427,9 +574,19 @@ watch(
           /* 非法 JSON 用默认 */
         }
       }
+      // STT 默认参数：从 sttParams JSON 反序列化（非法/空 → 默认）
+      sttParamsForm.value = getDefaultSttParams()
+      if (data.sttParams) {
+        try {
+          Object.assign(sttParamsForm.value, JSON.parse(data.sttParams))
+        } catch {
+          /* 非法 JSON 用默认 */
+        }
+      }
     } else {
       form.value = getDefaultForm()
       asrParamsForm.value = getDefaultAsrParams()
+      sttParamsForm.value = getDefaultSttParams()
     }
   },
   { immediate: true }
@@ -489,7 +646,7 @@ async function submit() {
     return
   }
 
-  // 仅 ASR 类型序列化默认参数；其他类型清空 asrParams
+  // 按类型序列化默认参数；其他类型清空
   if (form.value.type === 6) {
     const a = asrParamsForm.value
     const asrPayload: Record<string, unknown> = {
@@ -503,8 +660,23 @@ async function submit() {
     if (a.speechNoiseThreshold !== null) asrPayload.speechNoiseThreshold = a.speechNoiseThreshold
     if (a.vocabularyId.trim()) asrPayload.vocabularyId = a.vocabularyId.trim()
     form.value.asrParams = JSON.stringify(asrPayload)
+    form.value.sttParams = null
+  } else if (form.value.type === 4) {
+    const s = sttParamsForm.value
+    const sttPayload: Record<string, unknown> = {
+      enableItn: s.enableItn,
+      enableWords: s.enableWords,
+      diarizationEnabled: s.diarizationEnabled,
+      disfluencyRemovalEnabled: s.disfluencyRemovalEnabled,
+      timestampAlignmentEnabled: s.timestampAlignmentEnabled
+    }
+    if (s.speakerCount !== null) sttPayload.speakerCount = s.speakerCount
+    if (s.vocabularyId.trim()) sttPayload.vocabularyId = s.vocabularyId.trim()
+    form.value.sttParams = JSON.stringify(sttPayload)
+    form.value.asrParams = null
   } else {
     form.value.asrParams = null
+    form.value.sttParams = null
   }
 
   saving.value = true

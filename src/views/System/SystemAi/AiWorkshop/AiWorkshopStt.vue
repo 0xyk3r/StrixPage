@@ -79,45 +79,58 @@
           </div>
         </n-tab-pane>
 
-        <!-- 上传识别（离线 STT，批量异步轮询） -->
+        <!-- 上传识别（离线 STT，批量异步轮询）：左控制面板 + 右识别结果 -->
         <n-tab-pane name="upload" tab="上传识别">
-          <n-form label-placement="left" label-width="80px">
-            <n-form-item label="选择模型">
-              <n-select
-                v-model:value="sttConfigKey"
-                :options="sttModelOptions"
-                placeholder="选择离线语音识别 (STT) 模型"
-                filterable
-                style="max-width: 360px"
-              />
-            </n-form-item>
-            <n-form-item label="上传音频">
-              <n-upload :max="1" accept="audio/*" :default-upload="false" @change="handleUploadChange">
-                <n-button>选择音频文件</n-button>
-              </n-upload>
-            </n-form-item>
-          </n-form>
+          <div class="realtime-layout">
+            <!-- 左：控制面板 -->
+            <div class="realtime-layout__panel">
+              <n-form label-placement="top">
+                <n-form-item label="选择模型">
+                  <n-select
+                    v-model:value="sttConfigKey"
+                    :options="sttModelOptions"
+                    placeholder="选择离线语音识别 (STT) 模型"
+                    filterable
+                  />
+                </n-form-item>
+                <n-form-item label="上传音频">
+                  <n-upload :max="1" accept="audio/*" :default-upload="false" @change="handleUploadChange">
+                    <n-button :disabled="transcribing">{{ audioFile ? audioFile.name : '选择音频文件' }}</n-button>
+                  </n-upload>
+                </n-form-item>
+              </n-form>
 
-          <n-space style="margin-top: 12px" align="center">
-            <n-button
-              type="primary"
-              :loading="transcribing"
-              :disabled="!sttConfigKey || !audioFile"
-              @click="transcribe"
-            >
-              开始识别
-            </n-button>
-            <n-text v-if="statusHint" depth="3" style="font-size: 12px">{{ statusHint }}</n-text>
-          </n-space>
+              <!-- 识别参数（按所选模型动态显示，默认折叠） -->
+              <n-collapse v-if="selectedSttModelName">
+                <n-collapse-item title="识别参数" name="stt-params">
+                  <stt-params-settings
+                    :params="sttModelParams"
+                    :model-name="selectedSttModelName"
+                    :disabled="transcribing"
+                    @reset="resetSttParams"
+                  />
+                </n-collapse-item>
+              </n-collapse>
 
-          <div v-if="result" class="stt-result-card">
-            <div class="stt-result-card__head">
-              <span class="stt-result-card__title">识别结果</span>
-              <span class="stt-result-card__count">共 {{ result.length }} 字</span>
+              <div class="realtime-layout__actions">
+                <n-button
+                  type="primary"
+                  block
+                  :loading="transcribing"
+                  :disabled="!sttConfigKey || !audioFile"
+                  @click="transcribe"
+                >
+                  开始识别
+                </n-button>
+                <n-text depth="3" style="font-size: 12px">
+                  {{ statusHint || '选择模型与音频文件后开始识别' }}
+                </n-text>
+              </div>
             </div>
-            <p class="stt-result-card__body">{{ result }}</p>
-            <div class="stt-result-card__foot">
-              <n-button size="small" ghost @click="copyText(result)">复制结果</n-button>
+
+            <!-- 右：识别结果 -->
+            <div class="realtime-layout__result">
+              <stt-result-view :result="parsedResult" />
             </div>
           </div>
         </n-tab-pane>
@@ -128,7 +141,7 @@
 
 <script lang="ts" setup>
 import type { UploadFileInfo } from 'naive-ui'
-import type { AiModelConfigResp } from '@/api/ai'
+import type { AiModelConfigResp, SttResult } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import { useAsrStream } from '@/composables/useAsrStream'
 import { type AsrVadParams, useAsrSettings } from '@/composables/useAsrSettings'
@@ -138,6 +151,9 @@ import AsrAudioMeter from './AsrAudioMeter.vue'
 import AsrVadSettings from './AsrVadSettings.vue'
 import AsrModelParamsSettings from './AsrModelParamsSettings.vue'
 import AsrTranscriptView from './AsrTranscriptView.vue'
+import { type SttParams, useSttParams } from '@/composables/useSttParams'
+import SttParamsSettings from './SttParamsSettings.vue'
+import SttResultView from './SttResultView.vue'
 
 interface Props {
   models: AiModelConfigResp[]
@@ -219,9 +235,34 @@ function onModeChange(next: string) {
 const sttConfigKey = ref('')
 const audioFile = ref<File | null>(null)
 const transcribing = ref(false)
-const result = ref('')
+const parsedResult = ref<SttResult | null>(null)
 const statusHint = ref('')
 let pollTimer: ReturnType<typeof setTimeout> | null = null
+
+const {
+  params: sttModelParams,
+  switchModel: switchSttModel,
+  setDefaults: setSttDefaults,
+  reset: resetSttParams,
+  toPayload: sttToPayload
+} = useSttParams()
+
+// 当前所选 STT 模型配置（用于参数面板按模型族显示 + 读取默认 sttParams）
+const selectedSttModel = computed(() => props.models.find((m) => m.key === sttConfigKey.value))
+const selectedSttModelName = computed(() => selectedSttModel.value?.modelName ?? '')
+
+// 切换模型：加载该模型的会话参数，并用模型配置默认 sttParams 预填
+watch(sttConfigKey, (key) => {
+  switchSttModel(key)
+  const raw = selectedSttModel.value?.sttParams
+  if (raw) {
+    try {
+      setSttDefaults(JSON.parse(raw) as SttParams)
+    } catch {
+      /* 非法 JSON 忽略 */
+    }
+  }
+})
 
 function handleUploadChange(options: { fileList: UploadFileInfo[] }) {
   const f = options.fileList[0]
@@ -231,11 +272,11 @@ function handleUploadChange(options: { fileList: UploadFileInfo[] }) {
 async function transcribe() {
   if (!sttConfigKey.value || !audioFile.value) return
   transcribing.value = true
-  result.value = ''
+  parsedResult.value = null
   statusHint.value = '正在提交…'
   try {
     // 提交后返回 taskId，转录在后端异步执行，前端轮询任务状态
-    const res = await aiApi.sttTranscribe(sttConfigKey.value, audioFile.value)
+    const res = await aiApi.sttTranscribe(sttConfigKey.value, audioFile.value, sttToPayload())
     const taskId = res.data?.data
     if (res.data?.code !== 200 || !taskId) {
       message.error(res.data?.msg ?? '提交失败')
@@ -252,6 +293,17 @@ async function transcribe() {
   }
 }
 
+/** 解析任务结果 JSON 为结构化结果（容错：失败回退纯文本单句） */
+function parseResult(raw: string): SttResult {
+  try {
+    const obj = JSON.parse(raw) as SttResult
+    if (obj && typeof obj.text === 'string' && Array.isArray(obj.sentences)) return obj
+  } catch {
+    /* 回退 */
+  }
+  return { text: raw, sentences: raw ? [{ text: raw }] : [] }
+}
+
 /** 轮询异步任务状态，直至 成功 / 失败 / 超时 */
 function pollTask(taskId: string) {
   let attempts = 0
@@ -262,7 +314,7 @@ function pollTask(taskId: string) {
       const res = await aiApi.taskStatus(taskId)
       const st = res.data?.data
       if (st?.status === 'SUCCEEDED') {
-        result.value = st.result ?? ''
+        parsedResult.value = parseResult(st.result ?? '')
         statusHint.value = ''
         transcribing.value = false
         message.success('识别完成')
@@ -286,11 +338,6 @@ function pollTask(taskId: string) {
     pollTimer = setTimeout(tick, 2000)
   }
   pollTimer = setTimeout(tick, 1500)
-}
-
-async function copyText(text: string) {
-  await navigator.clipboard.writeText(text)
-  message.success('已复制')
 }
 
 onUnmounted(() => {
@@ -343,49 +390,6 @@ onUnmounted(() => {
     &__result {
       height: 480px;
     }
-  }
-}
-
-.stt-result-card {
-  margin-top: 20px;
-  max-width: 640px;
-  border-radius: 12px;
-  background: var(--strix-bg-surface);
-  border: 1px solid var(--strix-border-default);
-  overflow: hidden;
-
-  &__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
-    border-bottom: 1px solid var(--strix-border-subtle);
-  }
-
-  &__title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--strix-text-secondary);
-  }
-
-  &__count {
-    font-size: 12px;
-    color: var(--strix-text-tertiary);
-    font-variant-numeric: tabular-nums;
-  }
-
-  &__body {
-    margin: 0;
-    padding: 14px;
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--strix-text-primary);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  &__foot {
-    padding: 0 14px 14px;
   }
 }
 </style>
