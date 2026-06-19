@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { BrowseFileItem } from '@/api/oss-browse'
-import * as pdfjsLib from 'pdfjs-dist'
+import { getDocument, GlobalWorkerOptions, type PDFDocumentProxy } from 'pdfjs-dist'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url
 ).toString()
@@ -20,14 +20,14 @@ const loading = ref(true)
 const error = ref('')
 const canvasRef = ref<HTMLCanvasElement>()
 
-let pdfDoc: pdfjsLib.PDFDocumentProxy | null = null
+let pdfDoc: PDFDocumentProxy | null = null
 let rendering = false
 
 async function loadPdf() {
   loading.value = true
   error.value = ''
   try {
-    pdfDoc = await pdfjsLib.getDocument(props.url).promise
+    pdfDoc = await getDocument(props.url).promise
     totalPages.value = pdfDoc.numPages
     currentPage.value = 1
     await renderPage()
