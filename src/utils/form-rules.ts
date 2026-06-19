@@ -1,8 +1,9 @@
 import type { FormItemRule } from 'naive-ui'
 
 /**
- * @deprecated 使用 useFormSchema composable 替代手动规则定义
- * 仅保留给 SystemConfigIndex 等无后端 DTO 的页面使用
+ * 表单规则生成器
+ * 适用于无后端 DTO Schema 的页面（如字典分组、克隆弹窗等）
+ * 有后端 DTO 的页面请使用 useFormSchema composable 自动加载 Schema
  */
 
 // ===== 基础规则生成器 =====
