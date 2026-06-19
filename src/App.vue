@@ -41,6 +41,7 @@ import StrixNetworkStatus from './components/system/StrixNetworkStatus.vue'
 import StrixSwNotify from './components/system/StrixSwNotify.vue'
 import StrixEmpty from './components/common/StrixEmpty.vue'
 import { EventBus } from './plugins/event-bus'
+import { updateStrixMessageTheme } from './utils/strix-message'
 import hljs from 'highlight.js/lib/core'
 import javascript from 'highlight.js/lib/languages/javascript'
 
@@ -72,6 +73,11 @@ const resolvedTheme = computed(() => {
 // 同步 data-theme 到 <html> 元素
 watchEffect(() => {
   document.documentElement.dataset.theme = resolvedTheme.value
+})
+
+// 同步主题到 StrixMessage discrete API
+watchEffect(() => {
+  updateStrixMessageTheme(resolvedTheme.value as 'light' | 'dark')
 })
 
 // 监听主题改变事件

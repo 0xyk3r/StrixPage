@@ -1,11 +1,58 @@
-import { type MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider'
-import { type MessageType, NAlert } from 'naive-ui'
+import {
+  type ConfigProviderProps,
+  createDiscreteApi,
+  darkTheme,
+  dateZhCN,
+  type GlobalThemeOverrides,
+  type MessageType,
+  NAlert,
+  zhCN
+} from 'naive-ui'
+import { shallowRef } from 'vue'
 
-let message: MessageApiInjection | null = null
+// 主题配置（与 App.vue 保持一致）
+const lightThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: '#18a058',
+    primaryColorHover: '#36ad6a',
+    primaryColorPressed: '#0c7a43',
+    primaryColorSuppl: '#36ad6a'
+  }
+}
 
-export const initStrixMessage = () => {
-  if (!message) {
-    message = useMessage()
+const darkThemeOverrides: GlobalThemeOverrides = {
+  common: {
+    primaryColor: '#63e2b7',
+    primaryColorHover: '#7fe7c4',
+    primaryColorPressed: '#5acea7',
+    primaryColorSuppl: '#7fe7c4'
+  }
+}
+
+// 创建响应式的配置引用（不在模块顶层调用 computed/useOsTheme 等）
+const configProviderPropsRef = shallowRef<ConfigProviderProps>({
+  theme: null,
+  themeOverrides: lightThemeOverrides,
+  locale: zhCN,
+  dateLocale: dateZhCN
+})
+
+// 使用 createDiscreteApi 创建独立的 message 实例
+// 不依赖 Vue 组件上下文，可在 axios 拦截器等非 setup 环境中使用
+const { message: discreteMessage } = createDiscreteApi(['message'], {
+  configProviderProps: configProviderPropsRef
+})
+
+/**
+ * 更新 discrete API 的主题配置
+ * 应在 App.vue 的 setup 中调用，与主应用主题保持同步
+ */
+export function updateStrixMessageTheme(theme: 'light' | 'dark' | null) {
+  configProviderPropsRef.value = {
+    theme: theme === 'dark' ? darkTheme : null,
+    themeOverrides: theme === 'dark' ? darkThemeOverrides : lightThemeOverrides,
+    locale: zhCN,
+    dateLocale: dateZhCN
   }
 }
 
@@ -15,8 +62,10 @@ export const createStrixMessage = (
   content: string = '',
   duration: number = 3000
 ) => {
-  initStrixMessage()
-  ;(message as any)[type](content, {
+  // 使用类型断言处理动态方法调用
+  const messageFn = (discreteMessage as any)[type]
+  if (!messageFn) return
+  messageFn(content, {
     duration,
     render: (props: any) => {
       const { type, closable, onClose, content } = props
