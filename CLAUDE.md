@@ -519,7 +519,7 @@ pnpm dict:types
 
 ## HTTP 加密通信
 
-`src/plugins/axios.ts` 已配置 SM2/SM4 加密：
+`src/utils/crypto.ts` 提供统一的 SM2/SM4 加密实现，`src/plugins/axios.ts` 自动调用：
 
 1. **请求加密**：
     - 生成随机 SM4 密钥
@@ -534,6 +534,11 @@ pnpm dict:types
 3. **密钥配置**：
     - `.env` 文件中配置公私钥
     - 不提交到 Git
+
+4. **错误处理**：
+    - HTTP 200 响应在成功拦截器中处理
+    - HTTP 4xx/5xx 响应在错误拦截器中解密并抛出 `StrixError`（`src/utils/strix-error.ts`）
+    - `StrixError` 保留后端返回的 `code`、`detail`、`operate` 信息
 
 ## 主题与样式
 

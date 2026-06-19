@@ -1,12 +1,13 @@
 import type { CancelableRequest } from '@/stores/http-canceler'
 import { useHttpCancelerStore } from '@/stores/http-canceler'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
+import { decrypt, encrypt, signGet, signPost } from '@/utils/crypto'
+import { StrixError } from '@/utils/strix-error'
 import { createStrixMessage } from '@/utils/strix-message'
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'
 import { storeToRefs } from 'pinia'
 import { parse as qsParse, stringify as qsStringify } from 'qs'
-import { sm2, sm3, sm4 } from 'sm-crypto'
 import { v4 as uuidv4 } from 'uuid'
 import { type Ref } from 'vue'
 import { useBaseURL } from '@/composables/useBaseUrl.ts'
@@ -44,9 +45,6 @@ function initStore() {
 axios.defaults.baseURL = useBaseURL()
 // 请求超时时间
 axios.defaults.timeout = 60000
-
-const serverSm2PublicKey = import.meta.env.VITE_APP_SERVER_SM2_PUBLIC_KEY
-const clientSm2PrivateKey = import.meta.env.VITE_APP_CLIENT_SM2_PRIVATE_KEY
 
 // 清除已有的拦截器
 axios.interceptors.request.clear()
@@ -134,7 +132,7 @@ axios.interceptors.request.use((config) => {
     )
 
     const signUrl = buildSignUrl(config.url)
-    config.headers.sign = paramsSignGet(signUrl, urlParams, config.headers.timestamp)
+    config.headers.sign = signGet(signUrl, urlParams, config.headers.timestamp)
   } else {
     console.log(
       '%c Strix HTTP %c POST %c%s',
@@ -148,9 +146,9 @@ axios.interceptors.request.use((config) => {
     const signUrl = buildSignUrl(config.url)
     // 对原始请求体字符串签名（加密前）
     const bodyString = config.data ? JSON.stringify(config.data) : ''
-    config.headers.sign = paramsSignPost(bodyString, signUrl, config.headers.timestamp)
+    config.headers.sign = signPost(bodyString, signUrl, config.headers.timestamp)
     if (config.data) {
-      config.data = JSON.stringify(enc(config.data))
+      config.data = JSON.stringify(encrypt(config.data))
     }
   }
   return config
@@ -186,7 +184,7 @@ axios.interceptors.response.use(
 
     // 解密 & 处理响应
     if (response.data) {
-      response.data = dec(response.data)
+      response.data = decrypt(response.data)
       console.log(
         '%c Strix HTTP %c 响应 %c%s',
         'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 2px 4px 6px; border-radius: 6px 0 0 6px; font-weight: bold; font-size: 12px;',
@@ -202,7 +200,7 @@ axios.interceptors.response.use(
         throw new Error('请求过于频繁')
       }
 
-      if (response.data.code !== 200 && !response.data.repCode) {
+      if (response.data.code !== 200) {
         handleError(response)
       } else if (showNotify) {
         createStrixMessage('success', (response.config.meta?.operate || '操作') + '成功', '操作成功')
@@ -223,6 +221,15 @@ axios.interceptors.response.use(
     } else if (error.code === 'ECONNABORTED') {
       createStrixMessage('error', '请求超时', '服务器响应时间过长, 请稍后重试')
     } else if (error.response) {
+      // 后端返回了带业务错误码的响应（如 400/401/403/404/500）
+      if (error.response.data?.code) {
+        // 解密响应体（如果需要）
+        if (error.response.data?.sign) {
+          error.response.data = decrypt(error.response.data)
+        }
+        handleError(error.response as AxiosResponse)
+        return
+      }
       const status = error.response.status
       if (status >= 500) {
         createStrixMessage('error', '服务器错误', `服务器内部异常 (${status}), 请稍后重试`)
@@ -250,186 +257,29 @@ function buildSignUrl(url: string | undefined): string {
 }
 
 /**
- * hex 字符串转字节数组
- */
-function hexToBytes(hex: string): Uint8Array {
-  const bytes = new Uint8Array(hex.length / 2)
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16)
-  }
-  return bytes
-}
-
-/**
- * 字节数组转 hex 字符串
- */
-function bytesToHex(bytes: Uint8Array): string {
-  return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-}
-
-/**
- * 生成随机 hex 字符串
- * @param length hex 字符串长度（字节数 × 2）
- */
-function generateRandomHex(length: number): string {
-  const bytes = new Uint8Array(length / 2)
-  crypto.getRandomValues(bytes)
-  return bytesToHex(bytes)
-}
-
-/**
- * SM2+SM4 加密
- * @param data 待加密数据
- * @returns 加密后的数据 { sign, data, iv }
- */
-function enc(data: any) {
-  const plaintext = JSON.stringify(data)
-
-  // 生成随机 SM4 密钥（16 字节 = 32 hex 字符）
-  const sm4KeyHex = generateRandomHex(32)
-  const sm4KeyBytes = hexToBytes(sm4KeyHex)
-  const sm4KeyBase64 = btoa(String.fromCharCode(...sm4KeyBytes))
-
-  // 生成随机 IV（16 字节）
-  const ivHex = generateRandomHex(32)
-  const ivBytes = hexToBytes(ivHex)
-  const ivBase64 = btoa(String.fromCharCode(...ivBytes))
-
-  // SM2 加密 SM4 密钥的 Base64 字符串（使用服务端公钥，C1C3C2 模式）
-  const encryptedKeyHex = sm2.doEncrypt(sm4KeyBase64, serverSm2PublicKey, 1)
-  // sm-crypto 输出不含 '04' 前缀，Java BouncyCastle 需要 '04' 前缀（非压缩点标识）
-  const encryptedKeyBytes = hexToBytes('04' + encryptedKeyHex)
-  const sign = btoa(String.fromCharCode(...encryptedKeyBytes))
-
-  // SM4/CBC 加密数据
-  const encryptedData = sm4.encrypt(plaintext, sm4KeyHex, {
-    mode: 'cbc',
-    iv: ivHex
-  })
-
-  return { sign, data: encryptedData, iv: ivBase64 }
-}
-
-/**
- * SM2+SM4 解密
- * @param response 待解密数据
- * @returns 解密后的数据
- */
-function dec(response: any) {
-  const data = response.data
-  const sign = response.sign
-  const ivField = response.iv
-
-  // 处理报错信息（无 sign 且非 200 成功响应）
-  if ((!data || !sign) && response.code !== 200) {
-    return response
-  }
-
-  // 无加密标记 (sign/iv)：端点使用 @IgnoreEncryption，响应为明文，直接返回
-  if (!sign) {
-    return response
-  }
-
-  if (data && sign) {
-    // Base64 解码 sign 得到 SM2 密文的 hex
-    const encryptedKeyBytes = Uint8Array.from(atob(sign), (c) => c.charCodeAt(0))
-    let encryptedKeyHex = bytesToHex(encryptedKeyBytes)
-    // Java BouncyCastle 输出含 '04' 非压缩点前缀，sm-crypto 不需要
-    if (encryptedKeyHex.startsWith('04')) {
-      encryptedKeyHex = encryptedKeyHex.substring(2)
-    }
-
-    // SM2 解密得到 SM4 密钥的 Base64 字符串
-    const sm4KeyBase64 = sm2.doDecrypt(encryptedKeyHex, clientSm2PrivateKey, 1)
-
-    if (!sm4KeyBase64) {
-      return {}
-    }
-
-    // Base64 解码 SM4 密钥
-    const sm4KeyBytes = Uint8Array.from(atob(sm4KeyBase64), (c) => c.charCodeAt(0))
-    const sm4KeyHex = bytesToHex(sm4KeyBytes)
-
-    // Base64 解码 IV
-    const ivBytes = Uint8Array.from(atob(ivField), (c) => c.charCodeAt(0))
-    const ivHex = bytesToHex(ivBytes)
-
-    // SM4/CBC 解密
-    const plaintext = sm4.decrypt(data, sm4KeyHex, {
-      mode: 'cbc',
-      iv: ivHex
-    })
-
-    return JSON.parse(plaintext)
-  }
-  return {}
-}
-
-/**
  * 异常处理
  * @param response 响应
  */
 function handleError(response: AxiosResponse) {
   const errTitle = (response.config.meta?.operate || '操作') + '失败'
-  let errMsg = '未知错误'
-  if (response.data) {
-    errMsg = response.data.msg
-    // 登录失效 清除登录信息并跳转到登录页
-    if (response.data.code === 401) {
-      loginInfoStore?.clearLoginInfo()
-      // noinspection JSIgnoredPromiseFromCall
-      router.replace({
-        path: '/login',
-        query: {
-          r: 'e',
-          to: router.currentRoute.value.fullPath
-        }
-      })
-    }
-  }
-  createStrixMessage('error', errTitle, errMsg)
-  throw new Error(errTitle)
-}
+  const errCode = response.data?.code ?? 500
+  const errMsg = response.data?.msg || '未知错误'
 
-/**
- * POST 请求签名：对原始请求体字符串签名
- * sign = SM3(bodyString + "|" + url + "|" + timestamp)
- *
- * @param bodyString 原始请求体 JSON 字符串
- * @param url 请求 URL
- * @param timestamp 时间戳
- * @returns SM3 签名
- */
-function paramsSignPost(bodyString: string, url: string, timestamp: any): string {
-  const content = bodyString + '|' + url + '|' + timestamp
-  return sm3(content)
-}
-
-/**
- * GET 请求签名：对排序后的查询参数签名
- * sign = SM3(sortedParamsJSON + "|" + url + "|" + timestamp)
- *
- * @param url 请求 URL
- * @param params 查询参数
- * @param timestamp 时间戳
- * @returns SM3 签名
- */
-function paramsSignGet(url: string, params: any, timestamp: any): string {
-  let paramsJson = '{}'
-  if (params) {
-    // 移除 null/undefined 值
-    const filtered: Record<string, any> = {}
-    for (const key of Object.keys(params).sort()) {
-      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
-        filtered[key] = params[key]
+  // 登录失效 清除登录信息并跳转到登录页
+  if (errCode === 401) {
+    loginInfoStore?.clearLoginInfo()
+    // noinspection JSIgnoredPromiseFromCall
+    router.replace({
+      path: '/login',
+      query: {
+        r: 'e',
+        to: router.currentRoute.value.fullPath
       }
-    }
-    paramsJson = JSON.stringify(filtered)
+    })
   }
-  const content = paramsJson + '|' + url + '|' + timestamp
-  return sm3(content)
+
+  createStrixMessage('error', errTitle, errMsg)
+  throw new StrixError(errTitle, errCode, errMsg)
 }
 
 export const http = axios
