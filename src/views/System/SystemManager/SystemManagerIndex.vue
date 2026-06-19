@@ -558,13 +558,17 @@ const selectedRows = computed(() =>
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  managerApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    // 清除展开行
-    dataExpandedRowKeys.value = []
-    dataRef.value = res.data.systemManagerList
-    pagination.itemCount = res.data.total
-  })
+  managerApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      // 清除展开行
+      dataExpandedRowKeys.value = []
+      dataRef.value = res.data.systemManagerList
+      pagination.itemCount = res.data.total
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 const dataExpandedRowKeys = ref<Array<string | number>>([])

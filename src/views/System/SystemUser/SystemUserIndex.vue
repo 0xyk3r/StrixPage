@@ -290,11 +290,15 @@ const selectedRows = computed(() =>
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  userApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.systemUserList
-    pagination.itemCount = res.data.total
-  })
+  userApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.systemUserList
+      pagination.itemCount = res.data.total
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 

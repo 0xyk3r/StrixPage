@@ -313,12 +313,16 @@ const getDataList = () => {
   dataLoading.value = true
   // 清除展开行
   dataExpandedRowKeys.value = []
-  regionApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.systemRegionList
-    pagination.itemCount = res.data.total
-    handleAddIsLeaf(dataRef.value)
-  })
+  regionApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.systemRegionList
+      pagination.itemCount = res.data.total
+      handleAddIsLeaf(dataRef.value)
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 const dataExpandedRowKeys = ref<string[]>([])

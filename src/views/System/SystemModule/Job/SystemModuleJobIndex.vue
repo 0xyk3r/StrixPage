@@ -373,10 +373,14 @@ const selectedRows = computed(() =>
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  jobApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.items
-  })
+  jobApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.items
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 

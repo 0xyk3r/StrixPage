@@ -386,12 +386,16 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  roleApi.list({}).then(({ data: res }) => {
-    dataLoading.value = false
-    // 清除展开行
-    dataExpandedRowKeys.value = []
-    dataRef.value = res.data.systemRoleList
-  })
+  roleApi
+    .list({})
+    .then(({ data: res }) => {
+      // 清除展开行
+      dataExpandedRowKeys.value = []
+      dataRef.value = res.data.systemRoleList
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 // 本地筛选数据

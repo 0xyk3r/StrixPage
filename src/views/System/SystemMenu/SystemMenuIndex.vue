@@ -404,10 +404,14 @@ const dataLoading = ref(true)
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
-  menuApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.systemMenuList
-  })
+  menuApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.systemMenuList
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 onMounted(getDataList)
 

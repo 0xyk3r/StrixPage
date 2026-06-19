@@ -642,11 +642,15 @@ const selectedRows = computed(() =>
 
 const getDataList = () => {
   dataLoading.value = true
-  dictApi.dataList(dictKey, listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.items
-    pagination.itemCount = res.data.total
-  })
+  dictApi
+    .dataList(dictKey, listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.items
+      pagination.itemCount = res.data.total
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 
 onMounted(() => {

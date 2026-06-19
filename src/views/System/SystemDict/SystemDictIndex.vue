@@ -646,11 +646,15 @@ const getDataList = () => {
 
   dataLoading.value = true
   expandedDataCache.value = {}
-  dictApi.list(listParams.value).then(({ data: res }) => {
-    dataLoading.value = false
-    dataRef.value = res.data.items
-    pagination.itemCount = res.data.total
-  })
+  dictApi
+    .list(listParams.value)
+    .then(({ data: res }) => {
+      dataRef.value = res.data.items
+      pagination.itemCount = res.data.total
+    })
+    .finally(() => {
+      dataLoading.value = false
+    })
 }
 
 onMounted(() => {

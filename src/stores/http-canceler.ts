@@ -15,11 +15,7 @@ export const useHttpCancelerStore = defineStore('httpCanceler', () => {
   }
 
   function removeRequestById(apiId: string) {
-    requestingApi.value.forEach((item, index) => {
-      if (item.requestId === apiId) {
-        requestingApi.value.splice(index, 1)
-      }
-    })
+    requestingApi.value = requestingApi.value.filter((item) => item.requestId !== apiId)
   }
 
   function removeRequestByGroup(group: string) {
