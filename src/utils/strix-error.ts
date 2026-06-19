@@ -19,3 +19,19 @@ export class StrixError extends Error {
     this.operate = operate
   }
 }
+
+/**
+ * 请求限流异常（429）
+ *
+ * 用于 axios 拦截器和 SSE 流处理中的限流错误统一处理。
+ */
+export class RateLimitError extends Error {
+  /** 建议等待秒数 */
+  public readonly retryAfter: number
+
+  constructor(retryAfter: number = 60) {
+    super(`请求过于频繁，请 ${retryAfter} 秒后再试`)
+    this.name = 'RateLimitError'
+    this.retryAfter = retryAfter
+  }
+}

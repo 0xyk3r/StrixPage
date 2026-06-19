@@ -29,7 +29,13 @@ async function handleStreamResponse(response: Response, onEvent: (event: AiStrea
     // 限流拦截器 / 鉴权失败等会直接返回 { code, msg, data } 明文 JSON（HTTP 200），并非 SSE 流
     try {
       const data = await response.json()
-      onEvent({ type: 'error', message: data?.msg ?? `请求失败 (HTTP ${response.status})` })
+      // 统一 429 限流处理
+      if (data?.code === 429) {
+        const retryAfter = parseInt(response.headers.get('retry-after') || '60', 10)
+        onEvent({ type: 'error', message: `请求过于频繁，请 ${retryAfter} 秒后再试` })
+      } else {
+        onEvent({ type: 'error', message: data?.msg ?? `请求失败 (HTTP ${response.status})` })
+      }
     } catch {
       onEvent({ type: 'error', message: '请求失败' })
     }

@@ -2,7 +2,7 @@ import type { CancelableRequest } from '@/stores/http-canceler'
 import { useHttpCancelerStore } from '@/stores/http-canceler'
 import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
 import { decrypt, encrypt, signGet, signPost } from '@/utils/crypto'
-import { StrixError } from '@/utils/strix-error'
+import { RateLimitError, StrixError } from '@/utils/strix-error'
 import { createStrixMessage } from '@/utils/strix-message'
 import type { AxiosResponse } from 'axios'
 import axios from 'axios'
@@ -195,9 +195,9 @@ axios.interceptors.response.use(
       )
 
       if (response.data.code === 429) {
-        const retryAfter = response.headers['retry-after'] || 60
-        createStrixMessage('warning', '请求失败', `请求过于频繁, 请 ${retryAfter} 秒后再试`)
-        throw new Error('请求过于频繁')
+        const retryAfter = parseInt(response.headers['retry-after'] || '60', 10)
+        createStrixMessage('warning', '请求失败', `请求过于频繁，请 ${retryAfter} 秒后再试`)
+        throw new RateLimitError(retryAfter)
       }
 
       if (response.data.code !== 200) {
