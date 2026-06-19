@@ -101,13 +101,11 @@ import { useResizeDetector } from '@/plugins/resize-detector'
 import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
-import { initStrixMessage } from '@/utils/strix-message'
 
 const route = useRoute()
 
 // 初始化全局工具
 initStrixLoadingBar(useLoadingBar())
-initStrixMessage()
 
 // Stores
 const tabsBarStore = useTabsBarStore()

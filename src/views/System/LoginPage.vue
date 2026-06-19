@@ -148,7 +148,7 @@ import { authApi } from '@/api/auth'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 import { initStrixLoadingBar } from '@/utils/strix-loading-bar'
-import { createStrixMessage, initStrixMessage } from '@/utils/strix-message'
+import { createStrixMessage } from '@/utils/strix-message'
 
 const route = useRoute()
 const router = useRouter()
@@ -157,7 +157,6 @@ const tabBarStore = useTabsBarStore()
 const loginInfoStore = useLoginInfoStore()
 
 initStrixLoadingBar(useLoadingBar())
-initStrixMessage()
 
 const loggedJumpPath = route.query.to || '/'
 
