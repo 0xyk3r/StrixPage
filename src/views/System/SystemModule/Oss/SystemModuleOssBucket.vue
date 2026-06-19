@@ -95,7 +95,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -132,6 +132,7 @@ const {
   addFormRef,
   showAdd,
   submitAdd,
+  submitLoading,
   resetForms,
   tryCloseAdd,
   activeFilters,

@@ -133,7 +133,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit">确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -152,8 +152,8 @@ import StrixBatchBar from '@/components/common/StrixBatchBar.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
-import { userApi } from '@/api/user'
 import type { SystemUserItem } from '@/api/user'
+import { userApi } from '@/api/user'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -205,6 +205,7 @@ const {
   editFormRef,
   showEdit,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseEdit,

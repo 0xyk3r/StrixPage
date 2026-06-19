@@ -92,7 +92,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -131,7 +131,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -173,7 +173,7 @@ import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import type { SystemRoleItem, SystemRoleResp, SystemPermissionItem } from '@/api/role'
+import type { SystemPermissionItem, SystemRoleItem, SystemRoleResp } from '@/api/role'
 import { roleApi } from '@/api/role'
 import type { SystemMenuManageItem } from '@/api/menu'
 import { menuApi } from '@/api/menu'
@@ -183,17 +183,7 @@ import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepMap, flatTree } from '@/utils/strix-tools'
 import { differenceWith, isEqual } from 'lodash-es'
-import {
-  type DataTableColumns,
-  NEmpty,
-  NGi,
-  NGrid,
-  NScrollbar,
-  NSpin,
-  NTabPane,
-  NTabs,
-  type TreeInst
-} from 'naive-ui'
+import { type DataTableColumns, NEmpty, NGi, NGrid, NScrollbar, NSpin, NTabPane, NTabs, type TreeInst } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -230,6 +220,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

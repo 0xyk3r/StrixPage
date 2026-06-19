@@ -94,7 +94,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd">确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -148,7 +148,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit">确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -160,8 +160,8 @@
 import type { NTagType } from '@/@types/naive-ui'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { regionApi } from '@/api/region'
 import type { SystemRegionListItem } from '@/api/region'
+import { regionApi } from '@/api/region'
 import type { CascaderDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
 import { handleOperate } from '@/utils/strix-table-tool'
@@ -204,6 +204,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

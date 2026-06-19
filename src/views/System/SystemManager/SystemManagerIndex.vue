@@ -185,7 +185,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -267,7 +267,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -279,8 +279,8 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import NebulaTag from '@/components/common/NebulaTag.vue'
-import { managerApi }from '@/api/manager'
 import type { SystemManagerItem } from '@/api/manager'
+import { managerApi } from '@/api/manager'
 import { regionApi } from '@/api/region'
 import { roleApi } from '@/api/role'
 import type { CascaderDataItem, SelectDataItem } from '@/api/types'
@@ -397,6 +397,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

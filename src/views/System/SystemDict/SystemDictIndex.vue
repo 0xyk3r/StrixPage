@@ -189,7 +189,7 @@
           <template #footer>
             <n-flex justify="end">
               <n-button @click="tryCloseAdd">取消</n-button>
-              <n-button type="primary" @click="submitAdd"> 确定</n-button>
+              <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
             </n-flex>
           </template>
         </n-modal>
@@ -265,7 +265,7 @@
           <template #footer>
             <n-flex justify="end">
               <n-button @click="tryCloseEdit">取消</n-button>
-              <n-button type="primary" @click="submitEdit"> 确定</n-button>
+              <n-button type="primary" :loading="submitLoading" @click="submitEdit"> 确定</n-button>
             </n-flex>
           </template>
         </n-modal>
@@ -290,14 +290,14 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
+import type { DictDataItem, DictItem } from '@/api/dict'
 import { dictApi } from '@/api/dict'
-import type { DictItem, DictDataItem } from '@/api/dict'
-import { dictGroupApi } from '@/api/dict-group'
 import type { DictGroupItem } from '@/api/dict-group'
+import { dictGroupApi } from '@/api/dict-group'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { NDataTable, NTag, type DataTableColumns } from 'naive-ui'
+import { type DataTableColumns, NDataTable, NTag } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'
@@ -397,6 +397,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

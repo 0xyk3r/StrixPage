@@ -101,7 +101,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -173,7 +173,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -184,7 +184,7 @@
 <script lang="ts" setup>
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
-import type { OssConfigItem, OssBucketItem, OssFileGroupItem } from '@/api/oss'
+import type { OssBucketItem, OssConfigItem, OssFileGroupItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import { useCrud } from '@/composables/useCrud'
@@ -224,6 +224,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

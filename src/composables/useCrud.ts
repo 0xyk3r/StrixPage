@@ -238,6 +238,9 @@ export function useCrud(config: UseCrudConfig) {
 
   // ===== 自动 CRUD 方法 =====
 
+  /** 提交按钮 loading 状态，防止重复提交 */
+  const submitLoading = ref(false)
+
   /** 打开新增弹窗 */
   const showAdd = async (initialValues?: Record<string, any>) => {
     currentSchemaGroup.value = 'insert'
@@ -277,36 +280,46 @@ export function useCrud(config: UseCrudConfig) {
 
   /** 校验并提交新增 */
   const submitAdd = async () => {
-    if (!api?.create) return
+    if (!api?.create || submitLoading.value) return
     try {
       await addFormRef.value?.validate()
     } catch {
       createStrixMessage('warning', VALIDATION_FAIL_TITLE, VALIDATION_FAIL_CONTENT)
       return
     }
-    const data = hooks?.transformAdd?.(cloneDeep(addForm.value)) ?? addForm.value
-    await api.create(data)
-    draft?.clearDraft('add')
-    resetForms()
-    fetchList()
-    hooks?.afterAdd?.()
+    submitLoading.value = true
+    try {
+      const data = hooks?.transformAdd?.(cloneDeep(addForm.value)) ?? addForm.value
+      await api.create(data)
+      draft?.clearDraft('add')
+      resetForms()
+      fetchList()
+      hooks?.afterAdd?.()
+    } finally {
+      submitLoading.value = false
+    }
   }
 
   /** 校验并提交编辑 */
   const submitEdit = async () => {
-    if (!api?.update) return
+    if (!api?.update || submitLoading.value) return
     try {
       await editFormRef.value?.validate()
     } catch {
       createStrixMessage('warning', VALIDATION_FAIL_TITLE, VALIDATION_FAIL_CONTENT)
       return
     }
-    const data = hooks?.transformEdit?.(cloneDeep(editForm.value)) ?? editForm.value
-    await api.update(editId.value, data)
-    draft?.clearDraft('edit', editId.value)
-    resetForms()
-    fetchList()
-    hooks?.afterEdit?.()
+    submitLoading.value = true
+    try {
+      const data = hooks?.transformEdit?.(cloneDeep(editForm.value)) ?? editForm.value
+      await api.update(editId.value, data)
+      draft?.clearDraft('edit', editId.value)
+      resetForms()
+      fetchList()
+      hooks?.afterEdit?.()
+    } finally {
+      submitLoading.value = false
+    }
   }
 
   /** 删除行 */
@@ -380,6 +393,7 @@ export function useCrud(config: UseCrudConfig) {
     showEdit,
     submitAdd,
     submitEdit,
+    submitLoading,
     deleteRow,
     resetForms,
     tryCloseAdd,

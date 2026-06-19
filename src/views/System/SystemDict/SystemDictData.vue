@@ -203,7 +203,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="submitAdd"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitAdd"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -280,7 +280,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="submitEdit"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="submitEdit"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -293,12 +293,12 @@ import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import StrixStylePicker from '@/components/common/StrixStylePicker.vue'
-import { dictApi } from '@/api/dict'
 import type { DictDataItem } from '@/api/dict'
+import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
 import { useDict } from '@/composables/useDict.ts'
 import { handleOperate } from '@/utils/strix-table-tool'
-import { NTag, type DataTableColumns } from 'naive-ui'
+import { type DataTableColumns, NTag } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixImportDialog from '@/components/common/StrixImportDialog.vue'
@@ -491,6 +491,7 @@ const {
   showEdit,
   submitAdd,
   submitEdit,
+  submitLoading,
   deleteRow,
   resetForms,
   tryCloseAdd,

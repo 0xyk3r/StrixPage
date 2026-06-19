@@ -142,7 +142,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseAdd">取消</n-button>
-          <n-button type="primary" @click="addData"> 确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="addData"> 确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -245,7 +245,7 @@
       <template #footer>
         <n-flex justify="end">
           <n-button @click="tryCloseEdit">取消</n-button>
-          <n-button type="primary" @click="editData">确定</n-button>
+          <n-button type="primary" :loading="submitLoading" @click="editData">确定</n-button>
         </n-flex>
       </template>
     </n-modal>
@@ -256,8 +256,8 @@
 <script lang="ts" setup>
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { menuApi } from '@/api/menu'
 import type { SystemMenuManageItem } from '@/api/menu'
+import { menuApi } from '@/api/menu'
 import { permissionApi } from '@/api/permission'
 import type { TreeDataItem } from '@/api/types'
 import { EventBus } from '@/plugins/event-bus'
@@ -290,6 +290,7 @@ const {
   initEditForm,
   editForm,
   editFormRef,
+  submitLoading,
   resetForms,
   tryCloseAdd,
   tryCloseEdit,
@@ -424,23 +425,30 @@ const showAddDataModal = ({ id, key }: { id: string; key: string }) => {
   addModal.value = true
 }
 const addData = () => {
+  if (submitLoading.value) return
   if (addDataModalType.value === 'menu') {
     addFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
+      submitLoading.value = true
       menuApi.create(addForm.value as any).then(() => {
         resetForms()
         getDataList()
         EventBus.emit('refresh-menu')
+      }).finally(() => {
+        submitLoading.value = false
       })
     })
   } else {
     addPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
+      submitLoading.value = true
       permissionApi.create(addPermissionForm.value).then(() => {
         resetForms()
         getDataList()
+      }).finally(() => {
+        submitLoading.value = false
       })
     })
   }
@@ -469,23 +477,30 @@ const showEditDataModal = (row: SystemMenuManageItem) => {
   }
 }
 const editData = () => {
+  if (submitLoading.value) return
   if (editDataModalType.value === 'menu') {
     editFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
+      submitLoading.value = true
       menuApi.update(editId.value, editForm.value as any).then(() => {
         resetForms()
         getDataList()
         EventBus.emit('refresh-menu')
+      }).finally(() => {
+        submitLoading.value = false
       })
     })
   } else {
     editPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
+      submitLoading.value = true
       permissionApi.update(editId.value, editPermissionForm.value).then(() => {
         resetForms()
         getDataList()
+      }).finally(() => {
+        submitLoading.value = false
       })
     })
   }
