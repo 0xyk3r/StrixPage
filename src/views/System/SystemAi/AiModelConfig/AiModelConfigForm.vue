@@ -166,6 +166,61 @@
       <n-form-item label="语言" path="language">
         <n-input v-model:value="form.language" clearable placeholder="如 zh / en（可选）" />
       </n-form-item>
+      <n-form-item label="语义断句">
+        <n-space align="center">
+          <n-switch v-model:value="asrParamsForm.semanticPunctuationEnabled" />
+          <n-text depth="3" style="font-size: 12px">开启后关闭 VAD 断句；Paraformer-8k-v2 情感识别需关闭</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="断句静音(ms)">
+        <n-input-number
+          v-model:value="asrParamsForm.maxSentenceSilence"
+          :min="200"
+          :max="6000"
+          :step="100"
+          clearable
+          placeholder="默认 1300"
+          style="width: 180px"
+        />
+      </n-form-item>
+      <n-form-item label="多阈值模式">
+        <n-switch v-model:value="asrParamsForm.multiThresholdModeEnabled" />
+      </n-form-item>
+      <n-form-item label="过滤语气词">
+        <n-space align="center">
+          <n-switch v-model:value="asrParamsForm.disfluencyRemovalEnabled" />
+          <n-text depth="3" style="font-size: 12px">仅 Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="标点预测">
+        <n-space align="center">
+          <n-switch v-model:value="asrParamsForm.punctuationPredictionEnabled" />
+          <n-text depth="3" style="font-size: 12px">仅 Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="数字正则化">
+        <n-space align="center">
+          <n-switch v-model:value="asrParamsForm.inverseTextNormalizationEnabled" />
+          <n-text depth="3" style="font-size: 12px">ITN，仅 Paraformer</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="噪音阈值">
+        <n-space align="center">
+          <n-input-number
+            v-model:value="asrParamsForm.speechNoiseThreshold"
+            :min="-1"
+            :max="1"
+            :step="0.1"
+            clearable
+            placeholder="默认 0"
+            style="width: 180px"
+          />
+          <n-text depth="3" style="font-size: 12px">仅 Fun-ASR</n-text>
+        </n-space>
+      </n-form-item>
+      <n-form-item label="热词 ID">
+        <n-input v-model:value="asrParamsForm.vocabularyId" clearable placeholder="可选，热词列表 ID" />
+      </n-form-item>
     </template>
 
     <n-space justify="end" style="margin-top: 16px">
@@ -241,10 +296,36 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   responseFormat: null,
   language: '',
   status: 1,
-  remark: ''
+  remark: '',
+  asrParams: null
 })
 
 const form = ref(getDefaultForm())
+
+/** ASR 默认参数编辑态（提交时序列化为 form.asrParams JSON 字符串） */
+interface AsrParamsForm {
+  semanticPunctuationEnabled: boolean
+  maxSentenceSilence: number | null
+  multiThresholdModeEnabled: boolean
+  disfluencyRemovalEnabled: boolean
+  punctuationPredictionEnabled: boolean
+  inverseTextNormalizationEnabled: boolean
+  speechNoiseThreshold: number | null
+  vocabularyId: string
+}
+
+const getDefaultAsrParams = (): AsrParamsForm => ({
+  semanticPunctuationEnabled: false,
+  maxSentenceSilence: null,
+  multiThresholdModeEnabled: false,
+  disfluencyRemovalEnabled: false,
+  punctuationPredictionEnabled: true,
+  inverseTextNormalizationEnabled: true,
+  speechNoiseThreshold: null,
+  vocabularyId: ''
+})
+
+const asrParamsForm = ref<AsrParamsForm>(getDefaultAsrParams())
 const statusSwitch = computed({
   get: () => form.value.status === 1,
   set: (v) => (form.value.status = v ? 1 : 0)
@@ -337,8 +418,18 @@ watch(
         status: data.status ?? 1,
         remark: data.remark ?? ''
       })
+      // ASR 默认参数：从 asrParams JSON 反序列化（非法/空 → 默认）
+      asrParamsForm.value = getDefaultAsrParams()
+      if (data.asrParams) {
+        try {
+          Object.assign(asrParamsForm.value, JSON.parse(data.asrParams))
+        } catch {
+          /* 非法 JSON 用默认 */
+        }
+      }
     } else {
       form.value = getDefaultForm()
+      asrParamsForm.value = getDefaultAsrParams()
     }
   },
   { immediate: true }
@@ -396,6 +487,24 @@ async function submit() {
     await formRef.value!.validate()
   } catch {
     return
+  }
+
+  // 仅 ASR 类型序列化默认参数；其他类型清空 asrParams
+  if (form.value.type === 6) {
+    const a = asrParamsForm.value
+    const asrPayload: Record<string, unknown> = {
+      semanticPunctuationEnabled: a.semanticPunctuationEnabled,
+      multiThresholdModeEnabled: a.multiThresholdModeEnabled,
+      disfluencyRemovalEnabled: a.disfluencyRemovalEnabled,
+      punctuationPredictionEnabled: a.punctuationPredictionEnabled,
+      inverseTextNormalizationEnabled: a.inverseTextNormalizationEnabled
+    }
+    if (a.maxSentenceSilence !== null) asrPayload.maxSentenceSilence = a.maxSentenceSilence
+    if (a.speechNoiseThreshold !== null) asrPayload.speechNoiseThreshold = a.speechNoiseThreshold
+    if (a.vocabularyId.trim()) asrPayload.vocabularyId = a.vocabularyId.trim()
+    form.value.asrParams = JSON.stringify(asrPayload)
+  } else {
+    form.value.asrParams = null
   }
 
   saving.value = true

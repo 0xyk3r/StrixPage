@@ -37,6 +37,8 @@ export interface AiModelConfigResp {
   promptAudioUrl?: string
   ossConfigKey?: string
   ossBucketName?: string
+  /** ASR run-task 默认参数（JSON 文本，ASR 专用） */
+  asrParams?: string
   status: number
   remark?: string
   createdTime: string
@@ -73,6 +75,8 @@ export interface AiModelConfigUpdateReq {
   promptAudioUrl?: string
   ossConfigKey?: string
   ossBucketName?: string
+  /** ASR run-task 默认参数（JSON 文本，ASR 专用） */
+  asrParams?: string | null
   status?: number
   remark?: string
 }

@@ -61,12 +61,19 @@
           <span class="sentence-card__spine" />
           <div class="sentence-card__body">
             <header class="sentence-card__head">
-              <span v-if="emotionMeta(item.s.emotion)" class="sentence-card__emotion">
-                <span class="sentence-card__emoji">{{ emotionMeta(item.s.emotion)!.emoji }}</span>
-                {{ emotionMeta(item.s.emotion)!.label }}
+              <span v-if="emotionMeta(item.s)" class="sentence-card__emotion">
+                <span class="sentence-card__emoji">{{ emotionMeta(item.s)!.emoji }}</span>
+                {{ emotionMeta(item.s)!.label }}
+                <span v-if="item.s.emotionConfidence !== undefined" class="sentence-card__emo-conf">
+                  {{ confidencePct(item.s.emotionConfidence) }}
+                </span>
               </span>
               <span class="sentence-card__index">#{{ item.index + 1 }}</span>
               <span class="sentence-card__meta">
+                <span v-if="item.s.beginTime !== undefined" class="sentence-card__time">
+                  {{ fmtTime(item.s.beginTime) }}<template v-if="item.s.endTime !== undefined">
+                    → {{ fmtTime(item.s.endTime) }}</template>
+                </span>
                 <span v-if="item.s.language" class="sentence-card__lang">{{ langLabel(item.s.language) }}</span>
                 <span class="sentence-card__status" :class="{ 'is-final': item.s.final }">
                   {{ item.s.final ? '已确认' : '识别中' }}
@@ -74,7 +81,17 @@
               </span>
             </header>
             <p class="sentence-card__text">
-              {{ item.s.text }}<span v-if="!item.s.final" class="sentence-card__cursor" />
+              <template v-if="item.s.words && item.s.words.length">
+                <span
+                  v-for="(w, wi) in item.s.words"
+                  :key="wi"
+                  class="sentence-card__word"
+                  :title="wordTitle(w)"
+                >{{ w.text }}{{ w.punctuation }}</span
+                >
+              </template>
+              <template v-else>{{ item.s.text }}</template>
+              <span v-if="!item.s.final" class="sentence-card__cursor" />
             </p>
           </div>
         </article>
@@ -112,13 +129,14 @@ defineEmits<{ clear: [] }>()
 
 const message = useMessage()
 
-/** 7 类情绪元数据：emoji + 中文（情绪色由 CSS 按 data-emotion + 主题决定） */
+/** 情绪元数据：emoji + 中文（情绪色由 CSS 按 data-emotion + 主题决定） */
 interface EmotionMeta {
   emoji: string
   label: string
 }
 
-const EMOTIONS: Record<string, EmotionMeta> = {
+/** Qwen 7 类细粒度情绪 */
+const EMOTIONS_QWEN: Record<string, EmotionMeta> = {
   neutral: { emoji: '😐', label: '平静' },
   happy: { emoji: '😊', label: '愉快' },
   surprised: { emoji: '😮', label: '惊讶' },
@@ -126,6 +144,18 @@ const EMOTIONS: Record<string, EmotionMeta> = {
   angry: { emoji: '😠', label: '愤怒' },
   disgusted: { emoji: '🤢', label: '厌恶' },
   fearful: { emoji: '😨', label: '恐惧' }
+}
+
+/** Paraformer 3 类极性情绪 */
+const EMOTIONS_POLARITY: Record<string, EmotionMeta> = {
+  positive: { emoji: '🙂', label: '正面' },
+  negative: { emoji: '🙁', label: '负面' },
+  neutral: { emoji: '😐', label: '中性' }
+}
+
+/** 按方案取映射表（默认 qwen7，兼容历史无 scheme 的数据） */
+function emotionTable(scheme?: string): Record<string, EmotionMeta> {
+  return scheme === 'polarity3' ? EMOTIONS_POLARITY : EMOTIONS_QWEN
 }
 
 /** 语种代码 → 中文标签（仅常见，未知回退大写代码） */
@@ -150,28 +180,53 @@ const LANG_LABELS: Record<string, string> = {
   vi: '越南语'
 }
 
-function emotionMeta(emotion?: string): EmotionMeta | undefined {
-  return emotion ? EMOTIONS[emotion] : undefined
+function emotionMeta(s: AsrSentence): EmotionMeta | undefined {
+  return s.emotion ? emotionTable(s.emotionScheme)[s.emotion] : undefined
 }
 
 function langLabel(lang: string): string {
   return LANG_LABELS[lang] ?? lang.toUpperCase()
 }
 
+/** 毫秒 → mm:ss.S（句级时间展示） */
+function fmtTime(ms?: number): string {
+  if (ms === undefined || ms === null) return ''
+  const totalSec = ms / 1000
+  const m = Math.floor(totalSec / 60)
+  const s = Math.floor(totalSec % 60)
+  const tenth = Math.floor((ms % 1000) / 100)
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${tenth}`
+}
+
+/** 字级时间区间提示（用于 span title） */
+function wordTitle(w: { beginTime: number; endTime: number }): string {
+  return `${(w.beginTime / 1000).toFixed(2)}s – ${(w.endTime / 1000).toFixed(2)}s`
+}
+
+/** 置信度百分比（polarity3 展示） */
+function confidencePct(v?: number): string {
+  return v === undefined || v === null ? '' : `${Math.round(v * 100)}%`
+}
+
 // —— 情绪统计 + 筛选 ——
 const activeEmotion = ref<string | null>(null)
 
-/** 按 EMOTIONS 顺序统计各情绪句数（仅统计出现过的，保持稳定顺序） */
+/** 统计各情绪句数（按各句自身 scheme 的映射表判断有效性，保持稳定顺序） */
 const emotionStats = computed(() => {
   const counts = new Map<string, number>()
   for (const s of props.sentences) {
-    if (s.emotion && EMOTIONS[s.emotion]) {
+    if (s.emotion && emotionTable(s.emotionScheme)[s.emotion]) {
       counts.set(s.emotion, (counts.get(s.emotion) ?? 0) + 1)
     }
   }
-  return Object.keys(EMOTIONS)
+  // 展示顺序：合并两表的键（neutral 共享），仅保留出现过的
+  const order = [...Object.keys(EMOTIONS_QWEN), 'positive', 'negative']
+  return order
     .filter((key) => counts.has(key))
-    .map((key) => ({ key, count: counts.get(key)!, emoji: EMOTIONS[key]!.emoji, label: EMOTIONS[key]!.label }))
+    .map((key) => {
+      const meta = EMOTIONS_QWEN[key] ?? EMOTIONS_POLARITY[key]!
+      return { key, count: counts.get(key)!, emoji: meta.emoji, label: meta.label }
+    })
 })
 
 /** 当前展示的句子（按情绪筛选，保留原始序号供 #N 展示） */
@@ -235,7 +290,9 @@ $emotion-dark: (
   sad: #6ba3f5,
   angry: #f07070,
   disgusted: #a8c060,
-  fearful: #b08bf0
+  fearful: #b08bf0,
+  positive: #63e2b7,
+  negative: #f07070
 );
 $emotion-light: (
   neutral: #6b7a90,
@@ -244,7 +301,9 @@ $emotion-light: (
   sad: #2563eb,
   angry: #dc2626,
   disgusted: #6b8e23,
-  fearful: #7c3aed
+  fearful: #7c3aed,
+  positive: #2db48c,
+  negative: #dc2626
 );
 
 .asr-transcript {
@@ -486,6 +545,28 @@ $emotion-light: (
   &__emoji {
     font-size: 13px;
     line-height: 1;
+  }
+
+  &__emo-conf {
+    margin-left: 2px;
+    font-size: 11px;
+    opacity: 0.75;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__time {
+    color: var(--strix-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__word {
+    border-radius: 3px;
+    transition: background 0.15s;
+    cursor: default;
+
+    &:hover {
+      background: color-mix(in srgb, var(--emotion-color) 22%, transparent);
+    }
   }
 
   &__index {

@@ -13,6 +13,14 @@ import type { AsrSettings } from '@/composables/useAsrSettings'
  */
 const FRAME_MS = 100 // 每帧时长（worklet 缓冲 100ms）
 
+/** 字级时间戳 */
+export interface AsrWord {
+  beginTime: number
+  endTime: number
+  text: string
+  punctuation: string
+}
+
 /**
  * 单个断句的识别结果。
  * 同一句的多次中间结果共享同一 id（itemId），通过 upsert 替换式更新 text；final 后定稿。
@@ -22,12 +30,22 @@ export interface AsrSentence {
   id: string
   /** 当前文本（实时替换，非追加） */
   text: string
-  /** 情绪（仅 Qwen-ASR 返回，7 类之一：surprised/neutral/happy/sad/disgusted/angry/fearful） */
+  /** 情绪（Qwen 7 类 / Paraformer 3 类极性，取值随 emotionScheme） */
   emotion?: string
+  /** 情绪取值方案：qwen7 | polarity3，决定前端用哪套映射 */
+  emotionScheme?: 'qwen7' | 'polarity3'
+  /** 情绪置信度 [0,1]（仅 Paraformer） */
+  emotionConfidence?: number
   /** 语种代码（zh/en/...） */
   language?: string
   /** 是否已确认（最终结果） */
   final: boolean
+  /** 句级开始时间(ms)（仅 Fun-ASR/Paraformer） */
+  beginTime?: number
+  /** 句级结束时间(ms) */
+  endTime?: number
+  /** 字级时间戳（仅 Fun-ASR/Paraformer） */
+  words?: AsrWord[]
 }
 
 /** 后端下发的转写消息 */
@@ -36,7 +54,12 @@ interface AsrMessage {
   text: string
   final: boolean
   emotion?: string
+  emotionScheme?: 'qwen7' | 'polarity3'
+  emotionConfidence?: number
   language?: string
+  beginTime?: number
+  endTime?: number
+  words?: AsrWord[]
 }
 
 /**
@@ -82,15 +105,25 @@ export function useAsrStream(settings: AsrSettings) {
         text: msg.text,
         final: msg.final,
         emotion: msg.emotion,
-        language: msg.language
+        emotionScheme: msg.emotionScheme,
+        emotionConfidence: msg.emotionConfidence,
+        language: msg.language,
+        beginTime: msg.beginTime,
+        endTime: msg.endTime,
+        words: msg.words
       })
     } else {
       const s = list[idx]!
       s.text = msg.text
       s.final = msg.final
-      // 情绪 / 语种仅在有值时覆盖，避免后续空值清掉已识别到的情绪
+      // 情绪 / 语种 / 时间戳仅在有值时覆盖，避免后续空值清掉已识别到的信息
       if (msg.emotion) s.emotion = msg.emotion
+      if (msg.emotionScheme) s.emotionScheme = msg.emotionScheme
+      if (msg.emotionConfidence !== undefined) s.emotionConfidence = msg.emotionConfidence
       if (msg.language) s.language = msg.language
+      if (msg.beginTime !== undefined) s.beginTime = msg.beginTime
+      if (msg.endTime !== undefined) s.endTime = msg.endTime
+      if (msg.words) s.words = msg.words
     }
   }
 
@@ -212,7 +245,7 @@ export function useAsrStream(settings: AsrSettings) {
     }
   }
 
-  async function start(configKey: string) {
+  async function start(configKey: string, paramsProvider?: () => Record<string, unknown>) {
     if (recording.value || connecting.value) return
     if (!configKey) {
       errorMsg.value = '请先选择 STT 模型'
@@ -262,6 +295,13 @@ export function useAsrStream(settings: AsrSettings) {
       ws.onopen = () => {
         connecting.value = false
         recording.value = true
+        // 首条 config 消息：携带会话级参数（可为空对象），后端据此 open 上游会话
+        try {
+          const params = paramsProvider ? paramsProvider() : {}
+          ws?.send(JSON.stringify({ type: 'config', params }))
+        } catch {
+          /* 发送失败不阻断：后端有超时兜底用模型默认参数 */
+        }
       }
       ws.onmessage = (ev: MessageEvent) => {
         try {
@@ -282,7 +322,12 @@ export function useAsrStream(settings: AsrSettings) {
               text: data.text,
               final: !!data.final,
               emotion: data.emotion,
-              language: data.language
+              emotionScheme: data.emotionScheme,
+              emotionConfidence: data.emotionConfidence,
+              language: data.language,
+              beginTime: data.beginTime,
+              endTime: data.endTime,
+              words: data.words
             })
           }
         } catch {

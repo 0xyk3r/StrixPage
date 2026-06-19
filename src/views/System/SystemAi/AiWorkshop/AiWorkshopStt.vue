@@ -41,6 +41,17 @@
                 </n-collapse-item>
               </n-collapse>
 
+              <!-- 识别参数（按所选模型动态显示，默认折叠） -->
+              <n-collapse v-if="selectedModelName">
+                <n-collapse-item title="识别参数" name="model-params">
+                  <asr-model-params-settings
+                    :params="asrModelParams"
+                    :model-name="selectedModelName"
+                    @reset="resetModelParams"
+                  />
+                </n-collapse-item>
+              </n-collapse>
+
               <div class="realtime-layout__actions">
                 <n-button
                   v-if="!asrRecording && !asrConnecting"
@@ -121,9 +132,11 @@ import type { AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import { useAsrStream } from '@/composables/useAsrStream'
 import { type AsrVadParams, useAsrSettings } from '@/composables/useAsrSettings'
+import { type AsrModelParams, useAsrModelParams } from '@/composables/useAsrModelParams'
 import { useMediaDevices } from '@/composables/useMediaDevices'
 import AsrAudioMeter from './AsrAudioMeter.vue'
 import AsrVadSettings from './AsrVadSettings.vue'
+import AsrModelParamsSettings from './AsrModelParamsSettings.vue'
 import AsrTranscriptView from './AsrTranscriptView.vue'
 
 interface Props {
@@ -158,8 +171,27 @@ const {
   stop: stopAsr
 } = useAsrStream(settings)
 
+const { params: asrModelParams, switchModel, setDefaults, reset: resetModelParams, toPayload } = useAsrModelParams()
+
+// 当前所选 ASR 模型配置（用于参数面板按模型族显示 + 读取默认 asrParams）
+const selectedAsrModel = computed(() => props.models.find((m) => m.key === asrConfigKey.value))
+const selectedModelName = computed(() => selectedAsrModel.value?.modelName ?? '')
+
+// 切换模型：加载该模型的会话参数，并用模型配置默认 asrParams 预填
+watch(asrConfigKey, (key) => {
+  switchModel(key)
+  const raw = selectedAsrModel.value?.asrParams
+  if (raw) {
+    try {
+      setDefaults(JSON.parse(raw) as AsrModelParams)
+    } catch {
+      /* 非法 JSON 忽略 */
+    }
+  }
+})
+
 async function onStart() {
-  await startAsr(asrConfigKey.value)
+  await startAsr(asrConfigKey.value, () => toPayload())
   // 授权麦克风后设备 label 才可读，补全设备下拉
   refreshDevices()
 }
