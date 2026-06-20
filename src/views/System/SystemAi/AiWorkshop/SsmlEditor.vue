@@ -40,7 +40,8 @@
               v-model:value="phonemePh"
               :placeholder="phonemeAlphabet === 'py' ? '拼音含声调，如 dang4 diao4（空格分隔）' : '音标，如 S AY N'"
             />
-            <n-button size="small" type="primary" block :disabled="!phonemePh.trim()" @click="applyPhoneme">插入
+            <n-button size="small" type="primary" block :disabled="!phonemePh.trim()" @click="applyPhoneme"
+              >插入
             </n-button>
           </div>
         </n-popover>
@@ -73,7 +74,8 @@
             <span class="ssml-form__title">指定数字 / 符号读法</span>
             <n-select v-model:value="sayAsType" :options="sayAsOptions" />
             <n-input v-model:value="sayAsText" placeholder="要朗读的内容，如 13800138000" />
-            <n-button size="small" type="primary" block :disabled="!sayAsText.trim()" @click="applySayAs">插入
+            <n-button size="small" type="primary" block :disabled="!sayAsText.trim()" @click="applySayAs"
+              >插入
             </n-button>
           </div>
         </n-popover>
@@ -112,8 +114,11 @@
     />
 
     <n-text depth="3" class="ssml-editor__note">
-      {{ sourceMode ? '源码模式：直接编辑完整 SSML，外层
-      <speak> 必不可少' : '在文本中选中片段后点击工具按钮，可对选中内容应用标记' }}
+      {{
+        sourceMode
+          ? '源码模式：直接编辑完整 SSML，外层 speak 标签必不可少'
+          : '在文本中选中片段后点击工具按钮，可对选中内容应用标记'
+      }}
     </n-text>
   </div>
 </template>
@@ -317,8 +322,9 @@ function applySayAs() {
   color: var(--strix-text-secondary);
   background: transparent;
   border: 1px solid var(--strix-border-default);
-  transition: color 0.18s ease,
-  border-color 0.18s ease;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
 
   &:hover:not(:disabled) {
     color: var(--strix-text-accent);
@@ -341,8 +347,9 @@ function applySayAs() {
   color: var(--strix-text-tertiary);
   background: transparent;
   border: 1px dashed var(--strix-border-default);
-  transition: color 0.18s ease,
-  border-color 0.18s ease;
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
 
   &:hover {
     color: var(--strix-text-accent);
