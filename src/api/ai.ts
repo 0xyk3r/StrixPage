@@ -41,6 +41,8 @@ export interface AiModelConfigResp {
   asrParams?: string
   /** STT 离线默认参数（JSON 文本，STT 专用） */
   sttParams?: string
+  /** TTS 合成默认参数（JSON 文本，TTS 专用） */
+  ttsParams?: string
   status: number
   remark?: string
   createdTime: string
@@ -81,6 +83,8 @@ export interface AiModelConfigUpdateReq {
   asrParams?: string | null
   /** STT 离线默认参数（JSON 文本，STT 专用） */
   sttParams?: string | null
+  /** TTS 合成默认参数（JSON 文本，TTS 专用） */
+  ttsParams?: string | null
   status?: number
   remark?: string
 }
@@ -161,6 +165,71 @@ export interface AiSessionRenameTitleReq {
 export interface AiTtsSynthesizeReq {
   configKey: string
   text: string
+  /** 音色 ID（声音复刻/设计的 voice_id，覆盖模型默认音色） */
+  voiceId?: string
+  /** 会话级覆盖参数（JSON 文本） */
+  params?: string
+}
+
+/** TTS 会话级合成参数（字段名对应后端 TtsParams，均可空） */
+export interface TtsParams {
+  /** 音色 ID */
+  voice?: string
+  /** 音频格式：mp3/wav/pcm/opus */
+  format?: string
+  /** 采样率(Hz) */
+  sampleRate?: number
+  /** 音量 [0,100] */
+  volume?: number
+  /** 语速 [0.5,2.0] */
+  rate?: number
+  /** 音调 [0.5,2.0] */
+  pitch?: number
+  /** opus 码率(kbps) [6,510] */
+  bitRate?: number
+  /** 指令控制文本（≤100 字符，复刻/设计音色） */
+  instruction?: string
+  /** 是否启用 SSML */
+  enableSsml?: boolean
+  /** 随机种子 [0,65535] */
+  seed?: number
+  /** 目标语言提示 */
+  languageHints?: string[]
+}
+
+/** TTS 自定义音色（声音复刻/设计） */
+export interface AiTtsVoiceResp {
+  id: string
+  configKey: string
+  voiceId: string
+  name: string
+  /** 1=声音复刻 2=声音设计 */
+  voiceType: number
+  targetModel: string
+  promptAudioUrl?: string
+  voicePrompt?: string
+  previewText?: string
+  /** DEPLOYING/OK/UNDEPLOYED */
+  status: string
+  remark?: string
+  createdTime: string
+}
+
+/** 声音复刻请求（公网音频 URL） */
+export interface AiTtsVoiceCloneReq {
+  configKey: string
+  name: string
+  audioUrl: string
+  remark?: string
+}
+
+/** 声音设计请求 */
+export interface AiTtsVoiceDesignReq {
+  configKey: string
+  name: string
+  voicePrompt: string
+  previewText: string
+  remark?: string
 }
 
 export interface AiImageGenerateReq {
@@ -305,9 +374,48 @@ export const aiApi = {
       meta: { operate: 'TTS 语音合成', notify: false, skipEncryption: true }
     }),
 
-  ttsEnroll: (configKey: string) =>
-    http.post<RetResult<string>>(`${BASE}/tts/enroll/${configKey}`, null, {
-      meta: { operate: '注册 TTS 音色' }
+  // TTS 音色：声音复刻（公网 URL），返回 taskId，需轮询 taskStatus
+  ttsVoiceClone: (data: AiTtsVoiceCloneReq) =>
+    http.post<RetResult<string>>(`${BASE}/tts/voice/clone`, data, {
+      meta: { operate: '声音复刻' }
+    }),
+
+  // TTS 音色：声音复刻（上传音频文件），FormData 跳过加密，返回 taskId
+  ttsVoiceCloneUpload: (configKey: string, name: string, audioFile: File, remark?: string) => {
+    const fd = new FormData()
+    fd.append('audio', audioFile)
+    fd.append('configKey', configKey)
+    fd.append('name', name)
+    if (remark) fd.append('remark', remark)
+    return http.post<RetResult<string>>(`${BASE}/tts/voice/clone/upload`, fd, {
+      meta: { operate: '声音复刻(上传)', notify: false, skipEncryption: true }
+    })
+  },
+
+  // TTS 音色：声音设计，返回 taskId（成功 result 为 voiceId|预览Base64）
+  ttsVoiceDesign: (data: AiTtsVoiceDesignReq) =>
+    http.post<RetResult<string>>(`${BASE}/tts/voice/design`, data, {
+      meta: { operate: '声音设计' }
+    }),
+
+  // TTS 音色列表
+  ttsVoiceList: (configKey: string) =>
+    http.get<RetResult<AiTtsVoiceResp[]>>(`${BASE}/tts/voice/list`, {
+      params: { configKey },
+      meta: { operate: '加载音色列表', notify: false }
+    }),
+
+  // TTS 音色：同步云端历史音色到本地，返回新增数量
+  ttsVoiceSync: (configKey: string) =>
+    http.post<RetResult<number>>(`${BASE}/tts/voice/sync`, null, {
+      params: { configKey },
+      meta: { operate: '同步云端音色', notify: false }
+    }),
+
+  // TTS 音色删除
+  ttsVoiceRemove: (id: string) =>
+    http.post<RetResult>(`${BASE}/tts/voice/remove/${id}`, null, {
+      meta: { operate: '删除音色' }
     }),
 
   // STT：FormData 上传，跳过加密；返回 taskId，需轮询 taskStatus

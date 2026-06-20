@@ -129,7 +129,7 @@
     <!-- TTS 参数 -->
     <template v-if="isTts">
       <n-form-item label="默认音色" path="voice">
-        <n-input v-model:value="form.voice" clearable placeholder="如 longxiaochun" />
+        <n-input v-model:value="form.voice" clearable placeholder="可选，cosyvoice-v3.5 无系统音色，请在工坊复刻/设计" />
       </n-form-item>
       <n-form-item label="语速">
         <n-input-number v-model:value="form.speed" :min="0.25" :max="4.0" :step="0.25" clearable style="width: 160px" />
@@ -141,6 +141,29 @@
           clearable
           placeholder="音频格式"
           style="width: 200px"
+        />
+      </n-form-item>
+      <n-form-item label="存储配置" path="ossConfigKey">
+        <n-select
+          v-model:value="form.ossConfigKey"
+          :options="ossConfigOptions"
+          clearable
+          filterable
+          placeholder="声音复刻上传音频经此 OSS 转公网 URL（可选）"
+          style="width: 100%"
+          @update:value="onOssConfigChange"
+        />
+      </n-form-item>
+      <n-form-item label="存储空间" path="ossBucketName">
+        <n-select
+          v-model:value="form.ossBucketName"
+          :options="ossBucketOptions"
+          :loading="loadingBuckets"
+          :disabled="!form.ossConfigKey"
+          clearable
+          filterable
+          :placeholder="form.ossConfigKey ? '选择存储空间 Bucket' : '请先选择存储配置'"
+          style="width: 100%"
         />
       </n-form-item>
     </template>

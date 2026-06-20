@@ -96,7 +96,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const message = useMessage()
-const configKey = ref('')
+const configKey = ref<string | null>(null)
 const prompt = ref('')
 const size = ref('1024*1024')
 const useCustomSize = ref(false)
@@ -144,7 +144,7 @@ async function generate() {
   resultUrl.value = ''
   try {
     const res = await aiApi.imageGenerate({
-      configKey: configKey.value,
+      configKey: configKey.value!,
       prompt: prompt.value,
       size: finalSize,
       imageUrls: refImageUrl.value ? [refImageUrl.value] : undefined

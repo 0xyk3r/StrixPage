@@ -173,7 +173,7 @@ const sttModelOptions = computed(() =>
 )
 
 // ——— 实时识别（ASR） ———
-const asrConfigKey = ref('')
+const asrConfigKey = ref<string | null>(null)
 const { settings, reset } = useAsrSettings()
 const { options: deviceOptions, refresh: refreshDevices } = useMediaDevices()
 const {
@@ -195,7 +195,7 @@ const selectedModelName = computed(() => selectedAsrModel.value?.modelName ?? ''
 
 // 切换模型：加载该模型的会话参数，并用模型配置默认 asrParams 预填
 watch(asrConfigKey, (key) => {
-  switchModel(key)
+  switchModel(key ?? '')
   const raw = selectedAsrModel.value?.asrParams
   if (raw) {
     try {
@@ -207,6 +207,7 @@ watch(asrConfigKey, (key) => {
 })
 
 async function onStart() {
+  if (!asrConfigKey.value) return
   await startAsr(asrConfigKey.value, () => toPayload())
   // 授权麦克风后设备 label 才可读，补全设备下拉
   refreshDevices()
@@ -232,7 +233,7 @@ function onModeChange(next: string) {
 }
 
 // ——— 上传识别（离线 STT，异步轮询） ———
-const sttConfigKey = ref('')
+const sttConfigKey = ref<string | null>(null)
 const audioFile = ref<File | null>(null)
 const transcribing = ref(false)
 const parsedResult = ref<SttResult | null>(null)
@@ -253,7 +254,7 @@ const selectedSttModelName = computed(() => selectedSttModel.value?.modelName ??
 
 // 切换模型：加载该模型的会话参数，并用模型配置默认 sttParams 预填
 watch(sttConfigKey, (key) => {
-  switchSttModel(key)
+  switchSttModel(key ?? '')
   const raw = selectedSttModel.value?.sttParams
   if (raw) {
     try {
@@ -276,7 +277,7 @@ async function transcribe() {
   statusHint.value = '正在提交…'
   try {
     // 提交后返回 taskId，转录在后端异步执行，前端轮询任务状态
-    const res = await aiApi.sttTranscribe(sttConfigKey.value, audioFile.value, sttToPayload())
+    const res = await aiApi.sttTranscribe(sttConfigKey.value!, audioFile.value, sttToPayload())
     const taskId = res.data?.data
     if (res.data?.code !== 200 || !taskId) {
       message.error(res.data?.msg ?? '提交失败')
