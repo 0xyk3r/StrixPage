@@ -10,8 +10,12 @@
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索"
-                     @keydown.enter="handleKeywordEnter" />
+            <n-input
+              v-model:value="listParams.keyword"
+              clearable
+              placeholder="按名称搜索"
+              @keydown.enter="handleKeywordEnter"
+            />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -58,7 +62,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -380,7 +384,7 @@ const dataColumns: DataTableColumns<OssFileGroupItem> = [
   { key: 'name', title: '文件组名称', width: 160 },
   { key: 'configKey', title: '存储服务 Key', width: 140 },
   { key: 'bucketName', title: '所属 Bucket', width: 140 },
-  { key: 'bucketDomain', title: '自定义域名', width: 240 },
+  // { key: 'bucketDomain', title: '自定义域名', width: 240 },
   { key: 'baseDir', title: '基础路径', width: 160 },
   { key: 'allowExtension', title: '允许的拓展名', width: 240 },
   {
