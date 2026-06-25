@@ -15,7 +15,10 @@
       <n-input v-model:value="form.name" clearable placeholder="显示名称" />
     </n-form-item>
     <n-form-item label="模型类型" path="type">
-      <n-select v-model:value="form.type" :options="typeOptions" placeholder="请选择模型类型" />
+      <n-select v-model:value="form.type" :options="aiModelTypeRef" placeholder="请选择模型类型" />
+    </n-form-item>
+    <n-form-item label="云厂商" path="providerType">
+      <n-select v-model:value="form.providerType" :options="aiProviderTypeRef" placeholder="自动识别（推荐）" />
     </n-form-item>
     <n-form-item label="Base URL" path="baseUrl">
       <n-input v-model:value="form.baseUrl" clearable placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1" />
@@ -808,6 +811,7 @@ import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import type { AiModelConfigResp, AiModelConfigUpdateReq, AiModelInfo } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import { ossApi } from '@/api/oss'
+import { useDict } from '@/composables/useDict.ts'
 
 interface Props {
   editId?: string
@@ -817,6 +821,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), { editId: '', initialData: null })
 const emit = defineEmits<{ (e: 'saved'): void; (e: 'cancel'): void }>()
 
+// 加载字典
+const aiModelTypeRef = useDict('AiModelType')
+const aiProviderTypeRef = useDict('AiProviderType')
+
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
 const saving = ref(false)
@@ -825,15 +833,6 @@ const isEdit = computed(() => !!props.editId)
 const fetchedModels = ref<AiModelInfo[]>([])
 const fetchingModels = ref(false)
 const filterTypes = ref<number[]>([1, 2, 3, 4, 5, 6])
-
-const typeOptions = [
-  { label: 'TEXT（文本对话）', value: 1 },
-  { label: 'VISION（视觉理解）', value: 2 },
-  { label: 'TTS（语音合成）', value: 3 },
-  { label: 'STT（离线语音识别）', value: 4 },
-  { label: 'IMAGE_GEN（图片生成）', value: 5 },
-  { label: 'ASR（实时语音识别）', value: 6 }
-]
 
 const audioFormatOptions = [
   { label: 'mp3', value: 'mp3' },
@@ -852,6 +851,7 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   key: '',
   name: '',
   type: 1,
+  providerType: 0,
   baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: '',
   modelName: '',
@@ -1127,7 +1127,7 @@ const canFetchModels = computed(() => {
 const modelOptions = computed<SelectOption[]>(() => {
   const filtered = fetchedModels.value.filter((m: AiModelInfo) => filterTypes.value.includes(m.type))
   return filtered.map((m: AiModelInfo) => ({
-    label: `${m.name} (${typeOptions.find((t) => t.value === m.type)?.label})`,
+    label: `${m.name} (${aiModelTypeRef.value.find((t) => t.value === m.type)?.label})`,
     value: m.name
   }))
 })
@@ -1140,6 +1140,7 @@ watch(
         key: data.key,
         name: data.name,
         type: data.type,
+        providerType: data.providerType ?? 0,
         baseUrl: data.baseUrl,
         apiKey: '',
         modelName: data.modelName,

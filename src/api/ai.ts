@@ -13,6 +13,8 @@ export interface AiModelConfigResp {
   name: string
   /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
   type: number
+  /** 0=自动识别 1=DashScope 2=DeepSeek 3=OpenAI 9=其他 */
+  providerType?: number
   baseUrl: string
   modelName: string
   temperature?: number
@@ -76,6 +78,8 @@ export interface AiModelConfigUpdateReq {
   name: string
   /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
   type: number
+  /** 0=自动识别 1=DashScope 2=DeepSeek 3=OpenAI 9=其他 */
+  providerType?: number
   baseUrl: string
   apiKey?: string
   modelName: string

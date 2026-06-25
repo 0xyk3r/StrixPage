@@ -379,6 +379,7 @@ onMounted(() => scrollToBottom())
   &__meta-cache-hit {
     color: rgba(34, 197, 94, 0.7);
     font-size: 10px;
+    margin-left: 6px;
   }
 
   &__meta-cache-write {
@@ -389,6 +390,7 @@ onMounted(() => scrollToBottom())
   &__meta-reasoning {
     color: rgba(147, 51, 234, 0.7);
     font-size: 10px;
+    margin-left: 6px;
   }
 
   &__model-tag {

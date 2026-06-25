@@ -153,7 +153,7 @@ const dialog = useDialog()
 
 const showNewSession = ref(false)
 const showSettings = ref(false)
-const newSessionModelId = ref<string>('')
+const newSessionModelId = ref<string | null>(null)
 const newSessionTitle = ref('')
 const creating = ref(false)
 const inputRef = ref()
