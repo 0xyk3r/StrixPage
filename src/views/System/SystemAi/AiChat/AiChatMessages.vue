@@ -14,13 +14,11 @@
         <template v-if="msg.role === 'user'">
           <div class="message__bubble message__bubble--user">
             <div v-if="msg.attachments?.length" class="message__attachments">
-              <img
-                v-for="(att, i) in msg.attachments.filter((a) => a.type === 'image')"
-                :key="i"
-                :src="att.url"
-                class="message__image"
-                :alt="att.name"
-              />
+              <template v-for="att in msg.attachments" :key="att.fileId">
+                <img v-if="att.type === 'image'" :src="att.previewUrl" class="message__image" :alt="att.name" />
+                <video v-else-if="att.type === 'video'" :src="att.previewUrl" controls class="message__video" />
+                <audio v-else-if="att.type === 'audio'" :src="att.previewUrl" controls class="message__audio" />
+              </template>
             </div>
             <div class="message__text">{{ msg.content }}</div>
           </div>
@@ -91,8 +89,27 @@
             <span v-if="msg.modelConfigName" class="message__model-tag" :title="msg.modelConfigName">
               {{ msg.modelConfigName }}
             </span>
-            <span v-if="msg.inputTokens" title="输入 tokens">↑{{ msg.inputTokens }}</span>
-            <span v-if="msg.outputTokens" title="输出 tokens">↓{{ msg.outputTokens }}</span>
+            <span
+              v-if="msg.inputTokens"
+              :title="`输入 tokens${msg.cacheHitTokens ? '（含缓存命中 ' + msg.cacheHitTokens + '）' : ''}`"
+            >
+              ↑{{ msg.inputTokens
+              }}<template v-if="msg.cacheHitTokens">
+                <span class="message__meta-cache-hit">💾{{ msg.cacheHitTokens }}</span></template
+              >
+            </span>
+            <span v-if="msg.cacheWriteTokens" title="缓存写入 tokens" class="message__meta-cache-write"
+              >📝{{ msg.cacheWriteTokens }}</span
+            >
+            <span
+              v-if="msg.outputTokens"
+              :title="`输出 tokens${msg.reasoningTokens ? '（含思考链 ' + msg.reasoningTokens + '）' : ''}`"
+            >
+              ↓{{ msg.outputTokens
+              }}<template v-if="msg.reasoningTokens">
+                <span class="message__meta-reasoning">🧠{{ msg.reasoningTokens }}</span></template
+              >
+            </span>
             <span v-if="msg.durationMs" title="耗时">{{ (msg.durationMs / 1000).toFixed(1) }}s</span>
           </div>
 
@@ -136,6 +153,7 @@ import type { Options } from 'markdown-it'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import type { UiMessage } from '@/stores/ai-chat'
+import type { AiAttachmentResp } from '@/api/ai'
 import AiThinkingBlock from './AiThinkingBlock.vue'
 
 interface Props {
@@ -146,11 +164,14 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  (e: 'edit-resend', payload: {
-    id: string;
-    content: string;
-    attachments: { type: string; url: string; name: string }[]
-  }): void
+  (
+    e: 'edit-resend',
+    payload: {
+      id: string
+      content: string
+      attachments: AiAttachmentResp[]
+    }
+  ): void
   (e: 'regenerate'): void
 }>()
 
@@ -324,6 +345,17 @@ onMounted(() => scrollToBottom())
     object-fit: cover;
   }
 
+  &__video {
+    max-width: 280px;
+    max-height: 200px;
+    border-radius: 6px;
+  }
+
+  &__audio {
+    max-width: 260px;
+    height: 36px;
+  }
+
   &__cursor {
     display: inline-block;
     width: 2px;
@@ -340,6 +372,23 @@ onMounted(() => scrollToBottom())
     margin-top: 4px;
     font-size: 11px;
     color: rgba(255, 255, 255, 0.25);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__meta-cache-hit {
+    color: rgba(34, 197, 94, 0.7);
+    font-size: 10px;
+  }
+
+  &__meta-cache-write {
+    color: rgba(250, 204, 21, 0.7);
+    font-size: 10px;
+  }
+
+  &__meta-reasoning {
+    color: rgba(147, 51, 234, 0.7);
+    font-size: 10px;
   }
 
   &__model-tag {
@@ -395,7 +444,8 @@ onMounted(() => scrollToBottom())
       color: #818cf8;
     }
 
-    ul, ol {
+    ul,
+    ol {
       padding-left: 20px;
       margin: 6px 0;
     }
@@ -406,7 +456,8 @@ onMounted(() => scrollToBottom())
       margin: 8px 0;
     }
 
-    th, td {
+    th,
+    td {
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 6px 10px;
     }
@@ -421,7 +472,8 @@ onMounted(() => scrollToBottom())
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

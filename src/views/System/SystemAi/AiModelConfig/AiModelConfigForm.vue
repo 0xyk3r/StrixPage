@@ -18,11 +18,7 @@
       <n-select v-model:value="form.type" :options="typeOptions" placeholder="请选择模型类型" />
     </n-form-item>
     <n-form-item label="Base URL" path="baseUrl">
-      <n-input
-        v-model:value="form.baseUrl"
-        clearable
-        placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1"
-      />
+      <n-input v-model:value="form.baseUrl" clearable placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1" />
     </n-form-item>
     <n-form-item label="API Key" path="apiKey">
       <n-input
@@ -36,9 +32,7 @@
     <n-form-item label="模型名称" path="modelName">
       <n-space vertical style="width: 100%">
         <n-space>
-          <n-button :disabled="!canFetchModels" :loading="fetchingModels" @click="fetchModels">
-            获取模型列表
-          </n-button>
+          <n-button :disabled="!canFetchModels" :loading="fetchingModels" @click="fetchModels"> 获取模型列表 </n-button>
           <n-text depth="3" style="font-size: 12px">填写 Base URL 和 API Key 后可获取</n-text>
         </n-space>
         <n-checkbox-group v-if="fetchedModels.length > 0" v-model:value="filterTypes">
@@ -62,6 +56,15 @@
         />
         <n-input v-else v-model:value="form.modelName" clearable placeholder="如 qwen3-max" />
       </n-space>
+    </n-form-item>
+    <n-form-item label="多模态支持" v-if="isText">
+      <n-checkbox-group v-model:value="modalitiesArray">
+        <n-space>
+          <n-checkbox value="image" label="图片" />
+          <n-checkbox value="video" label="视频" />
+          <n-checkbox value="audio" label="音频" />
+        </n-space>
+      </n-checkbox-group>
     </n-form-item>
     <n-form-item label="状态" path="status">
       <n-switch v-model:value="statusSwitch" />
@@ -92,44 +95,505 @@
       </n-form-item>
     </template>
 
-    <!-- TEXT only -->
+    <!-- TEXT only: advanced parameters in collapsible sections -->
     <template v-if="isText">
-      <n-form-item label="启用思考模式">
-        <n-switch v-model:value="thinkingSwitch" />
-      </n-form-item>
-      <n-form-item v-if="thinkingSwitch" label="思考 Token 预算">
-        <n-input-number v-model:value="form.thinkingBudget" :min="1024" :step="1024" clearable style="width: 160px" />
-      </n-form-item>
-      <n-form-item label="代码解释器">
-        <n-space align="center">
-          <n-switch v-model:value="codeInterpreterSwitch" :disabled="!thinkingSwitch" />
-          <n-text depth="3" style="font-size: 12px">需开启思考模式，仅流式对话生效</n-text>
-        </n-space>
-      </n-form-item>
-      <n-form-item label="联网搜索">
-        <n-switch v-model:value="searchSwitch" />
-      </n-form-item>
-      <n-form-item v-if="searchSwitch" label="搜索策略">
-        <n-select
-          v-model:value="form.searchStrategy"
-          :options="searchStrategyOptions"
-          clearable
-          placeholder="选择搜索策略"
-          style="width: 220px"
-        />
-      </n-form-item>
-      <n-form-item v-if="searchSwitch" label="来源引用">
-        <n-space align="center">
-          <n-switch v-model:value="sourceSwitch" />
-          <n-text depth="3" style="font-size: 12px">在回答中附带搜索来源</n-text>
-        </n-space>
-      </n-form-item>
+      <n-collapse :default-expanded-names="['thinking', 'search']" style="margin-top: 12px">
+        <!-- 生成参数 -->
+        <n-collapse-item title="生成参数" name="generation">
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Max Completion Tokens
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  限制模型输出的最大 Token 数（含思考链）。超过此值生成将停止。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number v-model:value="form.maxCompletionTokens" :min="1" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Presence Penalty
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  控制已出现内容的重复度。正值降低重复，负值增加重复。范围: -2.0 ~ 2.0，推荐: 0.0 ~ 1.5
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number
+              v-model:value="form.presencePenalty"
+              :min="-2"
+              :max="2"
+              :step="0.1"
+              clearable
+              style="width: 180px"
+            />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Frequency Penalty
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  按词频施加惩罚，降低高频词的出现概率。范围: -2.0 ~ 2.0，推荐: 0.0 ~ 1.0
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number
+              v-model:value="form.frequencyPenalty"
+              :min="-2"
+              :max="2"
+              :step="0.1"
+              clearable
+              style="width: 180px"
+            />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Repetition Penalty
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  对连续重复序列施加惩罚。1.0 表示不惩罚。范围: > 0，推荐: 1.0 ~ 1.2
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number
+              v-model:value="form.repetitionPenalty"
+              :min="0"
+              :step="0.05"
+              clearable
+              style="width: 180px"
+            />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Top K
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  每步生成时保留概率最高的 K 个候选 Token。值越大越随机。范围: 0 ~ 100，推荐: 20 ~ 50
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number v-model:value="form.topK" :min="0" :max="100" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Seed
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  固定随机种子可使相同输入得到相同输出，便于结果复现。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number v-model:value="form.seed" :min="0" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                N（候选数）
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  一次请求生成多个独立回复，适用于创意写作、广告文案。范围: 1 ~ 4
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number v-model:value="form.n" :min="1" :max="4" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item label="Stop Sequences">
+            <n-dynamic-tags v-model:value="stopSequencesArray" />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Response Format
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  设为 json_object 时模型严格输出合法 JSON（需在提示词中说明）。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-select
+              v-model:value="form.responseFormat"
+              :options="textResponseFormatOptions"
+              clearable
+              placeholder="默认 text"
+              style="width: 200px"
+            />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                Logprobs
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  返回每个输出 Token 的对数概率，可用于评估模型置信度。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-switch v-model:value="logprobsSwitch" />
+          </n-form-item>
+          <n-form-item v-if="logprobsSwitch">
+            <template #label>
+              <span class="param-label">
+                Top Logprobs
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  每步返回前 N 个最可能 Token 的概率。范围: 0 ~ 5
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number v-model:value="form.topLogprobs" :min="0" :max="5" clearable style="width: 180px" />
+          </n-form-item>
+        </n-collapse-item>
+
+        <!-- 思考模式 -->
+        <n-collapse-item title="思考模式" name="thinking">
+          <n-form-item label="启用思考模式">
+            <n-switch v-model:value="thinkingSwitch" />
+          </n-form-item>
+          <n-form-item v-if="thinkingSwitch">
+            <template #label>
+              <span class="param-label">
+                思考 Token 预算
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  限制思考过程的最大 Token 数。超过后立即输出最终回复。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-input-number
+              v-model:value="form.thinkingBudget"
+              :min="1024"
+              :step="1024"
+              clearable
+              style="width: 180px"
+            />
+          </n-form-item>
+          <n-form-item v-if="thinkingSwitch">
+            <template #label>
+              <span class="param-label">
+                保留思考过程
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  多轮对话中将历史思考过程传入下一轮，让模型参考先前推理。会增加 Token 消耗。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-space align="center">
+              <n-switch v-model:value="preserveThinkingSwitch" />
+              <n-text depth="3" style="font-size: 12px">在消息中保留思考内容</n-text>
+            </n-space>
+          </n-form-item>
+          <n-form-item v-if="thinkingSwitch">
+            <template #label>
+              <span class="param-label">
+                推理强度
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  DeepSeek-V4 模型专用。high = 标准推理，max = 最大力度推理。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-select
+              v-model:value="form.reasoningEffort"
+              :options="reasoningEffortOptions"
+              clearable
+              placeholder="默认"
+              style="width: 180px"
+            />
+          </n-form-item>
+          <n-form-item>
+            <template #label>
+              <span class="param-label">
+                代码解释器
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  模型可编写并执行 Python 代码解决数学计算、数据分析等问题。需同时开启思考模式。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-space align="center">
+              <n-switch v-model:value="codeInterpreterSwitch" :disabled="!thinkingSwitch" />
+              <n-text depth="3" style="font-size: 12px">需开启思考模式，仅流式对话生效</n-text>
+            </n-space>
+          </n-form-item>
+        </n-collapse-item>
+
+        <!-- 联网搜索 -->
+        <n-collapse-item title="联网搜索" name="search">
+          <n-form-item label="启用搜索">
+            <n-switch v-model:value="searchSwitch" />
+          </n-form-item>
+          <n-form-item v-if="searchSwitch">
+            <template #label>
+              <span class="param-label">
+                搜索策略
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  turbo: 平衡速度与效果（默认）；max: 多源搜索，更全面但更慢；agent: 多轮检索；agent_max: agent +
+                  网页抓取
+                </n-tooltip>
+              </span>
+            </template>
+            <n-select
+              v-model:value="form.searchStrategy"
+              :options="searchStrategyOptions"
+              clearable
+              placeholder="选择搜索策略"
+              style="width: 220px"
+            />
+          </n-form-item>
+          <n-form-item v-if="searchSwitch" label="来源引用">
+            <n-space align="center">
+              <n-switch v-model:value="sourceSwitch" />
+              <n-text depth="3" style="font-size: 12px">在回答中附带搜索来源</n-text>
+            </n-space>
+          </n-form-item>
+          <n-form-item v-if="searchSwitch">
+            <template #label>
+              <span class="param-label">
+                强制搜索
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  无论问题是否涉及实时信息，都强制执行联网搜索。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-space align="center">
+              <n-switch v-model:value="forcedSearchSwitch" />
+              <n-text depth="3" style="font-size: 12px">每次请求都执行搜索</n-text>
+            </n-space>
+          </n-form-item>
+          <n-form-item v-if="searchSwitch">
+            <template #label>
+              <span class="param-label">
+                搜索时效
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  仅返回指定时间范围内的搜索结果，适合查找最新信息。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-select
+              v-model:value="form.searchFreshness"
+              :options="searchFreshnessOptions"
+              clearable
+              placeholder="不限"
+              style="width: 200px"
+            />
+          </n-form-item>
+          <n-form-item v-if="searchSwitch">
+            <template #label>
+              <span class="param-label">
+                搜索增强
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  启用垂域搜索能力（天气、股票、汇率等精确数据源）。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-space align="center">
+              <n-switch v-model:value="searchExtensionSwitch" />
+              <n-text depth="3" style="font-size: 12px">启用扩展搜索能力</n-text>
+            </n-space>
+          </n-form-item>
+        </n-collapse-item>
+
+        <!-- 视觉参数 (仅多模态包含 image/video 时显示) -->
+        <n-collapse-item v-if="hasVisionModality" title="视觉参数" name="vision">
+          <n-form-item label="高分辨率图片">
+            <n-space align="center">
+              <n-switch v-model:value="vlHighResSwitch" />
+              <n-text depth="3" style="font-size: 12px">启用后忽略 Min/Max Pixels 限制</n-text>
+            </n-space>
+          </n-form-item>
+          <n-form-item v-if="!vlHighResSwitch" label="Min Pixels">
+            <n-input-number v-model:value="form.minPixels" :min="1" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item v-if="!vlHighResSwitch" label="Max Pixels">
+            <n-input-number v-model:value="form.maxPixels" :min="1" clearable style="width: 180px" />
+          </n-form-item>
+          <n-form-item v-if="modalitiesArray.includes('video')" label="Video FPS">
+            <n-input-number
+              v-model:value="form.videoFps"
+              :min="0.1"
+              :max="10"
+              :step="0.1"
+              clearable
+              style="width: 180px"
+            />
+          </n-form-item>
+        </n-collapse-item>
+
+        <!-- 其他能力 -->
+        <n-collapse-item title="其他能力" name="other">
+          <n-form-item label="图文混排输出">
+            <n-space align="center">
+              <n-switch v-model:value="textImageMixedSwitch" />
+              <n-text depth="3" style="font-size: 12px">允许模型输出穿插图片</n-text>
+            </n-space>
+          </n-form-item>
+        </n-collapse-item>
+      </n-collapse>
     </template>
 
     <!-- TTS 参数 -->
     <template v-if="isTts">
       <n-form-item label="默认音色" path="voice">
-        <n-input v-model:value="form.voice" clearable placeholder="可选，cosyvoice-v3.5 无系统音色，请在工坊复刻/设计" />
+        <n-input
+          v-model:value="form.voice"
+          clearable
+          placeholder="可选，cosyvoice-v3.5 无系统音色，请在工坊复刻/设计"
+        />
       </n-form-item>
       <n-form-item label="语速">
         <n-input-number v-model:value="form.speed" :min="0.25" :max="4.0" :step="0.25" clearable style="width: 160px" />
@@ -164,6 +628,22 @@
           filterable
           :placeholder="form.ossConfigKey ? '选择存储空间 Bucket' : '请先选择存储配置'"
           style="width: 100%"
+        />
+      </n-form-item>
+      <n-form-item label="克隆参考音频 URL" path="promptAudioUrl">
+        <n-input
+          v-model:value="form.promptAudioUrl"
+          clearable
+          placeholder="cosyvoice-v3.5-plus 零样本克隆专用，设置后忽略默认音色"
+        />
+      </n-form-item>
+      <n-form-item label="合成默认参数">
+        <n-input
+          v-model:value="form.ttsParams"
+          type="textarea"
+          clearable
+          :rows="3"
+          placeholder='JSON 格式，如 {"format":"mp3","sampleRate":22050}'
         />
       </n-form-item>
     </template>
@@ -378,13 +858,34 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   temperature: null,
   topP: null,
   maxTokens: null,
+  maxCompletionTokens: null,
+  presencePenalty: null,
+  frequencyPenalty: null,
+  repetitionPenalty: null,
+  topK: null,
+  seed: null,
+  n: null,
+  stopSequences: null,
+  logprobs: null,
+  topLogprobs: null,
   systemPrompt: '',
+  supportedModalities: null,
   enableThinking: 0,
   thinkingBudget: null,
+  preserveThinking: null,
+  reasoningEffort: null,
   enableCodeInterpreter: 0,
   enableSearch: 0,
   searchStrategy: null,
   enableSource: 0,
+  forcedSearch: null,
+  searchFreshness: null,
+  enableSearchExtension: null,
+  vlHighResolutionImages: null,
+  minPixels: null,
+  maxPixels: null,
+  videoFps: null,
+  enableTextImageMixed: null,
   voice: '',
   speed: null,
   responseFormat: null,
@@ -393,8 +894,10 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   remark: '',
   asrParams: null,
   sttParams: null,
+  ttsParams: null,
   ossConfigKey: null,
-  ossBucketName: null
+  ossBucketName: null,
+  promptAudioUrl: ''
 })
 
 const form = ref(getDefaultForm())
@@ -523,12 +1026,87 @@ const sourceSwitch = computed({
   get: () => form.value.enableSource === 1,
   set: (v) => (form.value.enableSource = v ? 1 : 0)
 })
+const preserveThinkingSwitch = computed({
+  get: () => form.value.preserveThinking === 1,
+  set: (v) => (form.value.preserveThinking = v ? 1 : 0)
+})
+const forcedSearchSwitch = computed({
+  get: () => form.value.forcedSearch === 1,
+  set: (v) => (form.value.forcedSearch = v ? 1 : 0)
+})
+const searchExtensionSwitch = computed({
+  get: () => form.value.enableSearchExtension === 1,
+  set: (v) => (form.value.enableSearchExtension = v ? 1 : 0)
+})
+const logprobsSwitch = computed({
+  get: () => form.value.logprobs === 1,
+  set: (v) => {
+    form.value.logprobs = v ? 1 : 0
+    if (!v) form.value.topLogprobs = null
+  }
+})
+const vlHighResSwitch = computed({
+  get: () => form.value.vlHighResolutionImages === 1,
+  set: (v) => (form.value.vlHighResolutionImages = v ? 1 : 0)
+})
+const textImageMixedSwitch = computed({
+  get: () => form.value.enableTextImageMixed === 1,
+  set: (v) => (form.value.enableTextImageMixed = v ? 1 : 0)
+})
+
+const modalitiesArray = computed({
+  get: () => {
+    try {
+      return JSON.parse(form.value.supportedModalities || '[]') as string[]
+    } catch {
+      return []
+    }
+  },
+  set: (val: string[]) => {
+    form.value.supportedModalities = val.length > 0 ? JSON.stringify(val) : null
+  }
+})
+
+const stopSequencesArray = computed({
+  get: () => {
+    try {
+      return JSON.parse(form.value.stopSequences || '[]') as string[]
+    } catch {
+      return []
+    }
+  },
+  set: (val: string[]) => {
+    form.value.stopSequences = val.length > 0 ? JSON.stringify(val) : null
+  }
+})
+
+const hasVisionModality = computed(() => {
+  const arr = modalitiesArray.value
+  return arr.includes('image') || arr.includes('video')
+})
 
 const searchStrategyOptions = [
-  { label: 'auto（模型自主判断）', value: 'auto' },
-  { label: 'standard（标准搜索）', value: 'standard' },
+  { label: 'turbo（快速搜索）', value: 'turbo' },
   { label: 'max（高性能搜索）', value: 'max' },
-  { label: 'agent（深度研究）', value: 'agent' }
+  { label: 'agent（深度研究）', value: 'agent' },
+  { label: 'agent_max（深度研究+）', value: 'agent_max' }
+]
+
+const reasoningEffortOptions = [
+  { label: 'high（高推理）', value: 'high' },
+  { label: 'max（最大推理）', value: 'max' }
+]
+
+const textResponseFormatOptions = [
+  { label: 'text（纯文本）', value: 'text' },
+  { label: 'json_object（JSON 模式）', value: 'json_object' }
+]
+
+const searchFreshnessOptions = [
+  { label: '7 天内', value: 7 },
+  { label: '30 天内', value: 30 },
+  { label: '180 天内', value: 180 },
+  { label: '365 天内', value: 365 }
 ]
 
 const isText = computed(() => form.value.type === 1)
@@ -568,13 +1146,34 @@ watch(
         temperature: data.temperature ?? null,
         topP: data.topP ?? null,
         maxTokens: data.maxTokens ?? null,
+        maxCompletionTokens: data.maxCompletionTokens ?? null,
+        presencePenalty: data.presencePenalty ?? null,
+        frequencyPenalty: data.frequencyPenalty ?? null,
+        repetitionPenalty: data.repetitionPenalty ?? null,
+        topK: data.topK ?? null,
+        seed: data.seed ?? null,
+        n: data.n ?? null,
+        stopSequences: data.stopSequences ?? null,
+        logprobs: data.logprobs ?? null,
+        topLogprobs: data.topLogprobs ?? null,
         systemPrompt: data.systemPrompt ?? '',
+        supportedModalities: data.supportedModalities ?? null,
         enableThinking: data.enableThinking ?? 0,
         thinkingBudget: data.thinkingBudget ?? null,
+        preserveThinking: data.preserveThinking ?? null,
+        reasoningEffort: data.reasoningEffort ?? null,
         enableCodeInterpreter: data.enableCodeInterpreter ?? 0,
         enableSearch: data.enableSearch ?? 0,
         searchStrategy: data.searchStrategy ?? null,
         enableSource: data.enableSource ?? 0,
+        forcedSearch: data.forcedSearch ?? null,
+        searchFreshness: data.searchFreshness ?? null,
+        enableSearchExtension: data.enableSearchExtension ?? null,
+        vlHighResolutionImages: data.vlHighResolutionImages ?? null,
+        minPixels: data.minPixels ?? null,
+        maxPixels: data.maxPixels ?? null,
+        videoFps: data.videoFps ?? null,
+        enableTextImageMixed: data.enableTextImageMixed ?? null,
         voice: data.voice ?? '',
         speed: data.speed ?? null,
         responseFormat: data.responseFormat ?? null,
@@ -727,3 +1326,21 @@ async function submit() {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.param-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.param-help {
+  color: var(--text-color-3, rgba(255, 255, 255, 0.3));
+  cursor: help;
+  transition: color 0.15s;
+
+  &:hover {
+    color: var(--primary-color, #6366f1);
+  }
+}
+</style>

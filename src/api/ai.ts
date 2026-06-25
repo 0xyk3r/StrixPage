@@ -18,18 +18,40 @@ export interface AiModelConfigResp {
   temperature?: number
   topP?: number
   maxTokens?: number
+  maxCompletionTokens?: number
+  presencePenalty?: number
+  frequencyPenalty?: number
+  repetitionPenalty?: number
+  topK?: number
+  seed?: number
+  n?: number
+  stopSequences?: string
+  logprobs?: number
+  topLogprobs?: number
   systemPrompt?: string
+  /** 多模态支持 JSON 数组: ["image","video","audio"] */
+  supportedModalities?: string
   /** 0=禁用 1=启用 */
   enableThinking?: number
   thinkingBudget?: number
+  preserveThinking?: number
+  reasoningEffort?: string
   /** 是否启用代码解释器：0=禁用 1=启用 */
   enableCodeInterpreter?: number
   /** 是否启用联网搜索：0=禁用 1=启用 */
   enableSearch?: number
-  /** 搜索策略：auto/standard/max/agent */
+  /** 搜索策略：turbo/max/agent/agent_max */
   searchStrategy?: string
   /** 是否附带搜索来源引用：0=禁用 1=启用 */
   enableSource?: number
+  forcedSearch?: number
+  searchFreshness?: number
+  enableSearchExtension?: number
+  vlHighResolutionImages?: number
+  minPixels?: number
+  maxPixels?: number
+  videoFps?: number
+  enableTextImageMixed?: number
   voice?: string
   speed?: number
   responseFormat?: string
@@ -60,18 +82,39 @@ export interface AiModelConfigUpdateReq {
   temperature?: number | null
   topP?: number | null
   maxTokens?: number | null
+  maxCompletionTokens?: number | null
+  presencePenalty?: number | null
+  frequencyPenalty?: number | null
+  repetitionPenalty?: number | null
+  topK?: number | null
+  seed?: number | null
+  n?: number | null
+  stopSequences?: string | null
+  logprobs?: number | null
+  topLogprobs?: number | null
   systemPrompt?: string
+  supportedModalities?: string | null
   /** 0=禁用 1=启用 */
   enableThinking?: number
   thinkingBudget?: number | null
+  preserveThinking?: number | null
+  reasoningEffort?: string | null
   /** 是否启用代码解释器：0=禁用 1=启用 */
   enableCodeInterpreter?: number
   /** 是否启用联网搜索：0=禁用 1=启用 */
   enableSearch?: number
-  /** 搜索策略：auto/standard/max/agent */
+  /** 搜索策略：turbo/max/agent/agent_max */
   searchStrategy?: string | null
   /** 是否附带搜索来源引用：0=禁用 1=启用 */
   enableSource?: number
+  forcedSearch?: number | null
+  searchFreshness?: number | null
+  enableSearchExtension?: number | null
+  vlHighResolutionImages?: number | null
+  minPixels?: number | null
+  maxPixels?: number | null
+  videoFps?: number | null
+  enableTextImageMixed?: number | null
   voice?: string
   speed?: number | null
   responseFormat?: string | null
@@ -123,10 +166,17 @@ export interface AiSessionCreateReq {
   title: string
 }
 
-export interface AiMessageAttachment {
-  type: string
-  url: string
+/** 附件（发送时提交） */
+export interface AiAttachment {
+  fileId: string
+  type: 'image' | 'video' | 'audio'
+  mimeType: string
   name: string
+}
+
+/** 附件响应（含预览 URL） */
+export interface AiAttachmentResp extends AiAttachment {
+  previewUrl: string
 }
 
 export interface AiMessageResp {
@@ -136,10 +186,15 @@ export interface AiMessageResp {
   role: string
   content: string
   thinkingContent?: string
-  /** JSON string: AiMessageAttachment[] */
-  attachments?: string
+  attachments?: AiAttachmentResp[]
   promptTokens?: number
   completionTokens?: number
+  /** 缓存命中 Token 数（实际计费输入 = promptTokens - cacheHitTokens） */
+  cacheHitTokens?: number
+  /** 缓存写入 Token 数（DashScope 特有） */
+  cacheWriteTokens?: number
+  /** 思考链 Token 数（包含于 completionTokens 内） */
+  reasoningTokens?: number
   /** 0=生成中 1=完成 2=错误 */
   status: number
   errorMsg?: string
@@ -151,7 +206,7 @@ export interface AiMessageResp {
 
 export interface AiChatMessageReq {
   content: string
-  attachments?: AiMessageAttachment[]
+  attachments?: AiAttachment[]
 }
 
 export interface AiSessionRenameTitleReq {

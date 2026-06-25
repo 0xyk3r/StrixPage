@@ -29,8 +29,13 @@
             @update:value="handleSwitchModel"
           />
           <div style="flex: 1" />
-          <n-button quaternary size="small" title="清空消息" :disabled="chatStore.streaming"
-                    @click="confirmClearMessages">
+          <n-button
+            quaternary
+            size="small"
+            title="清空消息"
+            :disabled="chatStore.streaming"
+            @click="confirmClearMessages"
+          >
             <template #icon>
               <n-icon :size="15">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -48,7 +53,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="3" />
                   <path
-                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                  />
                 </svg>
               </n-icon>
             </template>
@@ -69,7 +75,7 @@
           ref="inputRef"
           :disabled="chatStore.messageLoading"
           :streaming="chatStore.streaming"
-          :show-image-upload="isVisionModel"
+          :supported-modalities="currentModalities"
           @send="handleSend"
           @abort="chatStore.abortStream"
         />
@@ -93,12 +99,7 @@
     >
       <n-form label-placement="left" label-width="80px">
         <n-form-item label="模型">
-          <n-select
-            v-model:value="newSessionModelId"
-            :options="modelOptions"
-            placeholder="选择模型"
-            filterable
-          />
+          <n-select v-model:value="newSessionModelId" :options="modelOptions" placeholder="选择模型" filterable />
         </n-form-item>
         <n-form-item label="标题">
           <n-input v-model:value="newSessionTitle" clearable placeholder="对话标题（可选）" />
@@ -122,11 +123,13 @@
             <n-descriptions-item label="模型">{{ activeModelConfig.name }}</n-descriptions-item>
             <n-descriptions-item label="模型标识">{{ activeModelConfig.modelName }}</n-descriptions-item>
             <n-descriptions-item label="温度">{{ activeModelConfig.temperature }}</n-descriptions-item>
-            <n-descriptions-item label="最大输出">{{ activeModelConfig.maxTokens ?? '—' }} tokens</n-descriptions-item>
+            <n-descriptions-item label="最大输出">
+              {{ activeModelConfig.maxCompletionTokens ?? activeModelConfig.maxTokens ?? '—' }} tokens
+            </n-descriptions-item>
             <n-descriptions-item label="系统提示">
-              <span
-                style="white-space: pre-wrap; font-size: 12px; opacity: 0.7">{{ activeModelConfig.systemPrompt || '（未设置）'
-                }}</span>
+              <span style="white-space: pre-wrap; font-size: 12px; opacity: 0.7">{{
+                activeModelConfig.systemPrompt || '（未设置）'
+              }}</span>
             </n-descriptions-item>
           </n-descriptions>
         </template>
@@ -138,7 +141,7 @@
 
 <script lang="ts" setup>
 import { useAiChatStore } from '@/stores/ai-chat'
-import type { AiModelConfigResp } from '@/api/ai'
+import type { AiAttachment, AiAttachmentResp, AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import AiChatSessionList from './AiChatSessionList.vue'
 import AiChatMessages from './AiChatMessages.vue'
@@ -165,13 +168,16 @@ const modelOptions = computed(() =>
 
 const activeSession = computed(() => chatStore.sessions.find((s) => s.id === chatStore.activeSessionId))
 
-const activeModelConfig = computed(() =>
-  modelConfigs.value.find((m) => m.id === activeSession.value?.modelConfigId)
-)
+const activeModelConfig = computed(() => modelConfigs.value.find((m) => m.id === activeSession.value?.modelConfigId))
 
-const isVisionModel = computed(() => {
+const currentModalities = computed(() => {
   const config = modelConfigs.value.find((m) => m.id === activeSession.value?.modelConfigId)
-  return config?.type === 2
+  if (!config?.supportedModalities) return []
+  try {
+    return JSON.parse(config.supportedModalities) as string[]
+  } catch {
+    return []
+  }
 })
 
 async function loadModelConfigs() {
@@ -211,13 +217,23 @@ async function createSession() {
   }
 }
 
-async function handleSend(content: string, attachments: any[]) {
+async function handleSend(content: string, attachments: (AiAttachment & { localPreview?: string })[]) {
   await chatStore.sendMessage(content, attachments)
+  // 流式完成后（store.streaming 变为 false），后端 previewUrl 已就绪，可安全释放 ObjectURL
+  const stopWatch = watch(
+    () => chatStore.streaming,
+    (streaming) => {
+      if (!streaming) {
+        inputRef.value?.revokeLocalPreviews()
+        stopWatch()
+      }
+    }
+  )
 }
 
-async function handleEditResend(payload: { id: string; content: string; attachments: any[] }) {
+async function handleEditResend(payload: { id: string; content: string; attachments: AiAttachmentResp[] }) {
   await chatStore.truncateFrom(payload.id)
-  inputRef.value?.prefill(payload.content)
+  inputRef.value?.prefill(payload.content, payload.attachments)
 }
 
 async function handleRegenerate() {

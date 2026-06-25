@@ -12,6 +12,12 @@ export interface AiStreamEvent {
   modelConfigName?: string
   promptTokens?: number
   completionTokens?: number
+  /** 缓存命中 Token 数（prompt_tokens_details.cached_tokens） */
+  cacheHitTokens?: number
+  /** 缓存写入 Token 数（DashScope cache_write_tokens） */
+  cacheWriteTokens?: number
+  /** 思考链 Token 数（completion_tokens_details.reasoning_tokens） */
+  reasoningTokens?: number
   message?: string
 }
 
@@ -89,7 +95,10 @@ async function consumeSseStream(response: Response, onEvent: (event: AiStreamEve
                   modelConfigId: parsed.modelConfigId,
                   modelConfigName: parsed.modelConfigName,
                   promptTokens: parsed.promptTokens,
-                  completionTokens: parsed.completionTokens
+                  completionTokens: parsed.completionTokens,
+                  cacheHitTokens: parsed.cacheHitTokens,
+                  cacheWriteTokens: parsed.cacheWriteTokens,
+                  reasoningTokens: parsed.reasoningTokens
                 })
                 break
               case 'error':
