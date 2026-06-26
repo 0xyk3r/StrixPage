@@ -197,7 +197,7 @@ import { TooltipComponent } from 'echarts/components'
 import type { ComposeOption } from 'echarts/core'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { Pause, Play, RefreshCw } from 'lucide-vue-next'
+import { Pause, Play, RefreshCw } from '@lucide/vue'
 import VChart from 'vue-echarts'
 
 use([CanvasRenderer, PieChart, GaugeChart, TooltipComponent])

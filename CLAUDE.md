@@ -41,7 +41,7 @@ pnpm dict:types       # 从数据库同步字典类型
 - **Vue Router 5**：路由管理
 - **Axios**：HTTP 客户端（内置 SM2/SM4 加密）
 - **ECharts 6**：数据可视化
-- **lucide-vue-next**：图标库
+- **@lucide/vue**：图标库
 - **SCSS**：样式预处理器
 
 ### 自动导入
@@ -70,7 +70,7 @@ pnpm dict:types       # 从数据库同步字典类型
 ### 路径别名
 
 ```typescript
-import { xxx } from '@/xxx'  // @ = ./src/
+import { xxx } from '@/xxx' // @ = ./src/
 ```
 
 ## 目录结构
@@ -140,7 +140,7 @@ src/
 import type { RetResult } from './types'
 import { http } from '@/plugins/axios'
 
-const _n = '系统人员'  // 业务名称（用于日志）
+const _n = '系统人员' // 业务名称（用于日志）
 const BASE = 'system/manager'
 
 /** 列表项类型 */
@@ -167,44 +167,48 @@ export interface SystemManagerUpdateReq {
 }
 
 export const managerApi = {
-  urls: { list: BASE },  // 暴露 URL（用于 useCrud）
-  
+  urls: { list: BASE }, // 暴露 URL（用于 useCrud）
+
   /** 列表查询 */
   list: (params: Record<string, any>) =>
-    http.get<RetResult<ManagerListResp>>(BASE, { 
-      params, 
-      meta: { operate: `加载${_n}列表` } 
+    http.get<RetResult<ManagerListResp>>(BASE, {
+      params,
+      meta: { operate: `加载${_n}列表` }
     }),
-  
+
   /** 详情查询 */
   detail: (id: string) =>
-    http.get<RetResult<SystemManagerResp>>(`${BASE}/${id}`, { 
-      meta: { operate: `加载${_n}信息` } 
+    http.get<RetResult<SystemManagerResp>>(`${BASE}/${id}`, {
+      meta: { operate: `加载${_n}信息` }
     }),
-  
+
   /** 新增 */
   create: (data: SystemManagerUpdateReq) =>
-    http.post<RetResult>(`${BASE}/update`, data, { 
-      meta: { operate: `新增${_n}`, notify: true }  // notify: true 显示成功提示
+    http.post<RetResult>(`${BASE}/update`, data, {
+      meta: { operate: `新增${_n}`, notify: true } // notify: true 显示成功提示
     }),
-  
+
   /** 编辑 */
   update: (id: string, data: SystemManagerUpdateReq) =>
-    http.post<RetResult>(`${BASE}/update/${id}`, data, { 
-      meta: { operate: `编辑${_n}`, notify: true } 
+    http.post<RetResult>(`${BASE}/update/${id}`, data, {
+      meta: { operate: `编辑${_n}`, notify: true }
     }),
-  
+
   /** 删除 */
   remove: (id: string) =>
-    http.post<RetResult>(`${BASE}/remove/${id}`, null, { 
-      meta: { operate: `删除${_n}`, notify: true } 
+    http.post<RetResult>(`${BASE}/remove/${id}`, null, {
+      meta: { operate: `删除${_n}`, notify: true }
     }),
-  
+
   /** 批量删除 */
   batchRemove: (ids: string[]) =>
-    http.post<RetResult>(`${BASE}/batch/remove`, { ids }, { 
-      meta: { operate: `批量删除${_n}`, notify: true } 
-    }),
+    http.post<RetResult>(
+      `${BASE}/batch/remove`,
+      { ids },
+      {
+        meta: { operate: `批量删除${_n}`, notify: true }
+      }
+    )
 }
 ```
 
@@ -243,7 +247,7 @@ import StrixTag from '@/components/common/StrixTag.vue'
 // CRUD 核心逻辑
 const crud = useCrud({
   api: managerApi,
-  
+
   // 表格列定义
   columns: () => [
     { type: 'selection' },
@@ -261,21 +265,22 @@ const crud = useCrud({
       title: '操作',
       key: 'actions',
       width: 200,
-      render: (row) => h('div', { class: 'table-actions' }, [
-        h('a', { onClick: () => crud.showEdit(row) }, '编辑'),
-        h('a', { onClick: () => crud.handleDelete(row) }, '删除')
-      ])
+      render: (row) =>
+        h('div', { class: 'table-actions' }, [
+          h('a', { onClick: () => crud.showEdit(row) }, '编辑'),
+          h('a', { onClick: () => crud.handleDelete(row) }, '删除')
+        ])
     }
   ],
-  
+
   // 表单验证规则
   formRules: () => ({
     nickname: textField('昵称', 2, 16),
     loginName: textField('登录名', 4, 20),
-    loginPassword: textField('密码', 6, 32, crud.isEdit.value),  // 编辑时可选
+    loginPassword: textField('密码', 6, 32, crud.isEdit.value), // 编辑时可选
     status: selectField('状态')
   }),
-  
+
   // 生命周期钩子
   hooks: {
     beforeShowAdd: () => {
@@ -284,7 +289,7 @@ const crud = useCrud({
     },
     afterEdit: (row) => {
       // 编辑时数据转换
-      crud.formModel.value.loginPassword = ''  // 编辑时密码留空
+      crud.formModel.value.loginPassword = '' // 编辑时密码留空
     },
     transformAdd: (data) => {
       // 新增前数据处理
@@ -323,19 +328,22 @@ onMounted(() => {
         </n-form-item>
         <n-form-item>
           <n-button type="primary" @click="crud.list(searchParams)">查询</n-button>
-          <n-button @click="searchParams = {}; crud.list()">重置</n-button>
+          <n-button
+            @click="
+              searchParams = {}
+              crud.list()
+            "
+          >重置
+          </n-button
+          >
         </n-form-item>
       </n-form>
     </StrixBlock>
 
     <!-- 操作栏 -->
     <StrixBlock>
-      <n-button type="primary" @click="crud.showAdd()" v-auth="'system:manager:add'">
-        新增
-      </n-button>
-      <n-button @click="crud.batchRemove()" v-auth="'system:manager:remove'">
-        批量删除
-      </n-button>
+      <n-button type="primary" @click="crud.showAdd()" v-auth="'system:manager:add'"> 新增</n-button>
+      <n-button @click="crud.batchRemove()" v-auth="'system:manager:remove'"> 批量删除</n-button>
     </StrixBlock>
 
     <!-- 数据表格 -->
@@ -346,7 +354,7 @@ onMounted(() => {
         :data="crud.data"
         :loading="crud.loading"
         :pagination="crud.pagination"
-        :row-key="row => row.id"
+        :row-key="(row) => row.id"
         @update:checked-row-keys="crud.handleCheck"
       />
     </StrixBlock>
@@ -379,26 +387,28 @@ onMounted(() => {
 ### useCrud 提供的响应式状态
 
 ```typescript
-const crud = useCrud({ /* ... */ })
+const crud = useCrud({
+  /* ... */
+})
 
 // 自动管理的状态
-crud.data              // 列表数据
-crud.loading           // 加载状态
-crud.pagination        // 分页配置
-crud.modalVisible      // 弹窗显示状态
-crud.modalTitle        // 弹窗标题
-crud.formModel         // 表单数据
-crud.formRules         // 表单验证规则
-crud.isEdit            // 是否编辑模式
-crud.checkedRowKeys    // 选中的行
+crud.data // 列表数据
+crud.loading // 加载状态
+crud.pagination // 分页配置
+crud.modalVisible // 弹窗显示状态
+crud.modalTitle // 弹窗标题
+crud.formModel // 表单数据
+crud.formRules // 表单验证规则
+crud.isEdit // 是否编辑模式
+crud.checkedRowKeys // 选中的行
 
 // 方法
-crud.list(params)      // 加载列表
-crud.showAdd()         // 显示新增弹窗
-crud.showEdit(row)     // 显示编辑弹窗
-crud.handleSave()      // 保存（新增/编辑）
+crud.list(params) // 加载列表
+crud.showAdd() // 显示新增弹窗
+crud.showEdit(row) // 显示编辑弹窗
+crud.handleSave() // 保存（新增/编辑）
 crud.handleDelete(row) // 删除单条
-crud.batchRemove()     // 批量删除
+crud.batchRemove() // 批量删除
 crud.handleCheck(keys) // 处理行选中
 ```
 
@@ -407,23 +417,23 @@ crud.handleCheck(keys) // 处理行选中
 使用预定义的规则函数：
 
 ```typescript
-import { 
-  textField,      // 文本字段
-  selectField,    // 选择字段
-  remarkField,    // 备注字段
-  numberField,    // 数字字段
-  emailField,     // 邮箱字段
-  phoneField,     // 手机号字段
-  urlField        // URL 字段
+import {
+  textField, // 文本字段
+  selectField, // 选择字段
+  remarkField, // 备注字段
+  numberField, // 数字字段
+  emailField, // 邮箱字段
+  phoneField, // 手机号字段
+  urlField // URL 字段
 } from '@/utils/form-rules'
 
 const rules = {
-  nickname: textField('昵称', 2, 16),           // 必填，2-16字符
-  email: emailField('邮箱'),                     // 必填，邮箱格式
-  phone: phoneField('手机号', false),            // 选填，手机号格式
-  age: numberField('年龄', 1, 150),             // 必填，1-150
-  remark: remarkField(),                         // 选填，最多500字符
-  status: selectField('状态')                    // 必填，下拉选择
+  nickname: textField('昵称', 2, 16), // 必填，2-16字符
+  email: emailField('邮箱'), // 必填，邮箱格式
+  phone: phoneField('手机号', false), // 选填，手机号格式
+  age: numberField('年龄', 1, 150), // 必填，1-150
+  remark: remarkField(), // 选填，最多500字符
+  status: selectField('状态') // 必填，下拉选择
 }
 ```
 
@@ -435,8 +445,10 @@ const rules = {
 {
   title: '状态',
   key: 'status',
-  render: (row) => h(StrixTag, { 
-    value: row.status, 
+    render
+:
+  (row) => h(StrixTag, {
+    value: row.status,
     dictName: 'SystemUserStatus'  // 自动从字典获取颜色和标签
   })
 }
@@ -504,9 +516,9 @@ const statusOptions = useDict('SystemUserStatus')
 
 ```typescript
 interface DictOption {
-  label: string    // 显示文本
-  value: number    // 值
-  color?: string   // 颜色（用于 StrixTag）
+  label: string // 显示文本
+  value: number // 值
+  color?: string // 颜色（用于 StrixTag）
 }
 ```
 
@@ -550,7 +562,7 @@ import { useStrixSettingsStore } from '@/stores/strix-settings'
 const settings = useStrixSettingsStore()
 
 // 切换主题
-settings.toggleTheme()  // 切换 dark/light
+settings.toggleTheme() // 切换 dark/light
 
 // 获取当前主题
 const isDark = settings.isDark
@@ -564,7 +576,7 @@ const isDark = settings.isDark
 
 .container {
   @include flex-center;
-  
+
   .item {
     color: var(--primary-color);
   }

@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { useNetworkStore } from '@/stores/network'
-import { RefreshCw } from 'lucide-vue-next'
+import { RefreshCw } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 

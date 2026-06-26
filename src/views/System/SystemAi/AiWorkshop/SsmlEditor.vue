@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Clock, Code, Hash, Replace, Volume2 } from 'lucide-vue-next'
+import { Clock, Code, Hash, Replace, Volume2 } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{ modelValue: string; rows?: number; placeholder?: string }>(), {
   rows: 6,

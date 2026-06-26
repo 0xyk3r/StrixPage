@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { RotateCcw } from 'lucide-vue-next'
+import { RotateCcw } from '@lucide/vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 
 const props = withDefaults(

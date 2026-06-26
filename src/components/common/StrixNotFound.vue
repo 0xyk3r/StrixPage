@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowLeft, Home } from 'lucide-vue-next'
+import { ArrowLeft, Home } from '@lucide/vue'
 import { useTabsBarStore } from '@/stores/tabs-bar.ts'
 
 const route = useRoute()

@@ -39,7 +39,13 @@
     />
 
     <!-- 新增/编辑模态框 -->
-    <n-modal v-model:show="showModal" class="strix-form-modal" preset="card" :title="isEdit ? '编辑配置' : '新增配置'" style="width: 560px">
+    <n-modal
+      v-model:show="showModal"
+      class="strix-form-modal"
+      preset="card"
+      :title="isEdit ? '编辑配置' : '新增配置'"
+      style="width: 560px"
+    >
       <n-form ref="formRef" :model="formModel" :rules="formRules" label-placement="left" label-width="80">
         <n-form-item label="配置标识" path="key">
           <n-input v-model:value="formModel.key" :disabled="isEdit" placeholder="如 system.login.captcha" />
@@ -61,7 +67,12 @@
           <n-switch v-else v-model:value="switchValue" />
         </n-form-item>
         <n-form-item label="备注">
-          <n-input v-model:value="formModel.remark" type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" placeholder="配置说明 (可选)" />
+          <n-input
+            v-model:value="formModel.remark"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 4 }"
+            placeholder="配置说明 (可选)"
+          />
         </n-form-item>
       </n-form>
       <template #footer>
@@ -76,16 +87,14 @@
 </template>
 
 <script lang="ts" setup>
-import { systemConfigApi } from '@/api/system-config'
 import type { SystemConfigItem } from '@/api/system-config'
+import { systemConfigApi } from '@/api/system-config'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
-import { NTag } from 'naive-ui'
 import type { DataTableColumn, FormInst } from 'naive-ui'
+import { NTag } from 'naive-ui'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
-
-const dialog = useDialog()
 
 const loading = ref(false)
 const data = ref<SystemConfigItem[]>([])
@@ -94,9 +103,7 @@ const keyword = ref('')
 const filteredData = computed(() => {
   if (!keyword.value) return data.value
   const kw = keyword.value.toLowerCase()
-  return data.value.filter(
-    (item) => item.name.toLowerCase().includes(kw) || item.key.toLowerCase().includes(kw)
-  )
+  return data.value.filter((item) => item.name.toLowerCase().includes(kw) || item.key.toLowerCase().includes(kw))
 })
 
 const showModal = ref(false)
@@ -202,10 +209,8 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
     key: 'type',
     width: 80,
     render: (row) =>
-      h(
-        NTag,
-        { type: row.type === 1 ? 'info' : 'success', size: 'small', bordered: false },
-        () => (row.type === 1 ? '开关' : '内容')
+      h(NTag, { type: row.type === 1 ? 'info' : 'success', size: 'small', bordered: false }, () =>
+        row.type === 1 ? '开关' : '内容'
       )
   },
   {
@@ -214,10 +219,8 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
     ellipsis: { tooltip: true },
     render: (row) => {
       if (row.type === 1) {
-        return h(
-          NTag,
-          { type: row.value === 'true' ? 'success' : 'default', size: 'small', bordered: false },
-          () => (row.value === 'true' ? '开启' : '关闭')
+        return h(NTag, { type: row.value === 'true' ? 'success' : 'default', size: 'small', bordered: false }, () =>
+          row.value === 'true' ? '开启' : '关闭'
         )
       }
       return row.value ?? '-'

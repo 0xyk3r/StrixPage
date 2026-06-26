@@ -11,7 +11,11 @@
       @update:collapsed="siderCollapsed = $event"
       style="min-height: calc(100vh - 120px)"
     >
-      <DictGroupTree ref="groupTreeRef" :selected-group-id="selectedGroupId" @update:selected-group-id="onGroupChange" />
+      <DictGroupTree
+        ref="groupTreeRef"
+        :selected-group-id="selectedGroupId"
+        @update:selected-group-id="onGroupChange"
+      />
     </n-layout-sider>
 
     <!-- 右侧主内容 -->
@@ -27,8 +31,12 @@
           <template #body>
             <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
               <n-gi span="6 s:3 m:2">
-                <n-input v-model:value="listParams.keyword" clearable placeholder="按字典标识或名称搜索"
-                         @keydown.enter="handleKeywordEnter" />
+                <n-input
+                  v-model:value="listParams.keyword"
+                  clearable
+                  placeholder="按字典标识或名称搜索"
+                  @keydown.enter="handleKeywordEnter"
+                />
               </n-gi>
               <n-gi :span="1">
                 <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -95,10 +103,7 @@
         />
 
         <StrixBatchBar :count="selectedCount" @clear="clearSelection">
-          <n-popselect
-            :options="commonSwitchRef"
-            @update:value="(v: number) => batchModify('status', String(v))"
-          >
+          <n-popselect :options="commonSwitchRef" @update:value="(v: number) => batchModify('status', String(v))">
             <n-button size="small" quaternary type="primary">
               <template #icon>
                 <strix-icon icon="toggle-left" :size="14" />
@@ -116,7 +121,7 @@
 
         <strix-export-dialog
           v-model:show="showExportDialog"
-          :columns="(dataColumns as unknown as DataTableColumns)"
+          :columns="dataColumns as unknown as DataTableColumns"
           :data="dataRef || []"
           :fetch-all-data="fetchAllData"
           :selected-rows="selectedRows"
@@ -175,7 +180,12 @@
               />
             </n-form-item>
             <n-form-item label="字典状态" path="status">
-              <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable placeholder="请选择字典状态" />
+              <n-select
+                v-model:value="addForm.status"
+                :options="commonSwitchRef"
+                clearable
+                placeholder="请选择字典状态"
+              />
             </n-form-item>
             <n-form-item label="备注信息" path="remark">
               <n-input
@@ -325,9 +335,7 @@ const siderCollapsed = ref(false)
 const groupTreeRef = ref<InstanceType<typeof DictGroupTree> | null>(null)
 const groups = ref<DictGroupItem[]>([])
 
-const groupOptions = computed(() =>
-  groups.value.map((g) => ({ label: g.name, value: g.id }))
-)
+const groupOptions = computed(() => groups.value.map((g) => ({ label: g.name, value: g.id })))
 
 // 父级字典选项（从当前列表数据中选取）
 const parentDictOptions = computed(() =>
@@ -450,7 +458,6 @@ const {
 const { commentButton, panelProps: commentPanelProps } = useComment('SystemDict')
 
 // 展开行：内联预览
-const expandedRowKeys = ref<string[]>([])
 const expandedDataCache = ref<Record<string, DictDataItem[]>>({})
 
 async function loadExpandData(dictKey: string) {
@@ -632,9 +639,7 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 const dataRef = ref<DictItem[]>()
 const dataLoading = ref(true)
 
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 
 const getDataList = () => {
   // 同步分组筛选

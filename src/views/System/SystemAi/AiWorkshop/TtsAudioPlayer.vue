@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Download, Pause, Play } from 'lucide-vue-next'
+import { Download, Pause, Play } from '@lucide/vue'
 
 const props = withDefaults(
   defineProps<{

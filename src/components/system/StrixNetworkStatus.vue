@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { useNetworkStore } from '@/stores/network'
-import { WifiOff, Wifi } from 'lucide-vue-next'
+import { Wifi, WifiOff } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 
 const networkStore = useNetworkStore()

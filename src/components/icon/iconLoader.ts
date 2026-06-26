@@ -7,11 +7,11 @@ export function getIconComponent(name: string) {
 
   const comp = defineAsyncComponent(async () => {
     try {
-      const module = (await import('lucide-vue-next')) as any
+      const module = (await import('@lucide/vue')) as any
       return module[name] || module.FileQuestion
     } catch {
       console.warn(`Icon ${name} not found, using fallback`)
-      const { FileQuestion } = await import('lucide-vue-next')
+      const { FileQuestion } = await import('@lucide/vue')
       return FileQuestion
     }
   })

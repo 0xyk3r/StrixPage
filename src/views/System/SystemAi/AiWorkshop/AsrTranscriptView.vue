@@ -71,8 +71,8 @@
               <span class="sentence-card__index">#{{ item.index + 1 }}</span>
               <span class="sentence-card__meta">
                 <span v-if="item.s.beginTime !== undefined" class="sentence-card__time">
-                  {{ fmtTime(item.s.beginTime) }}<template v-if="item.s.endTime !== undefined">
-                    → {{ fmtTime(item.s.endTime) }}</template>
+                  {{ fmtTime(item.s.beginTime)
+                  }}<template v-if="item.s.endTime !== undefined"> → {{ fmtTime(item.s.endTime) }}</template>
                 </span>
                 <span v-if="item.s.language" class="sentence-card__lang">{{ langLabel(item.s.language) }}</span>
                 <span class="sentence-card__status" :class="{ 'is-final': item.s.final }">
@@ -82,11 +82,7 @@
             </header>
             <p class="sentence-card__text">
               <template v-if="item.s.words && item.s.words.length">
-                <span
-                  v-for="(w, wi) in item.s.words"
-                  :key="wi"
-                  class="sentence-card__word"
-                  :title="wordTitle(w)"
+                <span v-for="(w, wi) in item.s.words" :key="wi" class="sentence-card__word" :title="wordTitle(w)"
                 >{{ w.text }}{{ w.punctuation }}</span
                 >
               </template>
@@ -116,7 +112,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Copy, Mic, Trash2 } from 'lucide-vue-next'
+import { Copy, Mic, Trash2 } from '@lucide/vue'
 import type { AsrSentence } from '@/composables/useAsrStream'
 
 interface Props {
