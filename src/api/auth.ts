@@ -8,6 +8,7 @@ export interface LoginManagerInfo {
   type: number
   regionId: string
   permissionKeys: string[]
+  avatarConfig: string | null
 }
 
 /** 登录响应 */

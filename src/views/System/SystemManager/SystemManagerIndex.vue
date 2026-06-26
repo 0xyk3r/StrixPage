@@ -10,8 +10,12 @@
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、账号）"
-                     @keydown.enter="handleKeywordEnter" />
+            <n-input
+              v-model:value="listParams.keyword"
+              clearable
+              placeholder="请输入搜索条件（昵称、账号）"
+              @keydown.enter="handleKeywordEnter"
+            />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
@@ -72,10 +76,7 @@
     />
 
     <StrixBatchBar :count="selectedCount" @clear="clearSelection">
-      <n-popselect
-        :options="systemManagerStatusRef"
-        @update:value="(v: number) => batchModify('status', String(v))"
-      >
+      <n-popselect :options="systemManagerStatusRef" @update:value="(v: number) => batchModify('status', String(v))">
         <n-button size="small" quaternary type="primary">
           <template #icon>
             <strix-icon icon="toggle-left" :size="14" />
@@ -93,7 +94,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -279,6 +280,7 @@
 import StrixBlock from '@/components/common/StrixBlock.vue'
 import StrixTag from '@/components/common/StrixTag.vue'
 import NebulaTag from '@/components/common/NebulaTag.vue'
+import StrixAvatar from '@/components/common/StrixAvatar.vue'
 import type { SystemManagerItem } from '@/api/manager'
 import { managerApi } from '@/api/manager'
 import { regionApi } from '@/api/region'
@@ -479,7 +481,17 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
       ])
     }
   },
-  { key: 'nickname', title: '昵称', width: 160 },
+  {
+    key: 'nickname',
+    title: '昵称',
+    width: 200,
+    render(row) {
+      return h('div', { style: 'display:flex;align-items:center;gap:8px' }, [
+        h(StrixAvatar, { managerId: row.id, config: row.avatarConfig ?? null, size: 28 }),
+        h('span', row.nickname)
+      ])
+    }
+  },
   { key: 'loginName', title: '登录名', width: 160 },
   {
     key: 'status',
@@ -552,9 +564,7 @@ const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColum
 // 加载列表
 const dataRef = ref<ExpandedManagerRow[]>()
 const dataLoading = ref(true)
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
@@ -603,8 +613,6 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
       if (row) row.roleIdArray = res.data.roleIds?.split(',')
     })
 }
-
-
 </script>
 
 <style lang="scss" scoped></style>

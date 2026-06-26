@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AvatarPickerDialog: typeof import('./../components/common/AvatarPickerDialog.vue')['default']
     CaptchaContainer: typeof import('./../components/captcha/CaptchaContainer.vue')['default']
     CaptchaPuzzle: typeof import('./../components/captcha/components/CaptchaPuzzle.vue')['default']
     FileBrowserContextMenu: typeof import('./../components/file-browser/FileBrowserContextMenu.vue')['default']
@@ -32,6 +33,7 @@ declare module 'vue' {
     NCode: typeof import('naive-ui')['NCode']
     NCollapse: typeof import('naive-ui')['NCollapse']
     NCollapseItem: typeof import('naive-ui')['NCollapseItem']
+    NColorPicker: typeof import('naive-ui')['NColorPicker']
     NDataTable: typeof import('naive-ui')['NDataTable']
     NDatePicker: typeof import('naive-ui')['NDatePicker']
     NDescriptions: typeof import('naive-ui')['NDescriptions']
@@ -105,6 +107,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     StrixAnnouncement: typeof import('./../components/common/StrixAnnouncement.vue')['default']
+    StrixAvatar: typeof import('./../components/common/StrixAvatar.vue')['default']
     StrixBackToTop: typeof import('./../components/common/StrixBackToTop.vue')['default']
     StrixBatchBar: typeof import('./../components/common/StrixBatchBar.vue')['default']
     StrixBlock: typeof import('./../components/common/StrixBlock.vue')['default']

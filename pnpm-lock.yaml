@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@dicebear/core':
+        specifier: ^10.3.0
+        version: 10.3.0
+      '@dicebear/styles':
+        specifier: ^10.2.0
+        version: 10.2.0
       '@lucide/vue':
         specifier: ^1.21.0
         version: 1.21.0(vue@3.5.39(typescript@6.0.2))
@@ -763,6 +769,13 @@ packages:
     resolution: {integrity: sha512-//8027GSbxE9n3QlD73xFY6z4ZbHbvrOVB7AO6hsmrEzGbg+h2A09HboUyDgu+xsmj7JnvJD39Irt+2D0+iV8g==}
     peerDependencies:
       vue: ^3.0.11
+
+  '@dicebear/core@10.3.0':
+    resolution: {integrity: sha512-HbzHvYY/E0m3B7BfBjs8SO7JyqJnORJgQhM2YM7VoN/EQzrqJ3Z0j4+op+WfEWXWzZj75tQqBU5SZpUssi5m/Q==}
+    engines: {node: '>=22.0.0'}
+
+  '@dicebear/styles@10.2.0':
+    resolution: {integrity: sha512-o4rw0+7Q7sSAyr9YxYrUe3jCxlOAzEcBvbQvl4hQKQ+9WNmBK4p7wGYvsmGeJbxFh8y/Ux6ltrCPyXBIDV6qYA==}
 
   '@emnapi/core@1.9.2':
     resolution: {integrity: sha512-UC+ZhH3XtczQYfOlu3lNEkdW/p4dsJ1r/bP7H8+rhao3TTTMO1ATq/4DdIi23XuGoFY+Cz0JmCbdVl0hz9jZcA==}
@@ -4397,7 +4410,7 @@ snapshots:
     dependencies:
       '@babel/template': 7.28.6
       '@babel/traverse': 7.29.0
-      '@babel/types': 7.29.0
+      '@babel/types': 7.29.7
     transitivePeerDependencies:
       - supports-color
 
@@ -4675,7 +4688,7 @@ snapshots:
       '@babel/core': 7.29.0
       '@babel/helper-module-transforms': 7.28.6(@babel/core@7.29.0)
       '@babel/helper-plugin-utils': 7.28.6
-      '@babel/helper-validator-identifier': 7.28.5
+      '@babel/helper-validator-identifier': 7.29.7
       '@babel/traverse': 7.29.0
     transitivePeerDependencies:
       - supports-color
@@ -4926,7 +4939,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.29.0
       '@babel/helper-plugin-utils': 7.28.6
-      '@babel/types': 7.29.0
+      '@babel/types': 7.29.7
       esutils: 2.0.3
 
   '@babel/runtime@7.29.2': {}
@@ -4973,6 +4986,10 @@ snapshots:
   '@css-render/vue3-ssr@0.15.14(vue@3.5.39(typescript@6.0.2))':
     dependencies:
       vue: 3.5.39(typescript@6.0.2)
+
+  '@dicebear/core@10.3.0': {}
+
+  '@dicebear/styles@10.2.0': {}
 
   '@emnapi/core@1.9.2':
     dependencies:

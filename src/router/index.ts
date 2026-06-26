@@ -66,6 +66,15 @@ const routes: RouteRecordRaw[] = [
       ...customRoutes,
       ...developmentRoutes,
       {
+        path: '/profile',
+        name: 'SystemProfile',
+        component: () => import('@/views/System/SystemProfile/SystemProfilePage.vue'),
+        meta: {
+          title: '个人设置',
+          fixed: false
+        }
+      },
+      {
         path: '/system/manager',
         name: 'SystemManagerIndex',
         component: () => import('@/views/System/SystemManager/SystemManagerIndex.vue'),

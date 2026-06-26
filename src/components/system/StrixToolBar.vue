@@ -24,7 +24,7 @@
     <!-- 用户信息 -->
     <div class="nebula-toolbar__user" @click.stop="toggleUserMenu">
       <div class="nebula-toolbar__avatar">
-        {{ avatarLetter }}
+        <StrixAvatar :manager-id="loginInfo.id" :config="loginInfo.avatarConfig" :size="28" />
       </div>
       <span class="nebula-toolbar__name">{{ loginInfo.nickname || '未知' }}</span>
       <StrixIcon icon="chevron-down" :size="12" :class="['nebula-toolbar__chevron', { open: showUserMenu }]" />
@@ -56,17 +56,12 @@ import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
 import { createStrixMessage } from '@/utils/strix-message.ts'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
+import StrixAvatar from '@/components/common/StrixAvatar.vue'
 
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()
 
 const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
-
-// 头像首字母
-const avatarLetter = computed(() => {
-  const name = loginInfo.value.nickname || '?'
-  return name.charAt(0).toUpperCase()
-})
 
 // 用户菜单
 const showUserMenu = ref(false)
@@ -112,7 +107,7 @@ const handleUserAction = (key: string) => {
   showUserMenu.value = false
   switch (key) {
     case 'setting':
-      createStrixMessage('warning', '操作失败', '该功能暂未开放，敬请期待')
+      router.push('/profile')
       break
     case 'logout':
       logout()

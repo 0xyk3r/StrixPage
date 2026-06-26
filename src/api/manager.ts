@@ -14,6 +14,7 @@ export interface SystemManagerItem {
   regionId: string
   builtin: number
   createdTime: string
+  avatarConfig: string | null
 }
 
 /** 人员列表响应 */

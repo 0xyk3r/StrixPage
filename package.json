@@ -18,6 +18,8 @@
     "dict:types": "tsx scripts/generate-dict-types.ts"
   },
   "dependencies": {
+    "@dicebear/core": "^10.3.0",
+    "@dicebear/styles": "^10.2.0",
     "@lucide/vue": "^1.21.0",
     "axios": "^1.18.1",
     "dexie": "^4.2.1",
