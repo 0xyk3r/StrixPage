@@ -343,6 +343,42 @@ export interface SttResult {
 }
 
 // ============================================================
+//  FIM 续写
+// ============================================================
+
+/** FIM 续写请求 */
+export interface AiFimReq {
+  /** 模型配置 Key（必须为支持 FIM 的提供商，如 DeepSeek） */
+  modelKey: string
+  /**
+   * FIM 模式：前缀文本；对话前缀续写模式：assistant 前缀内容（必填）
+   */
+  prompt: string
+  /** FIM 专用：后缀文本（可选，提供时启用 FIM 填充模式） */
+  suffix?: string
+  /** 对话前缀续写专用：系统提示词（可选） */
+  systemPrompt?: string
+  /** 对话前缀续写专用：用户消息（可选，提供背景上下文） */
+  userContent?: string
+  /** true = 对话前缀续写（Chat Prefix），false/undefined = FIM 填充 */
+  chatPrefix?: boolean
+  /** 最大生成 Token 数（1-4096，不填使用模型配置默认值） */
+  maxTokens?: number
+  /** 温度覆盖（0-2，不填使用模型配置） */
+  temperature?: number
+}
+
+/** FIM 续写响应 */
+export interface AiFimResp {
+  /** 生成的文本内容 */
+  text: string
+  /** 停止原因：stop=正常结束，length=达到 Token 限制 */
+  finishReason?: string
+  promptTokens?: number
+  completionTokens?: number
+}
+
+// ============================================================
 //  API 方法
 // ============================================================
 
@@ -381,6 +417,12 @@ export const aiApi = {
   fetchModels: (data: AiFetchModelsReq) =>
     http.post<RetResult<AiModelInfo[]>>(`${BASE}/model-config/fetch-models`, data, {
       meta: { operate: '获取模型列表', notify: false }
+    }),
+
+  // FIM 续写
+  fim: (data: AiFimReq) =>
+    http.post<RetResult<AiFimResp>>(`${BASE}/fim`, data, {
+      meta: { operate: 'AI 文本续写' }
     }),
 
   // 会话

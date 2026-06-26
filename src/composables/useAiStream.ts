@@ -162,9 +162,54 @@ export async function streamAiMessage(
 }
 
 /**
- * 向 POST /system/ai/chat/{sessionId}/regenerate 发送无请求体的 SSE 请求。
- * 签名使用空字符串 body，与后端 SignFilter 的无 body 处理一致。
+ * 向 POST /system/ai/fim/stream 发送加密请求并解析 SSE 流。
+ * 事件格式与 streamAiMessage 兼容：content / done / error。
  */
+export async function streamFimRequest(
+  body: {
+    modelKey: string
+    prompt: string
+    suffix?: string
+    systemPrompt?: string
+    userContent?: string
+    chatPrefix?: boolean
+    maxTokens?: number
+    temperature?: number
+  },
+  onEvent: (event: AiStreamEvent) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  const loginStore = useLoginInfoStore()
+  const token = loginStore.loginToken
+  const timestamp = Date.now().toString()
+  const signUrl = '/system/ai/fim/stream'
+  const fetchUrl = `${useBaseURL()}system/ai/fim/stream`
+
+  const bodyString = JSON.stringify(body)
+  const sign = sm3(bodyString + '|' + signUrl + '|' + timestamp)
+  const encBody = enc(body)
+
+  let response: Response
+  try {
+    response = await fetch(fetchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        timestamp,
+        sign
+      },
+      body: JSON.stringify(encBody),
+      signal
+    })
+  } catch (err: any) {
+    if (err?.name === 'AbortError') return
+    onEvent({ type: 'error', message: err?.message ?? '网络请求失败' })
+    return
+  }
+
+  await handleStreamResponse(response, onEvent)
+}
 export async function streamAiRegenerate(
   sessionId: string,
   onEvent: (event: AiStreamEvent) => void,

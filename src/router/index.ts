@@ -8,7 +8,6 @@ const Redirect = () => import('@/components/view/StrixRedirect.vue')
 const NotFound = () => import('@/components/common/StrixNotFound.vue')
 const Forbidden = () => import('@/components/common/StrixForbidden.vue')
 
-
 const customRoutes: RouteRecordRaw[] = []
 
 const developmentRoutes = []
@@ -183,7 +182,8 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'notification-manage',
             name: 'SystemMonitorNotificationManageIndex',
-            component: () => import('@/views/System/SystemMonitor/NotificationManage/SystemMonitorNotificationManageIndex.vue'),
+            component: () =>
+              import('@/views/System/SystemMonitor/NotificationManage/SystemMonitorNotificationManageIndex.vue'),
             meta: {
               title: '通知管理',
               empty: false,
@@ -406,6 +406,12 @@ const routes: RouteRecordRaw[] = [
             meta: { title: 'AI 工坊', permission: 'system:ai:workshop' }
           },
           {
+            path: 'fim',
+            name: 'SystemAiFim',
+            component: () => import('@/views/System/SystemAi/AiFim/AiFimPage.vue'),
+            meta: { title: 'AI 续写', permission: 'system:ai:fim' }
+          },
+          {
             path: 'model-config',
             name: 'SystemAiModelConfig',
             component: () => import('@/views/System/SystemAi/AiModelConfig/AiModelConfigPage.vue'),
@@ -435,8 +441,7 @@ router.beforeEach((to, from) => {
   const { loginToken } = storeToRefs(loginInfoStore)
 
   // 处理相同路由跳转问题（允许仅查询参数变化的导航，用于筛选条件 URL 同步）
-  if (!to.meta.isRedirect && to.name === from.name && to.fullPath === from.fullPath)
-    return `/redirect${to.path}`
+  if (!to.meta.isRedirect && to.name === from.name && to.fullPath === from.fullPath) return `/redirect${to.path}`
 
   // 加载条
   controlStrixLoadingBar('start')
