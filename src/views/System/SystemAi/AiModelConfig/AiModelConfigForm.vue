@@ -177,7 +177,7 @@
               style="width: 180px"
             />
           </n-form-item>
-          <n-form-item>
+          <n-form-item v-if="providerFeatures.repetitionPenalty">
             <template #label>
               <span class="param-label">
                 Repetition Penalty
@@ -203,7 +203,7 @@
               style="width: 180px"
             />
           </n-form-item>
-          <n-form-item>
+          <n-form-item v-if="providerFeatures.topK">
             <template #label>
               <span class="param-label">
                 Top K
@@ -335,11 +335,11 @@
         </n-collapse-item>
 
         <!-- 思考模式 -->
-        <n-collapse-item title="思考模式" name="thinking">
+        <n-collapse-item v-if="providerFeatures.thinkingControl !== 'none'" title="思考模式" name="thinking">
           <n-form-item label="启用思考模式">
             <n-switch v-model:value="thinkingSwitch" />
           </n-form-item>
-          <n-form-item v-if="thinkingSwitch">
+          <n-form-item v-if="thinkingSwitch && providerFeatures.thinkingBudget">
             <template #label>
               <span class="param-label">
                 思考 Token 预算
@@ -365,7 +365,7 @@
               style="width: 180px"
             />
           </n-form-item>
-          <n-form-item v-if="thinkingSwitch">
+          <n-form-item v-if="thinkingSwitch && providerFeatures.preserveThinking">
             <template #label>
               <span class="param-label">
                 保留思考过程
@@ -388,7 +388,7 @@
               <n-text depth="3" style="font-size: 12px">在消息中保留思考内容</n-text>
             </n-space>
           </n-form-item>
-          <n-form-item v-if="thinkingSwitch">
+          <n-form-item v-if="thinkingSwitch && providerFeatures.reasoningEffortPlacement === 'thinking-nested'">
             <template #label>
               <span class="param-label">
                 推理强度
@@ -402,7 +402,7 @@
                       </svg>
                     </n-icon>
                   </template>
-                  DeepSeek-V4 模型专用。high = 标准推理，max = 最大力度推理。
+                  DashScope 推理力度控制，high = 标准推理，max = 最大力度推理。
                 </n-tooltip>
               </span>
             </template>
@@ -414,7 +414,7 @@
               style="width: 180px"
             />
           </n-form-item>
-          <n-form-item>
+          <n-form-item v-if="providerFeatures.codeInterpreter">
             <template #label>
               <span class="param-label">
                 代码解释器
@@ -437,10 +437,37 @@
               <n-text depth="3" style="font-size: 12px">需开启思考模式，仅流式对话生效</n-text>
             </n-space>
           </n-form-item>
+          <!-- DeepSeek 专属：推理强度独立于思考模式开关 -->
+          <n-form-item v-if="providerFeatures.reasoningEffortPlacement === 'standalone'">
+            <template #label>
+              <span class="param-label">
+                推理强度
+                <n-tooltip trigger="hover" :style="{ maxWidth: '280px' }">
+                  <template #trigger>
+                    <n-icon :size="13" class="param-help">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                      </svg>
+                    </n-icon>
+                  </template>
+                  DeepSeek 推理强度控制。high = 标准推理（默认），max = 最大力度推理。不依赖思考模式开关，始终生效。
+                </n-tooltip>
+              </span>
+            </template>
+            <n-select
+              v-model:value="form.reasoningEffort"
+              :options="reasoningEffortOptions"
+              clearable
+              placeholder="默认（high）"
+              style="width: 180px"
+            />
+          </n-form-item>
         </n-collapse-item>
 
         <!-- 联网搜索 -->
-        <n-collapse-item title="联网搜索" name="search">
+        <n-collapse-item v-if="isText && providerFeatures.search" title="联网搜索" name="search">
           <n-form-item label="启用搜索">
             <n-switch v-model:value="searchSwitch" />
           </n-form-item>
@@ -551,8 +578,8 @@
           </n-form-item>
         </n-collapse-item>
 
-        <!-- 视觉参数 (仅多模态包含 image/video 时显示) -->
-        <n-collapse-item v-if="hasVisionModality" title="视觉参数" name="vision">
+        <!-- 视觉参数 (仅多模态包含 image/video 时显示，且仅 DashScope/AUTO 提供商支持) -->
+        <n-collapse-item v-if="hasVisionModality && providerFeatures.vision" title="视觉参数" name="vision">
           <n-form-item label="高分辨率图片">
             <n-space align="center">
               <n-switch v-model:value="vlHighResSwitch" />
@@ -578,7 +605,7 @@
         </n-collapse-item>
 
         <!-- 其他能力 -->
-        <n-collapse-item title="其他能力" name="other">
+        <n-collapse-item v-if="providerFeatures.textImageMixed" title="其他能力" name="other">
           <n-form-item label="图文混排输出">
             <n-space align="center">
               <n-switch v-model:value="textImageMixedSwitch" />
@@ -1108,6 +1135,120 @@ const searchFreshnessOptions = [
   { label: '180 天内', value: 180 },
   { label: '365 天内', value: 365 }
 ]
+
+// ============================================================
+//  提供商功能注册表（驱动参数按提供商显示）
+// ============================================================
+
+interface ProviderFeatures {
+  topK: boolean
+  repetitionPenalty: boolean
+  thinkingBudget: boolean
+  preserveThinking: boolean
+  codeInterpreter: boolean
+  search: boolean
+  vision: boolean
+  textImageMixed: boolean
+  reasoningEffortPlacement: 'thinking-nested' | 'standalone' | 'none'
+  thinkingControl: 'dashscope-bool' | 'deepseek-object' | 'none'
+}
+
+const PROVIDER_FEATURES: Record<number, ProviderFeatures> = {
+  0: {
+    topK: true,
+    repetitionPenalty: true,
+    thinkingBudget: true,
+    preserveThinking: true,
+    codeInterpreter: true,
+    search: true,
+    vision: true,
+    textImageMixed: true,
+    reasoningEffortPlacement: 'thinking-nested',
+    thinkingControl: 'dashscope-bool'
+  },
+  1: {
+    topK: true,
+    repetitionPenalty: true,
+    thinkingBudget: true,
+    preserveThinking: true,
+    codeInterpreter: true,
+    search: true,
+    vision: true,
+    textImageMixed: true,
+    reasoningEffortPlacement: 'thinking-nested',
+    thinkingControl: 'dashscope-bool'
+  },
+  2: {
+    topK: false,
+    repetitionPenalty: false,
+    thinkingBudget: false,
+    preserveThinking: false,
+    codeInterpreter: false,
+    search: false,
+    vision: false,
+    textImageMixed: false,
+    reasoningEffortPlacement: 'standalone',
+    thinkingControl: 'deepseek-object'
+  },
+  3: {
+    topK: false,
+    repetitionPenalty: false,
+    thinkingBudget: false,
+    preserveThinking: false,
+    codeInterpreter: false,
+    search: false,
+    vision: false,
+    textImageMixed: false,
+    reasoningEffortPlacement: 'none',
+    thinkingControl: 'none'
+  },
+  9: {
+    topK: true,
+    repetitionPenalty: true,
+    thinkingBudget: true,
+    preserveThinking: true,
+    codeInterpreter: true,
+    search: true,
+    vision: true,
+    textImageMixed: true,
+    reasoningEffortPlacement: 'thinking-nested',
+    thinkingControl: 'dashscope-bool'
+  }
+}
+
+const providerFeatures = computed((): ProviderFeatures => {
+  const pt = form.value.providerType ?? 0
+  return (PROVIDER_FEATURES[pt] ?? PROVIDER_FEATURES[9]) as ProviderFeatures
+})
+
+// 切换提供商时清理对目标提供商无效的字段值（immediate: false，不影响编辑模式加载初始数据）
+watch(
+  () => form.value.providerType,
+  () => {
+    const features = providerFeatures.value
+    if (!features.topK) form.value.topK = null
+    if (!features.repetitionPenalty) form.value.repetitionPenalty = null
+    if (!features.thinkingBudget) form.value.thinkingBudget = null
+    if (!features.preserveThinking) form.value.preserveThinking = null
+    if (!features.codeInterpreter) form.value.enableCodeInterpreter = 0
+    if (!features.search) {
+      form.value.enableSearch = 0
+      form.value.searchStrategy = null
+      form.value.enableSource = 0
+      form.value.forcedSearch = null
+      form.value.searchFreshness = null
+      form.value.enableSearchExtension = null
+    }
+    if (!features.vision) {
+      form.value.vlHighResolutionImages = null
+      form.value.minPixels = null
+      form.value.maxPixels = null
+      form.value.videoFps = null
+    }
+    if (!features.textImageMixed) form.value.enableTextImageMixed = null
+    if (features.reasoningEffortPlacement === 'none') form.value.reasoningEffort = null
+  }
+)
 
 const isText = computed(() => form.value.type === 1)
 const isTextOrVision = computed(() => form.value.type === 1 || form.value.type === 2)
