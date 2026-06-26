@@ -21,7 +21,7 @@ export const downloadBlob = (res: AxiosResponse<Blob>, fileName: string) => {
   tempLink.click()
   document.body.removeChild(tempLink)
   // 释放 blob URL 地址
-  window.URL.revokeObjectURL(blobURL)
+  URL.revokeObjectURL(blobURL)
 }
 
 /**
@@ -29,10 +29,14 @@ export const downloadBlob = (res: AxiosResponse<Blob>, fileName: string) => {
  * @param {object} res 通过 axios 请求得到的 blob 响应结果
  * @returns {string} blob url
  */
-export const convertBlob = (res: AxiosResponse<Blob>) => {
-  const blob = new Blob([res.data], { type: res.headers['content-type'] })
-  // 创建新的 URL 并指向 File 对象或 Blob 对象的地址
-  return window.URL.createObjectURL(blob)
+export const convertBlob = (res: AxiosResponse<Blob>): string => {
+  const contentType = res.headers['content-type']
+
+  const blob = new Blob([res.data], {
+    type: typeof contentType === 'string' ? contentType : undefined
+  })
+
+  return URL.createObjectURL(blob)
 }
 
 /**
@@ -40,7 +44,7 @@ export const convertBlob = (res: AxiosResponse<Blob>) => {
  * @param {*} bytes  文件大小，单位为字节
  * @returns  {string} 格式化后的文件大小
  */
-export const formatFileSize = (bytes: number) => {
+export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB']

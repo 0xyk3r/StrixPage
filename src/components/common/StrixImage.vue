@@ -25,7 +25,7 @@ onMounted(loadObject)
 // 释放blob URL地址
 const revokeObject = () => {
   if (imageSrc.value) {
-    window.URL.revokeObjectURL(imageSrc.value)
+    URL.revokeObjectURL(imageSrc.value)
     imageSrc.value = ''
   }
 }
