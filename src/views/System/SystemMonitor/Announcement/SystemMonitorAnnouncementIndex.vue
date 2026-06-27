@@ -88,10 +88,11 @@
       :data="listData?.items ?? []"
       :loading="loading"
       :bordered="false"
+      :scroll-x="scrollX"
       :single-line="false"
       :row-key="(row: AnnouncementItem) => row.id"
-      size="small"
       :pagination="pagination"
+      size="small"
       remote
       @update:page="loadData"
       @update:page-size="handlePageSizeChange"
@@ -220,8 +221,9 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
-import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
 
 const dialog = useDialog()
 
@@ -390,52 +392,58 @@ const levelTagType = (level: string) => {
 }
 
 // 表格列定义
-const columns: DataTableColumn<AnnouncementItem>[] = [
+const columns: DataTableColumns<AnnouncementItem> = [
   { type: 'selection' },
-  { title: '标题', key: 'title', ellipsis: { tooltip: true } },
+  { title: '标题', key: 'title', width: 240, ellipsis: { tooltip: true } },
   {
     title: '级别',
     key: 'level',
     width: 100,
+    align: 'center',
     render: (row) => h(NTag, { type: levelTagType(row.level), size: 'small', bordered: false }, () => row.level)
   },
   {
     title: '展示方式',
     key: 'displayType',
     width: 100,
-    render: (row) => (row.displayType === 'BANNER' ? '底部横幅' : '弹窗提醒')
+    align: 'center',
+    render: (row) =>
+      h(NTag, { type: row.displayType === 'BANNER' ? 'info' : 'warning', size: 'small', bordered: false }, () =>
+        row.displayType === 'BANNER' ? '底部横幅' : '弹窗提醒'
+      )
   },
   {
     title: '状态',
     key: 'status',
     width: 80,
+    align: 'center',
     render: (row) =>
       h(NTag, { type: row.status === 1 ? 'success' : 'error', size: 'small', bordered: false }, () =>
-        row.status === 1 ? '有效' : '已终止'
+        row.status === 1 ? '有效' : '终止'
       )
   },
   {
     title: '生效时间',
     key: 'startTime',
-    width: 160,
+    width: 120,
     render: (row) => (row.startTime ? formatTime(row.startTime) : '立即生效')
   },
   {
     title: '失效时间',
     key: 'endTime',
-    width: 160,
+    width: 120,
     render: (row) => (row.endTime ? formatTime(row.endTime) : '不自动失效')
   },
   {
     title: '创建时间',
     key: 'createdTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.createdTime)
   },
   {
     title: '操作',
     key: 'actions',
-    width: 120,
+    width: 90,
     fixed: 'right',
     render: (row) =>
       handleOperate([
@@ -460,6 +468,8 @@ const columns: DataTableColumn<AnnouncementItem>[] = [
       ])
   }
 ]
+
+const { scrollX } = useTableColumns(columns as unknown as DataTableColumns)
 
 onMounted(() => loadData(1))
 </script>

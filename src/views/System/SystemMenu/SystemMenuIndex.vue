@@ -29,6 +29,7 @@
       :allow-checking-not-loaded="true"
       :cascade="false"
       :columns="visibleColumns"
+      :scroll-x="scrollX"
       :data="dataRef"
       :loading="dataLoading"
       :remote="true"
@@ -38,7 +39,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -340,7 +341,7 @@ const dataColumns: DataTableColumns<SystemMenuManageItem> = [
     key: 'type',
     title: '类型',
     align: 'center',
-    width: 120,
+    width: 100,
     valueMap: { menu: '菜单', permission: '按钮' },
     render(row) {
       return h(NebulaTag, { type: row.type === 'menu' ? 'success' : 'info' }, () =>
@@ -349,18 +350,18 @@ const dataColumns: DataTableColumns<SystemMenuManageItem> = [
     }
   },
   { key: 'key', title: '权限标识', width: 240 },
-  { key: 'url', title: '菜单路由', width: 320 },
+  { key: 'url', title: '菜单路由', width: 240 },
   {
     key: 'icon',
     title: '菜单图标',
     align: 'center',
-    width: 120,
+    width: 90,
     exportable: false,
     render(row) {
       return h(StrixIcon, { icon: kebabCase(row.icon), width: 24 })
     }
   },
-  { key: 'sortValue', title: '菜单排序', width: 120, align: 'center' },
+  { key: 'sortValue', title: '菜单排序', width: 100, align: 'center' },
   {
     key: 'actions',
     title: '操作',
@@ -396,7 +397,11 @@ const dataColumns: DataTableColumns<SystemMenuManageItem> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<SystemMenuManageItem[]>()
@@ -435,25 +440,31 @@ const addData = () => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       submitLoading.value = true
-      menuApi.create(addForm.value as any).then(() => {
-        resetForms()
-        getDataList()
-        EventBus.emit('refresh-menu')
-      }).finally(() => {
-        submitLoading.value = false
-      })
+      menuApi
+        .create(addForm.value as any)
+        .then(() => {
+          resetForms()
+          getDataList()
+          EventBus.emit('refresh-menu')
+        })
+        .finally(() => {
+          submitLoading.value = false
+        })
     })
   } else {
     addPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       submitLoading.value = true
-      permissionApi.create(addPermissionForm.value).then(() => {
-        resetForms()
-        getDataList()
-      }).finally(() => {
-        submitLoading.value = false
-      })
+      permissionApi
+        .create(addPermissionForm.value)
+        .then(() => {
+          resetForms()
+          getDataList()
+        })
+        .finally(() => {
+          submitLoading.value = false
+        })
     })
   }
 }
@@ -487,25 +498,31 @@ const editData = () => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       submitLoading.value = true
-      menuApi.update(editId.value, editForm.value as any).then(() => {
-        resetForms()
-        getDataList()
-        EventBus.emit('refresh-menu')
-      }).finally(() => {
-        submitLoading.value = false
-      })
+      menuApi
+        .update(editId.value, editForm.value as any)
+        .then(() => {
+          resetForms()
+          getDataList()
+          EventBus.emit('refresh-menu')
+        })
+        .finally(() => {
+          submitLoading.value = false
+        })
     })
   } else {
     editPermissionFormRef.value?.validate((errors) => {
       if (errors) return createStrixMessage('warning', '表单校验失败', '请检查表单中的错误，并根据提示修改')
 
       submitLoading.value = true
-      permissionApi.update(editId.value, editPermissionForm.value).then(() => {
-        resetForms()
-        getDataList()
-      }).finally(() => {
-        submitLoading.value = false
-      })
+      permissionApi
+        .update(editId.value, editPermissionForm.value)
+        .then(() => {
+          resetForms()
+          getDataList()
+        })
+        .finally(() => {
+          submitLoading.value = false
+        })
     })
   }
 }

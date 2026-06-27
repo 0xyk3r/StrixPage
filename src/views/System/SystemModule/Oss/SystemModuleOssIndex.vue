@@ -26,6 +26,7 @@
 
     <n-data-table
       :columns="visibleColumns"
+      :scroll-x="scrollX"
       :data="dataRef"
       :expanded-row-keys="dataExpandedRowKeys"
       :loading="dataLoading"
@@ -399,7 +400,11 @@ const dataColumns: DataTableColumns<ExpandedOssConfigRow> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<ExpandedOssConfigRow[]>()

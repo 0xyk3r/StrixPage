@@ -61,10 +61,12 @@
       :data="sessionData?.items ?? []"
       :loading="loading"
       :bordered="false"
+      :scroll-x="scrollX"
       :single-line="false"
       :row-key="rowKey"
-      size="small"
       :pagination="false"
+      size="small"
+      remote
     />
   </div>
 </template>
@@ -74,7 +76,8 @@ import type { OnlineSessionItem, OnlineSessionResp } from '@/api/session'
 import { sessionApi } from '@/api/session'
 import { handleOperate } from '@/utils/strix-table-tool'
 import StrixAvatar from '@/components/common/StrixAvatar.vue'
-import type { DataTableColumn, DataTableRowKey } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
 
 const dialog = useDialog()
 
@@ -165,31 +168,31 @@ const formatTime = (time: string | null) => {
   return time.replace('T', ' ').substring(0, 19)
 }
 
-const columns: DataTableColumn<OnlineSessionItem>[] = [
+const columns: DataTableColumns<OnlineSessionItem> = [
   { type: 'selection' },
   {
     title: '昵称',
     key: 'nickname',
-    width: 160,
+    width: 180,
     render: (row) =>
       h('div', { style: 'display:flex;align-items:center;gap:8px' }, [
         h(StrixAvatar, { managerId: row.managerId, size: 24 }),
         h('span', row.nickname)
       ])
   },
-  { title: '账号', key: 'loginName', width: 120 },
-  { title: 'IP', key: 'ip', width: 130 },
-  { title: '设备', key: 'device', width: 100 },
+  { title: '账号', key: 'loginName', width: 140 },
+  { title: 'IP', key: 'ip', width: 100 },
+  { title: '设备', key: 'device', width: 140 },
   {
     title: '登录时间',
     key: 'loginTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.loginTime)
   },
   {
     title: '最后活跃',
     key: 'lastActiveTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.lastActiveTime)
   },
   {
@@ -201,7 +204,8 @@ const columns: DataTableColumn<OnlineSessionItem>[] = [
   {
     title: '操作',
     key: 'actions',
-    width: 80,
+    width: 70,
+    align: 'center',
     fixed: 'right',
     render: (row) =>
       handleOperate([
@@ -216,4 +220,6 @@ const columns: DataTableColumn<OnlineSessionItem>[] = [
       ])
   }
 ]
+
+const { scrollX } = useTableColumns(columns as unknown as DataTableColumns)
 </script>

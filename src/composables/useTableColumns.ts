@@ -16,10 +16,31 @@ export const COLUMN_PANEL_KEY = Symbol() as InjectionKey<{
 type KeyedColumn = DataTableColumn & { key: string | number }
 type ToggleableColumn = KeyedColumn & { title: string }
 
+// 列宽兜底值：普通列未声明 width/minWidth 时使用
+const FALLBACK_COLUMN_WIDTH = 120
+// selection / expand 类型列的默认宽度（NaiveUI 内部约 ~50px）
+const SELECTION_EXPAND_WIDTH = 50
+
 function isFixedColumn(col: DataTableColumn): boolean {
   if ('type' in col && (col.type === 'expand' || col.type === 'selection')) return true
   if ('key' in col && (col.key === 'actions' || col.key === 'action')) return true
   return false
+}
+
+/** 解析单列的有效宽度（用于计算 scroll-x 总宽） */
+function resolveColumnWidth(col: DataTableColumn): number {
+  if ('type' in col && (col.type === 'selection' || col.type === 'expand')) {
+    const w = (col as { width?: number | string }).width
+    return typeof w === 'number' ? w : SELECTION_EXPAND_WIDTH
+  }
+  const raw = (col as { width?: number | string; minWidth?: number | string }).width
+    ?? (col as { minWidth?: number | string }).minWidth
+  if (typeof raw === 'number') return raw
+  if (typeof raw === 'string') {
+    const parsed = Number.parseFloat(raw)
+    return Number.isNaN(parsed) ? FALLBACK_COLUMN_WIDTH : parsed
+  }
+  return FALLBACK_COLUMN_WIDTH
 }
 
 /**
@@ -114,6 +135,10 @@ export function useTableColumns(rawColumns: DataTableColumns, tableId?: string) 
 
   const visibleCount = computed(() => columnConfigs.value.filter((c) => c.visible).length)
 
+  // 可见列宽度总和，作为 n-data-table 的 scroll-x。
+  // 容器宽度不足时触发横向滚动条，避免右侧列被压缩裁切。
+  const scrollX = computed(() => visibleColumns.value.reduce((sum, col) => sum + resolveColumnWidth(col), 0))
+
   // 路由切换时关闭面板
   watch(
     () => route.path,
@@ -125,5 +150,5 @@ export function useTableColumns(rawColumns: DataTableColumns, tableId?: string) 
   // 通过 provide 向 StrixColumnPanel 提供数据
   provide(COLUMN_PANEL_KEY, { configs: columnConfigs, reset: resetToDefault })
 
-  return { visibleColumns, showPanel, columnConfigs, visibleCount, resetToDefault }
+  return { visibleColumns, showPanel, columnConfigs, visibleCount, resetToDefault, scrollX }
 }

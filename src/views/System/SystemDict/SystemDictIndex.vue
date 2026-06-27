@@ -92,6 +92,7 @@
         <n-data-table
           :checked-row-keys="checkedRowKeys"
           :columns="visibleColumns"
+          :scroll-x="scrollX"
           :data="dataRef"
           :loading="dataLoading"
           :pagination="pagination"
@@ -518,12 +519,12 @@ const dataColumns: DataTableColumns<DictItem> = [
       } as Record<string, unknown>)
     }
   },
-  { key: 'key', title: '字典标识', width: 200 },
-  { key: 'name', title: '字典名称', width: 200 },
+  { key: 'key', title: '字典标识', width: 240 },
+  { key: 'name', title: '字典名称', width: 240 },
   {
     key: 'groupName',
     title: '分组',
-    width: 100,
+    width: 120,
     render(row) {
       if (!row.groupName) return h('span', { style: 'color: var(--strix-text-tertiary)' }, '-')
       return h(
@@ -633,7 +634,11 @@ const dataColumns: DataTableColumns<DictItem> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<DictItem[]>()

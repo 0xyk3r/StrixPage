@@ -10,8 +10,12 @@
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（昵称、手机号码）"
-                     @keydown.enter="handleKeywordEnter" />
+            <n-input
+              v-model:value="listParams.keyword"
+              clearable
+              placeholder="请输入搜索条件（昵称、手机号码）"
+              @keydown.enter="handleKeywordEnter"
+            />
           </n-gi>
           <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
             <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
@@ -52,15 +56,13 @@
       :pagination="pagination"
       :remote="true"
       :row-key="rowKey"
+      :scroll-x="scrollX"
       table-layout="fixed"
       @update:checked-row-keys="onCheckedRowKeysChange"
     />
 
     <StrixBatchBar :count="selectedCount" @clear="clearSelection">
-      <n-popselect
-        :options="systemUserStatusRef"
-        @update:value="(v: number) => batchModify('status', String(v))"
-      >
+      <n-popselect :options="systemUserStatusRef" @update:value="(v: number) => batchModify('status', String(v))">
         <n-button size="small" quaternary type="primary">
           <template #icon>
             <strix-icon icon="toggle-left" :size="14" />
@@ -78,7 +80,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -239,12 +241,12 @@ const { commentButton, panelProps: commentPanelProps } = useComment('SystemUser'
 // 展示列信息
 const dataColumns: DataTableColumns<SystemUserItem> = [
   ...(selectionColumn ? [selectionColumn] : []),
-  { key: 'nickname', title: '用户昵称', width: 200 },
-  { key: 'phoneNumber', title: '手机号码', width: 200 },
+  { key: 'nickname', title: '用户昵称', width: 320 },
+  { key: 'phoneNumber', title: '手机号码', width: 160 },
   {
     key: 'status',
     title: '用户状态',
-    width: 140,
+    width: 120,
     align: 'center',
     dictName: 'SystemUserStatus',
     render(row) {
@@ -279,14 +281,16 @@ const dataColumns: DataTableColumns<SystemUserItem> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<SystemUserItem[]>()
 const dataLoading = ref(true)
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
@@ -301,8 +305,6 @@ const getDataList = () => {
     })
 }
 onMounted(getDataList)
-
-
 </script>
 
 <style lang="scss" scoped></style>

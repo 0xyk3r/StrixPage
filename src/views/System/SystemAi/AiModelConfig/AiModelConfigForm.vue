@@ -28,6 +28,7 @@
         v-model:value="form.apiKey"
         type="password"
         show-password-on="click"
+        :input-props="{ autocomplete: 'new-password' }"
         clearable
         :placeholder="isEdit ? '不修改请留空' : '请输入 API Key'"
       />
@@ -879,7 +880,7 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   name: '',
   type: 1,
   providerType: 0,
-  baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  baseUrl: '',
   apiKey: '',
   modelName: '',
   temperature: null,

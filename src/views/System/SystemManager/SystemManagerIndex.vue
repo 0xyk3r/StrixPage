@@ -64,6 +64,7 @@
     <n-data-table
       :checked-row-keys="checkedRowKeys"
       :columns="visibleColumns"
+      :scroll-x="scrollX"
       :data="dataRef"
       :expanded-row-keys="dataExpandedRowKeys"
       :loading="dataLoading"
@@ -484,7 +485,7 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
   {
     key: 'nickname',
     title: '昵称',
-    width: 200,
+    width: 240,
     render(row) {
       return h('div', { style: 'display:flex;align-items:center;gap:8px' }, [
         h(StrixAvatar, { managerId: row.id, config: row.avatarConfig ?? null, size: 28 }),
@@ -492,11 +493,11 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
       ])
     }
   },
-  { key: 'loginName', title: '登录名', width: 160 },
+  { key: 'loginName', title: '登录名', width: 180 },
   {
     key: 'status',
     title: '账户状态',
-    width: 120,
+    width: 100,
     align: 'center',
     dictName: 'SystemManagerStatus',
     render(row) {
@@ -530,7 +531,7 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
       )
     }
   },
-  { key: 'createdTime', title: '创建时间', width: 180 },
+  { key: 'createdTime', title: '创建时间', width: 190 },
   {
     key: 'actions',
     title: '操作',
@@ -559,7 +560,11 @@ const dataColumns: DataTableColumns<ExpandedManagerRow> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<ExpandedManagerRow[]>()

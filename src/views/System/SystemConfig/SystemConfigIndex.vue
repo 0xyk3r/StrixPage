@@ -29,13 +29,15 @@
 
     <!-- 配置列表 -->
     <n-data-table
-      :columns="columns"
+      :columns="dataColumns"
       :data="filteredData"
       :loading="loading"
       :bordered="false"
+      :scroll-x="scrollX"
       :single-line="false"
       :row-key="(row: SystemConfigItem) => row.id"
       size="small"
+      remote
     />
 
     <!-- 新增/编辑模态框 -->
@@ -91,10 +93,11 @@ import type { SystemConfigItem } from '@/api/system-config'
 import { systemConfigApi } from '@/api/system-config'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
-import type { DataTableColumn, FormInst } from 'naive-ui'
+import type { DataTableColumns, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
 
 const loading = ref(false)
 const data = ref<SystemConfigItem[]>([])
@@ -201,9 +204,9 @@ const formatTime = (time: string | null) => {
   return time.replace('T', ' ').substring(0, 19)
 }
 
-const columns: DataTableColumn<SystemConfigItem>[] = [
-  { title: '配置标识', key: 'key', width: 200, ellipsis: { tooltip: true } },
-  { title: '配置名称', key: 'name', width: 160 },
+const dataColumns: DataTableColumns<SystemConfigItem> = [
+  { title: '配置标识', key: 'key', width: 240, ellipsis: { tooltip: true } },
+  { title: '配置名称', key: 'name', width: 240 },
   {
     title: '类型',
     key: 'type',
@@ -216,6 +219,7 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
   {
     title: '配置值',
     key: 'value',
+    width: 160,
     ellipsis: { tooltip: true },
     render: (row) => {
       if (row.type === 1) {
@@ -226,11 +230,11 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
       return row.value ?? '-'
     }
   },
-  { title: '备注', key: 'remark', ellipsis: { tooltip: true } },
+  { title: '备注', key: 'remark', width: 160, ellipsis: { tooltip: true } },
   {
     title: '更新时间',
     key: 'updatedTime',
-    width: 160,
+    width: 180,
     render: (row) => formatTime(row.updatedTime)
   },
   {
@@ -242,6 +246,7 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
       handleOperate([
         commentButton(row),
         {
+          type: 'warning',
           label: '编辑',
           icon: 'edit',
           auth: 'system:config:update',
@@ -259,6 +264,8 @@ const columns: DataTableColumn<SystemConfigItem>[] = [
       ])
   }
 ]
+
+const { scrollX } = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 onMounted(() => loadData())
 </script>

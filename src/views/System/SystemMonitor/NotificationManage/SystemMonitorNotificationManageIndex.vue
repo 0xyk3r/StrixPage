@@ -60,9 +60,7 @@
               <n-button v-auth="'system:monitor:notification:send'" type="primary" @click="showSendModal = true">
                 发送通知
               </n-button>
-              <n-button :loading="loading" quaternary type="primary" @click="loadData(1)">
-                刷新
-              </n-button>
+              <n-button :loading="loading" quaternary type="primary" @click="loadData(1)"> 刷新</n-button>
             </n-space>
           </n-gi>
         </n-grid>
@@ -76,10 +74,11 @@
       :data="listData?.items ?? []"
       :loading="loading"
       :bordered="false"
+      :scroll-x="scrollX"
       :single-line="false"
       :row-key="(row: NotificationManageItem) => row.id"
-      size="small"
       :pagination="pagination"
+      size="small"
       remote
       @update:page="loadData"
       @update:page-size="handlePageSizeChange"
@@ -138,7 +137,13 @@
     </n-modal>
 
     <!-- 通知详情模态框 -->
-    <n-modal v-model:show="showDetailModal" class="strix-form-modal" preset="card" title="通知详情" style="width: 680px">
+    <n-modal
+      v-model:show="showDetailModal"
+      class="strix-form-modal"
+      preset="card"
+      title="通知详情"
+      style="width: 680px"
+    >
       <template v-if="detailData">
         <n-descriptions :column="2" bordered size="small" style="margin-bottom: 16px">
           <n-descriptions-item label="标题" :span="2">{{ detailData.title }}</n-descriptions-item>
@@ -167,10 +172,11 @@
           :data="detailData.receivers"
           :bordered="false"
           :single-line="false"
-          size="small"
           :max-height="300"
-          virtual-scroll
           :pagination="false"
+          virtual-scroll
+          size="small"
+          remote
         />
       </template>
     </n-modal>
@@ -187,20 +193,21 @@
 </template>
 
 <script lang="ts" setup>
-import { notificationManageApi } from '@/api/notification-manage'
 import type {
+  NotificationDetailResp,
   NotificationManageItem,
   NotificationManageListResp,
-  NotificationDetailResp,
   SendNotificationReq
 } from '@/api/notification-manage'
+import { notificationManageApi } from '@/api/notification-manage'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
 import StrixManagerSelector from '@/components/data/StrixManagerSelector.vue'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
-import { NTag } from 'naive-ui'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
+import { type DataTableColumns, NTag } from 'naive-ui'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
 
 const dialog = useDialog()
 const message = useMessage()
@@ -367,18 +374,17 @@ const formatTime = (time: string | null) => {
 }
 
 // 表格列定义
-const columns: DataTableColumn<NotificationManageItem>[] = [
+const columns: DataTableColumns<NotificationManageItem> = [
   { type: 'selection' },
-  { title: '标题', key: 'title', ellipsis: { tooltip: true } },
+  { title: '标题', key: 'title', width: 240, ellipsis: { tooltip: true } },
   {
     title: '类型',
     key: 'bizType',
     width: 80,
+    align: 'center',
     render: (row) =>
-      h(
-        NTag,
-        { type: row.bizType === 'SYSTEM_BROADCAST' ? 'info' : 'success', size: 'small', bordered: false },
-        () => (row.bizType === 'SYSTEM_BROADCAST' ? '广播' : '定向')
+      h(NTag, { type: row.bizType === 'SYSTEM_BROADCAST' ? 'info' : 'success', size: 'small', bordered: false }, () =>
+        row.bizType === 'SYSTEM_BROADCAST' ? '广播' : '定向'
       )
   },
   {
@@ -391,28 +397,29 @@ const columns: DataTableColumn<NotificationManageItem>[] = [
     title: '已读率',
     key: 'readRate',
     width: 80,
+    titleAlign: 'center',
+    align: 'right',
     render: (row) => `${(row.readRate * 100).toFixed(0)}%`
   },
   {
     title: '状态',
     key: 'status',
-    width: 70,
+    width: 80,
+    align: 'center',
     render: (row) =>
-      h(
-        NTag,
-        { type: row.status === 1 ? 'success' : 'error', size: 'small', bordered: false },
-        () => (row.status === 1 ? '有效' : '已终止')
+      h(NTag, { type: row.status === 1 ? 'success' : 'error', size: 'small', bordered: false }, () =>
+        row.status === 1 ? '有效' : '终止'
       )
   },
   {
     title: '发送人',
     key: 'senderName',
-    width: 100
+    width: 120
   },
   {
     title: '发送时间',
     key: 'createdTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.createdTime)
   },
   {
@@ -452,10 +459,8 @@ const receiverColumns: DataTableColumn[] = [
     key: 'readStatus',
     width: 80,
     render: (row: any) =>
-      h(
-        NTag,
-        { type: row.readStatus === 1 ? 'success' : 'default', size: 'small', bordered: false },
-        () => (row.readStatus === 1 ? '已读' : '未读')
+      h(NTag, { type: row.readStatus === 1 ? 'success' : 'default', size: 'small', bordered: false }, () =>
+        row.readStatus === 1 ? '已读' : '未读'
       )
   },
   {
@@ -469,13 +474,13 @@ const receiverColumns: DataTableColumn[] = [
     key: 'validStatus',
     width: 80,
     render: (row: any) =>
-      h(
-        NTag,
-        { type: row.validStatus === 1 ? 'success' : 'error', size: 'small', bordered: false },
-        () => (row.validStatus === 1 ? '有效' : '无效')
+      h(NTag, { type: row.validStatus === 1 ? 'success' : 'error', size: 'small', bordered: false }, () =>
+        row.validStatus === 1 ? '有效' : '无效'
       )
   }
 ]
+
+const { scrollX } = useTableColumns(columns as unknown as DataTableColumns)
 
 onMounted(() => loadData(1))
 </script>

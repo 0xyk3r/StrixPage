@@ -191,6 +191,62 @@
   }
 }
 
+// ---- Fixed Columns: opaque background ----
+// 固定列使用 position: sticky 浮在滚动内容之上，仅靠单元格自身 background-color 遮挡。
+// 主题将 tdColor 设为 transparent、thColor 设为半透明，导致固定列穿透显示内容、
+// 表头半透明色叠加变深。这里为固定列补足与所在卡片一致的不透明底色，并同步各行状态。
+// 颜色为 themeOverrides 中半透明色叠加卡片底色 (dark #0f1019 / light #ffffff) 的不透明等效值。
+
+// 默认 = 暗色主题（:root 默认即暗色）
+.n-data-table-th--fixed-left,
+.n-data-table-th--fixed-right {
+  background-color: #13141c !important; // thColor 叠加卡片色
+}
+
+.n-data-table-td--fixed-left,
+.n-data-table-td--fixed-right {
+  background-color: #0f1019 !important; // 卡片底色 cardColor
+}
+
+// hover 行的固定列
+.n-data-table-tr:hover > .n-data-table-td--fixed-left,
+.n-data-table-tr:hover > .n-data-table-td--fixed-right,
+.n-data-table-td--fixed-left.n-data-table-td--hover,
+.n-data-table-td--fixed-right.n-data-table-td--hover {
+  background-color: #171821 !important; // tdColorHover 叠加卡片色
+}
+
+// 斑马纹行的固定列
+.n-data-table-tr--striped .n-data-table-td--fixed-left,
+.n-data-table-tr--striped .n-data-table-td--fixed-right {
+  background-color: #13141c !important; // tdColorStriped 叠加卡片色
+}
+
+// 亮色主题覆盖
+[data-theme='light'] {
+  .n-data-table-th--fixed-left,
+  .n-data-table-th--fixed-right {
+    background-color: #fafafa !important; // thColor 叠加白色
+  }
+
+  .n-data-table-td--fixed-left,
+  .n-data-table-td--fixed-right {
+    background-color: #ffffff !important; // 卡片底色 cardColor
+  }
+
+  .n-data-table-tr:hover > .n-data-table-td--fixed-left,
+  .n-data-table-tr:hover > .n-data-table-td--fixed-right,
+  .n-data-table-td--fixed-left.n-data-table-td--hover,
+  .n-data-table-td--fixed-right.n-data-table-td--hover {
+    background-color: #f9f9f9 !important; // tdColorHover 叠加白色
+  }
+
+  .n-data-table-tr--striped .n-data-table-td--fixed-left,
+  .n-data-table-tr--striped .n-data-table-td--fixed-right {
+    background-color: #fbfbfb !important; // tdColorStriped 叠加白色
+  }
+}
+
 // ============================================================
 // Nebula Action Buttons (used in table action columns)
 // ============================================================

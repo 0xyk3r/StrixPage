@@ -4,18 +4,18 @@
       <template #body>
         <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
           <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="按名称搜索"
-                     @keydown.enter="handleKeywordEnter" />
+            <n-input
+              v-model:value="listParams.keyword"
+              clearable
+              placeholder="按名称搜索"
+              @keydown.enter="handleKeywordEnter"
+            />
           </n-gi>
           <n-gi :span="1">
             <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
           </n-gi>
           <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-            <n-button
-              :type="sortMode ? 'warning' : 'default'"
-              quaternary
-              @click="toggleSortMode"
-            >
+            <n-button :type="sortMode ? 'warning' : 'default'" quaternary @click="toggleSortMode">
               <template #icon><strix-icon icon="arrow-up-down" :size="16" /></template>
               {{ sortMode ? '退出排序' : '排序模式' }}
             </n-button>
@@ -57,13 +57,9 @@
     <!-- 排序模式：拖拽列表 -->
     <template v-if="sortMode">
       <VueDraggable v-model="sortableItems" handle=".drag-handle" style="margin: 12px 0">
-        <div
-          v-for="item in sortableItems"
-          :key="item.id"
-          class="dict-sort-item"
-        >
+        <div v-for="item in sortableItems" :key="item.id" class="dict-sort-item">
           <span class="drag-handle" style="cursor: grab; margin-right: 8px">⠿</span>
-          <n-tag :type="((item.style || 'default') as any)" size="small" :bordered="false" style="margin-right: 8px">
+          <n-tag :type="(item.style || 'default') as any" size="small" :bordered="false" style="margin-right: 8px">
             {{ item.label }}
           </n-tag>
           <n-text depth="3">{{ item.value }}</n-text>
@@ -89,6 +85,7 @@
       <n-data-table
         :checked-row-keys="checkedRowKeys"
         :columns="visibleColumns"
+        :scroll-x="scrollX"
         :data="dataRef"
         :loading="dataLoading"
         :pagination="pagination"
@@ -100,10 +97,7 @@
     </template>
 
     <StrixBatchBar :count="selectedCount" @clear="clearSelection">
-      <n-popselect
-        :options="commonSwitchRef"
-        @update:value="(v: number) => batchModify('status', String(v))"
-      >
+      <n-popselect :options="commonSwitchRef" @update:value="(v: number) => batchModify('status', String(v))">
         <n-button size="small" quaternary type="primary">
           <template #icon>
             <strix-icon icon="toggle-left" :size="14" />
@@ -121,7 +115,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -181,12 +175,7 @@
           <n-switch v-model:value="addFormIsDefault" @update:value="onDefaultToggle('add', $event)" />
         </n-form-item>
         <n-form-item label="有效期" path="validRange">
-          <n-date-picker
-            v-model:value="addValidRange"
-            type="datetimerange"
-            clearable
-            style="width: 100%"
-          />
+          <n-date-picker v-model:value="addValidRange" type="datetimerange" clearable style="width: 100%" />
         </n-form-item>
         <n-form-item label="字典状态" path="status">
           <n-select v-model:value="addForm.status" :options="commonSwitchRef" clearable placeholder="请选择字典状态" />
@@ -252,12 +241,7 @@
             <n-switch v-model:value="editFormIsDefault" @update:value="onDefaultToggle('edit', $event)" />
           </n-form-item>
           <n-form-item label="有效期" path="validRange">
-            <n-date-picker
-              v-model:value="editValidRange"
-              type="datetimerange"
-              clearable
-              style="width: 100%"
-            />
+            <n-date-picker v-model:value="editValidRange" type="datetimerange" clearable style="width: 100%" />
           </n-form-item>
           <n-form-item label="字典状态" path="status">
             <n-select
@@ -407,7 +391,10 @@ function onDefaultToggle(mode: 'add' | 'edit', val: boolean) {
 const addValidRange = computed<[number, number] | null>({
   get: (): [number, number] | null => {
     if (addForm.value.validFrom && addForm.value.validTo) {
-      return [new Date(addForm.value.validFrom).getTime(), new Date(addForm.value.validTo).getTime()] as [number, number]
+      return [new Date(addForm.value.validFrom).getTime(), new Date(addForm.value.validTo).getTime()] as [
+        number,
+        number
+      ]
     }
     return null
   },
@@ -425,7 +412,10 @@ const addValidRange = computed<[number, number] | null>({
 const editValidRange = computed<[number, number] | null>({
   get: (): [number, number] | null => {
     if (editForm.value.validFrom && editForm.value.validTo) {
-      return [new Date(editForm.value.validFrom).getTime(), new Date(editForm.value.validTo).getTime()] as [number, number]
+      return [new Date(editForm.value.validFrom).getTime(), new Date(editForm.value.validTo).getTime()] as [
+        number,
+        number
+      ]
     }
     return null
   },
@@ -565,13 +555,15 @@ const dataColumns: DataTableColumns<DictDataItem> = [
     width: 60,
     align: 'center',
     render(row) {
-      return row.isDefault === 1 ? h('span', { style: 'color: var(--strix-color-star); font-size: 16px' }, '★') : h('span', { style: 'color: var(--strix-text-tertiary)' }, '-')
+      return row.isDefault === 1
+        ? h('span', { style: 'color: var(--strix-color-star); font-size: 16px' }, '★')
+        : h('span', { style: 'color: var(--strix-text-tertiary)' }, '-')
     }
   },
   {
     key: 'style',
     title: '样式预览',
-    width: 140,
+    width: 160,
     align: 'center',
     exportable: false,
     render(row) {
@@ -581,13 +573,14 @@ const dataColumns: DataTableColumns<DictDataItem> = [
   {
     key: 'validity',
     title: '有效期',
-    width: 100,
+    width: 90,
     align: 'center',
     render(row) {
       const status = getValidityStatus(row)
       if (status === 'expired') return h(NTag, { size: 'small', type: 'error', bordered: false }, () => '已过期')
       if (status === 'not_started') return h(NTag, { size: 'small', type: 'info', bordered: false }, () => '未生效')
-      if (row.validFrom || row.validTo) return h(NTag, { size: 'small', type: 'success', bordered: false }, () => '有效')
+      if (row.validFrom || row.validTo)
+        return h(NTag, { size: 'small', type: 'success', bordered: false }, () => '有效')
       return h('span', { style: 'color: var(--strix-text-tertiary)' }, '永久')
     }
   },
@@ -631,14 +624,16 @@ const dataColumns: DataTableColumns<DictDataItem> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 // 加载列表
 const dataRef = ref<DictDataItem[]>()
 const dataLoading = ref(true)
 
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 
 const getDataList = () => {
   dataLoading.value = true

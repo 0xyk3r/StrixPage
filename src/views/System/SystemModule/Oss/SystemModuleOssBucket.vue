@@ -45,6 +45,7 @@
 
     <n-data-table
       :columns="visibleColumns"
+      :scroll-x="scrollX"
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
@@ -174,7 +175,11 @@ const dataColumns: DataTableColumns<OssBucketItem> = [
 ]
 
 // 列可见性与排序
-const { visibleColumns, showPanel: showColumnPanel } = useTableColumns(dataColumns as unknown as DataTableColumns)
+const {
+  visibleColumns,
+  scrollX,
+  showPanel: showColumnPanel
+} = useTableColumns(dataColumns as unknown as DataTableColumns)
 
 // 加载列表
 const dataRef = ref<OssBucketItem[]>()

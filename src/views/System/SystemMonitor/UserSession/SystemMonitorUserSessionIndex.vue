@@ -19,11 +19,7 @@
       <n-gi>
         <n-card size="small">
           <n-statistic label="平均会话数">
-            <n-number-animation
-              :from="0"
-              :to="avgSessions"
-              :precision="1"
-            />
+            <n-number-animation :from="0" :to="avgSessions" :precision="1" />
           </n-statistic>
         </n-card>
       </n-gi>
@@ -47,23 +43,11 @@
                 批量踢出 ({{ checkedRowKeys.length }})
               </n-button>
               <n-divider vertical />
-              <n-select
-                v-model:value="refreshInterval"
-                :options="intervalOptions"
-                size="small"
-                style="width: 110px"
-              />
-              <n-button
-                :type="autoRefresh ? 'primary' : 'default'"
-                size="small"
-                quaternary
-                @click="toggleAutoRefresh"
-              >
+              <n-select v-model:value="refreshInterval" :options="intervalOptions" size="small" style="width: 110px" />
+              <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" quaternary @click="toggleAutoRefresh">
                 {{ autoRefresh ? '暂停刷新' : '自动刷新' }}
               </n-button>
-              <n-button :loading="loading" quaternary type="primary" @click="loadData">
-                刷新
-              </n-button>
+              <n-button :loading="loading" quaternary type="primary" @click="loadData"> 刷新</n-button>
             </n-space>
           </n-gi>
         </n-grid>
@@ -77,19 +61,22 @@
       :data="sessionData?.items ?? []"
       :loading="loading"
       :bordered="false"
+      :scroll-x="scrollX"
       :single-line="false"
       :row-key="rowKey"
-      size="small"
       :pagination="false"
+      size="small"
+      remote
     />
   </div>
 </template>
 
 <script lang="ts" setup>
+import type { OnlineUserSessionItem, OnlineUserSessionResp } from '@/api/user-session'
 import { userSessionApi } from '@/api/user-session'
-import type { OnlineUserSessionResp, OnlineUserSessionItem } from '@/api/user-session'
 import { handleOperate } from '@/utils/strix-table-tool'
-import type { DataTableColumn, DataTableRowKey } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
 
 const dialog = useDialog()
 
@@ -157,10 +144,9 @@ const handleKickAll = async (row: OnlineUserSessionItem) => {
 }
 
 const handleBatchKick = () => {
-  const userIds: string[] = [...new Set(
-    checkedRowKeys.value
-      .map(key => String(key).split('__')[0])
-  )].filter((id): id is string => !!id)
+  const userIds: string[] = [...new Set(checkedRowKeys.value.map((key) => String(key).split('__')[0]))].filter(
+    (id): id is string => !!id
+  )
   if (userIds.length === 0) return
 
   dialog.warning({
@@ -181,22 +167,22 @@ const formatTime = (time: string | null) => {
   return time.replace('T', ' ').substring(0, 19)
 }
 
-const columns: DataTableColumn<OnlineUserSessionItem>[] = [
+const columns: DataTableColumns<OnlineUserSessionItem> = [
   { type: 'selection' },
-  { title: '昵称', key: 'nickname', width: 120 },
+  { title: '昵称', key: 'nickname', width: 180 },
   { title: '手机号', key: 'phoneNumber', width: 130 },
-  { title: 'IP', key: 'ip', width: 130 },
-  { title: '设备', key: 'device', width: 100 },
+  { title: 'IP', key: 'ip', width: 100 },
+  { title: '设备', key: 'device', width: 140 },
   {
     title: '登录时间',
     key: 'loginTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.loginTime)
   },
   {
     title: '最后活跃',
     key: 'lastActiveTime',
-    width: 160,
+    width: 120,
     render: (row) => formatTime(row.lastActiveTime)
   },
   {
@@ -208,7 +194,8 @@ const columns: DataTableColumn<OnlineUserSessionItem>[] = [
   {
     title: '操作',
     key: 'actions',
-    width: 80,
+    width: 70,
+    align: 'center',
     fixed: 'right',
     render: (row) =>
       handleOperate([
@@ -223,4 +210,6 @@ const columns: DataTableColumn<OnlineUserSessionItem>[] = [
       ])
   }
 ]
+
+const { scrollX } = useTableColumns(columns as unknown as DataTableColumns)
 </script>

@@ -28,7 +28,9 @@
       :data="filteredList"
       :loading="loading"
       :row-key="(row: AiModelConfigResp) => row.id"
+      :scroll-x="scrollX"
       table-layout="fixed"
+      remote
     />
 
     <n-modal
@@ -54,13 +56,14 @@
 <script lang="ts" setup>
 import { h } from 'vue'
 import type { DataTableColumns } from 'naive-ui'
-import { NButton, NSpace, NSwitch, NTag } from 'naive-ui'
+import { NButton, NSwitch, NTag } from 'naive-ui'
 import type { AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import AiModelConfigForm from './AiModelConfigForm.vue'
+import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { handleOperate } from '@/utils/strix-table-tool.ts'
 
 const message = useMessage()
-const dialog = useDialog()
 
 const list = ref<AiModelConfigResp[]>([])
 const loading = ref(false)
@@ -102,29 +105,31 @@ const filteredList = computed(() => {
   })
 })
 
-async function loadList() {
+const loadList = () => {
   loading.value = true
-  try {
-    const res = await aiApi.modelConfigList()
-    list.value = (res.data?.data ?? []) as AiModelConfigResp[]
-  } finally {
-    loading.value = false
-  }
+  aiApi
+    .modelConfigList()
+    .then((res) => {
+      list.value = (res.data?.data ?? []) as AiModelConfigResp[]
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
-function clearSearch() {
+const clearSearch = () => {
   keyword.value = ''
   filterType.value = null
   loadList()
 }
 
-function showAdd() {
+const showAdd = () => {
   editId.value = ''
   editData.value = null
   showModal.value = true
 }
 
-function showEdit(row: AiModelConfigResp) {
+const showEdit = (row: AiModelConfigResp) => {
   editId.value = row.id
   editData.value = row
   showModal.value = true
@@ -140,17 +145,10 @@ function resetForm() {
   editData.value = null
 }
 
-function confirmRemove(row: AiModelConfigResp) {
-  dialog.warning({
-    title: '确认删除',
-    content: `确认删除模型配置「${row.name}」？`,
-    positiveText: '删除',
-    negativeText: '取消',
-    onPositiveClick: async () => {
-      await aiApi.modelConfigRemove(row.id)
-      message.success('删除成功')
-      loadList()
-    }
+function deleteRow(id: string) {
+  aiApi.modelConfigRemove(id).then(() => {
+    message.success('删除成功')
+    loadList()
   })
 }
 
@@ -171,8 +169,8 @@ async function testConnection(row: AiModelConfigResp) {
 }
 
 const columns: DataTableColumns<AiModelConfigResp> = [
-  { title: 'Key', key: 'key', width: 160, ellipsis: true },
-  { title: '名称', key: 'name', width: 160, ellipsis: true },
+  { title: 'Key', key: 'key', width: 240, ellipsis: true },
+  { title: '名称', key: 'name', width: 240, ellipsis: true },
   {
     title: '类型',
     key: 'type',
@@ -180,7 +178,7 @@ const columns: DataTableColumns<AiModelConfigResp> = [
     render: (row) =>
       h(NTag, { type: MODEL_TYPE_COLOR[row.type] as any, size: 'small' }, () => MODEL_TYPE_LABEL[row.type] ?? '未知')
   },
-  { title: '模型名称', key: 'modelName', ellipsis: true },
+  { title: '模型名称', key: 'modelName', width: 240, ellipsis: true },
   {
     title: '状态',
     key: 'status',
@@ -192,21 +190,41 @@ const columns: DataTableColumns<AiModelConfigResp> = [
         size: 'small'
       })
   },
-  { title: '备注', key: 'remark', ellipsis: true },
+  { title: '备注', key: 'remark', width: 200, ellipsis: true },
   {
     title: '操作',
     key: 'actions',
-    width: 240,
-    render: (row) =>
-      h(NSpace, { size: 'small' }, () => [
-        h(NButton, { size: 'small', onClick: () => showEdit(row) }, () => '编辑'),
-        row.type <= 2
-          ? h(NButton, { size: 'small', type: 'info', onClick: () => testConnection(row) }, () => '测试')
-          : null,
-        h(NButton, { size: 'small', type: 'error', onClick: () => confirmRemove(row) }, () => '删除')
+    width: 130,
+    fixed: 'right',
+    render(row) {
+      return handleOperate([
+        {
+          type: 'info',
+          label: '测试',
+          icon: 'plug',
+          disabled: row.type > 2,
+          onClick: () => testConnection(row)
+        },
+        {
+          type: 'warning',
+          label: '编辑',
+          icon: 'square-pen',
+          onClick: () => showEdit(row)
+        },
+        {
+          type: 'error',
+          label: '删除',
+          icon: 'trash',
+          onClick: () => deleteRow(row.id),
+          popconfirm: true,
+          popconfirmMessage: `确认删除模型配置「${row.name}」？`
+        }
       ])
+    }
   }
 ]
+
+const { scrollX } = useTableColumns(columns as unknown as DataTableColumns)
 
 onMounted(() => loadList())
 </script>
