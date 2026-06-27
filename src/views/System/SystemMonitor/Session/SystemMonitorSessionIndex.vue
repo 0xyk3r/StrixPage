@@ -19,11 +19,7 @@
       <n-gi>
         <n-card size="small">
           <n-statistic label="平均会话数">
-            <n-number-animation
-              :from="0"
-              :to="avgSessions"
-              :precision="1"
-            />
+            <n-number-animation :from="0" :to="avgSessions" :precision="1" />
           </n-statistic>
         </n-card>
       </n-gi>
@@ -47,23 +43,11 @@
                 批量踢出 ({{ checkedRowKeys.length }})
               </n-button>
               <n-divider vertical />
-              <n-select
-                v-model:value="refreshInterval"
-                :options="intervalOptions"
-                size="small"
-                style="width: 110px"
-              />
-              <n-button
-                :type="autoRefresh ? 'primary' : 'default'"
-                size="small"
-                quaternary
-                @click="toggleAutoRefresh"
-              >
+              <n-select v-model:value="refreshInterval" :options="intervalOptions" size="small" style="width: 110px" />
+              <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" quaternary @click="toggleAutoRefresh">
                 {{ autoRefresh ? '暂停刷新' : '自动刷新' }}
               </n-button>
-              <n-button :loading="loading" quaternary type="primary" @click="loadData">
-                刷新
-              </n-button>
+              <n-button :loading="loading" quaternary type="primary" @click="loadData"> 刷新 </n-button>
             </n-space>
           </n-gi>
         </n-grid>
@@ -86,9 +70,10 @@
 </template>
 
 <script lang="ts" setup>
+import type { OnlineSessionItem, OnlineSessionResp } from '@/api/session'
 import { sessionApi } from '@/api/session'
-import type { OnlineSessionResp, OnlineSessionItem } from '@/api/session'
 import { handleOperate } from '@/utils/strix-table-tool'
+import StrixAvatar from '@/components/common/StrixAvatar.vue'
 import type { DataTableColumn, DataTableRowKey } from 'naive-ui'
 
 const dialog = useDialog()
@@ -157,10 +142,9 @@ const handleKickAll = async (row: OnlineSessionItem) => {
 }
 
 const handleBatchKick = () => {
-  const managerIds: string[] = [...new Set(
-    checkedRowKeys.value
-      .map(key => String(key).split('__')[0])
-  )].filter((id): id is string => !!id)
+  const managerIds: string[] = [...new Set(checkedRowKeys.value.map((key) => String(key).split('__')[0]))].filter(
+    (id): id is string => !!id
+  )
   if (managerIds.length === 0) return
 
   dialog.warning({
@@ -183,7 +167,16 @@ const formatTime = (time: string | null) => {
 
 const columns: DataTableColumn<OnlineSessionItem>[] = [
   { type: 'selection' },
-  { title: '昵称', key: 'nickname', width: 120 },
+  {
+    title: '昵称',
+    key: 'nickname',
+    width: 160,
+    render: (row) =>
+      h('div', { style: 'display:flex;align-items:center;gap:8px' }, [
+        h(StrixAvatar, { managerId: row.managerId, size: 24 }),
+        h('span', row.nickname)
+      ])
+  },
   { title: '账号', key: 'loginName', width: 120 },
   { title: 'IP', key: 'ip', width: 130 },
   { title: '设备', key: 'device', width: 100 },

@@ -81,6 +81,7 @@
 
 <script lang="ts" setup>
 import { useLoginInfoStore } from '@/stores/login-info'
+import { useAvatarStore } from '@/stores/avatar'
 import { storeToRefs } from 'pinia'
 import { profileApi } from '@/api/profile'
 import { textField } from '@/utils/form-rules'
@@ -92,6 +93,7 @@ import type { FormInst } from 'naive-ui'
 
 const loginInfoStore = useLoginInfoStore()
 const { loginInfo } = storeToRefs(loginInfoStore)
+const avatarStore = useAvatarStore()
 
 // 加载个人信息
 const profileInfo = ref<any>(null)
@@ -127,12 +129,15 @@ const showPicker = ref(false)
 function handleAvatarConfirm(configJson: string) {
   profileApi.updateAvatar(configJson).then(() => {
     loginInfoStore.loginInfo.avatarConfig = configJson
+    // 同步写回头像缓存，保证其它页面（仅凭 ID 渲染）即时一致
+    avatarStore.setCache(loginInfo.value.id, configJson)
   })
 }
 
 function handleResetAvatar() {
   profileApi.updateAvatar(null).then(() => {
     loginInfoStore.loginInfo.avatarConfig = null
+    avatarStore.setCache(loginInfo.value.id, null)
   })
 }
 </script>

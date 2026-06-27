@@ -45,6 +45,12 @@ export interface SystemManagerUpdateReq {
   regionId: string
 }
 
+/** 批量头像配置响应 */
+export interface ManagerAvatarResp {
+  /** 管理员 ID -> 头像配置 JSON 映射（无配置的为 null） */
+  avatars: Record<string, string | null>
+}
+
 export const managerApi = {
   urls: { list: BASE },
 
@@ -78,5 +84,17 @@ export const managerApi = {
     http.get<RetResult<TransferDataResp>>(`${BASE}/transfer`, {
       params,
       meta: { operate: `加载${_n}穿梭框` }
-    })
+    }),
+
+  avatars: (ids: string[]) =>
+    http.post<RetResult<ManagerAvatarResp>>(
+      `${BASE}/avatars`,
+      { ids },
+      {
+        meta: {
+          operate: `加载${_n}头像`,
+          notify: false
+        }
+      }
+    )
 }

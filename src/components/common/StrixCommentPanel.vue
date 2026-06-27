@@ -1,11 +1,5 @@
 <template>
-  <n-drawer
-    v-model:show="showModel"
-    :width="480"
-    placement="right"
-    :trap-focus="false"
-    class="strix-comment-drawer"
-  >
+  <n-drawer v-model:show="showModel" :width="480" placement="right" :trap-focus="false" class="strix-comment-drawer">
     <n-drawer-content closable :body-content-style="{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }">
       <template #header>
         <div class="comment-header">
@@ -50,6 +44,7 @@
 
             <!-- 评论头部 -->
             <div class="comment-item-header">
+              <StrixAvatar :manager-id="item.createdBy" :size="22" />
               <n-tag size="tiny" :bordered="false" type="info">
                 {{ item.authorName }}
               </n-tag>
@@ -159,12 +154,7 @@
                   @update:value="searchManagers"
                 />
                 <div class="mention-list">
-                  <div
-                    v-for="mgr in filteredManagers"
-                    :key="mgr.id"
-                    class="mention-item"
-                    @click="selectMention(mgr)"
-                  >
+                  <div v-for="mgr in filteredManagers" :key="mgr.id" class="mention-item" @click="selectMention(mgr)">
                     {{ mgr.nickname }}
                   </div>
                   <div v-if="!filteredManagers.length" class="mention-empty">无匹配结果</div>
@@ -172,11 +162,7 @@
               </div>
             </n-popover>
 
-            <n-upload
-              :show-file-list="false"
-              :custom-request="handleUpload"
-              accept="image/*"
-            >
+            <n-upload :show-file-list="false" :custom-request="handleUpload" accept="image/*">
               <n-button size="tiny" quaternary>
                 <template #icon><StrixIcon icon="image" :size="14" /></template>
                 图片
@@ -202,6 +188,7 @@
 <script lang="ts" setup>
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixImage from '@/components/common/StrixImage.vue'
+import StrixAvatar from '@/components/common/StrixAvatar.vue'
 import type { CommentItem } from '@/api/comment'
 import { commentApi } from '@/api/comment'
 import { managerApi, type SystemManagerItem } from '@/api/manager'
@@ -228,7 +215,9 @@ const showModel = computed({
 
 const loginInfo = useLoginInfoStore()
 const isSuperManager = computed(() => loginInfo.loginInfo.type === 1)
-const canPin = computed(() => loginInfo.loginInfo.permissionKeys?.includes('system:comment:pin') || isSuperManager.value)
+const canPin = computed(
+  () => loginInfo.loginInfo.permissionKeys?.includes('system:comment:pin') || isSuperManager.value
+)
 
 // Markdown 渲染器
 const md = new MarkdownIt({
@@ -269,9 +258,9 @@ const selectedMentions = ref<{ id: string; name: string }[]>([])
 const filteredManagers = computed(() => {
   if (!mentionSearch.value) return managers.value.slice(0, 20)
   const q = mentionSearch.value.toLowerCase()
-  return managers.value.filter(
-    (m) => m.nickname.toLowerCase().includes(q) || m.loginName.toLowerCase().includes(q)
-  ).slice(0, 20)
+  return managers.value
+    .filter((m) => m.nickname.toLowerCase().includes(q) || m.loginName.toLowerCase().includes(q))
+    .slice(0, 20)
 })
 
 // 附件
@@ -310,20 +299,26 @@ function debouncedLoad() {
 }
 
 // 监听面板打开
-watch(() => props.show, (val) => {
-  if (val && props.bizId) {
-    loadComments(true)
-    loadManagers()
-  } else {
-    resetInput()
+watch(
+  () => props.show,
+  (val) => {
+    if (val && props.bizId) {
+      loadComments(true)
+      loadManagers()
+    } else {
+      resetInput()
+    }
   }
-})
+)
 
-watch(() => props.bizId, (val) => {
-  if (val && props.show) {
-    loadComments(true)
+watch(
+  () => props.bizId,
+  (val) => {
+    if (val && props.show) {
+      loadComments(true)
+    }
   }
-})
+)
 
 // 加载管理员列表（用于 @提及）
 async function loadManagers() {
@@ -358,11 +353,12 @@ function selectMention(mgr: SystemManagerItem) {
 // 引用
 function handleQuote(item: CommentItem) {
   // 剥离已有引用行，只取作者本人的首行有效内容
-  const firstLine = item.content
-    .split('\n')
-    .filter((line) => !line.startsWith('> '))
-    .map((line) => line.trim())
-    .find(Boolean) || ''
+  const firstLine =
+    item.content
+      .split('\n')
+      .filter((line) => !line.startsWith('> '))
+      .map((line) => line.trim())
+      .find(Boolean) || ''
   const excerpt = firstLine.length > 80 ? firstLine.substring(0, 80) + '...' : firstLine
   inputContent.value = `> ${item.authorName}: ${excerpt}\n\n${inputContent.value}`
   inputRef.value?.focus()
