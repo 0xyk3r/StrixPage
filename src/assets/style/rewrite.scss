@@ -35,3 +35,8 @@ $_anim-duration: 280ms;
 .n-modal .n-card {
   border-radius: 14px !important;
 }
+
+// n-layout 去除背景色
+.n-layout {
+  background: inherit !important;
+}

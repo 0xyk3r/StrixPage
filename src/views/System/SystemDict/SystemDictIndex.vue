@@ -2,14 +2,13 @@
   <n-layout has-sider>
     <!-- 左侧分组树 -->
     <n-layout-sider
-      bordered
-      :width="200"
-      :collapsed-width="0"
-      collapse-mode="width"
       :collapsed="siderCollapsed"
+      :collapsed-width="0"
+      :width="200"
+      collapse-mode="width"
+      class="dict-sider"
       show-trigger
       @update:collapsed="siderCollapsed = $event"
-      style="min-height: calc(100vh - 120px)"
     >
       <DictGroupTree
         ref="groupTreeRef"
@@ -679,4 +678,9 @@ const viewDictData = (key: string) => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dict-sider {
+  border-radius: 14px;
+  min-height: calc(100vh - 120px);
+}
+</style>
