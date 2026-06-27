@@ -13,6 +13,16 @@ export const getFormattedDate = (date = new Date()) => {
 }
 
 /**
+ * 格式化 ISO 日期时间字符串为 yyyy-MM-dd HH:mm:ss
+ * 兼容形如 "2024-01-01T12:00:00" 和 "2024-01-01 12:00:00" 的输入
+ * @param time ISO 日期时间字符串，为空时返回 '-'
+ */
+export const formatISODateTime = (time: string | null | undefined): string => {
+  if (!time) return '-'
+  return time.replace('T', ' ').substring(0, 19)
+}
+
+/**
  * 获取日期差
  * @param {string} start 开始日期
  * @param {string} end 结束日期

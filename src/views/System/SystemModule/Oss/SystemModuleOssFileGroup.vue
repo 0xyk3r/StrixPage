@@ -54,8 +54,8 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
     />
 
@@ -248,7 +248,7 @@ import type { OssFileGroupItem } from '@/api/oss'
 import { ossApi } from '@/api/oss'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'

@@ -69,8 +69,9 @@
 import type { OnlineUserSessionItem, OnlineUserSessionResp } from '@/api/user-session'
 import { userSessionApi } from '@/api/user-session'
 import { handleOperate } from '@/utils/strix-table-tool'
+import { formatISODateTime } from '@/utils/strix-date-util'
 import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
-import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
 
 const dialog = useDialog()
 
@@ -156,11 +157,6 @@ const handleBatchKick = () => {
   })
 }
 
-const formatTime = (time: string | null) => {
-  if (!time) return '-'
-  return time.replace('T', ' ').substring(0, 19)
-}
-
 const columns: DataTableColumns<OnlineUserSessionItem> = [
   { type: 'selection' },
   { title: '昵称', key: 'nickname', width: 180 },
@@ -171,13 +167,13 @@ const columns: DataTableColumns<OnlineUserSessionItem> = [
     title: '登录时间',
     key: 'loginTime',
     width: 120,
-    render: (row) => formatTime(row.loginTime)
+    render: (row) => formatISODateTime(row.loginTime)
   },
   {
     title: '最后活跃',
     key: 'lastActiveTime',
     width: 120,
-    render: (row) => formatTime(row.lastActiveTime)
+    render: (row) => formatISODateTime(row.lastActiveTime)
   },
   {
     title: '会话数',

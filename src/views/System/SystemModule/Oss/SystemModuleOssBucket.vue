@@ -49,8 +49,8 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
     />
 

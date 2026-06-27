@@ -34,8 +34,8 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
       @load="onDataChildrenLoad"
     />
@@ -346,5 +346,3 @@ const onDataChildrenLoad = (rowData: Record<string, unknown>) => {
   })
 }
 </script>
-
-<style lang="scss" scoped></style>

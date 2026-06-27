@@ -10,7 +10,7 @@
           </n-space>
         </n-checkbox-group>
         <n-space>
-          <n-button size="small" @click="selectedKeys = dictList.map(d => d.key)">全选</n-button>
+          <n-button size="small" @click="selectedKeys = dictList.map((d) => d.key)">全选</n-button>
           <n-button size="small" @click="selectedKeys = []">取消全选</n-button>
         </n-space>
       </n-space>
@@ -73,11 +73,11 @@
 </template>
 
 <script lang="ts" setup>
-import { dictApi } from '@/api/dict'
 import type { DictItem } from '@/api/dict'
+import { dictApi } from '@/api/dict'
 import type { DataTableColumn, UploadFileInfo } from 'naive-ui'
 
-const props = defineProps<{
+defineProps<{
   mode: 'export' | 'import'
   dictList: DictItem[]
 }>()

@@ -56,7 +56,7 @@ import { NButton, NSwitch, NTag } from 'naive-ui'
 import type { AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import AiModelConfigForm from './AiModelConfigForm.vue'
-import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
 import { handleOperate } from '@/utils/strix-table-tool.ts'
 
 const message = useMessage()

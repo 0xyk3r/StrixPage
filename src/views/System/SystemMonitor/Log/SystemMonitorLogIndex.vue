@@ -154,9 +154,9 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
       :row-props="rowProps"
+      remote
       table-layout="fixed"
     />
 
@@ -202,7 +202,7 @@ import type { SystemLogItem } from '@/api/monitor'
 import { monitorApi } from '@/api/monitor'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 import StrixBlock from '@/components/common/StrixBlock.vue'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { useCrud } from '@/composables/useCrud'
 import { type DataTableColumns } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'

@@ -27,7 +27,7 @@
 import { RotateCcw } from '@lucide/vue'
 import { useTabsBarStore } from '@/stores/tabs-bar'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     title?: string
     description?: string

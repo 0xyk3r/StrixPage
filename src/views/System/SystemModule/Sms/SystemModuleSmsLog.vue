@@ -57,8 +57,8 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
     />
 
@@ -81,7 +81,7 @@ import type { SmsLogItem } from '@/api/sms'
 import { smsApi } from '@/api/sms'
 import type { SelectDataItem } from '@/api/types'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import { createPaginatedFetcher } from '@/composables/useTableExport'

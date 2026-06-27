@@ -26,12 +26,10 @@
       :columns="dataColumns"
       :data="filteredData"
       :loading="loading"
-      :bordered="false"
       :scroll-x="scrollX"
-      :single-line="false"
       :row-key="(row: SystemConfigItem) => row.id"
-      size="small"
       remote
+      table-layout="fixed"
     />
 
     <!-- 新增/编辑模态框 -->
@@ -42,7 +40,7 @@
       :title="isEdit ? '编辑配置' : '新增配置'"
       style="width: 560px"
     >
-      <n-form ref="formRef" :model="formModel" :rules="formRules" label-placement="left" label-width="80">
+      <n-form ref="formRef" :model="formModel" :rules="formRules" label-placement="left" label-width="auto">
         <n-form-item label="配置标识" path="key">
           <n-input v-model:value="formModel.key" :disabled="isEdit" placeholder="如 system.login.captcha" />
         </n-form-item>
@@ -87,11 +85,12 @@ import type { SystemConfigItem } from '@/api/system-config'
 import { systemConfigApi } from '@/api/system-config'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
+import { formatISODateTime } from '@/utils/strix-date-util'
 import type { DataTableColumns, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
-import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
 
 const loading = ref(false)
 const data = ref<SystemConfigItem[]>([])
@@ -193,11 +192,6 @@ const handleDelete = async (row: SystemConfigItem) => {
   await loadData()
 }
 
-const formatTime = (time: string | null) => {
-  if (!time) return '-'
-  return time.replace('T', ' ').substring(0, 19)
-}
-
 const dataColumns: DataTableColumns<SystemConfigItem> = [
   { title: '配置标识', key: 'key', width: 240, ellipsis: { tooltip: true } },
   { title: '配置名称', key: 'name', width: 240 },
@@ -229,7 +223,7 @@ const dataColumns: DataTableColumns<SystemConfigItem> = [
     title: '更新时间',
     key: 'updatedTime',
     width: 180,
-    render: (row) => formatTime(row.updatedTime)
+    render: (row) => formatISODateTime(row.updatedTime)
   },
   {
     title: '操作',
@@ -242,7 +236,7 @@ const dataColumns: DataTableColumns<SystemConfigItem> = [
         {
           type: 'warning',
           label: '编辑',
-          icon: 'edit',
+          icon: 'square-pen',
           auth: 'system:config:update',
           onClick: () => showEdit(row)
         },

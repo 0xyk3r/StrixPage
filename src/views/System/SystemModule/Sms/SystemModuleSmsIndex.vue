@@ -181,7 +181,7 @@ import StrixTag from '@/components/common/StrixTag.vue'
 import type { SmsConfigItem, SmsSignItem, SmsTemplateItem } from '@/api/sms'
 import { smsApi } from '@/api/sms'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { differenceWith, find, isEqual } from 'lodash-es'
 import { type DataTableColumns, NDataTable, NScrollbar, NSpin, NTabPane, NTabs } from 'naive-ui'
@@ -499,22 +499,3 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
 }
 </script>
 
-<style lang="scss" scoped>
-::v-deep(.expand-menu-pane) {
-  .n-grid:not(:last-child) {
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .n-grid {
-    align-items: center;
-  }
-}
-
-::v-deep(.expand-permission-pane) {
-  .n-tag:not(:last-child) {
-    margin: 0 8px 8px 0;
-  }
-}
-</style>

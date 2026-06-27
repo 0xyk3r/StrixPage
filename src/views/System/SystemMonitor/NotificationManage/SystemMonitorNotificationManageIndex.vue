@@ -81,7 +81,7 @@
 
     <!-- 发送通知模态框 -->
     <n-modal v-model:show="showSendModal" class="strix-form-modal" preset="card" title="发送通知" style="width: 640px">
-      <n-form ref="sendFormRef" :model="sendForm" :rules="sendFormRules" label-placement="left" label-width="80">
+      <n-form ref="sendFormRef" :model="sendForm" :rules="sendFormRules" label-placement="left" label-width="auto">
         <n-form-item label="通知标题" path="title">
           <n-input v-model:value="sendForm.title" maxlength="200" show-count placeholder="请输入通知标题" />
         </n-form-item>
@@ -153,7 +153,7 @@
             </n-tag>
           </n-descriptions-item>
           <n-descriptions-item label="发送人">{{ detailData.senderName }}</n-descriptions-item>
-          <n-descriptions-item label="发送时间">{{ formatTime(detailData.createdTime) }}</n-descriptions-item>
+          <n-descriptions-item label="发送时间">{{ formatISODateTime(detailData.createdTime) }}</n-descriptions-item>
           <n-descriptions-item v-if="detailData.endReason" label="终止原因" :span="2">
             {{ detailData.endReason }}
           </n-descriptions-item>
@@ -197,12 +197,13 @@ import type {
 import { notificationManageApi } from '@/api/notification-manage'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
+import { formatISODateTime } from '@/utils/strix-date-util'
 import StrixManagerSelector from '@/components/data/StrixManagerSelector.vue'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
 import type { DataTableColumn, DataTableRowKey, FormInst } from 'naive-ui'
 import { type DataTableColumns, NTag } from 'naive-ui'
-import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
 
 const dialog = useDialog()
 const message = useMessage()
@@ -363,11 +364,6 @@ const resetSendForm = () => {
   }
 }
 
-const formatTime = (time: string | null) => {
-  if (!time) return '-'
-  return time.replace('T', ' ').substring(0, 19)
-}
-
 // 表格列定义
 const columns: DataTableColumns<NotificationManageItem> = [
   { type: 'selection' },
@@ -415,7 +411,7 @@ const columns: DataTableColumns<NotificationManageItem> = [
     title: '发送时间',
     key: 'createdTime',
     width: 120,
-    render: (row) => formatTime(row.createdTime)
+    render: (row) => formatISODateTime(row.createdTime)
   },
   {
     title: '操作',
@@ -462,7 +458,7 @@ const receiverColumns: DataTableColumn[] = [
     title: '已读时间',
     key: 'readAt',
     width: 160,
-    render: (row: any) => formatTime(row.readAt)
+    render: (row: any) => formatISODateTime(row.readAt)
   },
   {
     title: '有效状态',

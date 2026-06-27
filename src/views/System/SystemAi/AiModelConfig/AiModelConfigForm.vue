@@ -839,7 +839,7 @@ import type { FormInst, FormRules, SelectOption } from 'naive-ui'
 import type { AiModelConfigResp, AiModelConfigUpdateReq, AiModelInfo } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import { ossApi } from '@/api/oss'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 
 interface Props {
   editId?: string

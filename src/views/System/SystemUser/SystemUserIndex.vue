@@ -52,9 +52,9 @@
       :data="dataRef"
       :loading="dataLoading"
       :pagination="pagination"
-      :remote="true"
       :row-key="rowKey"
       :scroll-x="scrollX"
+      remote
       table-layout="fixed"
       @update:checked-row-keys="onCheckedRowKeysChange"
     />
@@ -155,7 +155,7 @@ import { createPaginatedFetcher } from '@/composables/useTableExport'
 import type { SystemUserItem } from '@/api/user'
 import { userApi } from '@/api/user'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
@@ -304,5 +304,3 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 </script>
-
-<style lang="scss" scoped></style>

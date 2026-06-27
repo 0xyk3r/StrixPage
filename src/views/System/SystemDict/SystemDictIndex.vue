@@ -98,10 +98,10 @@
           :data="dataRef"
           :loading="dataLoading"
           :pagination="pagination"
-          :remote="true"
           :row-key="rowKey"
-          table-layout="fixed"
           :row-props="rowProps"
+          remote
+          table-layout="fixed"
           @update:checked-row-keys="onCheckedRowKeysChange"
         />
 
@@ -308,7 +308,7 @@ import { dictApi } from '@/api/dict'
 import type { DictGroupItem } from '@/api/dict-group'
 import { dictGroupApi } from '@/api/dict-group'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns, NDataTable, NTag } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -473,7 +473,7 @@ async function loadExpandData(dictKey: string) {
   }
 }
 
-function rowProps(row: Record<string, unknown>) {
+function rowProps() {
   return {
     onClick: (e: MouseEvent) => {
       const target = e.target as HTMLElement

@@ -283,7 +283,7 @@ import { roleApi } from '@/api/role'
 import type { CascaderDataItem, SelectDataItem } from '@/api/types'
 import { useQuickMenuStore } from '@/stores/quick-menu'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { deepSearch } from '@/utils/strix-tools'
 import { differenceWith, find, isEqual } from 'lodash-es'
@@ -613,5 +613,3 @@ const changeSystemManagerRoles = (systemManagerId: string, roles: Array<string |
     })
 }
 </script>
-
-<style lang="scss" scoped></style>

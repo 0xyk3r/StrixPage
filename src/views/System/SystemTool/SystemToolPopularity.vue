@@ -97,8 +97,8 @@
                 :max-height="290"
                 :min-height="290"
                 :pagination="popularityDataPagination"
-                :remote="true"
                 :row-key="popularityDataRowKey"
+                remote
                 table-layout="fixed"
               >
                 <template #empty>

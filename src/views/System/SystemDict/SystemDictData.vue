@@ -87,8 +87,8 @@
         :data="dataRef"
         :loading="dataLoading"
         :pagination="pagination"
-        :remote="true"
         :row-key="rowKey"
+        remote
         table-layout="fixed"
         @update:checked-row-keys="onCheckedRowKeysChange"
       />
@@ -278,7 +278,7 @@ import StrixStylePicker from '@/components/common/StrixStylePicker.vue'
 import type { DictDataItem } from '@/api/dict'
 import { dictApi } from '@/api/dict'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns, NTag } from 'naive-ui'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'

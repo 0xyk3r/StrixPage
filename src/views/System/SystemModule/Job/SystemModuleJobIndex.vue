@@ -40,6 +40,7 @@
       :loading="dataLoading"
       :pagination="pagination"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
       @update:checked-row-keys="onCheckedRowKeysChange"
     />
@@ -77,8 +78,8 @@
       :title="'添加' + _baseName"
       class="strix-form-modal"
       preset="card"
-      @update:show="tryCloseAdd"
       size="huge"
+      @update:show="tryCloseAdd"
       @after-leave="resetForms"
     >
       <n-form
@@ -139,8 +140,8 @@
       :title="'修改' + _baseName"
       class="strix-form-modal"
       preset="card"
-      @update:show="tryCloseEdit"
       size="huge"
+      @update:show="tryCloseEdit"
       @after-leave="resetForms"
     >
       <n-spin :show="editLoading">
@@ -199,7 +200,7 @@ import StrixTag from '@/components/common/StrixTag.vue'
 import type { JobItem } from '@/api/job'
 import { jobApi } from '@/api/job'
 import { useCrud } from '@/composables/useCrud'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
@@ -389,22 +390,3 @@ const runJob = (id: string) => {
 }
 </script>
 
-<style lang="scss" scoped>
-::v-deep(.expand-menu-pane) {
-  .n-grid:not(:last-child) {
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .n-grid {
-    align-items: center;
-  }
-}
-
-::v-deep(.expand-permission-pane) {
-  .n-tag:not(:last-child) {
-    margin: 0 8px 8px 0;
-  }
-}
-</style>

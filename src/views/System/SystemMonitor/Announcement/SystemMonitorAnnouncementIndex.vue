@@ -101,7 +101,7 @@
         :model="publishForm"
         :rules="publishFormRules"
         label-placement="left"
-        label-width="80"
+        label-width="auto"
       >
         <n-form-item label="公告标题" path="title">
           <n-input v-model:value="publishForm.title" maxlength="200" show-count placeholder="请输入公告标题" />
@@ -178,12 +178,12 @@
               {{ detailData.status === 1 ? '有效' : '已终止' }}
             </n-tag>
           </n-descriptions-item>
-          <n-descriptions-item label="创建时间">{{ formatTime(detailData.createdTime) }}</n-descriptions-item>
+          <n-descriptions-item label="创建时间">{{ formatISODateTime(detailData.createdTime) }}</n-descriptions-item>
           <n-descriptions-item v-if="detailData.startTime" label="生效时间">
-            {{ formatTime(detailData.startTime) }}
+            {{ formatISODateTime(detailData.startTime) }}
           </n-descriptions-item>
           <n-descriptions-item v-if="detailData.endTime" label="失效时间">
-            {{ formatTime(detailData.endTime) }}
+            {{ formatISODateTime(detailData.endTime) }}
           </n-descriptions-item>
           <n-descriptions-item v-if="detailData.endReason" label="终止原因" :span="2">
             {{ detailData.endReason }}
@@ -209,11 +209,12 @@ import type {
 import { announcementApi } from '@/api/announcement'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { useFormSchema } from '@/composables/useFormSchema'
+import { formatISODateTime } from '@/utils/strix-date-util'
 import StrixCommentPanel from '@/components/common/StrixCommentPanel.vue'
 import { useComment } from '@/composables/useComment'
 import type { DataTableColumns, DataTableRowKey, FormInst } from 'naive-ui'
 import { NTag } from 'naive-ui'
-import { useTableColumns } from '@/composables/useTableColumns.ts'
+import { useTableColumns } from '@/composables/useTableColumns'
 
 const dialog = useDialog()
 
@@ -365,11 +366,6 @@ const resetPublishForm = () => {
   }
 }
 
-const formatTime = (time: string | null) => {
-  if (!time) return '-'
-  return time.replace('T', ' ').substring(0, 19)
-}
-
 const levelTagType = (level: string) => {
   switch (level) {
     case 'WARNING':
@@ -416,19 +412,19 @@ const columns: DataTableColumns<AnnouncementItem> = [
     title: '生效时间',
     key: 'startTime',
     width: 120,
-    render: (row) => (row.startTime ? formatTime(row.startTime) : '立即生效')
+    render: (row) => (row.startTime ? formatISODateTime(row.startTime) : '立即生效')
   },
   {
     title: '失效时间',
     key: 'endTime',
     width: 120,
-    render: (row) => (row.endTime ? formatTime(row.endTime) : '不自动失效')
+    render: (row) => (row.endTime ? formatISODateTime(row.endTime) : '不自动失效')
   },
   {
     title: '创建时间',
     key: 'createdTime',
     width: 120,
-    render: (row) => formatTime(row.createdTime)
+    render: (row) => formatISODateTime(row.createdTime)
   },
   {
     title: '操作',

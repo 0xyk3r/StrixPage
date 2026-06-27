@@ -36,8 +36,8 @@
       :scroll-x="scrollX"
       :data="filteredData"
       :loading="dataLoading"
-      :remote="true"
       :row-key="rowKey"
+      remote
       table-layout="fixed"
     />
 
