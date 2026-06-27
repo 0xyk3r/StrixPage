@@ -7,54 +7,56 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索关键字（模板Code、名称）"
-                     @keydown.enter="handleKeywordEnter" />
-          </n-gi>
-          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="请输入搜索关键字（模板Code、名称）"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="配置 Key" path="configKey" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.configKey"
-              :options="smsConfigSelectList"
-              clearable
-              placeholder="请选择短信配置 Key"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="状态" path="status" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.status"
-              :options="smsTemplateStatusRef"
-              clearable
-              placeholder="请选择状态"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="类型" path="type" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.type"
-              :options="smsTemplateTypeRef"
-              clearable
-              placeholder="请选择类型"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-        </n-grid>
+        <n-form-item label="配置 Key" path="configKey">
+          <n-select
+            v-model:value="listParams.configKey"
+            :options="smsConfigSelectList"
+            clearable
+            placeholder="请选择短信配置 Key"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="状态" path="status">
+          <n-select
+            v-model:value="listParams.status"
+            :options="smsTemplateStatusRef"
+            clearable
+            placeholder="请选择状态"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="类型" path="type">
+          <n-select
+            v-model:value="listParams.type"
+            :options="smsTemplateTypeRef"
+            clearable
+            placeholder="请选择类型"
+            @update:value="getDataList"
+          />
+        </n-form-item>
       </n-form>
     </strix-block>
 
@@ -71,7 +73,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"

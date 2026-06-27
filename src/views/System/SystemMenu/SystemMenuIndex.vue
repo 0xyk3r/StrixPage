@@ -1,36 +1,40 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
     <strix-block>
+      <template #search>
+        <n-input v-model:value="keyword" clearable placeholder="按名称 / 权限标识 / 菜单路由搜索">
+          <template #prefix>
+            <strix-icon icon="search" :size="16" />
+          </template>
+        </n-input>
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="() => showAddDataModal({ id: '', key: '' })"> 添加{{ _baseName }} </n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
+      </template>
       <template #body>
-        <n-grid :cols="6">
-          <n-gi :span="1">
-            <n-button type="primary" @click="() => showAddDataModal({ id: '', key: '' })">
-              添加{{ _baseName }}
-            </n-button>
-          </n-gi>
-          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-          </n-gi>
-        </n-grid>
-        <n-alert closable style="margin-top: 15px" title="提醒" type="warning">
-          考虑到 UI 展示和性能问题，不建议配置超过 3 级菜单。
-        </n-alert>
+        <n-alert closable title="提醒" type="warning"> 考虑到 UI 展示和性能问题，不建议配置超过 3 级菜单。 </n-alert>
       </template>
     </strix-block>
 
     <n-data-table
+      v-model:expanded-row-keys="expandedRowKeys"
       :allow-checking-not-loaded="true"
       :cascade="false"
       :columns="visibleColumns"
       :scroll-x="scrollX"
-      :data="dataRef"
+      :data="filteredData"
       :loading="dataLoading"
       :remote="true"
       :row-key="rowKey"
@@ -419,6 +423,51 @@ const getDataList = () => {
     })
 }
 onMounted(getDataList)
+
+// ---- 本地搜索（菜单一次性返回全部数据，无分页，按名称 / 权限标识 / 菜单路由本地过滤）----
+const keyword = ref('')
+
+// 单节点是否命中关键字（名称、权限标识、菜单路由）
+const matchMenuNode = (node: SystemMenuManageItem, kw: string) => {
+  return [node.name, node.key, node.url].some((field) => field?.toLowerCase().includes(kw))
+}
+
+// 过滤树：节点自身命中则保留整棵子树；否则若有子孙命中，保留该节点作为路径
+const filterMenuTree = (nodes: SystemMenuManageItem[], kw: string): SystemMenuManageItem[] => {
+  const result: SystemMenuManageItem[] = []
+  for (const node of nodes) {
+    if (matchMenuNode(node, kw)) {
+      result.push(node)
+    } else {
+      const children = node.children?.length ? filterMenuTree(node.children, kw) : []
+      if (children.length) result.push({ ...node, children })
+    }
+  }
+  return result
+}
+
+const filteredData = computed(() => {
+  const kw = keyword.value.trim().toLowerCase()
+  if (!kw) return dataRef.value
+  return filterMenuTree(dataRef.value ?? [], kw)
+})
+
+// 受控展开：搜索时自动展开命中路径上的所有父节点，便于看到深层命中项
+const expandedRowKeys = ref<string[]>([])
+const collectExpandKeys = (nodes: SystemMenuManageItem[]): string[] => {
+  const keys: string[] = []
+  for (const node of nodes) {
+    if (node.children?.length) {
+      keys.push(node.id)
+      keys.push(...collectExpandKeys(node.children))
+    }
+  }
+  return keys
+}
+
+watch(keyword, (kw) => {
+  expandedRowKeys.value = kw.trim() ? collectExpandKeys(filteredData.value ?? []) : []
+})
 
 const addDataModalType = ref('menu')
 const showAddDataModal = ({ id, key }: { id: string; key: string }) => {

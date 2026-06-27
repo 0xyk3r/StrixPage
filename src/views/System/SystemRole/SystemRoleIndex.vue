@@ -1,30 +1,28 @@
 <template>
   <div :class="{ 'nebula-column-panel-push': showColumnPanel }">
     <strix-block cleanable @clear="clearSearch">
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input
-              v-model:value="filterDataListParams.keyword"
-              clearable
-              placeholder="请输入搜索条件（角色名称）"
-              @keydown.enter="handleKeywordEnter"
-            />
-          </n-gi>
-          <n-gi :span="1">
-            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-          </n-gi>
-          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="filterDataListParams.keyword"
+          clearable
+          placeholder="请输入搜索条件（角色名称）"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
       </template>
     </strix-block>
 
@@ -52,7 +50,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="filterDataList || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -249,7 +247,11 @@ type ExpandedRoleRow = SystemRoleItem & {
   expandTab?: string
 }
 
-const renderExpandMenuChildren = (row: SystemRoleItem, children: SystemMenuManageItem[] | undefined, colorIndex: number) => {
+const renderExpandMenuChildren = (
+  row: SystemRoleItem,
+  children: SystemMenuManageItem[] | undefined,
+  colorIndex: number
+) => {
   if (!children) {
     return []
   }
@@ -418,9 +420,7 @@ const filterDataList = computed(() =>
   })
 )
 
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 
 const dataExpandedRowKeys = ref<Array<string | number>>([])
 const dataExpandedRowKeysChange = (value: Array<string | number>) => {
@@ -436,7 +436,6 @@ const dataExpandedRowKeysChange = (value: Array<string | number>) => {
     }
   })
 }
-
 
 const removeRoleMenu = (row: ExpandedRoleRow, menuId: string) => {
   roleApi.removeMenu(row.id, menuId).then(({ data: res }) => {

@@ -1,25 +1,21 @@
 <template>
   <div class="ai-model-config-page">
     <strix-block cleanable @clear="clearSearch">
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="keyword" clearable placeholder="搜索模型名称或 Key" @keydown.enter="loadList" />
-          </n-gi>
-          <n-gi span="2">
-            <n-select
-              v-model:value="filterType"
-              :options="typeOptions"
-              clearable
-              placeholder="模型类型"
-              style="width: 160px"
-              @update:value="loadList"
-            />
-          </n-gi>
-          <n-gi span="2">
-            <n-button type="primary" @click="showAdd">添加模型配置</n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input-group>
+          <n-select
+            v-model:value="filterType"
+            :options="typeOptions"
+            clearable
+            placeholder="模型类型"
+            style="flex: 0 0 160px"
+            @update:value="loadList"
+          />
+          <n-input v-model:value="keyword" clearable placeholder="搜索模型名称或 Key" @keydown.enter="loadList" />
+        </n-input-group>
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="showAdd">添加模型配置</n-button>
       </template>
     </strix-block>
 

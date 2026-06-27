@@ -7,57 +7,51 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input
-              v-model:value="listParams.keyword"
-              clearable
-              placeholder="请输入搜索条件（昵称、账号）"
-              @keydown.enter="handleKeywordEnter"
-            />
-          </n-gi>
-          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
-            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-            <n-button v-auth="'system:manager:add'" quaternary type="primary" @click="showImportDialog = true">
-              <template #icon>
-                <strix-icon icon="upload" :size="16" />
-              </template>
-              导入
-            </n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="请输入搜索条件（昵称、账号）"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
+        <n-button v-auth="'system:manager:add'" quaternary type="primary" @click="showImportDialog = true">
+          <template #icon>
+            <strix-icon icon="upload" :size="16" />
+          </template>
+          导入
+        </n-button>
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="人员角色" path="roleId" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.roleId"
-              :options="systemRoleSelectList"
-              clearable
-              placeholder="请选择人员角色"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="人员状态" path="status" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.status"
-              :options="systemManagerStatusRef"
-              placeholder="请选择人员状态"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="人员类型" path="type" span="6 s:3 m:2">
-            <n-select v-model:value="listParams.type" :options="systemManagerTypeRef" placeholder="请选择人员类型" />
-          </n-form-item-gi>
-        </n-grid>
+        <n-form-item label="人员角色" path="roleId">
+          <n-select
+            v-model:value="listParams.roleId"
+            :options="systemRoleSelectList"
+            clearable
+            placeholder="请选择人员角色"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="人员状态" path="status">
+          <n-select v-model:value="listParams.status" :options="systemManagerStatusRef" placeholder="请选择人员状态" />
+        </n-form-item>
+        <n-form-item label="人员类型" path="type">
+          <n-select v-model:value="listParams.type" :options="systemManagerTypeRef" placeholder="请选择人员类型" />
+        </n-form-item>
       </n-form>
     </strix-block>
 

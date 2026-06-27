@@ -7,45 +7,43 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input
-              v-model:value="listParams.keyword"
-              clearable
-              placeholder="请输入搜索条件（昵称、手机号码）"
-              @keydown.enter="handleKeywordEnter"
-            />
-          </n-gi>
-          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-            <n-button v-auth="'system:user:add'" quaternary type="primary" @click="showImportDialog = true">
-              <template #icon>
-                <strix-icon icon="upload" :size="16" />
-              </template>
-              导入
-            </n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="请输入搜索条件（昵称、手机号码）"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
+        <n-button v-auth="'system:user:add'" quaternary type="primary" @click="showImportDialog = true">
+          <template #icon>
+            <strix-icon icon="upload" :size="16" />
+          </template>
+          导入
+        </n-button>
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="用户状态" path="status" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.status"
-              :options="systemUserStatusRef"
-              clearable
-              placeholder="请选择用户状态"
-            />
-          </n-form-item-gi>
-        </n-grid>
+        <n-form-item label="用户状态" path="status">
+          <n-select
+            v-model:value="listParams.status"
+            :options="systemUserStatusRef"
+            clearable
+            placeholder="请选择用户状态"
+          />
+        </n-form-item>
       </n-form>
     </strix-block>
     <n-data-table

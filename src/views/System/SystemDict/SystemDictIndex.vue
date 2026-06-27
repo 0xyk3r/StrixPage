@@ -28,64 +28,66 @@
           @clear="clearSearch"
           @clear-filter="clearFilter"
         >
-          <template #body>
-            <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-              <n-gi span="6 s:3 m:2">
-                <n-input
-                  v-model:value="listParams.keyword"
-                  clearable
-                  placeholder="按字典标识或名称搜索"
-                  @keydown.enter="handleKeywordEnter"
-                />
-              </n-gi>
-              <n-gi :span="1">
-                <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-              </n-gi>
-              <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-                <n-button quaternary type="primary" @click="showSearchModal = true">
-                  <template #icon><strix-icon icon="search" :size="16" /></template>
-                  全局搜索
-                </n-button>
-                <n-button quaternary type="primary" @click="openImportExport('export')">
-                  <template #icon><strix-icon icon="download" :size="16" /></template>
-                  导出
-                </n-button>
-                <n-button quaternary type="primary" @click="openImportExport('import')">
-                  <template #icon><strix-icon icon="upload" :size="16" /></template>
-                  导入
-                </n-button>
-                <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-                  <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-                  列配置
-                </n-button>
-                <n-button quaternary type="primary" @click="showExportDialog = true">
-                  <template #icon><strix-icon icon="file-down" :size="16" /></template>
-                  表格导出
-                </n-button>
-              </n-gi>
-            </n-grid>
+          <template #search>
+            <n-input
+              v-model:value="listParams.keyword"
+              clearable
+              placeholder="按字典标识或名称搜索"
+              @keydown.enter="handleKeywordEnter"
+            />
+          </template>
+          <template #actions>
+            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
+            <n-button quaternary type="primary" @click="showSearchModal = true">
+              <template #icon>
+                <strix-icon icon="search" :size="16" />
+              </template>
+              全局搜索
+            </n-button>
+            <n-button quaternary type="primary" @click="openImportExport('export')">
+              <template #icon>
+                <strix-icon icon="download" :size="16" />
+              </template>
+              导出
+            </n-button>
+            <n-button quaternary type="primary" @click="openImportExport('import')">
+              <template #icon>
+                <strix-icon icon="upload" :size="16" />
+              </template>
+              导入
+            </n-button>
+            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+              <template #icon>
+                <strix-icon icon="columns-3" :size="16" />
+              </template>
+              列配置
+            </n-button>
+            <n-button quaternary type="primary" @click="showExportDialog = true">
+              <template #icon>
+                <strix-icon icon="file-down" :size="16" />
+              </template>
+              表格导出
+            </n-button>
           </template>
           <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-            <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-              <n-form-item-gi label="字典状态" path="status" span="6 s:3 m:2">
-                <n-select
-                  v-model:value="listParams.status"
-                  :options="commonSwitchRef"
-                  clearable
-                  placeholder="请选择字典状态"
-                  @update:value="getDataList"
-                />
-              </n-form-item-gi>
-              <n-form-item-gi label="是否内置" path="provided" span="6 s:3 m:2">
-                <n-select
-                  v-model:value="listParams.provided"
-                  :options="commonFlagRef"
-                  clearable
-                  placeholder="请选择字典是否内置"
-                  @update:value="getDataList"
-                />
-              </n-form-item-gi>
-            </n-grid>
+            <n-form-item label="字典状态" path="status">
+              <n-select
+                v-model:value="listParams.status"
+                :options="commonSwitchRef"
+                clearable
+                placeholder="请选择字典状态"
+                @update:value="getDataList"
+              />
+            </n-form-item>
+            <n-form-item label="是否内置" path="provided">
+              <n-select
+                v-model:value="listParams.provided"
+                :options="commonFlagRef"
+                clearable
+                placeholder="请选择字典是否内置"
+                @update:value="getDataList"
+              />
+            </n-form-item>
           </n-form>
         </strix-block>
 

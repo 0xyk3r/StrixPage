@@ -27,30 +27,24 @@
 
     <!-- 搜索与操作栏 -->
     <strix-block>
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="keyword" clearable placeholder="按昵称或手机号搜索" @keydown.enter="loadData" />
-          </n-gi>
-          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
-            <n-space align="center" :size="4">
-              <n-button
-                v-auth="'system:monitor:user-session'"
-                :disabled="checkedRowKeys.length === 0"
-                type="error"
-                @click="handleBatchKick"
-              >
-                批量踢出 ({{ checkedRowKeys.length }})
-              </n-button>
-              <n-divider vertical />
-              <n-select v-model:value="refreshInterval" :options="intervalOptions" size="small" style="width: 110px" />
-              <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" quaternary @click="toggleAutoRefresh">
-                {{ autoRefresh ? '暂停刷新' : '自动刷新' }}
-              </n-button>
-              <n-button :loading="loading" quaternary type="primary" @click="loadData"> 刷新</n-button>
-            </n-space>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input v-model:value="keyword" clearable placeholder="按昵称或手机号搜索" @keydown.enter="loadData" />
+      </template>
+      <template #actions>
+        <n-button
+          v-auth="'system:monitor:user-session'"
+          :disabled="checkedRowKeys.length === 0"
+          type="error"
+          @click="handleBatchKick"
+        >
+          批量踢出 ({{ checkedRowKeys.length }})
+        </n-button>
+        <n-divider vertical />
+        <n-select v-model:value="refreshInterval" :options="intervalOptions" size="small" style="width: 110px" />
+        <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" quaternary @click="toggleAutoRefresh">
+          {{ autoRefresh ? '暂停刷新' : '自动刷新' }}
+        </n-button>
+        <n-button :loading="loading" quaternary type="primary" @click="loadData"> 刷新</n-button>
       </template>
     </strix-block>
 

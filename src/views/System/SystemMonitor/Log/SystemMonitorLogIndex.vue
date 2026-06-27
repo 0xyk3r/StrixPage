@@ -49,116 +49,102 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="按操作名称搜索"
-                     @keydown.enter="handleKeywordEnter" />
-          </n-gi>
-          <n-gi span="6 s:3 m:4" class="nebula-export__trigger-gi">
-            <n-space align="center" :size="4">
-              <n-select
-                v-model:value="refreshInterval"
-                :disabled="!autoRefresh"
-                :options="intervalOptions"
-                size="small"
-                style="width: 110px"
-              />
-              <n-button
-                :type="autoRefresh ? 'primary' : 'default'"
-                size="small"
-                quaternary
-                @click="toggleAutoRefresh"
-              >
-                <template #icon>
-                  <strix-icon :icon="autoRefresh ? 'pause' : 'play'" :size="16" />
-                </template>
-                {{ autoRefresh ? '暂停' : '自动刷新' }}
-              </n-button>
-              <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-                <template #icon>
-                  <strix-icon icon="columns-3" :size="16" />
-                </template>
-                列配置
-              </n-button>
-              <n-button quaternary type="primary" @click="showExportDialog = true">
-                <template #icon>
-                  <strix-icon icon="download" :size="16" />
-                </template>
-                导出
-              </n-button>
-              <n-button
-                v-auth="'system:monitor:log:delete'"
-                quaternary
-                type="error"
-                @click="showCleanupModal = true"
-              >
-                <template #icon>
-                  <strix-icon icon="trash-2" :size="16" />
-                </template>
-                清理
-              </n-button>
-            </n-space>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="按操作名称搜索"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-select
+          v-model:value="refreshInterval"
+          :disabled="!autoRefresh"
+          :options="intervalOptions"
+          size="small"
+          style="width: 110px"
+        />
+        <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" quaternary @click="toggleAutoRefresh">
+          <template #icon>
+            <strix-icon :icon="autoRefresh ? 'pause' : 'play'" :size="16" />
+          </template>
+          {{ autoRefresh ? '暂停' : '自动刷新' }}
+        </n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
+        <n-button v-auth="'system:monitor:log:delete'" quaternary type="error" @click="showCleanupModal = true">
+          <template #icon>
+            <strix-icon icon="trash-2" :size="16" />
+          </template>
+          清理
+        </n-button>
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="操作类型" path="operationType" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.operationType"
-              :options="systemLogOperTypeRef"
-              clearable
-              placeholder="请选择操作类型"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="操作分组" path="operationGroup" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.operationGroup"
-              :options="operationGroupOptions"
-              clearable
-              placeholder="请选择操作分组"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="响应状态" path="responseCode" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.responseCode"
-              :options="responseCodeOptions"
-              clearable
-              placeholder="请选择响应状态"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="操作用户" path="clientUsername" span="6 s:3 m:2">
-            <n-input
-              v-model:value="listParams.clientUsername"
-              clearable
-              placeholder="按用户名搜索"
-              @clear="getDataList"
-              @keyup.enter="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="客户端IP" path="clientIp" span="6 s:3 m:2">
-            <n-input
-              v-model:value="listParams.clientIp"
-              clearable
-              placeholder="按IP搜索"
-              @clear="getDataList"
-              @keyup.enter="getDataList"
-            />
-          </n-form-item-gi>
-          <n-form-item-gi label="时间范围" path="dateRange" span="6 s:3 m:2">
-            <n-date-picker
-              v-model:value="dateRange"
-              type="datetimerange"
-              clearable
-              style="width: 100%"
-              @update:value="handleDateRangeChange"
-            />
-          </n-form-item-gi>
-        </n-grid>
+        <n-form-item label="操作类型" path="operationType">
+          <n-select
+            v-model:value="listParams.operationType"
+            :options="systemLogOperTypeRef"
+            clearable
+            placeholder="请选择操作类型"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="操作分组" path="operationGroup">
+          <n-select
+            v-model:value="listParams.operationGroup"
+            :options="operationGroupOptions"
+            clearable
+            placeholder="请选择操作分组"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="响应状态" path="responseCode">
+          <n-select
+            v-model:value="listParams.responseCode"
+            :options="responseCodeOptions"
+            clearable
+            placeholder="请选择响应状态"
+            @update:value="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="操作用户" path="clientUsername">
+          <n-input
+            v-model:value="listParams.clientUsername"
+            clearable
+            placeholder="按用户名搜索"
+            @clear="getDataList"
+            @keyup.enter="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="客户端IP" path="clientIp">
+          <n-input
+            v-model:value="listParams.clientIp"
+            clearable
+            placeholder="按IP搜索"
+            @clear="getDataList"
+            @keyup.enter="getDataList"
+          />
+        </n-form-item>
+        <n-form-item label="时间范围" path="dateRange">
+          <n-date-picker
+            v-model:value="dateRange"
+            type="datetimerange"
+            clearable
+            style="width: 100%"
+            @update:value="handleDateRangeChange"
+          />
+        </n-form-item>
       </n-form>
     </strix-block>
 
@@ -176,7 +162,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :title="_baseName"
@@ -190,9 +176,7 @@
     <!-- 清理确认对话框 -->
     <n-modal v-model:show="showCleanupModal" preset="card" title="清理操作日志" style="width: 480px">
       <n-space vertical :size="16">
-        <n-alert type="warning">
-          清理操作不可恢复，请确认要删除的日志时间范围。
-        </n-alert>
+        <n-alert type="warning"> 清理操作不可恢复，请确认要删除的日志时间范围。 </n-alert>
         <n-date-picker
           v-model:value="cleanupRange"
           type="datetimerange"

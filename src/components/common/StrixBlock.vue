@@ -1,11 +1,26 @@
 <template>
   <div
     :class="['strix-block', { expanded: isExpanded, hovering }]"
+    :style="{ '--strix-search-field-min': searchFieldMin, '--strix-filter-field-min': filterFieldMin }"
     @mouseenter="hovering = true"
     @mouseleave="hovering = false"
   >
-    <!-- 主内容区 -->
-    <div class="strix-block__body">
+    <!-- 工具栏：搜索区 + 操作区（响应式 flex，按容器自身宽度自适应换行） -->
+    <div v-if="$slots.search || $slots.actions" class="strix-block__toolbar">
+      <div v-if="$slots.search" class="strix-block__toolbar-search">
+        <slot name="search" />
+      </div>
+      <div v-if="$slots.actions" class="strix-block__toolbar-actions">
+        <slot name="actions" />
+      </div>
+    </div>
+
+    <!-- 主内容区（额外内容，如提示 alert；与工具栏可并存） -->
+    <div
+      v-if="$slots.body"
+      class="strix-block__body"
+      :class="{ 'strix-block__body__no_top': $slots.search || $slots.actions }"
+    >
       <slot name="body" />
     </div>
 
@@ -70,7 +85,11 @@ import type { ActiveFilter } from '@/composables/useFilterState'
 defineProps({
   cleanable: { type: Boolean, default: false },
   activeFilters: { type: Array as PropType<ActiveFilter[]>, default: () => [] },
-  activeFilterCount: { type: Number, default: 0 }
+  activeFilterCount: { type: Number, default: 0 },
+  // 搜索区每个字段的最小宽度（低于此宽度则换行），可按页面需要覆盖
+  searchFieldMin: { type: String, default: '220px' },
+  // 展开筛选区每列的最小宽度（决定自适应列数）
+  filterFieldMin: { type: String, default: '260px' }
 })
 defineEmits(['clear', 'clear-filter'])
 const slots = useSlots()
@@ -122,6 +141,46 @@ watch(isExpanded, (val) => {
 // ---- 主体内容 ----
 .strix-block__body {
   padding: $space-4;
+
+  &__no_top {
+    padding-top: 0;
+  }
+}
+
+// ---- 工具栏：搜索区 + 操作区 ----
+.strix-block__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: $space-3;
+  padding: $space-4;
+}
+
+// 搜索区：弹性占据剩余空间，内部字段按容器宽度自适应换行（不依赖断点）
+.strix-block__toolbar-search {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2 $space-3;
+
+  // 每个搜索字段（n-input / n-select / n-input-group 等）：有空间则并排，窄则换行
+  > :deep(*) {
+    flex: 1 1 var(--strix-search-field-min);
+    min-width: 0;
+  }
+}
+
+// 操作区：内容自适应宽度，靠右对齐；一行放不下时整体作为紧凑块换行
+.strix-block__toolbar-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-2;
 }
 
 // ---- 活跃筛选标签 ----
@@ -150,6 +209,13 @@ watch(isExpanded, (val) => {
   .expanded & {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  // 展开筛选区：表单项按容器宽度自适应分列（auto-fill，不依赖断点）
+  :deep(.n-form) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--strix-filter-field-min), 1fr));
+    gap: $space-1 $space-5;
   }
 }
 

@@ -7,26 +7,28 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="listParams.keyword" clearable placeholder="请输入搜索条件（任务名称）"
-                     @keydown.enter="handleKeywordEnter" />
-          </n-gi>
-          <n-gi :span="1">
-            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-          </n-gi>
-          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="请输入搜索条件（任务名称）"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
       </template>
     </strix-block>
 
@@ -43,10 +45,7 @@
     />
 
     <StrixBatchBar :count="selectedCount" @clear="clearSelection">
-      <n-popselect
-        :options="jobStatusRef"
-        @update:value="(v: number) => batchModify('status', String(v))"
-      >
+      <n-popselect :options="jobStatusRef" @update:value="(v: number) => batchModify('status', String(v))">
         <n-button size="small" quaternary type="primary">
           <template #icon>
             <strix-icon icon="toggle-left" :size="14" />
@@ -64,7 +63,7 @@
 
     <strix-export-dialog
       v-model:show="showExportDialog"
-      :columns="(dataColumns as unknown as DataTableColumns)"
+      :columns="dataColumns as unknown as DataTableColumns"
       :data="dataRef || []"
       :fetch-all-data="fetchAllData"
       :selected-rows="selectedRows"
@@ -283,9 +282,7 @@ const {
   api: jobApi,
   draftKey: 'ModuleJob',
   batch: true,
-  filters: [
-    { key: 'keyword', label: '关键词' }
-  ],
+  filters: [{ key: 'keyword', label: '关键词' }],
   urlSync: true,
   schemaDto: 'JobUpdateReq'
 })
@@ -372,9 +369,7 @@ const {
 const dataRef = ref<JobItem[]>()
 const dataLoading = ref(true)
 
-const selectedRows = computed(() =>
-  dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? []
-)
+const selectedRows = computed(() => dataRef.value?.filter((row) => checkedRowKeys.value.includes(row.id)) ?? [])
 // 加载数据
 const getDataList = () => {
   dataLoading.value = true
@@ -389,11 +384,8 @@ const getDataList = () => {
 }
 onMounted(getDataList)
 
-
-
 const runJob = (id: string) => {
-  jobApi.run(id).then(() => {
-  })
+  jobApi.run(id).then(() => {})
 }
 </script>
 

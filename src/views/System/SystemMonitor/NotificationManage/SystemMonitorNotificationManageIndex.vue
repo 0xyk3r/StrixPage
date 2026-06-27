@@ -33,37 +33,32 @@
 
     <!-- 搜索与操作栏 -->
     <strix-block>
-      <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input v-model:value="keyword" clearable placeholder="按标题搜索" @keydown.enter="loadData(1)" />
-          </n-gi>
-          <n-gi span="6 s:3 m:1">
-            <n-select
-              v-model:value="statusFilter"
-              :options="statusOptions"
-              clearable
-              placeholder="状态"
-              @update:value="loadData(1)"
-            />
-          </n-gi>
-          <n-gi span="6 s:6 m:3" class="nebula-export__trigger-gi">
-            <n-space align="center" :size="4">
-              <n-button
-                v-auth="'system:monitor:notification:terminate'"
-                :disabled="checkedRowKeys.length === 0"
-                type="error"
-                @click="handleBatchTerminate"
-              >
-                批量终止 ({{ checkedRowKeys.length }})
-              </n-button>
-              <n-button v-auth="'system:monitor:notification:send'" type="primary" @click="showSendModal = true">
-                发送通知
-              </n-button>
-              <n-button :loading="loading" quaternary type="primary" @click="loadData(1)"> 刷新</n-button>
-            </n-space>
-          </n-gi>
-        </n-grid>
+      <template #search>
+        <n-input-group>
+          <n-select
+            v-model:value="statusFilter"
+            :options="statusOptions"
+            clearable
+            placeholder="状态"
+            style="width: 140px; flex: 0 0 auto"
+            @update:value="loadData(1)"
+          />
+          <n-input v-model:value="keyword" clearable placeholder="按标题搜索" @keydown.enter="loadData(1)" />
+        </n-input-group>
+      </template>
+      <template #actions>
+        <n-button
+          v-auth="'system:monitor:notification:terminate'"
+          :disabled="checkedRowKeys.length === 0"
+          type="error"
+          @click="handleBatchTerminate"
+        >
+          批量终止 ({{ checkedRowKeys.length }})
+        </n-button>
+        <n-button v-auth="'system:monitor:notification:send'" type="primary" @click="showSendModal = true">
+          发送通知
+        </n-button>
+        <n-button :loading="loading" quaternary type="primary" @click="loadData(1)"> 刷新</n-button>
       </template>
     </strix-block>
 

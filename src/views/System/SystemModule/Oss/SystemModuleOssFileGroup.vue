@@ -7,46 +7,44 @@
       @clear="clearSearch"
       @clear-filter="clearFilter"
     >
+      <template #search>
+        <n-input
+          v-model:value="listParams.keyword"
+          clearable
+          placeholder="按名称搜索"
+          @keydown.enter="handleKeywordEnter"
+        />
+      </template>
+      <template #actions>
+        <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
+        <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
+          <template #icon>
+            <strix-icon icon="columns-3" :size="16" />
+          </template>
+          列配置
+        </n-button>
+        <n-button quaternary type="primary" @click="showExportDialog = true">
+          <template #icon>
+            <strix-icon icon="download" :size="16" />
+          </template>
+          导出
+        </n-button>
+      </template>
       <template #body>
-        <n-grid :cols="6" :x-gap="20" :y-gap="10" item-responsive responsive="screen">
-          <n-gi span="6 s:3 m:2">
-            <n-input
-              v-model:value="listParams.keyword"
-              clearable
-              placeholder="按名称搜索"
-              @keydown.enter="handleKeywordEnter"
-            />
-          </n-gi>
-          <n-gi :span="1">
-            <n-button type="primary" @click="showAdd()"> 添加{{ _baseName }}</n-button>
-          </n-gi>
-          <n-gi span="6 s:2 m:3" class="nebula-export__trigger-gi">
-            <n-button quaternary type="primary" @click="showColumnPanel = !showColumnPanel">
-              <template #icon><strix-icon icon="columns-3" :size="16" /></template>
-              列配置
-            </n-button>
-            <n-button quaternary type="primary" @click="showExportDialog = true">
-              <template #icon><strix-icon icon="download" :size="16" /></template>
-              导出
-            </n-button>
-          </n-gi>
-        </n-grid>
-        <n-alert style="margin-top: 15px" title="提醒" type="warning">
+        <n-alert title="提醒" type="warning">
           文件分组与文件属于强绑定模式，所以文件组创建后不建议进行修改或删除操作，删除会导致该文件组下所有文件无法获取。
         </n-alert>
       </template>
       <n-form :model="listParams" :show-feedback="false" label-placement="left" label-width="auto">
-        <n-grid :cols="6" :x-gap="20" :y-gap="5" item-responsive responsive="screen">
-          <n-form-item-gi label="存储配置 Key" path="configKey" span="6 s:3 m:2">
-            <n-select
-              v-model:value="listParams.configKey"
-              :options="ossConfigSelectList"
-              clearable
-              placeholder="请选择存储配置 Key"
-              @update:value="getDataList"
-            />
-          </n-form-item-gi>
-        </n-grid>
+        <n-form-item label="存储配置 Key" path="configKey">
+          <n-select
+            v-model:value="listParams.configKey"
+            :options="ossConfigSelectList"
+            clearable
+            placeholder="请选择存储配置 Key"
+            @update:value="getDataList"
+          />
+        </n-form-item>
       </n-form>
     </strix-block>
 
