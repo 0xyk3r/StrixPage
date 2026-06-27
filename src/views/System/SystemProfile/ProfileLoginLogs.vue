@@ -1,21 +1,16 @@
 <template>
   <div class="profile-logs">
     <div class="profile-section__title">登录记录</div>
-    <div class="profile-logs__desc">仅展示当前账号的登录历史，最近 {{ pagination.pageSize }} 条</div>
+    <div class="profile-logs__desc">展示当前账号的登录历史</div>
 
     <n-data-table
       :columns="columns"
       :data="logList"
       :loading="loading"
       :pagination="pagination"
+      :scroll-x="1200"
       remote
       style="margin-top: 12px"
-      @update:page="
-        (p) => {
-          pagination.page = p
-          loadLogs()
-        }
-      "
     />
   </div>
 </template>
@@ -31,30 +26,39 @@ const pagination = reactive({
   page: 1,
   pageSize: 15,
   itemCount: 0,
-  showQuickJumper: true
+  showQuickJumper: true,
+  onChange: (page: number) => {
+    pagination.page = page
+    loadLogs()
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    pagination.pageSize = pageSize
+    pagination.page = 1
+    loadLogs()
+  }
 })
 
 const columns: DataTableColumns<LoginLogItem> = [
   {
     title: '登录时间',
     key: 'operationTime',
-    width: 180,
+    width: 240,
     render: (row) => row.operationTime?.replace('T', ' ') ?? '-'
   },
   {
     title: 'IP 地址',
     key: 'clientIp',
-    width: 150
+    width: 200
   },
   {
     title: '设备/系统',
     key: 'clientDevice',
-    width: 160
+    width: 320
   },
   {
     title: '状态',
     key: 'responseCode',
-    width: 100,
+    width: 120,
     align: 'center',
     render: (row) =>
       h(NTag, { type: row.responseCode === 200 ? 'success' : 'error', size: 'small' }, () =>

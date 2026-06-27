@@ -1,7 +1,14 @@
 <template>
   <div class="profile-security">
     <div class="profile-section__title">修改密码</div>
-    <n-form ref="formRef" :model="form" :rules="rules" label-placement="left" label-width="90" style="max-width: 420px">
+    <n-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      label-placement="left"
+      label-width="100"
+      style="max-width: 420px"
+    >
       <n-form-item label="当前密码" path="oldPassword">
         <n-input
           v-model:value="form.oldPassword"
@@ -38,12 +45,12 @@
 
     <n-divider />
 
-    <div class="profile-section__title">Token 状态</div>
+    <div class="profile-section__title">登录凭证状态</div>
     <n-descriptions :column="1" label-placement="left" bordered style="max-width: 420px">
-      <n-descriptions-item label="当前 Token">
+      <n-descriptions-item label="当前登陆状态">
         <n-tag type="success" size="small">有效</n-tag>
       </n-descriptions-item>
-      <n-descriptions-item label="到期时间">{{ tokenExpire }}</n-descriptions-item>
+      <n-descriptions-item label="凭证到期时间">{{ tokenExpire }}</n-descriptions-item>
     </n-descriptions>
   </div>
 </template>

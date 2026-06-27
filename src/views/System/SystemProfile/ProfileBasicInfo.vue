@@ -39,7 +39,7 @@
       :model="nicknameForm"
       :rules="nicknameRules"
       label-placement="left"
-      label-width="80"
+      label-width="100"
       style="max-width: 420px"
     >
       <n-form-item label="当前昵称" path="nickname">
