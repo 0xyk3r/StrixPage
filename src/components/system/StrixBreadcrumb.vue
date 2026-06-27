@@ -26,8 +26,8 @@
 
 <script lang="ts" setup>
 import StrixIcon from '@/components/icon/StrixIcon.vue'
-import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
-import { replaceDynamicName } from '@/utils/dynamic-component-util.ts'
+import { useStrixSettingsStore } from '@/stores/strix-settings'
+import { replaceDynamicName } from '@/utils/dynamic-component-util'
 import { storeToRefs } from 'pinia'
 import type { RouteLocationMatched } from 'vue-router'
 

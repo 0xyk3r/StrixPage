@@ -1,3 +1,4 @@
+import type { RetResult } from '@/api/types'
 import { http } from '@/plugins/axios'
 import { callOnce } from './strix-cache-call'
 
@@ -19,18 +20,7 @@ export interface RegionSelectOption {
   value: string
 }
 
-/**
- * 地区列表响应
- */
-interface ListRegionResponse {
-  code: number
-  msg: string
-  data: {
-    items: RegionItem[]
-  }
-}
-
-// 地区数据缓存
+// 地区数据缓存（模块级，应用生命周期内有效）
 let regionCache: RegionItem[] | null = null
 
 /**
@@ -38,14 +28,12 @@ let regionCache: RegionItem[] | null = null
  * @returns 地区列表
  */
 export async function getRegionList(): Promise<RegionItem[]> {
-  // 如果已有缓存，直接返回
   if (regionCache) {
     return regionCache
   }
 
-  // 使用 callOnce 避免短时间内重复请求
   const fetchRegions = async () => {
-    const { data: res } = await http.get<ListRegionResponse>('zjjg/common/region', {
+    const { data: res } = await http.get<RetResult<{ items: RegionItem[] }>>('zjjg/common/region', {
       meta: { operate: '获取地区列表', notify: false }
     })
     return res.data?.items || []
@@ -156,32 +144,4 @@ export async function refreshRegionCache(): Promise<RegionItem[]> {
 export async function createRegionIdNameMap(): Promise<Map<string, string>> {
   const regions = await getRegionList()
   return new Map(regions.map((item) => [item.id, item.name]))
-}
-
-/**
- * 使用组合式API方式获取地区选项
- * 适用于Vue组件中使用
- * @returns 响应式的地区选项ref
- */
-export function useRegionOptions() {
-  const options = ref<RegionSelectOption[]>([])
-  const loading = ref(false)
-
-  const loadOptions = async () => {
-    loading.value = true
-    try {
-      options.value = await convertToRegionOptions()
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // 自动加载
-  loadOptions()
-
-  return {
-    options,
-    loading,
-    refresh: loadOptions
-  }
 }

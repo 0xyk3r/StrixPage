@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 import { useNotificationStore } from '@/stores/notification'
 import { useSseStore } from '@/stores/sse'
-import type { NotificationItem } from '@/@types/components/notification'
+import type { NotificationItem } from '@/api/notification'
 import { createStrixMessage } from '@/utils/strix-message'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 import StrixNotificationList from '@/components/notification/StrixNotificationList.vue'

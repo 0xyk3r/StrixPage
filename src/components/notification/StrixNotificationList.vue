@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { NotificationItem as NotificationItemType } from '@/@types/components/notification'
+import type { NotificationItem as NotificationItemType } from '@/api/notification'
 import StrixNotificationItem from './StrixNotificationItem.vue'
 import StrixIcon from '@/components/icon/StrixIcon.vue'
 

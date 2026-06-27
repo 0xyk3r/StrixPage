@@ -24,6 +24,8 @@ export function useTokenRenewal() {
     if (expireTime - currentTime < thirtyDaysInMs) {
       authApi.renewToken().then(({ data: res }) => {
         loginInfoStore.updateLoginInfo(res)
+      }).catch((e) => {
+        console.warn('[Token续签] 续签失败，Token 将在过期后无效:', e)
       })
     }
   }

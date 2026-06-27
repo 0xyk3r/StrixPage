@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useStrixSettingsStore } from '@/stores/strix-settings.ts'
+import { useStrixSettingsStore } from '@/stores/strix-settings'
 import { storeToRefs } from 'pinia'
 import type { ActiveFilter } from '@/composables/useFilterState'
 

@@ -11,9 +11,9 @@ export const deepSearch = <T extends Record<string, any>>(
   value: string,
   key: string = 'id',
   sub: string = 'children'
-): T | false | null => {
+): T | null => {
   if (!value || !data) {
-    return false
+    return null
   }
   for (const node of data) {
     if (node[key] === value) {
@@ -48,7 +48,7 @@ export const flatTree = <T extends Record<string, any>>(data: T[], sub = 'childr
   data.forEach((item) => {
     res.push(item)
     if (item[sub] && item[sub].length > 0) {
-      flatTree(item.children, sub, res)
+      flatTree(item[sub], sub, res)
     }
   })
   return res

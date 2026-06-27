@@ -51,9 +51,9 @@
 
 <script lang="ts" setup>
 import { authApi } from '@/api/auth'
-import { EventBus } from '@/plugins/event-bus.ts'
-import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
-import { createStrixMessage } from '@/utils/strix-message.ts'
+import { EventBus } from '@/plugins/event-bus'
+import { type LoginInfoRefs, useLoginInfoStore } from '@/stores/login-info'
+import { createStrixMessage } from '@/utils/strix-message'
 import { storeToRefs } from 'pinia'
 import screenfull from 'screenfull'
 import StrixAvatar from '@/components/common/StrixAvatar.vue'
@@ -61,7 +61,7 @@ import StrixAvatar from '@/components/common/StrixAvatar.vue'
 const router = useRouter()
 const loginInfoStore = useLoginInfoStore()
 
-const { loginInfo } = storeToRefs(loginInfoStore) as LoginInfoStore
+const { loginInfo } = storeToRefs(loginInfoStore) as unknown as LoginInfoRefs
 
 // 用户菜单
 const showUserMenu = ref(false)

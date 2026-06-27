@@ -85,3 +85,45 @@ export function numberField(label: string, opts?: { min?: number; max?: number }
   }
   return rules
 }
+
+/** 邮箱字段：必填 + 格式校验 */
+export function emailField(label: string, opts?: { required?: boolean }): FormItemRule[] {
+  const rules: FormItemRule[] = []
+  if (opts?.required !== false) {
+    rules.push(requiredInput(label))
+  }
+  rules.push({
+    type: 'email',
+    message: `请输入有效的${label}地址`,
+    trigger: 'blur'
+  })
+  return rules
+}
+
+/** 手机号字段：可选必填 + 格式校验（中国大陆） */
+export function phoneField(label: string, opts?: { required?: boolean }): FormItemRule[] {
+  const rules: FormItemRule[] = []
+  if (opts?.required !== false) {
+    rules.push(requiredInput(label))
+  }
+  rules.push({
+    pattern: /^1[3-9]\d{9}$/,
+    message: `请输入有效的${label}（11位手机号）`,
+    trigger: 'blur'
+  })
+  return rules
+}
+
+/** URL 字段：可选必填 + 格式校验 */
+export function urlField(label: string, opts?: { required?: boolean }): FormItemRule[] {
+  const rules: FormItemRule[] = []
+  if (opts?.required !== false) {
+    rules.push(requiredInput(label))
+  }
+  rules.push({
+    type: 'url',
+    message: `请输入有效的${label}（以 http:// 或 https:// 开头）`,
+    trigger: 'blur'
+  })
+  return rules
+}

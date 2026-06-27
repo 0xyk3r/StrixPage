@@ -97,10 +97,10 @@
 </template>
 
 <script lang="ts" setup>
-import { EventBus } from '@/plugins/event-bus.ts'
-import { useQuickMenuStore } from '@/stores/quick-menu.ts'
-import { useTabsBarStore } from '@/stores/tabs-bar.ts'
-import { useBookmarksStore } from '@/stores/bookmarks.ts'
+import { EventBus } from '@/plugins/event-bus'
+import { useQuickMenuStore } from '@/stores/quick-menu'
+import { useTabsBarStore } from '@/stores/tabs-bar'
+import { useBookmarksStore } from '@/stores/bookmarks'
 import { storeToRefs } from 'pinia'
 import { useDraggable } from 'vue-draggable-plus'
 import StrixIcon from '@/components/icon/StrixIcon.vue'

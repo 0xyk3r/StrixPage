@@ -14,7 +14,7 @@
 </template>
 <script lang="ts" setup>
 import type { StrixNameFetcherProps } from '@/@types/components/StrixNameFetcher'
-import { callOnce } from '@/utils/strix-cache-call.ts'
+import { callOnce } from '@/utils/strix-cache-call'
 import { commonApi } from '@/api/common'
 
 const { dataType, dataId } = defineProps<StrixNameFetcherProps>()

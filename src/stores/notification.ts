@@ -1,6 +1,5 @@
+import type { ListNotificationReq, NotificationListResp } from '@/api/notification'
 import { notificationApi } from '@/api/notification'
-import type { ListNotificationReq } from '@/api/notification'
-import type { NotificationListResp } from '@/@types/components/notification'
 import { defineStore } from 'pinia'
 
 /**
@@ -22,33 +21,18 @@ export const useNotificationStore = defineStore('notification', () => {
     }
   }
 
-  async function fetchNotifications(params: ListNotificationReq) {
-    try {
-      const { data: res } = await notificationApi.list(params)
-      return res.data as NotificationListResp
-    } catch (error) {
-      console.error('获取通知列表失败:', error)
-      throw error
-    }
+  async function fetchNotifications(params: ListNotificationReq): Promise<NotificationListResp> {
+    const { data: res } = await notificationApi.list(params)
+    return res.data
   }
 
   async function markAsRead(notificationId: string) {
-    try {
-      await notificationApi.markRead(notificationId)
-    } catch (error) {
-      console.error('标记通知为已读失败:', error)
-      throw error
-    }
+    await notificationApi.markRead(notificationId)
   }
 
   async function markAllAsRead() {
-    try {
-      await notificationApi.markAllRead()
-      unreadCount.value = 0
-    } catch (error) {
-      console.error('标记全部通知为已读失败:', error)
-      throw error
-    }
+    await notificationApi.markAllRead()
+    unreadCount.value = 0
   }
 
   return {

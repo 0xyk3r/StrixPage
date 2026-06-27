@@ -13,10 +13,10 @@ import { shallowRef } from 'vue'
 // 主题配置（与 App.vue 保持一致）
 const lightThemeOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: '#18a058',
-    primaryColorHover: '#36ad6a',
-    primaryColorPressed: '#0c7a43',
-    primaryColorSuppl: '#36ad6a'
+    primaryColor: '#2db48c',
+    primaryColorHover: '#3bc49d',
+    primaryColorPressed: '#24a07c',
+    primaryColorSuppl: '#3bb5a5'
   }
 }
 

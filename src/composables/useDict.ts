@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { type DictItem, useDictStore } from '@/stores/dict.ts'
+import { type DictItem, useDictStore } from '@/stores/dict'
 
 /**
  * 字典数据 Composable (完整版)
@@ -43,11 +43,6 @@ export function useDictFull(dictName: string) {
 export function useDict(dictName: string) {
   return useDictFull(dictName).data
 }
-
-/**
- * @deprecated 请使用 useDict
- */
-export const useDictData = useDict
 
 /**
  * 级联字典数据 Composable

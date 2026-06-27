@@ -11,9 +11,5 @@ export const initStrixLoadingBar = (naiveLoadingBar: LoadingBarApiInjection) => 
 }
 
 export const controlStrixLoadingBar = (state: LoadingBarState): void => {
-  if (loadingBar != null) {
-    if (state === 'start' || state === 'finish' || state === 'error') {
-      loadingBar[state]()
-    }
-  }
+  loadingBar?.[state]()
 }

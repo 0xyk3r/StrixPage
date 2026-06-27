@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useQuickMenuStore } from '@/stores/quick-menu.ts'
+import { useQuickMenuStore } from '@/stores/quick-menu'
 import { storeToRefs } from 'pinia'
 
 const quickMenuStore = useQuickMenuStore()

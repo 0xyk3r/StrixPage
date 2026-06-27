@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import type { NTagType } from '@/@types/naive-ui'
-import { useDict } from '@/composables/useDict.ts'
+import { useDict } from '@/composables/useDict'
 import NebulaTag from '@/components/common/NebulaTag.vue'
 
 const { value, dictName, notFoundLabel } = defineProps({

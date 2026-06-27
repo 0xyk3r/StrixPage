@@ -3,7 +3,7 @@
 </template>
 <script lang="ts" setup>
 import { commonApi } from '@/api/common'
-import { convertBlob } from '@/utils/strix-file-util.ts'
+import { convertBlob } from '@/utils/strix-file-util'
 
 const { value } = defineProps({
   value: { type: [String, Number], required: true },

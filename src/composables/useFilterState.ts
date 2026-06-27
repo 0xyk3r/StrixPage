@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es'
-import { useDictStore } from '@/stores/dict.ts'
+import { useDictStore } from '@/stores/dict'
 import { deepSearch } from '@/utils/strix-tools'
 
 export interface FilterDefinition {

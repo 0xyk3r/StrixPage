@@ -13,8 +13,7 @@ import router from './router'
 // pinia 持久化插件
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-import auth from './directives/auth.ts'
-import StrixEmpty from './components/common/StrixEmpty.vue'
+import auth from './directives/auth'
 
 const app = createApp(App)
 
@@ -32,8 +31,5 @@ app.use(router)
 
 // 注册全局指令
 app.directive('auth', auth)
-
-// 注册全局组件
-app.component('StrixEmpty', StrixEmpty)
 
 app.mount('#app')

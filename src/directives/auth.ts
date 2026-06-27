@@ -1,4 +1,4 @@
-import { useLoginInfoStore } from '@/stores/login-info.ts'
+import { useLoginInfoStore } from '@/stores/login-info'
 import type { DirectiveBinding } from 'vue'
 import { watchEffect } from 'vue'
 

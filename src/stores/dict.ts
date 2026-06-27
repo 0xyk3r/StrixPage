@@ -1,5 +1,5 @@
+import type { CommonDictDataItem, CommonDictResp, DictVersionItem } from '@/api/common'
 import { commonApi } from '@/api/common'
-import type { DictVersionItem, CommonDictDataItem, CommonDictResp } from '@/api/common'
 import { throttle } from 'lodash-es'
 import { defineStore } from 'pinia'
 
@@ -128,35 +128,47 @@ export const useDictStore = defineStore(
   }
 )
 
+/** 字典数据类型枚举（与后端 DictDataType 枚举对应） */
+const enum DictDataType {
+  STRING = 1,
+  INTEGER = 2,
+  LONG = 3,
+  FLOAT = 4,
+  DOUBLE = 5,
+  BOOLEAN = 6,
+  SHORT = 7,
+  BYTE = 8,
+  DATE = 9,
+  JSON = 10,
+  ENUM_SET = 11
+}
+
 function convertType(value: string, typeName: number) {
   switch (typeName) {
-    case 1:
+    case DictDataType.STRING:
       return String(value)
-    case 2:
+    case DictDataType.INTEGER:
+    case DictDataType.LONG:
       return Number(value)
-    case 3:
-      return Number(value)
-    case 4:
+    case DictDataType.FLOAT:
+    case DictDataType.DOUBLE:
       return parseFloat(value)
-    case 5:
-      return parseFloat(value)
-    case 6:
+    case DictDataType.BOOLEAN:
       return Boolean(value)
-    case 7:
+    case DictDataType.SHORT:
+    case DictDataType.BYTE:
       return parseInt(value)
-    case 8:
-      return parseInt(value)
-    case 9:
+    case DictDataType.DATE:
       return value // DATE: keep as ISO string
-    case 10: {
+    case DictDataType.JSON: {
       try {
         return JSON.parse(value)
       } catch {
         return value
       }
     }
-    case 11:
-      return value.split(',') // ENUM_SET
+    case DictDataType.ENUM_SET:
+      return value.split(',')
     default:
       return value
   }

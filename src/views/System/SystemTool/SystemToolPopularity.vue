@@ -183,7 +183,7 @@ import { handleOperate } from '@/utils/strix-table-tool'
 import { cloneDeep, debounce, pick } from 'lodash-es'
 import { type DataTableColumns, type FormInst, NInputNumber } from 'naive-ui'
 import { useFormSchema } from '@/composables/useFormSchema'
-import { usePagination } from '@/composables/usePagination.ts'
+import { usePagination } from '@/composables/usePagination'
 
 // 加载列表
 const dataRef = ref()

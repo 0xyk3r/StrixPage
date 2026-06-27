@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import { ArrowLeft, Home, ShieldAlert } from '@lucide/vue'
-import { useTabsBarStore } from '@/stores/tabs-bar.ts'
+import { useTabsBarStore } from '@/stores/tabs-bar'
 
 const route = useRoute()
 const router = useRouter()

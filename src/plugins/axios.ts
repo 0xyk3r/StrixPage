@@ -1,6 +1,6 @@
 import type { CancelableRequest } from '@/stores/http-canceler'
 import { useHttpCancelerStore } from '@/stores/http-canceler'
-import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info'
+import { type LoginInfoRefs, useLoginInfoStore } from '@/stores/login-info'
 import { useSseStore } from '@/stores/sse'
 import { decrypt, encrypt, signGet, signPost } from '@/utils/crypto'
 import { RateLimitError, StrixError } from '@/utils/strix-error'
@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia'
 import { parse as qsParse, stringify as qsStringify } from 'qs'
 import { v4 as uuidv4 } from 'uuid'
 import { type Ref } from 'vue'
-import { useBaseURL } from '@/composables/useBaseUrl.ts'
+import { useBaseURL } from '@/composables/useBaseUrl'
 import router from '@/router'
 
 // 扩展 axios 类型定义
@@ -34,7 +34,7 @@ let token: Ref<any> | null = null
 function initStore() {
   if (!loginInfoStore) {
     loginInfoStore = useLoginInfoStore()
-    const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
+    const { loginToken } = storeToRefs(loginInfoStore) as unknown as LoginInfoRefs
     token = loginToken
   }
   if (!httpCancelerStore) {
@@ -249,9 +249,7 @@ axios.interceptors.response.use(
  * @returns 完整的签名URL
  */
 function buildSignUrl(url: string | undefined): string {
-  if (!url) {
-    return url || ''
-  }
+  if (!url) return ''
 
   // 确保 url 以斜杠开头
   return url.startsWith('/') ? url : '/' + url

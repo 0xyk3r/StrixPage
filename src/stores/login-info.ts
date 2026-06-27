@@ -3,7 +3,7 @@ import type { RetResult } from '@/api/types'
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
 
-export interface LoginInfoStore {
+export interface LoginInfoRefs {
   loginToken: Ref<string>
   loginTokenExpire: Ref<string>
   loginInfo: Ref<LoginManagerInfo>

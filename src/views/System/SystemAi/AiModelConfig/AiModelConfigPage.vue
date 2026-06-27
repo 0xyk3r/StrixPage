@@ -57,7 +57,7 @@ import type { AiModelConfigResp } from '@/api/ai'
 import { aiApi } from '@/api/ai'
 import AiModelConfigForm from './AiModelConfigForm.vue'
 import { useTableColumns } from '@/composables/useTableColumns'
-import { handleOperate } from '@/utils/strix-table-tool.ts'
+import { handleOperate } from '@/utils/strix-table-tool'
 
 const message = useMessage()
 

@@ -1,5 +1,5 @@
 import { sm3 } from 'sm-crypto'
-import { enc } from '@/utils/sm-crypto'
+import { encrypt } from '@/utils/crypto'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useBaseURL } from '@/composables/useBaseUrl'
 
@@ -137,7 +137,7 @@ export async function streamAiMessage(
   // SM3 签名（对原始明文 body 签名，与 axios.ts 中逻辑一致）
   const bodyString = JSON.stringify(body)
   const sign = sm3(bodyString + '|' + signUrl + '|' + timestamp)
-  const encBody = enc(body)
+  const encBody = encrypt(body)
 
   let response: Response
   try {
@@ -187,7 +187,7 @@ export async function streamFimRequest(
 
   const bodyString = JSON.stringify(body)
   const sign = sm3(bodyString + '|' + signUrl + '|' + timestamp)
-  const encBody = enc(body)
+  const encBody = encrypt(body)
 
   let response: Response
   try {

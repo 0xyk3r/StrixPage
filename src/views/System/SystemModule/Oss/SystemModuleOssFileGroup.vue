@@ -252,7 +252,7 @@ import { useDict } from '@/composables/useDict'
 import { createStrixMessage } from '@/utils/strix-message'
 import { handleOperate } from '@/utils/strix-table-tool'
 import { type DataTableColumns } from 'naive-ui'
-import { type LoginInfoStore, useLoginInfoStore } from '@/stores/login-info.ts'
+import { type LoginInfoRefs, useLoginInfoStore } from '@/stores/login-info'
 import { storeToRefs } from 'pinia'
 import StrixExportDialog from '@/components/common/StrixExportDialog.vue'
 import StrixColumnPanel from '@/components/common/StrixColumnPanel.vue'
@@ -268,7 +268,7 @@ const showExportDialog = ref(false)
 const fetchAllData = createPaginatedFetcher(ossApi.urls.fileGroupList, 'fileGroups', () => listParams.value)
 
 const loginInfoStore = useLoginInfoStore()
-const { loginToken } = storeToRefs(loginInfoStore) as LoginInfoStore
+const { loginToken } = storeToRefs(loginInfoStore) as unknown as LoginInfoRefs
 
 // 加载字典
 const ossFileGroupSecretTypeRef = useDict('OssFileGroupSecretType')

@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { getIconComponent } from '@/components/icon/iconLoader.ts'
+import { getIconComponent } from '@/components/icon/iconLoader'
 
 interface Props {
   icon?: string

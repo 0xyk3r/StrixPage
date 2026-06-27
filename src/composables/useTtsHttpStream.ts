@@ -1,5 +1,5 @@
 import { sm3 } from 'sm-crypto'
-import { enc } from '@/utils/sm-crypto'
+import { encrypt } from '@/utils/crypto'
 import { useLoginInfoStore } from '@/stores/login-info'
 import { useBaseURL } from '@/composables/useBaseUrl'
 
@@ -166,7 +166,7 @@ export function useTtsHttpStream() {
     const fetchUrl = `${useBaseURL()}system/ai/tts/synthesize/stream`
     const bodyString = JSON.stringify(body)
     const sign = sm3(bodyString + '|' + signUrl + '|' + timestamp)
-    const encBody = enc(body)
+    const encBody = encrypt(body)
 
     abortController = new AbortController()
     try {

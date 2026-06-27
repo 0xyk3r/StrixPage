@@ -6,7 +6,7 @@ import type { PaginationInfo } from 'naive-ui'
  * @param loadFunc 加载数据方法
  * @returns 分页配置
  */
-export const usePagination = (params: Ref<any>, loadFunc: () => void) => {
+export function usePagination(params: Ref<any>, loadFunc: () => void) {
   const dataPagination = reactive({
     page: params.value.pageIndex || 1,
     pageSize: params.value.pageSize || 10,
