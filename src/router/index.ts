@@ -254,6 +254,15 @@ const routes: RouteRecordRaw[] = [
               title: '热度工具',
               permission: 'system:tool'
             }
+          },
+          {
+            path: 'document-convert',
+            name: 'SystemToolDocumentConvert',
+            component: () => import('@/views/System/SystemTool/SystemToolDocumentConvert.vue'),
+            meta: {
+              title: '文档格式转换',
+              permission: 'system:tool:document:convert'
+            }
           }
         ]
       },

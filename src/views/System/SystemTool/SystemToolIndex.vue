@@ -69,6 +69,12 @@ const tools = [
     description: '用于配置浏览量、人气值等数据的算法，以及查看相应数据的原始数值的工具。',
     icon: 'flame',
     url: '/system/tool/popularity'
+  },
+  {
+    name: '文档格式转换',
+    description: '支持 Excel / PDF / PPT / Word 等 18 种格式转换，含文档转图片、HTML、Markdown 等能力。',
+    icon: 'file-cog',
+    url: '/system/tool/document-convert'
   }
 ]
 
@@ -123,13 +129,19 @@ const openTool = (url: string) => {
   cursor: pointer;
   overflow: hidden;
   animation: ts-card-in 0.5s var(--delay, 0s) both cubic-bezier(0.16, 1, 0.3, 1);
-  transition: border-color 0.25s, background 0.25s, transform 0.2s, box-shadow 0.25s;
+  transition:
+    border-color 0.25s,
+    background 0.25s,
+    transform 0.2s,
+    box-shadow 0.25s;
 
   &:hover {
     border-color: var(--strix-border-accent);
     background: var(--strix-bg-surface-hover);
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--strix-border-accent);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.15),
+      0 0 0 1px var(--strix-border-accent);
 
     .ts-card-glow {
       opacity: 1;
