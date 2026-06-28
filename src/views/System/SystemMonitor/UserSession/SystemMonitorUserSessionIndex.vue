@@ -1,29 +1,36 @@
-<template>
+﻿<template>
   <div>
-    <!-- 统计卡片 -->
-    <n-grid :x-gap="12" :y-gap="12" cols="2 s:2 m:3" responsive="screen" style="margin-bottom: 12px">
-      <n-gi>
-        <n-card size="small">
-          <n-statistic label="在线用户">
-            <n-number-animation :from="0" :to="sessionData?.onlineUserCount ?? 0" />
-          </n-statistic>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-statistic label="活跃会话数">
-            <n-number-animation :from="0" :to="sessionData?.totalSessionCount ?? 0" />
-          </n-statistic>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-statistic label="平均会话数">
-            <n-number-animation :from="0" :to="avgSessions" :precision="1" />
-          </n-statistic>
-        </n-card>
-      </n-gi>
-    </n-grid>
+    <div class="nbp-header">
+      <div class="nbp-header__left">
+        <div class="nbp-header__brand">
+          <span class="nbp-pulse-dot nbp-pulse-dot--info"></span>
+          <span class="nbp-mono-label nbp-mono-label--info">USER_SIGNAL</span>
+        </div>
+        <h2 class="nbp-page-title nbp-page-title--info">用户会话</h2>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="nbp-stats us-stats-3" style="margin-bottom: 12px">
+      <div class="nbp-stat-card us-stat-card">
+        <span class="nbp-hud-corner nbp-hud-corner--tl nbp-hud-corner--info"></span>
+        <span class="nbp-hud-corner nbp-hud-corner--br nbp-hud-corner--info"></span>
+        <div class="nbp-stat-card__label">在线用户</div>
+        <div class="nbp-stat-card__val us-blue">{{ sessionData?.onlineUserCount ?? 0 }}</div>
+      </div>
+      <div class="nbp-stat-card us-stat-card">
+        <span class="nbp-hud-corner nbp-hud-corner--tl nbp-hud-corner--info"></span>
+        <span class="nbp-hud-corner nbp-hud-corner--br nbp-hud-corner--info"></span>
+        <div class="nbp-stat-card__label">活跃会话数</div>
+        <div class="nbp-stat-card__val us-teal">{{ sessionData?.totalSessionCount ?? 0 }}</div>
+      </div>
+      <div class="nbp-stat-card us-stat-card">
+        <span class="nbp-hud-corner nbp-hud-corner--tl nbp-hud-corner--info"></span>
+        <span class="nbp-hud-corner nbp-hud-corner--br nbp-hud-corner--info"></span>
+        <div class="nbp-stat-card__label">平均会话数</div>
+        <div class="nbp-stat-card__val">{{ avgSessions }}</div>
+      </div>
+    </div>
 
     <!-- 搜索与操作栏 -->
     <strix-block>

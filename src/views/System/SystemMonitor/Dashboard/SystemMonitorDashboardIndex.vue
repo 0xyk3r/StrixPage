@@ -1,164 +1,159 @@
-<template>
-  <div class="page-container">
-    <!-- 控制栏 -->
-    <n-card class="control-card">
-      <n-space :wrap="false" align="center" justify="space-between">
-        <n-space align="center">
-          <n-text strong>活动仪表板</n-text>
-          <n-divider vertical />
-          <n-radio-group v-model:value="timeRange" size="small">
-            <n-radio-button value="today">今日</n-radio-button>
-            <n-radio-button value="7days">近7天</n-radio-button>
-            <n-radio-button value="30days">近30天</n-radio-button>
-          </n-radio-group>
-        </n-space>
+﻿<template>
+  <div class="dash">
+    <div class="nbp-header">
+      <div class="nbp-header__left">
+        <div class="nbp-header__brand">
+          <span class="nbp-pulse-dot"></span>
+          <span class="nbp-mono-label">MISSION_CONTROL</span>
+        </div>
+        <h2 class="nbp-page-title">活动仪表盘</h2>
+      </div>
+      <div class="dash-controls">
+        <div class="dash-time-group">
+          <button
+            v-for="opt in timeRangeOptions"
+            :key="opt.value"
+            :class="['dash-time-btn', { 'is-active': timeRange === opt.value }]"
+            @click="setTimeRange(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        </div>
+        <div class="dash-divider-v"></div>
+        <span v-if="lastUpdateTime" class="nbp-mono-xs nbp-dim">{{ lastUpdateTime }}</span>
+        <select v-model="refreshInterval" :disabled="!autoRefresh" class="nbp-select">
+          <option v-for="opt in intervalOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+        <button :class="['nbp-ctrl-btn', { 'is-active': autoRefresh }]" @click="toggleAutoRefresh">
+          {{ autoRefresh ? '⏸ 暂停' : '▶ 自动刷新' }}
+        </button>
+        <button class="nbp-ctrl-btn" :disabled="loading" @click="fetchData">
+          <span :class="{ 'nbp-spin': loading }">↻</span> 刷新
+        </button>
+      </div>
+    </div>
 
-        <n-space align="center">
-          <n-text depth="3" style="font-size: 13px">
-            {{ lastUpdateTime ? `最后更新: ${lastUpdateTime}` : '暂未加载' }}
-          </n-text>
-          <n-select
-            v-model:value="refreshInterval"
-            :disabled="!autoRefresh"
-            :options="intervalOptions"
-            size="small"
-            style="width: 140px"
-          />
-          <n-button :type="autoRefresh ? 'primary' : 'default'" size="small" @click="toggleAutoRefresh">
-            <template #icon>
-              <strix-icon :icon="autoRefresh ? 'pause' : 'play'" :size="16" />
-            </template>
-            {{ autoRefresh ? '暂停刷新' : '自动刷新' }}
-          </n-button>
-          <n-button :disabled="loading" :loading="loading" size="small" @click="fetchData">
-            <template #icon>
-              <strix-icon icon="refresh-cw" :size="16" />
-            </template>
-            刷新
-          </n-button>
-        </n-space>
-      </n-space>
-    </n-card>
+    <!-- Stats strip -->
+    <div class="nbp-stats">
+      <div v-for="stat in statCards" :key="stat.key" class="nbp-stat-card">
+        <span class="nbp-hud-corner nbp-hud-corner--tl"></span>
+        <span class="nbp-hud-corner nbp-hud-corner--br"></span>
+        <div class="nbp-stat-card__label">{{ stat.label }}</div>
+        <div class="nbp-stat-card__val" :style="{ color: stat.color }">
+          {{ stat.format ? stat.format(stat.val) : stat.val }}
+          <span v-if="stat.suffix" class="nbp-stat-card__suffix">{{ stat.suffix }}</span>
+        </div>
+        <div class="nbp-stat-card__meta">{{ stat.meta }}</div>
+      </div>
+    </div>
 
-    <!-- 统计卡片 -->
-    <n-grid :x-gap="12" :y-gap="12" cols="2 s:2 m:5" responsive="screen" style="margin-bottom: 12px">
-      <n-gi>
-        <n-card size="small">
-          <n-spin :show="loading">
-            <n-statistic label="今日操作">
-              <n-number-animation :from="0" :to="stats.todayCount" />
-            </n-statistic>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-spin :show="loading">
-            <n-statistic label="今日错误">
-              <n-number-animation :from="0" :to="stats.todayErrorCount" />
-            </n-statistic>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-spin :show="loading">
-            <n-statistic label="错误率">
-              <template #suffix>%</template>
-              <n-number-animation :from="0" :to="stats.errorRate" :precision="2" />
-            </n-statistic>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-spin :show="loading">
-            <n-statistic label="平均响应">
-              <template #suffix>ms</template>
-              <n-number-animation :from="0" :to="stats.avgResponseTime" />
-            </n-statistic>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card size="small">
-          <n-spin :show="loading">
-            <n-statistic label="活跃用户">
-              <n-number-animation :from="0" :to="stats.activeUserCount" />
-            </n-statistic>
-          </n-spin>
-        </n-card>
-      </n-gi>
-    </n-grid>
+    <!-- Charts: trend + hourly -->
+    <div class="dash-chart-row">
+      <div class="nbp-panel">
+        <div class="nbp-panel__head">
+          <span class="nbp-panel__title">操作趋势</span>
+          <span class="nbp-mono-label nbp-dim">TREND_ANALYSIS</span>
+        </div>
+        <n-spin :show="loading">
+          <div class="dash-chart-body">
+            <v-chart v-if="trendChartOptions" :option="trendChartOptions" autoresize class="dash-vchart" />
+            <div v-else-if="!loading" class="dash-chart-empty">暂无趋势数据</div>
+          </div>
+        </n-spin>
+      </div>
+      <div class="nbp-panel">
+        <div class="nbp-panel__head">
+          <span class="nbp-panel__title">今日小时分布</span>
+          <span class="nbp-mono-label nbp-dim">HOURLY_DIST</span>
+        </div>
+        <n-spin :show="loading">
+          <div class="dash-chart-body">
+            <v-chart v-if="hourlyChartOptions" :option="hourlyChartOptions" autoresize class="dash-vchart" />
+            <div v-else-if="!loading" class="dash-chart-empty">暂无数据</div>
+          </div>
+        </n-spin>
+      </div>
+    </div>
 
-    <!-- 趋势图 + 小时分布 -->
-    <n-grid :x-gap="12" :y-gap="12" cols="1 m:2" responsive="screen" style="margin-bottom: 12px">
-      <n-gi>
-        <n-card :segmented="{ content: true }" title="操作趋势">
-          <n-spin :show="loading">
-            <div class="chart-container">
-              <v-chart v-if="trendChartOptions" :option="trendChartOptions" autoresize class="strix-charts" />
-              <StrixEmpty v-else description="暂无趋势数据" />
-            </div>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card :segmented="{ content: true }" title="今日小时分布">
-          <n-spin :show="loading">
-            <div class="chart-container">
-              <v-chart v-if="hourlyChartOptions" :option="hourlyChartOptions" autoresize class="strix-charts" />
-              <StrixEmpty v-else description="暂无小时分布数据" />
-            </div>
-          </n-spin>
-        </n-card>
-      </n-gi>
-    </n-grid>
+    <!-- Charts: user rank + module rank -->
+    <div class="dash-chart-row">
+      <div class="nbp-panel">
+        <div class="nbp-panel__head">
+          <span class="nbp-panel__title">用户活跃排名</span>
+          <span class="nbp-mono-label nbp-dim">USER_RANK</span>
+        </div>
+        <n-spin :show="loading">
+          <div class="dash-chart-body">
+            <v-chart v-if="userRankChartOptions" :option="userRankChartOptions" autoresize class="dash-vchart" />
+            <div v-else-if="!loading" class="dash-chart-empty">暂无数据</div>
+          </div>
+        </n-spin>
+      </div>
+      <div class="nbp-panel">
+        <div class="nbp-panel__head">
+          <span class="nbp-panel__title">模块操作排名</span>
+          <span class="nbp-mono-label nbp-dim">MODULE_RANK</span>
+        </div>
+        <n-spin :show="loading">
+          <div class="dash-chart-body">
+            <v-chart v-if="moduleRankChartOptions" :option="moduleRankChartOptions" autoresize class="dash-vchart" />
+            <div v-else-if="!loading" class="dash-chart-empty">暂无数据</div>
+          </div>
+        </n-spin>
+      </div>
+    </div>
 
-    <!-- 排名图 -->
-    <n-grid :x-gap="12" :y-gap="12" cols="1 m:2" responsive="screen" style="margin-bottom: 12px">
-      <n-gi>
-        <n-card :segmented="{ content: true }" title="用户活跃排名">
-          <n-spin :show="loading">
-            <div class="chart-container">
-              <v-chart v-if="userRankChartOptions" :option="userRankChartOptions" autoresize class="strix-charts" />
-              <StrixEmpty v-else description="暂无用户排名数据" />
-            </div>
-          </n-spin>
-        </n-card>
-      </n-gi>
-      <n-gi>
-        <n-card :segmented="{ content: true }" title="模块操作排名">
-          <n-spin :show="loading">
-            <div class="chart-container">
-              <v-chart v-if="moduleRankChartOptions" :option="moduleRankChartOptions" autoresize class="strix-charts" />
-              <StrixEmpty v-else description="暂无模块排名数据" />
-            </div>
-          </n-spin>
-        </n-card>
-      </n-gi>
-    </n-grid>
-
-    <!-- 最近操作 -->
-    <n-card :segmented="{ content: true }" title="最近操作">
-      <n-spin :show="loading">
-        <n-data-table
-          :columns="recentColumns"
-          :data="data?.recentActivities || []"
-          :bordered="false"
-          :single-line="false"
-          size="small"
-          :pagination="false"
-        />
-      </n-spin>
-    </n-card>
+    <!-- Recent activities -->
+    <div class="nbp-panel">
+      <div class="nbp-panel__head">
+        <span class="nbp-panel__title">最近操作</span>
+        <span class="nbp-mono-label nbp-dim">RECENT_ACTIVITY</span>
+      </div>
+      <div class="nbp-table-wrap dash-act-table">
+        <div v-if="loading" class="nbp-loading-bar">
+          <div class="nbp-loading-bar__fill"></div>
+        </div>
+        <div class="nbp-thead dash-act-cols">
+          <div class="nbp-th">用户</div>
+          <div class="nbp-th">模块</div>
+          <div class="nbp-th">操作名称</div>
+          <div class="nbp-th">状态</div>
+          <div class="nbp-th">耗时</div>
+          <div class="nbp-th">时间</div>
+        </div>
+        <div v-if="!loading && !data?.recentActivities?.length" class="nbp-table-empty">
+          <span class="nbp-mono-label nbp-dim">NO_RECENT_ACTIVITY</span>
+        </div>
+        <div
+          v-for="(row, i) in data?.recentActivities ?? []"
+          :key="i"
+          class="nbp-row dash-act-cols"
+          :style="{ '--ri': i }"
+        >
+          <div class="nbp-td">{{ row.username }}</div>
+          <div class="nbp-td">
+            <span class="dash-act-chip">{{ row.operationGroup }}</span>
+          </div>
+          <div class="nbp-td nbp-ellipsis">{{ row.operationName }}</div>
+          <div class="nbp-td">
+            <span :class="['dash-act-status', row.responseCode === 200 ? 'is-ok' : 'is-err']">{{
+                row.responseCode === 200 ? '成功' : '失败'
+              }}</span>
+          </div>
+          <div class="nbp-td nbp-mono-xs nbp-dim">{{ row.operationSpend ?? '—' }} ms</div>
+          <div class="nbp-td nbp-mono-xs nbp-dim">
+            {{ row.operationTime ? formatRelativeTime(row.operationTime) : '—' }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import StrixEmpty from '@/components/common/StrixEmpty.vue'
-import { useChartTheme } from '@/composables/useChartTheme'
+import type { TimeRange } from '@/composables/useDashboard'
 import { useDashboard } from '@/composables/useDashboard'
+import { useChartTheme } from '@/composables/useChartTheme'
 import { formatRelativeTime } from '@/utils/time-format'
 import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts'
 import { BarChart, LineChart } from 'echarts/charts'
@@ -167,7 +162,6 @@ import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/compon
 import type { ComposeOption } from 'echarts/core'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import type { DataTableColumn } from 'naive-ui'
 import VChart from 'vue-echarts'
 
 use([CanvasRenderer, LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent])
@@ -181,18 +175,67 @@ const { loading, data, stats, timeRange, autoRefresh, refreshInterval, lastUpdat
 
 const { colors } = useChartTheme()
 
+const setTimeRange = (value: string) => {
+  timeRange.value = value as TimeRange
+}
+
+const timeRangeOptions = [
+  { label: '今日', value: 'today' },
+  { label: '近7天', value: '7days' },
+  { label: '近30天', value: '30days' }
+]
+
 const intervalOptions = [
   { label: '10 秒', value: 10000 },
   { label: '30 秒', value: 30000 },
   { label: '60 秒', value: 60000 }
 ]
 
-// ---------- 趋势图 ----------
+const statCards = computed(() => [
+  {
+    key: 'todayCount',
+    label: '今日操作',
+    val: stats.value.todayCount,
+    meta: 'OPERATIONS',
+    color: 'var(--strix-color-accent)'
+  },
+  {
+    key: 'todayErrorCount',
+    label: '今日错误',
+    val: stats.value.todayErrorCount,
+    meta: 'ERRORS',
+    color: 'var(--strix-color-error)'
+  },
+  {
+    key: 'errorRate',
+    label: '错误率',
+    val: stats.value.errorRate,
+    suffix: '%',
+    format: (v: number) => v.toFixed(2),
+    meta: 'ERROR_RATE',
+    color: 'var(--strix-color-warning)'
+  },
+  {
+    key: 'avgResponseTime',
+    label: '平均响应',
+    val: stats.value.avgResponseTime,
+    suffix: 'ms',
+    meta: 'AVG_LATENCY',
+    color: 'var(--strix-color-info)'
+  },
+  {
+    key: 'activeUserCount',
+    label: '活跃用户',
+    val: stats.value.activeUserCount,
+    meta: 'ACTIVE_USERS',
+    color: 'var(--strix-color-accent)'
+  }
+])
+
 const trendChartOptions = computed<ChartOption | null>(() => {
   const trends = data.value?.trends
   if (!trends?.length) return null
   const c = colors.value
-
   return {
     tooltip: {
       trigger: 'axis',
@@ -200,11 +243,7 @@ const trendChartOptions = computed<ChartOption | null>(() => {
       borderColor: c.border,
       textStyle: { color: c.text, fontSize: 12 }
     },
-    legend: {
-      data: ['操作总数', '错误数'],
-      textStyle: { color: c.textSecondary, fontSize: 12 },
-      top: 0
-    },
+    legend: { data: ['操作总数', '错误数'], textStyle: { color: c.textSecondary, fontSize: 12 }, top: 0 },
     grid: { top: 36, right: 16, bottom: 24, left: 48 },
     xAxis: {
       type: 'category',
@@ -255,22 +294,16 @@ const trendChartOptions = computed<ChartOption | null>(() => {
   }
 })
 
-// ---------- 小时分布图 ----------
 const hourlyChartOptions = computed<ChartOption | null>(() => {
   const hourly = data.value?.hourlyDistribution
   if (!hourly?.length) return null
   const c = colors.value
-
   return {
     tooltip: {
       trigger: 'axis',
       backgroundColor: c.tooltipBg,
       borderColor: c.border,
-      textStyle: { color: c.text, fontSize: 12 },
-      formatter: (params: any) => {
-        const p = Array.isArray(params) ? params[0] : params
-        return `${p.name}:00 — ${p.value} 次操作`
-      }
+      textStyle: { color: c.text, fontSize: 12 }
     },
     grid: { top: 12, right: 16, bottom: 24, left: 48 },
     xAxis: {
@@ -308,12 +341,10 @@ const hourlyChartOptions = computed<ChartOption | null>(() => {
   }
 })
 
-// ---------- 排名图 (水平条形图) ----------
 const buildRankOptions = (items: { name: string; count: number }[] | undefined, color: string): ChartOption | null => {
   if (!items?.length) return null
   const c = colors.value
   const reversed = [...items].reverse()
-
   return {
     tooltip: {
       trigger: 'axis',
@@ -333,12 +364,7 @@ const buildRankOptions = (items: { name: string; count: number }[] | undefined, 
       data: reversed.map((r) => r.name),
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: {
-        color: c.textSecondary,
-        fontSize: 11,
-        width: 88,
-        overflow: 'truncate'
-      }
+      axisLabel: { color: c.textSecondary, fontSize: 11, width: 88, overflow: 'truncate' }
     },
     series: [
       {
@@ -359,12 +385,7 @@ const buildRankOptions = (items: { name: string; count: number }[] | undefined, 
           borderRadius: [0, 3, 3, 0]
         },
         barMaxWidth: 20,
-        label: {
-          show: true,
-          position: 'right',
-          color: c.textSecondary,
-          fontSize: 11
-        }
+        label: { show: true, position: 'right', color: c.textSecondary, fontSize: 11 }
       }
     ]
   }
@@ -372,56 +393,129 @@ const buildRankOptions = (items: { name: string; count: number }[] | undefined, 
 
 const userRankChartOptions = computed(() => buildRankOptions(data.value?.userRanks, colors.value.accent))
 const moduleRankChartOptions = computed(() => buildRankOptions(data.value?.moduleRanks, colors.value.info))
-
-// ---------- 最近操作表格 ----------
-const recentColumns: DataTableColumn[] = [
-  { title: '用户', key: 'username', width: 120 },
-  { title: '操作模块', key: 'operationGroup', width: 120 },
-  { title: '操作名称', key: 'operationName', ellipsis: { tooltip: true } },
-  {
-    title: '状态',
-    key: 'responseCode',
-    width: 80,
-    render: (row: any) =>
-      h(
-        'span',
-        { style: { color: row.responseCode === 200 ? colors.value.accent : colors.value.error } },
-        row.responseCode === 200 ? '成功' : '失败'
-      )
-  },
-  {
-    title: '耗时',
-    key: 'operationSpend',
-    width: 80,
-    render: (row: any) => `${row.operationSpend ?? '-'} ms`
-  },
-  {
-    title: '时间',
-    key: 'operationTime',
-    width: 130,
-    render: (row: any) => (row.operationTime ? formatRelativeTime(row.operationTime) : '-')
-  }
-]
 </script>
 
 <style lang="scss" scoped>
-.control-card {
-  margin-bottom: 12px;
+.dash {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-  :deep(.n-card__content) {
-    padding: 12px 16px;
+/* ─── Controls ─── */
+.dash-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dash-time-group {
+  display: flex;
+  gap: 3px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.dash-time-btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: var(--strix-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--strix-text-primary);
+  }
+
+  &.is-active {
+    background: var(--strix-color-accent);
+    color: #06060e;
+    font-weight: 600;
   }
 }
 
-.chart-container {
-  height: 300px;
+.dash-divider-v {
+  width: 1px;
+  height: 24px;
+  background: var(--strix-border-default);
+}
+
+/* ─── Charts ─── */
+.dash-chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 12px;
+}
+
+.dash-chart-body {
+  height: 280px;
+  padding: 12px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.strix-charts {
+.dash-vchart {
   width: 100%;
   height: 100%;
+}
+
+.dash-chart-empty {
+  font-size: 13px;
+  color: var(--strix-text-secondary);
+  opacity: 0.4;
+}
+
+.dash-chart-skel {
+  position: absolute;
+  inset: 12px;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* ─── Activity table ─── */
+.dash-act-table {
+  border: none;
+  border-radius: 0;
+}
+
+.dash-act-cols {
+  grid-template-columns: 120px 100px 1fr 70px 90px 120px;
+}
+
+.dash-act-chip {
+  padding: 2px 8px;
+  background: var(--strix-bg-surface-hover);
+  border: 1px solid var(--strix-border-default);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--strix-text-secondary);
+}
+
+.dash-act-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+
+  &.is-ok {
+    color: var(--strix-color-success);
+    background: color-mix(in srgb, var(--strix-color-success) 10%, transparent);
+  }
+
+  &.is-err {
+    color: var(--strix-color-error);
+    background: color-mix(in srgb, var(--strix-color-error) 10%, transparent);
+  }
 }
 </style>

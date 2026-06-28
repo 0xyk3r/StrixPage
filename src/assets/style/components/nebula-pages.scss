@@ -1,0 +1,805 @@
+// ============================================================
+// Nebula Design System — Pages Shared Utilities
+// ============================================================
+// 为自定义页面（不依赖 NaiveUI 组件）提供通用的布局与样式原语
+// 类名前缀: .nbp- (Nebula Page)
+// ============================================================
+
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+// ============================================================
+// Page Header
+// ============================================================
+
+/// 页面外层容器（留出顶部间距）
+.nbp-page {
+  padding: $space-1 0;
+}
+
+/// 页面头部区域（品牌标签 + 标题 + 右侧工具）
+.nbp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-bottom: $space-5;
+}
+
+.nbp-header__left {
+  min-width: 0;
+}
+
+/// 品牌标签行（脉冲点 + 单行标识）
+.nbp-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: $space-2 + 2px;
+}
+
+/// 脉冲状态点（绿色 accent）
+.nbp-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: $radius-circle;
+  background: var(--strix-color-accent);
+  box-shadow: 0 0 8px var(--strix-accent-glow);
+  animation: nbp-pulse 2.5s ease-in-out infinite;
+
+  // 蓝色变体（用于用户会话等）
+  &--info {
+    background: var(--strix-color-info);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--strix-color-info) 50%, transparent);
+  }
+}
+
+@keyframes nbp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/// 单行等宽标识（HUD 风格大写标签）
+.nbp-mono-label {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: 2.5px;
+  color: var(--strix-text-accent);
+  opacity: 0.65;
+  text-transform: uppercase;
+
+  &--info {
+    color: var(--strix-color-info);
+  }
+}
+
+/// 页面主标题（渐变文字）
+.nbp-page-title {
+  font-family: $font-display;
+  font-size: $text-2xl;
+  font-weight: $weight-bold;
+  letter-spacing: -0.5px;
+  color: var(--strix-text-primary);
+  margin: 0 0 $space-1;
+  background: var(--strix-logo-gradient);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nbp-shimmer 6s ease-in-out infinite;
+
+  // 蓝色渐变变体
+  &--info {
+    background: linear-gradient(135deg, #a5f3fc 0%, #38bdf8 40%, #0ea5e9 70%, #a5f3fc 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: nbp-shimmer 6s ease-in-out infinite;
+  }
+}
+
+@keyframes nbp-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/// 页面副标题
+.nbp-page-subtitle {
+  font-size: $text-xs;
+  color: var(--strix-text-secondary);
+  margin: 0;
+}
+
+// ============================================================
+// Toolbar & Search
+// ============================================================
+
+.nbp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $space-2 + 2px;
+  margin-bottom: $space-3 + 2px;
+  flex-wrap: wrap;
+}
+
+/// 搜索框（带图标 + 可选清除按钮）
+.nbp-search {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: 0 $space-3;
+  height: 36px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: $radius-md - 2px;
+  flex: 1;
+  min-width: 180px;
+  transition: border-color $duration-normal;
+  color: var(--strix-text-secondary);
+
+  &:focus-within {
+    border-color: var(--strix-border-accent);
+    background: var(--strix-bg-surface-hover);
+  }
+}
+
+.nbp-search__icon {
+  flex-shrink: 0;
+  color: var(--strix-text-secondary);
+  pointer-events: none;
+}
+
+.nbp-search__input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--strix-text-primary);
+  font-size: $text-xs;
+
+  &::placeholder {
+    color: var(--strix-text-muted);
+  }
+}
+
+.nbp-search__clear {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: $radius-circle;
+  border: none;
+  background: var(--strix-text-muted);
+  color: var(--strix-bg-base);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  transition: opacity $duration-fast;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// ============================================================
+// Buttons
+// ============================================================
+
+/// 基础操作按钮（新增、刷新等）
+.nbp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1 + 2px;
+  height: 36px;
+  padding: 0 $space-4;
+  border-radius: $radius-md - 2px;
+  border: 1px solid transparent;
+  font-size: $text-xs;
+  font-weight: $weight-medium;
+  cursor: pointer;
+  transition: all $duration-normal;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &--primary {
+    background: var(--strix-color-accent);
+    color: $dark-bg-base;
+    border-color: var(--strix-color-accent);
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+
+    &:active {
+      filter: brightness(0.95);
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &--ghost {
+    background: var(--strix-bg-surface);
+    color: var(--strix-text-secondary);
+    border-color: var(--strix-border-default);
+
+    &:hover {
+      border-color: var(--strix-border-accent);
+      color: var(--strix-text-primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/// 小型控制按钮（自动刷新、刷新等）
+.nbp-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1 + 1px;
+  height: 32px;
+  padding: 0 $space-3;
+  border-radius: $radius-sm + 1px;
+  border: 1px solid var(--strix-border-default);
+  background: var(--strix-bg-surface);
+  color: var(--strix-text-secondary);
+  font-size: $text-xs;
+  font-weight: $weight-medium;
+  cursor: pointer;
+  transition: all $duration-normal;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+    color: var(--strix-text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.is-active {
+    border-color: var(--strix-border-accent);
+    color: var(--strix-color-accent);
+    background: var(--strix-accent-glow-subtle);
+  }
+
+  &--info.is-active {
+    border-color: color-mix(in srgb, var(--strix-color-info) 50%, transparent);
+    color: var(--strix-color-info);
+    background: color-mix(in srgb, var(--strix-color-info) 8%, transparent);
+  }
+}
+
+/// 选择框（刷新间隔等）
+.nbp-select {
+  height: 32px;
+  padding: 0 $space-2;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-default);
+  border-radius: $radius-sm + 1px;
+  color: var(--strix-text-secondary);
+  font-size: $text-xs;
+  cursor: pointer;
+  outline: none;
+  transition: border-color $duration-normal;
+
+  &:focus {
+    border-color: var(--strix-border-accent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/// 表格行级操作按钮
+.nbp-op {
+  height: 26px;
+  padding: 0 $space-2 + 2px;
+  border-radius: $radius-sm;
+  border: 1px solid;
+  font-size: $text-2xs + 1.5px;
+  font-weight: $weight-medium;
+  cursor: pointer;
+  transition: all $duration-instant;
+
+  &--neutral {
+    color: var(--strix-text-secondary);
+    border-color: var(--strix-border-default);
+    background: transparent;
+
+    &:hover {
+      border-color: var(--strix-border-accent);
+      color: var(--strix-text-accent);
+    }
+  }
+
+  &--edit {
+    color: var(--strix-color-warning);
+    border-color: color-mix(in srgb, var(--strix-color-warning) 40%, transparent);
+    background: transparent;
+
+    &:hover {
+      background: color-mix(in srgb, var(--strix-color-warning) 10%, transparent);
+    }
+  }
+
+  &--danger {
+    color: var(--strix-color-error);
+    border-color: color-mix(in srgb, var(--strix-color-error) 40%, transparent);
+    background: transparent;
+
+    &:hover {
+      background: color-mix(in srgb, var(--strix-color-error) 10%, transparent);
+    }
+  }
+
+  &--info {
+    color: var(--strix-color-info);
+    border-color: color-mix(in srgb, var(--strix-color-info) 40%, transparent);
+    background: transparent;
+
+    &:hover {
+      background: color-mix(in srgb, var(--strix-color-info) 10%, transparent);
+    }
+  }
+}
+
+// ============================================================
+// Stats Cards
+// ============================================================
+
+.nbp-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: $space-2 + 2px;
+}
+
+.nbp-stat-card {
+  position: relative;
+  padding: $space-4 $space-4 + 2px;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  border-radius: $radius-lg - 2px;
+  overflow: hidden;
+  transition: border-color $duration-normal;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+
+    .nbp-hud-corner {
+      opacity: 0.65;
+    }
+  }
+}
+
+.nbp-stat-card__label {
+  font-size: $text-xs;
+  color: var(--strix-text-secondary);
+  margin-bottom: $space-2;
+}
+
+.nbp-stat-card__val {
+  font-family: $font-display;
+  font-size: $text-2xl + 4px;
+  font-weight: $weight-bold;
+  line-height: 1;
+  letter-spacing: -1px;
+  color: var(--strix-text-primary);
+  margin-bottom: $space-1;
+}
+
+.nbp-stat-card__suffix {
+  font-size: $text-sm;
+  font-weight: $weight-regular;
+  color: var(--strix-text-secondary);
+  margin-left: 2px;
+}
+
+.nbp-stat-card__meta {
+  font-family: $font-mono;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--strix-text-muted);
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+/// HUD 角标装饰（用于卡片四角）
+.nbp-hud-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--strix-color-accent);
+  border-style: solid;
+  opacity: 0.25;
+  transition: opacity $duration-normal;
+
+  &--tl {
+    top: 6px;
+    left: 6px;
+    border-width: 1.5px 0 0 1.5px;
+  }
+
+  &--tr {
+    top: 6px;
+    right: 6px;
+    border-width: 1.5px 1.5px 0 0;
+  }
+
+  &--bl {
+    bottom: 6px;
+    left: 6px;
+    border-width: 0 0 1.5px 1.5px;
+  }
+
+  &--br {
+    bottom: 6px;
+    right: 6px;
+    border-width: 0 1.5px 1.5px 0;
+  }
+
+  &--info {
+    border-color: var(--strix-color-info);
+  }
+}
+
+// ============================================================
+// Table
+// ============================================================
+
+.nbp-table-wrap {
+  position: relative;
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  border-radius: $radius-lg - 2px;
+  overflow: hidden;
+}
+
+/// 顶部加载进度条
+.nbp-loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--strix-border-subtle);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.nbp-loading-bar__fill {
+  height: 100%;
+  background: var(--strix-color-accent);
+  animation: nbp-load-slide 1.2s ease-in-out infinite;
+
+  &--info {
+    background: var(--strix-color-info);
+  }
+}
+
+@keyframes nbp-load-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+/// 表头（需配合 grid-template-columns 使用）
+.nbp-thead {
+  padding: $space-2 + 2px $space-4;
+  border-bottom: 1px solid var(--strix-border-subtle);
+  background: var(--strix-bg-elevated);
+  display: grid;
+}
+
+.nbp-th {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $weight-medium;
+  letter-spacing: 1.5px;
+  color: var(--strix-text-muted);
+  opacity: 0.6;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+/// 数据行（需配合 grid-template-columns 使用）
+.nbp-row {
+  display: grid;
+  padding: $space-2 + 3px $space-4;
+  border-bottom: 1px solid var(--strix-border-subtle);
+  animation: nbp-row-in $duration-slow calc(var(--ri, 0) * 0.03s) both $ease-out-expo;
+  transition: background $duration-instant;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--strix-bg-surface-hover);
+  }
+}
+
+@keyframes nbp-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/// 单元格基础样式
+.nbp-td {
+  display: flex;
+  align-items: center;
+  font-size: $text-xs;
+  color: var(--strix-text-primary);
+  padding-right: $space-2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/// 空状态
+.nbp-table-empty {
+  padding: $space-12 $space-5;
+  text-align: center;
+}
+
+.nbp-table-empty__icon {
+  font-size: 32px;
+  color: var(--strix-text-muted);
+  opacity: 0.25;
+  margin-bottom: $space-2 + 2px;
+}
+
+.nbp-table-empty__sub {
+  margin-top: $space-2;
+  font-size: $text-sm;
+  color: var(--strix-text-secondary);
+}
+
+// ============================================================
+// Panel (Card container with heading)
+// ============================================================
+
+.nbp-panel {
+  background: var(--strix-bg-surface);
+  border: 1px solid var(--strix-border-subtle);
+  border-radius: $radius-lg - 2px;
+  overflow: hidden;
+  transition: border-color $duration-normal;
+
+  &:hover {
+    border-color: var(--strix-border-accent);
+  }
+}
+
+.nbp-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-3 + 2px $space-4;
+  border-bottom: 1px solid var(--strix-border-subtle);
+  background: var(--strix-bg-elevated);
+}
+
+.nbp-panel__title {
+  font-family: $font-display;
+  font-size: $text-sm;
+  font-weight: $weight-semibold;
+  color: var(--strix-text-primary);
+}
+
+// ============================================================
+// Badges & Pills
+// ============================================================
+
+/// 类型标签
+.nbp-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $weight-bold;
+  letter-spacing: 1px;
+  padding: 2px $space-2;
+  border-radius: $radius-pill;
+  border: 1px solid;
+
+  &--info {
+    color: var(--strix-color-info);
+    border-color: color-mix(in srgb, var(--strix-color-info) 35%, transparent);
+    background: color-mix(in srgb, var(--strix-color-info) 10%, transparent);
+  }
+
+  &--teal,
+  &--success {
+    color: var(--strix-color-accent);
+    border-color: var(--strix-border-accent);
+    background: var(--strix-accent-glow-subtle);
+  }
+
+  &--warning {
+    color: var(--strix-color-warning);
+    border-color: color-mix(in srgb, var(--strix-color-warning) 35%, transparent);
+    background: color-mix(in srgb, var(--strix-color-warning) 10%, transparent);
+  }
+
+  &--error,
+  &--danger {
+    color: var(--strix-color-error);
+    border-color: color-mix(in srgb, var(--strix-color-error) 35%, transparent);
+    background: color-mix(in srgb, var(--strix-color-error) 10%, transparent);
+  }
+
+  &--neutral {
+    color: var(--strix-text-muted);
+    border-color: var(--strix-border-default);
+    background: transparent;
+  }
+}
+
+/// ON/OFF 开关状态胶囊
+.nbp-status-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $weight-bold;
+  letter-spacing: 1px;
+  padding: 2px $space-2 + 2px;
+  border-radius: $radius-pill;
+  border: 1px solid var(--strix-border-default);
+  color: var(--strix-text-muted);
+  background: var(--strix-bg-surface);
+  transition: all $duration-normal;
+
+  &--on {
+    color: var(--strix-color-accent);
+    border-color: var(--strix-border-accent);
+    background: var(--strix-accent-glow-subtle);
+    box-shadow: 0 0 8px var(--strix-accent-glow-subtle);
+  }
+}
+
+/// 会话数气泡
+.nbp-session-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 $space-1 + 2px;
+  border-radius: $radius-pill;
+  background: var(--strix-accent-glow-subtle);
+  border: 1px solid var(--strix-border-accent);
+  color: var(--strix-color-accent);
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $weight-bold;
+}
+
+/// 代码片段内联展示
+.nbp-code-chip {
+  display: inline-block;
+  font-family: $font-mono;
+  font-size: $text-2xs + 1.5px;
+  color: var(--strix-text-accent);
+  background: var(--strix-accent-glow-subtle);
+  padding: 2px $space-1 + 3px;
+  border-radius: $radius-xs;
+  border: 1px solid var(--strix-border-accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ============================================================
+// Live Badge
+// ============================================================
+
+.nbp-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px $space-2 + 2px;
+  border-radius: $radius-pill;
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  font-weight: $weight-bold;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  &--accent {
+    color: var(--strix-color-success);
+    border: 1px solid color-mix(in srgb, var(--strix-color-success) 40%, transparent);
+    background: color-mix(in srgb, var(--strix-color-success) 10%, transparent);
+  }
+
+  &--info {
+    color: var(--strix-color-info);
+    border: 1px solid color-mix(in srgb, var(--strix-color-info) 40%, transparent);
+    background: color-mix(in srgb, var(--strix-color-info) 10%, transparent);
+  }
+}
+
+.nbp-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: $radius-circle;
+  background: currentColor;
+  animation: nbp-pulse 1.5s ease-in-out infinite;
+}
+
+// ============================================================
+// Spin animation
+// ============================================================
+
+.nbp-spin {
+  animation: nbp-spin-anim 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes nbp-spin-anim {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================
+// Utilities
+// ============================================================
+
+.nbp-dim {
+  opacity: 0.45;
+}
+
+.nbp-secondary {
+  color: var(--strix-text-secondary);
+}
+
+.nbp-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nbp-mono {
+  font-family: $font-mono;
+}
+
+.nbp-mono-xs {
+  font-family: $font-mono;
+  font-size: $text-2xs;
+  letter-spacing: 0.5px;
+}
