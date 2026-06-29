@@ -23,14 +23,28 @@
       <n-text depth="3" style="font-size: 12px">提示：停发阈值建议大于服务端断句窗口（400ms）</n-text>
       <n-button size="small" ghost @click="emit('reset')">恢复默认</n-button>
     </div>
+    <!-- 诊断：持续发送（绕过 VAD 发送门控，用于排查丢字/丢句来源） -->
+    <div class="vad-settings__diag">
+      <n-checkbox :checked="alwaysSend" @update:checked="(val: boolean) => emit('update-always-send', val)">
+        持续发送
+      </n-checkbox>
+      <n-tooltip trigger="hover">
+        <template #trigger><span class="vad-settings__hint">?</span></template>
+        开启后录音期间持续上行全部音频，绕过 VAD 发送门控（VAD 仅驱动可视化）。
+      </n-tooltip>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { AsrVadParams } from '@/composables/useAsrSettings'
 
-defineProps<{ vad: AsrVadParams }>()
-const emit = defineEmits<{ update: [key: keyof AsrVadParams, value: number]; reset: [] }>()
+defineProps<{ vad: AsrVadParams; alwaysSend: boolean }>()
+const emit = defineEmits<{
+  update: [key: keyof AsrVadParams, value: number]
+  reset: []
+  'update-always-send': [value: boolean]
+}>()
 
 interface SliderItem {
   key: keyof AsrVadParams
@@ -137,6 +151,14 @@ const items: SliderItem[] = [
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+  }
+
+  &__diag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
   }
 }
 </style>

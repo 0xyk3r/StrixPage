@@ -53,6 +53,8 @@ interface AsrMessage {
   itemId?: string
   text: string
   final: boolean
+  /** 模型撤回标记：上游对该句的误识别（噪声/音乐）做修正，前端据此移除已展示的该句 */
+  removed?: boolean
   emotion?: string
   emotionScheme?: 'qwen7' | 'polarity3'
   emotionConfidence?: number
@@ -127,6 +129,17 @@ export function useAsrStream(settings: AsrSettings) {
     }
   }
 
+  /**
+   * 移除一句（模型对噪声/音乐的误识别在断句时被撤回，后端下发 removed=true）。
+   * 命中 itemId 则删除该句；找不到（前端已无此句）则忽略。
+   */
+  function removeSentence(itemId?: string) {
+    if (!itemId) return
+    const list = sentences.value
+    const idx = list.findIndex((s) => s.id === itemId)
+    if (idx !== -1) list.splice(idx, 1)
+  }
+
   let ws: WebSocket | null = null
   let audioCtx: AudioContext | null = null
   let mediaStream: MediaStream | null = null
@@ -188,10 +201,18 @@ export function useAsrStream(settings: AsrSettings) {
    * RMS VAD 帧处理（读 settings.vad 实时值，录音中调参即时生效）：
    * - idle/starting：仅滚动缓冲前冗余帧并检测起说；连续 startFrames 帧超过 rmsStart 进入 active，补发前冗余。
    * - active/trailing：持续上行；连续静音超过 idleStopMs 才停发回 idle（idleStopMs > 服务端断句窗口，保证句尾不截断）。
+   *
+   * 诊断模式（settings.alwaysSend）：持续上行全部音频帧，绕过 VAD 发送门控；
+   * VAD 仍正常运行以驱动可视化（currentRms / vadPhase），但不再决定是否发送。
+   * 用于区分「前端 VAD 漏发丢字/丢句」与「上游模型丢字」。
    */
   function handleFrame(rms: number, pcm: ArrayBuffer) {
     currentRms.value = rms
     const v = settings.vad
+    // 诊断：持续发送模式下，先无条件上行当前帧（VAD 状态机仍继续跑，仅用于可视化）
+    if (settings.alwaysSend) {
+      sendFrame(pcm)
+    }
     if (vadPhase.value === 'idle' || vadPhase.value === 'starting') {
       preroll.push(pcm)
       while (preroll.length > v.prerollFrames) preroll.shift()
@@ -201,7 +222,8 @@ export function useAsrStream(settings: AsrSettings) {
           vadPhase.value = 'active'
           vadIdleMs = 0
           vadStartCount = 0
-          for (const b of preroll) sendFrame(b) // 补发前冗余（含起始帧）
+          // 诊断模式下已逐帧上行，避免补发前冗余造成重复
+          if (!settings.alwaysSend) for (const b of preroll) sendFrame(b) // 补发前冗余（含起始帧）
           preroll = []
         }
       } else {
@@ -209,7 +231,7 @@ export function useAsrStream(settings: AsrSettings) {
         vadPhase.value = 'idle'
       }
     } else {
-      sendFrame(pcm)
+      if (!settings.alwaysSend) sendFrame(pcm)
       if (rms < v.rmsStop) {
         vadIdleMs += FRAME_MS
         vadPhase.value = 'trailing'
@@ -314,6 +336,11 @@ export function useAsrStream(settings: AsrSettings) {
           if (data.done) {
             // 服务端会话结束（最终结果已下发），此时再关闭 WS
             closeWs()
+            return
+          }
+          if (data.removed && data.itemId) {
+            // 模型撤回该句（对噪声/音乐误识别的修正，上游返回空 transcript）：移除已展示的句子
+            removeSentence(data.itemId)
             return
           }
           if (typeof data.text === 'string') {

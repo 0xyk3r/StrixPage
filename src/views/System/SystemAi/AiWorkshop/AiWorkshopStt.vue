@@ -37,7 +37,13 @@
               <!-- 高级 VAD 设置（默认折叠） -->
               <n-collapse>
                 <n-collapse-item title="高级 VAD 设置" name="vad">
-                  <asr-vad-settings :vad="settings.vad" @update="onVadUpdate" @reset="reset" />
+                  <asr-vad-settings
+                    :vad="settings.vad"
+                    :always-send="settings.alwaysSend"
+                    @update="onVadUpdate"
+                    @update-always-send="(val: boolean) => (settings.alwaysSend = val)"
+                    @reset="reset"
+                  />
                 </n-collapse-item>
               </n-collapse>
 

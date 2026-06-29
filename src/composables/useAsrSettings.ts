@@ -16,6 +16,11 @@ export interface AsrVadParams {
 export interface AsrSettings {
   /** 选中的麦克风 deviceId，'' 表示系统默认 */
   deviceId: string
+  /**
+   * 诊断开关：持续上行全部音频，绕过 RMS VAD 发送门控（VAD 仍驱动可视化）。
+   * 用于区分「前端 VAD 漏发导致丢字/丢句」与「上游模型丢字」：开启后若仍丢字，则为上游模型行为。
+   */
+  alwaysSend: boolean
   vad: AsrVadParams
 }
 
@@ -31,13 +36,14 @@ export const DEFAULT_VAD: AsrVadParams = {
 const STORAGE_KEY = 'strix-asr-settings'
 
 function loadSettings(): AsrSettings {
-  const fallback: AsrSettings = { deviceId: '', vad: { ...DEFAULT_VAD } }
+  const fallback: AsrSettings = { deviceId: '', alwaysSend: false, vad: { ...DEFAULT_VAD } }
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return fallback
     const parsed = JSON.parse(raw) as Partial<AsrSettings>
     return {
       deviceId: typeof parsed.deviceId === 'string' ? parsed.deviceId : '',
+      alwaysSend: parsed.alwaysSend === true,
       vad: { ...DEFAULT_VAD, ...parsed.vad }
     }
   } catch {
