@@ -402,6 +402,15 @@ const routes: RouteRecordRaw[] = [
             meta: { title: 'AI 续写', permission: 'system:ai:fim' }
           },
           {
+            path: 'document-ai-analyze',
+            name: 'DocumentAiAnalyzePage',
+            component: () => import('@/views/System/DocumentAiAnalyze/DocumentAiAnalyzePage.vue'),
+            meta: {
+              title: '文档 AI 分析',
+              permission: 'system:ai:document'
+            }
+          },
+          {
             path: 'model-config',
             name: 'SystemAiModelConfig',
             component: () => import('@/views/System/SystemAi/AiModelConfig/AiModelConfigPage.vue'),
@@ -473,3 +482,4 @@ router.afterEach((to, from, failure) => {
 })
 
 export default router
+

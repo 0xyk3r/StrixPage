@@ -49,7 +49,7 @@
     </div>
 
     <!-- 识别流：逐句卡片 / 空状态 -->
-    <div ref="streamEl" class="asr-transcript__stream" @scroll="onScroll">
+    <StrixAutoScroll class="asr-transcript__stream" :threshold="40">
       <template v-if="visibleSentences.length">
         <article
           v-for="item in visibleSentences"
@@ -107,12 +107,13 @@
           {{ recording ? '聆听中，开口说话即可看到逐句识别' : '点击「开始录音」，授权麦克风后实时识别' }}
         </p>
       </div>
-    </div>
+    </StrixAutoScroll>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Copy, Mic, Trash2 } from '@lucide/vue'
+import StrixAutoScroll from '@/components/common/StrixAutoScroll.vue'
 import type { AsrSentence } from '@/composables/useAsrStream'
 
 interface Props {
@@ -254,27 +255,7 @@ async function copyAll() {
   }
 }
 
-// —— 自动滚动到底：新句追加时滚到底，但用户上滑查看历史时暂停 ——
-const streamEl = ref<HTMLElement | null>(null)
-const stickToBottom = ref(true)
-
-function onScroll() {
-  const el = streamEl.value
-  if (!el) return
-  // 距底部 40px 内视为「贴底」，否则用户在上翻，暂停自动滚动
-  stickToBottom.value = el.scrollHeight - el.scrollTop - el.clientHeight < 40
-}
-
-watch(
-  () => props.sentences.map((s) => s.text).join(' '),
-  () => {
-    if (!stickToBottom.value) return
-    nextTick(() => {
-      const el = streamEl.value
-      if (el) el.scrollTop = el.scrollHeight
-    })
-  }
-)
+// 自动滚动到底（新句追加时贴底跟随、用户上滑暂停）由 StrixAutoScroll 内部处理
 </script>
 
 <style lang="scss" scoped>
