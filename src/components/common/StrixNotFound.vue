@@ -81,7 +81,7 @@ const starStyle = (i: number) => {
   }
 }
 
-let timer: number | null = null
+let timer: ReturnType<typeof setInterval> | null = null
 const clearTimer = () => {
   if (timer) {
     clearInterval(timer)

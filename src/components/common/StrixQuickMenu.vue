@@ -31,7 +31,7 @@ const quickMenuStore = useQuickMenuStore()
 const { quickMenus } = storeToRefs(quickMenuStore)
 
 const autoActive = ref(false)
-let autoActiveTimer: number | null = null
+let autoActiveTimer: ReturnType<typeof setInterval> | null = null
 const clearAutoActiveTimer = () => {
   if (autoActiveTimer !== null) {
     clearTimeout(autoActiveTimer)
