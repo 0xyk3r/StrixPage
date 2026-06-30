@@ -36,7 +36,7 @@
     <n-form-item label="模型名称" path="modelName">
       <n-space vertical style="width: 100%">
         <n-space>
-          <n-button :disabled="!canFetchModels" :loading="fetchingModels" @click="fetchModels"> 获取模型列表 </n-button>
+          <n-button :disabled="!canFetchModels" :loading="fetchingModels" @click="fetchModels"> 获取模型列表</n-button>
           <n-text depth="3" style="font-size: 12px">填写 Base URL 和 API Key 后可获取</n-text>
         </n-space>
         <n-checkbox-group v-if="fetchedModels.length > 0" v-model:value="filterTypes">
@@ -47,6 +47,7 @@
             <n-checkbox :value="4" label="STT" />
             <n-checkbox :value="5" label="IMAGE_GEN" />
             <n-checkbox :value="6" label="ASR" />
+            <n-checkbox :value="7" label="TRANSLATE" />
           </n-space>
         </n-checkbox-group>
         <n-select
@@ -827,6 +828,49 @@
       </n-form-item>
     </template>
 
+    <!-- LiveTranslate 参数（实时语音翻译） -->
+    <template v-if="isLiveTranslate">
+      <n-form-item label="源语种">
+        <n-select
+          v-model:value="ltParamsForm.sourceLanguage"
+          :options="ltSourceLanguageOptions"
+          placeholder="自动检测（推荐）"
+          style="width: 220px"
+          clearable
+        />
+      </n-form-item>
+      <n-form-item label="目标语种">
+        <n-select
+          v-model:value="ltParamsForm.targetLanguage"
+          :options="ltLanguageOptions"
+          placeholder="翻译目标语种"
+          style="width: 220px"
+        />
+      </n-form-item>
+      <n-form-item label="默认音色">
+        <n-select
+          v-model:value="ltParamsForm.voice"
+          :options="ltVoiceOptions"
+          placeholder="选择翻译输出音色"
+          style="width: 240px"
+        />
+      </n-form-item>
+      <n-form-item label="输出模态">
+        <n-radio-group v-model:value="ltParamsForm.modalities">
+          <n-space>
+            <n-radio value="text">仅文本</n-radio>
+            <n-radio value="text_audio">文本 + 音频</n-radio>
+          </n-space>
+        </n-radio-group>
+      </n-form-item>
+      <n-form-item label="输出源语言转写">
+        <n-space align="center">
+          <n-switch v-model:value="ltParamsForm.enableSourceTranscription" />
+          <n-text depth="3" style="font-size: 12px">同步返回源语言原文（用于对照显示）</n-text>
+        </n-space>
+      </n-form-item>
+    </template>
+
     <n-space justify="end" style="margin-top: 16px">
       <n-button @click="emit('cancel')">取消</n-button>
       <n-button type="primary" :loading="saving" @click="submit">保存</n-button>
@@ -860,7 +904,7 @@ const isEdit = computed(() => !!props.editId)
 
 const fetchedModels = ref<AiModelInfo[]>([])
 const fetchingModels = ref(false)
-const filterTypes = ref<number[]>([1, 2, 3, 4, 5, 6])
+const filterTypes = ref<number[]>([1, 2, 3, 4, 5, 6, 7])
 
 const audioFormatOptions = [
   { label: 'mp3', value: 'mp3' },
@@ -923,6 +967,7 @@ const getDefaultForm = (): AiModelConfigUpdateReq & { apiKey: string } => ({
   asrParams: null,
   sttParams: null,
   ttsParams: null,
+  liveTranslateParams: null,
   ossConfigKey: null,
   ossBucketName: null,
   promptAudioUrl: ''
@@ -977,6 +1022,25 @@ const getDefaultSttParams = (): SttParamsForm => ({
 })
 
 const sttParamsForm = ref<SttParamsForm>(getDefaultSttParams())
+
+/** LiveTranslate 默认参数编辑态（提交时序列化为 form.liveTranslateParams JSON 字符串） */
+interface LtParamsForm {
+  sourceLanguage: string
+  targetLanguage: string
+  voice: string
+  enableSourceTranscription: boolean
+  modalities: string
+}
+
+const getDefaultLtParams = (): LtParamsForm => ({
+  sourceLanguage: '',
+  targetLanguage: 'en',
+  voice: 'Tina',
+  enableSourceTranscription: true,
+  modalities: 'text_audio'
+})
+
+const ltParamsForm = ref<LtParamsForm>(getDefaultLtParams())
 
 // ——— STT 专用：OSS 存储联动（音频文件需先上传至 OSS） ———
 const ossConfigOptions = ref<SelectOption[]>([])
@@ -1137,6 +1201,132 @@ const searchFreshnessOptions = [
   { label: '365 天内', value: 365 }
 ]
 
+const ltSourceLanguageOptions = [
+  { label: '自动检测（推荐）', value: '' },
+  { label: '中文（普通话）', value: 'zh' },
+  { label: '粤语', value: 'yue' },
+  { label: '英语', value: 'en' },
+  { label: '日语', value: 'ja' },
+  { label: '韩语', value: 'ko' },
+  { label: '法语', value: 'fr' },
+  { label: '德语', value: 'de' },
+  { label: '俄语', value: 'ru' },
+  { label: '意大利语', value: 'it' },
+  { label: '西班牙语', value: 'es' },
+  { label: '葡萄牙语', value: 'pt' },
+  { label: '阿拉伯语', value: 'ar' },
+  { label: '荷兰语', value: 'nl' },
+  { label: '越南语', value: 'vi' },
+  { label: '泰语', value: 'th' },
+  { label: '印尼语', value: 'id' },
+  { label: '土耳其语', value: 'tr' },
+  { label: '印地语', value: 'hi' },
+  { label: '波兰语', value: 'pl' },
+  { label: '乌克兰语', value: 'uk' },
+  { label: '捷克语', value: 'cs' },
+  { label: '乌尔都语', value: 'ur' },
+  { label: '菲律宾语', value: 'tl' },
+  { label: '瑞典语', value: 'sv' },
+  { label: '丹麦语', value: 'da' },
+  { label: '希伯来语', value: 'he' },
+  { label: '冰岛语', value: 'is' },
+  { label: '马来语', value: 'ms' },
+  { label: '挪威语', value: 'no' },
+  { label: '波斯语', value: 'fa' }
+]
+
+const ltLanguageOptions = [
+  { label: '英语', value: 'en' },
+  { label: '中文（普通话）', value: 'zh' },
+  { label: '日语', value: 'ja' },
+  { label: '韩语', value: 'ko' },
+  { label: '法语', value: 'fr' },
+  { label: '德语', value: 'de' },
+  { label: '俄语', value: 'ru' },
+  { label: '意大利语', value: 'it' },
+  { label: '西班牙语', value: 'es' },
+  { label: '葡萄牙语', value: 'pt' },
+  { label: '阿拉伯语', value: 'ar' },
+  { label: '荷兰语', value: 'nl' },
+  { label: '越南语', value: 'vi' },
+  { label: '泰语', value: 'th' },
+  { label: '印尼语', value: 'id' },
+  { label: '土耳其语', value: 'tr' },
+  { label: '印地语', value: 'hi' },
+  { label: '波兰语', value: 'pl' },
+  { label: '乌克兰语', value: 'uk' },
+  { label: '捷克语', value: 'cs' },
+  { label: '乌尔都语', value: 'ur' },
+  { label: '菲律宾语', value: 'tl' },
+  { label: '瑞典语', value: 'sv' },
+  { label: '丹麦语', value: 'da' },
+  { label: '希伯来语', value: 'he' },
+  { label: '冰岛语', value: 'is' },
+  { label: '马来语', value: 'ms' },
+  { label: '挪威语', value: 'no' },
+  { label: '波斯语', value: 'fa' }
+]
+
+const ltVoiceOptions = [
+  { label: 'Tina（甜甜，默认）', value: 'Tina' },
+  { label: 'Cherry（芊悦，Qwen3 默认）', value: 'Cherry' },
+  { label: 'Cindy（林欣宜，台湾口音）', value: 'Cindy' },
+  { label: 'Liora Mira（清欢）', value: 'Liora Mira' },
+  { label: 'Sunnybobi（知芝）', value: 'Sunnybobi' },
+  { label: 'Raymond（林川野）', value: 'Raymond' },
+  { label: 'Ethan（晨煦）', value: 'Ethan' },
+  { label: 'Theo Calm（予安）', value: 'Theo Calm' },
+  { label: 'Serena（苏瑶）', value: 'Serena' },
+  { label: 'Harvey（厚）', value: 'Harvey' },
+  { label: 'Maia（四月）', value: 'Maia' },
+  { label: 'Evan（江晨）', value: 'Evan' },
+  { label: 'Qiao（小乔妹，台湾口音）', value: 'Qiao' },
+  { label: 'Momo（茉兔）', value: 'Momo' },
+  { label: 'Wil（伟伦）', value: 'Wil' },
+  { label: 'Angel（台普-安琪）', value: 'Angel' },
+  { label: 'Li Cassian（东厂-李公公）', value: 'Li Cassian' },
+  { label: 'Mia（温柔生活博主-舒然）', value: 'Mia' },
+  { label: 'Joyner（喜剧担当-阿逗）', value: 'Joyner' },
+  { label: 'Gold（金爷）', value: 'Gold' },
+  { label: 'Katerina（卡捷琳娜）', value: 'Katerina' },
+  { label: 'Ryan（甜茶）', value: 'Ryan' },
+  { label: 'Jennifer（詹妮弗）', value: 'Jennifer' },
+  { label: 'Aiden（艾登）', value: 'Aiden' },
+  { label: 'Mione（敏儿）', value: 'Mione' },
+  { label: 'Sohee（素熙）', value: 'Sohee' },
+  { label: 'Lenn（莱恩）', value: 'Lenn' },
+  { label: 'Ono Anna（小野杏）', value: 'Ono Anna' },
+  { label: 'Sonrisa（索尼莎）', value: 'Sonrisa' },
+  { label: 'Bodega（博德加）', value: 'Bodega' },
+  { label: 'Emilien（埃米尔安）', value: 'Emilien' },
+  { label: 'Andre（安德雷）', value: 'Andre' },
+  { label: 'Radio Gol（拉迪奥·戈尔）', value: 'Radio Gol' },
+  { label: 'Alek（阿列克）', value: 'Alek' },
+  { label: 'Rizky（阿力）', value: 'Rizky' },
+  { label: 'Roya（萝雅）', value: 'Roya' },
+  { label: 'Arda（阿尔达）', value: 'Arda' },
+  { label: 'Hana（阿幸）', value: 'Hana' },
+  { label: 'Dolce（多尔切）', value: 'Dolce' },
+  { label: 'Jakub（雅克）', value: 'Jakub' },
+  { label: 'Griet（海娜）', value: 'Griet' },
+  { label: 'Eliška（艾莉卡）', value: 'Eliška' },
+  { label: 'Marina（玛丽娜）', value: 'Marina' },
+  { label: 'Siiri（西芮）', value: 'Siiri' },
+  { label: 'Ingrid（林恩）', value: 'Ingrid' },
+  { label: 'Sigga（海娜）', value: 'Sigga' },
+  { label: 'Bea（雅娜）', value: 'Bea' },
+  { label: 'Chloe（思怡）', value: 'Chloe' },
+  { label: 'Sunny（四川-晴儿）', value: 'Sunny' },
+  { label: 'Dylan（北京-晓东）', value: 'Dylan' },
+  { label: 'Eric（四川-程川）', value: 'Eric' },
+  { label: 'Peter（天津-李彼得）', value: 'Peter' },
+  { label: 'Joseph Chen（阿樸伯，闽南话）', value: 'Joseph Chen' },
+  { label: 'Marcus（陕西-秦川）', value: 'Marcus' },
+  { label: 'Li（南京-老李）', value: 'Li' },
+  { label: 'Kiki（粤语-阿清）', value: 'Kiki' },
+  { label: 'Rocky（粤语-阿强）', value: 'Rocky' }
+]
+
 // ============================================================
 //  提供商功能注册表（驱动参数按提供商显示）
 // ============================================================
@@ -1256,6 +1446,7 @@ const isTextOrVision = computed(() => form.value.type === 1 || form.value.type =
 const isTts = computed(() => form.value.type === 3)
 const isStt = computed(() => form.value.type === 4)
 const isAsr = computed(() => form.value.type === 6)
+const isLiveTranslate = computed(() => form.value.type === 7)
 
 const canFetchModels = computed(() => {
   // 编辑模式：只需要 baseUrl（假设后端已有 API Key）
@@ -1348,10 +1539,28 @@ watch(
           /* 非法 JSON 用默认 */
         }
       }
+      // LiveTranslate 默认参数：从 liveTranslateParams JSON 反序列化
+      ltParamsForm.value = getDefaultLtParams()
+      if (data.liveTranslateParams) {
+        try {
+          const lt = JSON.parse(data.liveTranslateParams)
+          if (lt.sourceLanguage !== undefined) ltParamsForm.value.sourceLanguage = lt.sourceLanguage ?? ''
+          if (lt.targetLanguage) ltParamsForm.value.targetLanguage = lt.targetLanguage
+          if (lt.voice) ltParamsForm.value.voice = lt.voice
+          if (lt.enableSourceTranscription !== undefined)
+            ltParamsForm.value.enableSourceTranscription = !!lt.enableSourceTranscription
+          if (lt.modalities)
+            ltParamsForm.value.modalities =
+              Array.isArray(lt.modalities) && lt.modalities.includes('audio') ? 'text_audio' : 'text'
+        } catch {
+          /* 非法 JSON 用默认 */
+        }
+      }
     } else {
       form.value = getDefaultForm()
       asrParamsForm.value = getDefaultAsrParams()
       sttParamsForm.value = getDefaultSttParams()
+      ltParamsForm.value = getDefaultLtParams()
     }
   },
   { immediate: true }
@@ -1426,6 +1635,7 @@ async function submit() {
     if (a.vocabularyId.trim()) asrPayload.vocabularyId = a.vocabularyId.trim()
     form.value.asrParams = JSON.stringify(asrPayload)
     form.value.sttParams = null
+    form.value.liveTranslateParams = null
   } else if (form.value.type === 4) {
     const s = sttParamsForm.value
     const sttPayload: Record<string, unknown> = {
@@ -1439,9 +1649,23 @@ async function submit() {
     if (s.vocabularyId.trim()) sttPayload.vocabularyId = s.vocabularyId.trim()
     form.value.sttParams = JSON.stringify(sttPayload)
     form.value.asrParams = null
+    form.value.liveTranslateParams = null
+  } else if (form.value.type === 7) {
+    const lt = ltParamsForm.value
+    const ltPayload: Record<string, unknown> = {
+      targetLanguage: lt.targetLanguage || 'en',
+      voice: lt.voice || 'Tina',
+      modalities: lt.modalities === 'text_audio' ? ['text', 'audio'] : ['text'],
+      enableSourceTranscription: lt.enableSourceTranscription
+    }
+    if (lt.sourceLanguage.trim()) ltPayload.sourceLanguage = lt.sourceLanguage.trim()
+    form.value.liveTranslateParams = JSON.stringify(ltPayload)
+    form.value.asrParams = null
+    form.value.sttParams = null
   } else {
     form.value.asrParams = null
     form.value.sttParams = null
+    form.value.liveTranslateParams = null
   }
 
   saving.value = true

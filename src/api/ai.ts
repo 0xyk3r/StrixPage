@@ -11,7 +11,7 @@ export interface AiModelConfigResp {
   id: string
   key: string
   name: string
-  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
+  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) 7=实时语音翻译 */
   type: number
   /** 0=自动识别 1=DashScope 2=DeepSeek 3=OpenAI 9=其他 */
   providerType?: number
@@ -67,6 +67,8 @@ export interface AiModelConfigResp {
   sttParams?: string
   /** TTS 合成默认参数（JSON 文本，TTS 专用） */
   ttsParams?: string
+  /** 实时语音翻译默认参数（JSON 文本，LiveTranslate 专用） */
+  liveTranslateParams?: string
   status: number
   remark?: string
   createdTime: string
@@ -76,7 +78,7 @@ export interface AiModelConfigResp {
 export interface AiModelConfigUpdateReq {
   key: string
   name: string
-  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) */
+  /** 1=TEXT 2=VISION 3=TTS 4=STT(离线) 5=IMAGE_GEN 6=ASR(实时) 7=实时语音翻译 */
   type: number
   /** 0=自动识别 1=DashScope 2=DeepSeek 3=OpenAI 9=其他 */
   providerType?: number
@@ -132,6 +134,8 @@ export interface AiModelConfigUpdateReq {
   sttParams?: string | null
   /** TTS 合成默认参数（JSON 文本，TTS 专用） */
   ttsParams?: string | null
+  /** 实时语音翻译默认参数（JSON 文本，LiveTranslate 专用） */
+  liveTranslateParams?: string | null
   status?: number
   remark?: string
 }

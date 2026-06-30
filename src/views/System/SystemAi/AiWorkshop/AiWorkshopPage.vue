@@ -10,6 +10,9 @@
       <n-tab-pane name="image" tab="图片生成">
         <ai-workshop-image :models="models" />
       </n-tab-pane>
+      <n-tab-pane name="live-translate" tab="实时语音翻译">
+        <ai-workshop-live-translate :models="models" />
+      </n-tab-pane>
     </n-tabs>
   </div>
 </template>
@@ -20,6 +23,7 @@ import { aiApi } from '@/api/ai'
 import AiWorkshopTts from './AiWorkshopTts.vue'
 import AiWorkshopStt from './AiWorkshopStt.vue'
 import AiWorkshopImage from './AiWorkshopImage.vue'
+import AiWorkshopLiveTranslate from './AiWorkshopLiveTranslate.vue'
 
 const activeTab = ref('tts')
 const models = ref<AiModelConfigResp[]>([])

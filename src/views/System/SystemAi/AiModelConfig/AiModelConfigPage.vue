@@ -22,8 +22,15 @@
     <div class="nbp-toolbar ain-toolbar">
       <div class="ain-filters">
         <label class="nbp-search ain-search">
-          <svg class="nbp-search__icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.5">
+          <svg
+            class="nbp-search__icon"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>
@@ -85,8 +92,8 @@
         <div class="ain-card__head">
           <div class="ain-card__type-badge">
             <span :class="['ain-type-badge', `ain-type-badge--${item.type}`]">{{
-                MODEL_TYPE_LABEL[item.type] ?? 'UNKNOWN'
-              }}</span>
+              MODEL_TYPE_LABEL[item.type] ?? 'UNKNOWN'
+            }}</span>
           </div>
           <div class="ain-card__status">
             <span :class="['ain-status-dot', { 'is-active': item.status === 1 }]"></span>
@@ -168,7 +175,8 @@ const MODEL_TYPE_LABEL: Record<number, string> = {
   3: 'TTS',
   4: 'STT',
   5: 'IMAGE',
-  6: 'ASR'
+  6: 'ASR',
+  7: 'TRANSLATE'
 }
 
 const typeLegend: [number, string][] = [
@@ -177,7 +185,8 @@ const typeLegend: [number, string][] = [
   [3, 'TTS'],
   [4, 'STT'],
   [5, 'IMAGE'],
-  [6, 'ASR']
+  [6, 'ASR'],
+  [7, 'TRANSLATE']
 ]
 
 const typeOptions = Object.entries(MODEL_TYPE_LABEL).map(([v, l]) => ({
@@ -314,27 +323,39 @@ onMounted(() => loadList())
 }
 
 /* Type colors */
-.ain-type-dot--1, .ain-stripe--type1, .ain-type-badge--1 {
+.ain-type-dot--1,
+.ain-stripe--type1,
+.ain-type-badge--1 {
   --type-color: #70c0e8;
 }
 
-.ain-type-dot--2, .ain-stripe--type2, .ain-type-badge--2 {
+.ain-type-dot--2,
+.ain-stripe--type2,
+.ain-type-badge--2 {
   --type-color: #63e2b7;
 }
 
-.ain-type-dot--3, .ain-stripe--type3, .ain-type-badge--3 {
+.ain-type-dot--3,
+.ain-stripe--type3,
+.ain-type-badge--3 {
   --type-color: #f2c97d;
 }
 
-.ain-type-dot--4, .ain-stripe--type4, .ain-type-badge--4 {
+.ain-type-dot--4,
+.ain-stripe--type4,
+.ain-type-badge--4 {
   --type-color: #e88080;
 }
 
-.ain-type-dot--5, .ain-stripe--type5, .ain-type-badge--5 {
+.ain-type-dot--5,
+.ain-stripe--type5,
+.ain-type-badge--5 {
   --type-color: #c084fc;
 }
 
-.ain-type-dot--6, .ain-stripe--type6, .ain-type-badge--6 {
+.ain-type-dot--6,
+.ain-stripe--type6,
+.ain-type-badge--6 {
   --type-color: #fb923c;
 }
 
@@ -422,6 +443,17 @@ onMounted(() => loadList())
   border-color: #fb923c;
 }
 
+.ain-type-dot--7,
+.ain-stripe--type7,
+.ain-type-badge--7 {
+  --type-color: #34d399;
+}
+
+.ain-filter-type--7.is-active {
+  background: #34d399;
+  border-color: #34d399;
+}
+
 /* ─── Grid ─── */
 .ain-grid {
   display: grid;
@@ -437,9 +469,10 @@ onMounted(() => loadList())
   border-radius: 12px;
   overflow: hidden;
   animation: ain-card-in 0.35s var(--delay, 0s) both cubic-bezier(0.16, 1, 0.3, 1);
-  transition: border-color 0.25s,
-  transform 0.2s,
-  box-shadow 0.25s;
+  transition:
+    border-color 0.25s,
+    transform 0.2s,
+    box-shadow 0.25s;
 
   &:hover {
     border-color: var(--strix-border-accent);
